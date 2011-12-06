@@ -1,0 +1,14 @@
+-include local.config
+
+ifndef OMEGA_XSL
+OMEGA_XSL=${OMEGA_HOME}/Docs/XSL
+endif
+
+ifndef DB2LATEX_XSL
+DB2LATEX_XSL=$(OMEGA_XSL)/db2latex.xsl   
+endif
+
+%.tex: %.xml
+	xsltproc $(DB2LATEX_XSL) $< > $@
+
+

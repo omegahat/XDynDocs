@@ -1,0 +1,17 @@
+\frametitle {Supernova data}
+\begin{verbatim}
+      size decay      fit
+ [1,]    5 0.010 4.333333
+ [2,]    5 0.050 4.377778
+ [3,]    5 0.001 4.600000
+ [4,]   10 0.010 4.133333
+ [5,]   10 0.050 3.977778
+ [6,]   10 0.001 4.411111
+ [7,]   15 0.010 4.366667
+ [8,]   15 0.050 4.322222
+ [9,]   15 0.001 4.388889
+[10,]   20 0.010 4.422222
+[11,]   20 0.050 4.433333
+[12,]   20 0.001 4.511111
+\end{verbatim}
+Fit neural net with 10 hidden units and decay 0.05.  Repeat five times and average result.

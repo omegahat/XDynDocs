@@ -1,0 +1,28 @@
+Using db2latex to convert docbook markup to LaTeX.
+
+http://db2latex.sourceforge.net/
+
+----------
+
+The db2latex distribution doesn't run in xsltproc
+without first editing the file
+ xsl/common/common.xsl
+
+Change the name of the template 
+
+  <xsl:template name="question.answer.label">
+
+at line (approx.) 359 by preceeding the question.answer.label
+with some arbitrary string, e.g. "DUNCANquestion.answer.label"
+
+
+---------
+
+Put 
+
+ <rewriteURI uriStartString="http://www.sourceforge.net/projects/db2latex/release/xsl/" rewritePrefix="/Users/duncan/db2latex-xsl-0.8pre1/xsl/"/>
+
+into the catalog.xml file that is referenced by the XML_CATALOG_FILES environment variables which is used by
+xsltproc to find files locally.
+
+

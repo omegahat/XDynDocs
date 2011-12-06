@@ -1,0 +1,184 @@
+
+\begin{abstract}
+  We'll look at the general area of how we correct our code as we are
+  developing it to overcome the problems and ``bugs''.
+  We'll look at the tools that can help us within the R language, both
+  debugging tools and also some testing tools.
+  More importantly, we'll discuss the \textit{process} of debugging and the
+  mind skills, rather than then specific computational commands, that
+  one needs to develop to perform debugging efficiently and
+  effectively.  In addition to fixing bugs, it is also important to be
+  able to create test cases that find bugs or ``verify'' that there
+  are no bugs. This testing is an important part of ensuring that 
+  code is more general  than the one case we test it on.
+  We'll then discuss how to make code ``better'' in terms of making it
+  go faster, and identify some general principles and tools that can
+  be used to help this. Again, we want to focus on how to think about
+  these general problems and not just explain the syntax of the
+  commands. One needs to be able to adapt the approach for different
+  cases and be creative in considering considering various paths.
+
+\end{abstract}
+
+
+\section{The art of debugging}\label{sec:artOfDebugging}
+Ideally, we would be sufficiently careful and clever to write code so
+that it worked the first time.  And furthermore, we would ideally
+never have to modify it to do new things.  However, we generally make
+numerous mistakes even in a small segment of code consisting of just a
+few commands.  And we regularly return to code we wrote previously to
+adapt it to do something slightly different than we initially
+planned. Once we start making these changes, we often break the
+original code and have to go back and try to fix that feature while
+generalizing the code.  So, generally, we spend a lot of time fixing
+things rather than just writing and then executing the code. We
+oscillate between changing the code and (re-)running it to check that it
+works or gather information about what is wrong.  Generally, the
+development of computer commands and software is almost always an
+iterative process and at each iteration we gather data about what
+aspects of the code we might want to focus on in the next iteration.
+This is very much like data analysis.  We explore data through
+different numerical and graphical summaries trying to get an
+impression about how we might summarize or model it adequately, and
+then we proceed to fit these ``models''.  We then look at many
+different aspects of the results (e.g. residual plots) and return to
+the modeling process.  Debugging is often similar where we run code
+and compute intermediate and final results and verify that they meet
+our expectations or find out where they don't.
+
+It is almost absurd to think that somebody will write even five lines
+of code without some simple mistake. And mistakes come in numerous
+flavors. Being able to identify these errors rapidly and accurately
+saves a lot of time and importantly, allows us to continue to focus on
+the task at hand.  It is so easy to get distracted from this and let
+programming become a mahor ordeal and time-sink. Practice and
+experience really helps reduce this distraction. When we are doing
+data analysis, we do not want to focus on the computations necessary
+to see the aspect of the data in which we are immediately
+interested. But bugs and errors in our commands distract us yet
+further, furthering the focus onto the computations.  And this makes
+us less productive and becomes a serious problem as deadlines
+approach.  So it is very important that we learn, polish and maintain
+our skills in the art of debugging.  The main skills in debugging are
+reasoning about what could have given rise to particular outcomes or
+events and connecting the output to the code.  It requires a lot of
+conjecturing and reasoning to eliminate and prioritize the likely
+causes of the issues.  The bugs are specific to the problem and the
+class of common bugs are often specific to a language and indeed often
+to a specific programmer. But there is a general approach to and set
+of mental skills involved in debugging that transcend particular
+languages and are intrinsic to all computer debugging. Indeed, they
+are general problem solving skills. They involve diagnosing problems,
+gathering data and evidence, connecting it to possible explanations,
+testing the likelihood of the different explanations by both abstract
+thought and also performing other tests to gain more information.
+
+There are several general approaches or principles of debugging.
+Also, each language has its own error messages, debugging tools and
+also its own types of common bugs. We of course will focus on R.
+Debugging in lower-level languages such as C/C++ or Java involves a
+quite different interface. But the thought process is very
+similar. But for languages such as C/C++ which do not take care of
+memory management for the programmer have a rich and frustrating class
+of additional bugs. Fortunately, in R, we don't encounter these.
+However, we do often run into cases where code runs slowly because
+objects are not collected when we think they should. While these
+aren't bugs, they can make some computations infeasible or at least
+very slow. So they can become non-fatal bugs and we have to look at
+these with a different  mind-set and with different tools.
+
+
+If we find that a program gives strange or incorrect results, we neded
+to find out why. Before embarking on a potentially lengthy debugging
+session, it is important to make certain that it is the code that is
+wrong and not your expectation of what the right answer is. It is not
+as unusual as one might think that you the human and code writer have
+made a mistake in determining the expected result.  If you start
+changing the code to try to ``fix'' it, you will in face be breaking
+it.  So it is very valuable to have some cases that you have worked
+through manually, i.e.  on paper or with a different piece of code,
+that you can use to verify the results. You need to think of different
+typical and boundary-case inputs and determine the correct results.
+Then you can test the code on each of these and if the results agree,
+you can be more confident that the code is correct.  However you still
+have not verified this but merely got the response for a small set of
+inputs.
+
+So now that we are dealing with a case where the code is producing the
+wrong answer, we need to find the earliest point in that code that
+gives the ``wrong'' or unexpected intermediate result.  If we have
+just changed a particlar segment of the code, that would be the first
+place to look. However, when we have very llittle information about
+the potential cause, such as when it is not our code or we have
+changed lots of different pieces we might have to do what is called a
+binary search or bisection.  Essentially we consider the code as two
+pieces and place a check at the mid-point. If the results look correct
+at that point, we surmise that the error occurs in the second half.
+If the results are incorrect, then we look in the first half. And we
+can repeat this step many times by splitting the particular part,
+i.e. the first or second part and keep going until we find the
+particular expression or line of code that seems to be giving the
+error.  At any point, we determine if the results are erroneous by
+looking at a subset or all of the local variables.
+
+Bisection is a very generic style of debugging that makes use of no
+contextual information such as the nature of the erroneous results.
+For example, we might have a vector which as length $0$ rather than
+the same length as the inputs. Or we might have \NA{} values when we
+didn't expect any and that causes problems when doing further
+subseting.  Such characteristics will typically give one more specific
+locations of potential expressions that are causing the problems.
+Obviously, if a variable \rvar{x} has the wrong value, we should first
+look at expressions which assign a value to \rvar{x}. If there is
+nothing obvious there, we need look at the values going into those
+expressions and see if those intermediate values are correct.
+
+Regardless of whether we have some hunches or contextual information
+about the likely location of the problem, what we have discussed is
+looking at the values of different variables and expressions.  So we
+need to be able to do this while the function is running.  A very
+common approach that people use because of its apparent ``simplicity''
+is to add code that prints the values of various variables.  Then, as
+the code is run, we see these values appear on the console and we can
+review them to reason about what might be wrong. We are looking at
+evidence and adjusting our hypotheses or conjectures, eliminating
+some, giving less and more credence to others, and positing new
+explanations.
+
+Generally, adding code that simply prints variables is not a good
+idea.  It is a very basic approach to debugging. It is simple and so
+used by beginners and we all continue to use it for ``quick''
+debugging.  In R, adding simple call to \rfunc{print} or \rfunc{cat}
+is not usually a problem. However, it sometimes happens that the code
+we add has a bug or an error in it itself.  For example, we may call
+\rfunc{cat} with a complex object that \rfunc{cat} cannot handle, or
+we may have a type in the expression.  But more importantly, printing
+out numerous intermediate values can yield too much output that is
+hard to digest and hides the important information. So the output of
+interest should be chosen judiciously. A second problem with merely
+print the intermediate results is tat we often want to explore the
+object.  We want to do dynamic calculations on that object to explore
+it in ways that are suggested by its contents as we examine it. In
+other words, we want to investigate the object(s) in ways that will
+only become apparent when we look at it.  Of course, we can add
+additional commands to print out these further aspects of the
+object(s) and then run the example agai.
+
+
+
+
+Assign values so we can get to the same point without having
+to redo all the calculations. Necessary in lengthy computations.
+
+
+
+
+
+\input{profiling}
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

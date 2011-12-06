@@ -1,0 +1,259 @@
+
+<section>
+<title>The (very) Basics of Computers</title>
+
+Before we start using the computer for doing statistical computations,
+we should have some idea about how it works. We won't spend long on
+this as most of you will be already familiar with the ideas and there
+are many places to find additional information.  But it helps to both
+concretize our vocabulary and also avoid any misconceptions.
+We are only talking about regular desktops, laptops, mainframes, etc.
+here; we are not talking about embedded computational devices in
+cars, ATMs, cell phones, PDAs, etc.
+
+<para/> See <ulink
+url="computer.howstuffworks.com">computer.howstuffworks.com</ulink>
+for a lot of information.
+
+<para/>
+The computer is a general-purpose information processing device. 
+It takes input from people through devices such as a keyboard and mouse.
+Or, in some cases, it receives information via a microphone or
+a stylus and tablet.  
+These devices are all known as input devices. 
+Information also comes from removable storage devices such as a 
+floppy disk, CD, and DVD, and from  permanent storage devices such
+as a hard disk.  
+The internet is yet another means for obtaining information.
+The computer processes this information, and displays it or stores it.
+People receive this information via output devices, 
+such as a monitor, printer, or speaker.
+Information can be stored on a hard disk, written via a floppy drive
+or DVD drive onto removable storage devices, or sent over the 
+network somewhere else. 
+
+<para/>
+The computer comes in a case, i.e. a laptop, desktop "tower", or rack-mounted box. 
+Within this case, there are the "guts" of the machine that processes information.  
+Important internal components are the
+<itemizedlist>
+<listitem>
+motherboard
+</listitem>
+<listitem>
+CPU - Central Processing Unit
+</listitem>
+<listitem>
+RAM - Random Access Memory
+</listitem>
+<listitem>
+hard drive/disk
+</listitem>
+</itemizedlist>
+
+<para/>
+The <emphasis>motherboard</emphasis> is the physical board the connects the internal
+components and provides connectors for the other devices.  
+According to 
+<ulink
+url="computer.howstuffworks.com/motherboard.htm">computer.howstuffworks.com</ulink>:
+
+<quote>
+Think of a motherboard as a scale model of a futuristic city with many modular 
+plug-in buildings, each using power from a common electrical system. 
+Multiple-lane highways of various widths transport data between the buildings. 
+The motherboard is the data and power infrastructure for the entire computer. 
+</quote>
+
+The buildings in this city consist of memory chips, PCI slots for holding internal
+peripherals suchs the hard drive or graphics card, and the CPU.
+The highways are known as "busses" that connect the internal peripherals
+and components by moving data along conductors in the form of wires, etc.  
+And the external peripherals,
+such as network cards, floppy drives, CD and DVD drives,
+are connected via other busses such as USB, Firewire, etc.
+
+<para/>
+
+The highways form a multi-layered roadway system that carry signals and voltages 
+across the city. 
+Layered fabrication techniques are used so that some layers of the board carry 
+data and memory buses while other layers carry voltage and ground returns without 
+the roads short-circuiting at intersections. 
+The insulated layers are manufactured into one complete, complex sandwich. 
+Chips and sockets are soldered onto the motherboard.
+
+<para/> 
+
+The <emphasis>CPU</emphasis>, also called the microprocessor, 
+is at the heart of the computer.
+It is a complete computation engine fabricated on a single chip,
+such as a Pentium IV,  Celeron, or AMD chip.
+Fairly simple digital logic techniques within the CPU enables 
+the computer to do its work -- computation.
+Basically, the CPU executes a very limited set of
+instructions in sequence very, very fast.  A 3.0Ghz chip executes 3
+billion of these operations per second.  The instructions are things
+like fetch values from memory, put values in memory, perform
+arithmetic, branch on conditions.  Different chip designs allow it 
+different instructions to execute natively in the circuit and so very fast.
+Other things can be done in software by combining different primitive
+instructions to get new, higher-level commands.
+
+<para/>
+
+The CPU needs fast access to data in order to maximize its performance.
+If it had to go to the hard drive to retrieve data every time it needed it, 
+the CPU would operate very slowly because it would have to wait for the
+data to be fetched off the disk. 
+Instead, the data that the CPU needs gets moved from the storage device 
+into random access memory (RAM).
+RAM is volatile memory in that it disappears when the machine is turned off,
+unlike information on the hard drive which is stored permanently, 
+i.e. even when the machine is off. 
+The advantages of RAM are that the read/write speed is much faster than a hard drive,
+and the technology is geared toward accessing small pieces 
+of data at a time, unlike the technology of the hard drive.
+
+<para/>
+
+<emphasis>Random access memory</emphasis> is considered "random access" because you can access any 
+memory cell directly if you know its location, i.e. which cell it is in.
+Similar to a microprocessor, RAM is a chip, which is an integrated circuit 
+made of transistors and capacitors. 
+In the most common form of computer RAM, dynamic random access memory, 
+a transistor and a capacitor are paired to create a memory cell, 
+which represents a single bit of data. 
+The capacitor holds the bit of information -- a 0 or a 1, and
+the transistor acts as a switch that lets the cell be read or changed.
+A capacitor is like a small bucket that stores electrons, when 
+it is filled with electrons it contains a 1, and when empty it holds 0. 
+However, capacitors are leaky, and in a matter of a few milliseconds a 
+full capacitor loses its charge.  
+Therefore, the "full" capacitors must be constantly recharged -- thousands of times 
+a second.
+
+<para/>
+
+Even with RAM, it can still take too long for data to get from the memory chip to the CPU.
+To speed things up, small amounts of data are held in a cache right in the CPU. 
+In addition, a secondary cache typically resides on a memory card located near the CPU. 
+This supply has a direct connection to the CPU, and is static RAM.
+Unlike dynamic RAM, static RAM never has to be refreshed. 
+This makes it significantly faster than dynamic RAM. 
+However, because it has more parts, a static memory cell takes up a lot more space on a 
+chip than a dynamic memory cell. 
+Therefore, you get less memory per chip, and that makes static RAM a lot more expensive.
+
+<para/>
+
+Two other forms of memory are <emphasis>virtual memory</emphasis> and 
+<emphasis>read-only memory</emphasis> (ROM).
+Virtual memory sits on the hard disk.  
+The computer looks at RAM for areas that have not been used recently and copies 
+them onto the hard disk. 
+This frees up space in RAM to load new data. 
+This copying happens automatically, and it makes your computer feel like it 
+has unlimited RAM space. 
+Because hard disk space is so much cheaper than RAM chips, 
+it also has an economic benefit.
+However, for the reasons mentioned already, if the computer relies too heavily 
+on virtual memory, the CPU will operate too slowly. 
+
+<para/>
+
+Read-only memory (ROM), also known as firmware, is an integrated circuit programmed 
+with specific data when it is manufactured. 
+This memory is used to store the initial instructions the computer needs to start. 
+When we turn on a machine, it "boots" up which means that it 
+bootstraps itself into activity. It does this bootstrapping using
+its <emphasis>BIOS</emphasis> (Basic Input/Output System).  
+The BIOS instructions do things like test the hardware of the machine.
+In general, it provides the very, very low-level interface to the different 
+components of the machine and the peripherals.  
+This bootrapping step initializes the components and
+gets the machinery into working conditions, and then tries to find the
+operating system (or boot loader program) to which it will pass
+control.  This operating system might be Windows, Mac OSX, Linux, BSD
+or some other system.  It might be located on (one of) the hard
+drive(s), on a CD or even on another machine.
+
+<para/>
+
+The operating system, and specifically the kernel, is essentially a
+regular application that manages the resources of the machine. The
+kernel is run when the operating system is started and it can start
+other applications, allocate resources to these applications and
+basically coordinates access to the disks, file systems on the disks,
+network connectivity, screen, memory, and so on.
+
+At the simplest level, an operating system does two things:
+<itemizedlist>
+<listitem>
+It manages the hardware and software resources of the computer system. 
+These resources include such things as the processor, memory, disk space, etc.
+The operating system makes sure that each application gets the necessary resources 
+and shares these resources with the other applications running on the computer.
+</listitem>
+<listitem>
+It provides a stable, consistent way for applications and users to deal with the hardware 
+without having to know all its details.
+That is, the operating system provides a consistent application interface and user interface,
+no matter what particular type of computer it is runnning on.
+</listitem>
+</itemizedlist>
+
+<para/>
+
+A consistent application program interface (API) allows a software developer to 
+write an application on one computer and have a high level of confidence that it will 
+run on another computer of the same type, even if the amount of memory or the quantity of 
+storage is different on the two machines. 
+Also, an operating system can ensure that applications continue to run when hardware 
+upgrades and updates occur, 
+because the operating system and not the application is charged with managing the 
+hardware and the distribution of its resources. 
+
+<!-- 
+The path between the operating system and the hardware not on the computer's motherboard 
+goes through a special program called a driver. 
+The driver's main function is to be the translator between the electrical signals 
+of the hardware subsystems and the high-level programming languages of the operating system
+and application programs. 
+Drivers provide a way for applications to make use of hardware without having 
+to know every detail of the its operation.
+Similarly, application program interfaces let application programmers use functions of 
+the computer and operating system without having to directly keep track of all the 
+details in the CPU's operation.  -->
+
+
+When an application is running, it is executing commands in order.
+Each command may have inputs and will generate some outputs.  Often
+the order of the commands is conditional on previous outputs, so the
+program branches.  The inputs might be from the
+last command, and often involve getting results from commands much
+earlier.  To perform the instruction or command, the machine brings
+information directly to the CPU.  It stores the inputs, i.e.  very
+simple values such as numbers, logical values, etc. directly to the
+CPU registers.  And then it performs the
+operation and puts the result somewhere.  These inputs and outputs
+move to and from the registers to a local piece of memory,
+i.e. the cache, for immediate reuse.  When the
+cache gets full, they are moved to slower, but bigger areas of memory,
+namely RAM.  And when this gets full, from many
+users running many applications, things get stored in a very temporary
+area on a much bigger but much slower area which is the
+<emphasis>swap</emphasis> area on the hard drive/disk, i.e. the virtual memory.  
+As a result,
+as we use more memory, more input and output values are moved to
+progressively slower areas in terms of access.  So we try to minimize
+this movement, using as little memory as possible and also trying to use
+efficiently the memory that is closest to us.
+
+<para/>
+
+Generally, when performing computations there is a trade-off between
+memory and speed.  The more we hold around, i.e. the more memory we
+use, the faster computations are.
+
+</section>

@@ -1,0 +1,619 @@
+<?xml version="1.0"?>
+<!DOCTYPE slides>
+<!-- $Id $ -->
+
+<slides xmlns:xi='http://www.w3.org/2003/XInclude'
+        xmlns:s="http://cm.bell-labs.com/stat/S4">
+<slidesinfo>
+<title>How Computers Work</title>
+  <author><firstname>Duncan</firstname><surname>Temple  Lang</surname></author>
+  <copyright><year>2004</year><holder>Duncan Temple Lang</holder></copyright>
+</slidesinfo>
+
+
+<foil>
+<title>Recap</title>
+
+<itemizedlist>
+<listitem>
+
+This class is about learning practical skills for doing statistical
+computing: data analysis and simulation.
+
+</listitem>
+
+<listitem>
+People often learn how things are implemented in statistical software
+systems so that they can create new algorithms efficiently using those
+clever techniques.  This is far less common than using the computer to
+analyze data. So we will focus on learning skills for accessing data,
+manipulating them, doing high-level statistical analyses on them,
+reporting the results.  The statistical methodology we will look at in
+particular is computer intensive and involves resampling,
+e.g. bootstrapping and cross validation.
+</listitem>
+
+<listitem>
+The syllabus is
+<ulink url="CourseOutline.html">course outline</ulink>.
+</listitem>
+</itemizedlist>
+
+</foil>
+
+<foilgroup>
+<title>How do Computers Work</title>
+
+<foil>
+<title>How do Computers Work</title>
+
+<itemizedlist>
+ <listitem>Basic components</listitem>
+ <listitem>How they work together</listitem>
+ <listitem>Representing numbers in a computer</listitem>
+</itemizedlist>
+</foil>
+
+<foil>
+ <title>The Components of a Computer</title>
+ <itemizedlist>
+   <listitem>Case</listitem>
+   <listitem>Input devices: mouse, keyboard</listitem>
+   <listitem>Output device:  monitor/screen, serial
+   connection</listitem>
+   <listitem>External devices:
+     <itemizedlist>
+      <listitem>Printers</listitem>
+      <listitem>Scanner</listitem>
+     </itemizedlist>
+   </listitem>
+   <listitem>Internals
+     <itemizedlist>
+      <listitem>
+         <ulink url="motherboard-small.jpg">Motherboard</ulink>
+         <?line-break?>
+         <ulink url="motherboard.jpg">detailed view</ulink>
+      </listitem>
+      <listitem>
+        Central Processing Unit = <ulink url="microprocessor-p4-alone.jpg">CPU</ulink> (a.k.a. chip)
+      </listitem>   
+      <listitem>
+       Random Access Memory = <ulink url="SDRAM.jpg">RAM</ulink>
+       <?line-break?>
+        <emphasis>volatile</emphasis>
+      </listitem>  
+      <listitem>
+       Hard drives/disks
+       <?line-break?>
+        <emphasis>Permanent</emphasis>
+      </listitem>
+      <listitem>
+         CD-DVD, floppy, ...
+      </listitem>
+      <listitem>
+         <ulink url="videoCard2.jpg">video</ulink>, network, sound cards, etc.
+      </listitem>
+     </itemizedlist>
+   </listitem>
+ </itemizedlist>
+</foil>
+
+
+<foil>
+<title>Connecting the pieces</title>
+ <itemizedlist>
+  <listitem>
+    Motherboard is the frame that connects them altogether
+  </listitem>
+  <listitem>
+    Communication and data busses move data and instructions.
+   between them
+    <?line-break?>
+      Electrical current along very, very small wires.
+  </listitem>
+  <listitem>
+     CPU and RAM fit into slots on motherboard
+  </listitem>  
+  <listitem>
+     Ribbons connect motherboard and  drives (and CD/DVD)
+  </listitem>
+  <listitem>
+    keyboard, mouse, USB devices, on  <ulink url="connectors.jpg">special connectors</ulink>
+     on motherboard.
+  </listitem>
+ </itemizedlist>
+</foil>
+
+<foil>
+<title>How does the machine work: Boot Sequence</title>
+
+ When we turn on the machine
+ the BIOS =  <emphasis>Basic Input Output System </emphasis>
+ does machine-level initializiation
+ <itemizedlist>
+  <listitem>
+    initializes devices
+  </listitem>
+  <listitem>
+    sets up motherboard, interrupts, etc.
+  </listitem>
+  <listitem>
+   looks to load the operating system
+   <?break-line?>  
+    searches the bootable devices: disk, CD, floppy, ...
+  </listitem>
+  <listitem>
+   hands control over to the operating systems:
+    <?line-break?>
+     Linux, MacOSX, Unix, Windows 2000, XP, NT, ME, CE, ...
+  </listitem>
+ </itemizedlist>
+</foil>
+
+<foil>
+<title>The Operating System</title>
+ <itemizedlist>
+  <listitem>
+   the operating system is essentially a program
+    <?line-break?>
+    the kernel
+  </listitem>
+  <listitem>
+   manages and synchronizes resources of the machine
+   <itemizedlist>
+    <listitem>
+     access to disks
+   </listitem>
+   <listitem>
+     allocation of memory
+   </listitem>
+   <listitem>
+      access to devices
+   </listitem>
+   <listitem>
+     starting new applications
+   </listitem>
+   </itemizedlist>
+  </listitem>
+   <listitem>
+     On a multi-tasking, multi-user system, the OS
+     acts like a "parent"
+   </listitem>
+ </itemizedlist>
+ 
+  It starts the application(s) with which 
+  we can start other programs, etc.
+</foil>
+
+
+<foil>
+ <title>Software</title>
+
+ <itemizedlist>
+ <listitem>
+   Each program (e.g. R, Matlab, the kernel itself)
+   is compiled to run on a particular type of machine:
+   <?line-break?>
+    compiled object/machine code.
+ </listitem>
+ <listitem>
+   software is mapped to a sequence of very low-level,
+   simple instructions that are understood by the particular
+   type of CPU.
+ </listitem>
+ <listitem>
+   instructions include:
+    <itemizedlist>
+    <listitem>
+      arithmetic: add, subtract, multiply, divide
+    </listitem>
+    <listitem>
+     access memory: fetch and store values
+    </listitem>
+    <listitem>
+     decision making:
+       <?line-break?>
+        compare values and do different things
+        if equal or not equal.
+    </listitem>
+    </itemizedlist>
+ </listitem>
+
+ <listitem> 
+  <ulink url="microprocessor1.gif">CPU pipeline</ulink>
+ </listitem>
+
+ <listitem>
+   Chip speed = number of instructions per second
+   <?line-break?>
+     3GHz = 3 billion instructions per second
+ </listitem>
+ <listitem>
+   Intel i386 chip has very different instructions
+   than PowerPC (Mac) chips
+    <?line-break?>
+     so can't compare speeds!
+ </listitem>
+ </itemizedlist>
+
+</foil>
+
+<foil>
+<title>Data and the CPU</title>
+<itemizedlist>
+  <listitem>
+   Most instructions have inputs
+   <?line-break?>
+   e.g.  add  x1 and x2
+   <?line-break?>
+          compare 'a' and 'c'
+  </listitem>
+
+  <listitem>
+   Fetch inputs from memory onto registers
+  </listitem>
+  <listitem>
+    Access to RAM is much slower than local registers
+  </listitem>
+  <listitem>
+    When exhaust supply of RAM, we use <emphasis>virtual</emphasis>
+    memory (swap space)
+  </listitem>
+  <listitem>
+   Virtual memory is even slower than RAM
+   <?line-break?>
+      hard drive access
+  </listitem>
+</itemizedlist>
+</foil>
+
+<foil>
+ <title>Speed of the Computer</title>
+
+ <itemizedlist>
+  <listitem>Scientific computing often concerned with efficiency</listitem>
+  <listitem><quote>Premature optimization is the root of all evil</quote>
+       Donald Knuth</listitem>
+  <listitem>In other words, 
+     <itemizedlist>
+      <listitem> 
+        first get things working 
+      </listitem>
+      <listitem> 
+        then figure out if they are adequate
+      </listitem>
+      <listitem>
+        if not, fix the important/large bottlenecks
+      </listitem>
+     </itemizedlist>
+   </listitem>         
+
+   <listitem>
+   <quote>It is easier to optimize correct code than to 
+       correct optimized code</quote>
+   </listitem>
+ </itemizedlist>
+</foil>
+
+<foil>
+<title></title>
+ <itemizedlist>
+   <listitem>
+    Speed of CPU is not the speed of the computer
+      <?line-break?> 
+      just one component.
+   </listitem>
+   <listitem>
+     CPU must wait for data to be available on registers
+   </listitem>
+   <listitem>
+      data comes from
+        <itemizedlist>
+          <listitem> L2 cache</listitem>,
+          <listitem> RAM</listitem>, 
+          <listitem>swap space on disk</listitem>
+        </itemizedlist>
+   </listitem>
+ </itemizedlist>
+</foil>
+
+
+<foil>
+<title>Why do we need to know this</title>
+
+<itemizedlist>
+
+<listitem>
+ When a machine fails, we want to be able to try to diagnose
+ the problem, and consider possible solutions.
+</listitem>
+ <listitem>
+  When computations get slow or fail, we need to know 
+  what are the likely causes
+ </listitem>
+<listitem>
+ We need to be able to understand the capabilities of
+  the technology
+</listitem>
+ <listitem>
+  When buying machines for projects, we want to be able
+  to understand the different options and trade-offs.
+ </listitem>
+</itemizedlist>
+</foil>
+
+</foilgroup>
+
+<foilgroup>
+<title>Representing Data on a Computer</title>
+
+<foil>
+ <title>Bits and Bytes</title>
+
+<itemizedlist>
+<listitem>
+ Computer technology based on very simple binary
+ state:  ON or OFF.
+</listitem>
+<listitem>
+  Data is stored in memory as a sequence of BITs
+  <?line-break?>
+    Binary Digit = BIT, coined by <ulink url="http://cm.bell-labs.com/who/tukey">J. W. Tukey</ulink>!
+</listitem>
+<listitem>
+ A machine accesses data in units of a "BYTE".
+ <?line-break?>
+ 1 byte = 8 bits
+</listitem>
+</itemizedlist>
+
+</foil>
+
+
+<foil>
+ <title>Integers</title>
+ <itemizedlist>
+  <listitem>
+   How can we represent an integer in the computer?
+  </listitem> 
+
+  <listitem>
+   Can we represent them all?
+   <?line-break?>
+    If not, how many?
+  </listitem>
+ </itemizedlist>
+
+</foil>
+
+<foil>
+<title>One Possible Representation</title>
+ <emphasis> This is NOT what we do!</emphasis>
+
+<itemizedlist>
+<listitem>
+  Record each digit &amp; the number of digits.
+</listitem>
+
+<listitem>
+  Do arithmetic by matching the digits 
+  by position and doing the usual arithmetic.
+</listitem>
+
+ <listitem>
+  
+   <itemizedlist>
+    <listitem>
+      1234 = {4, {1, 2, 3, 4}}
+    </listitem>
+    <listitem>
+      92312312314123213 = {17, {9, 2, 3, 1, 2, 3, 1, 2, 3, 1, 4, 1, 2, 3, 2, 1, 3}}
+    </listitem>
+   </itemizedlist>
+
+ </listitem>
+
+<listitem>
+ Infinite precision.
+</listitem>
+
+<listitem>
+ Any problems?
+</listitem>
+</itemizedlist>
+
+</foil>
+
+<foil>
+<title>IEEE Approach</title>
+
+<itemizedlist>
+ <listitem>
+  Use 4 BYTES = 32 bits to represent an integer.
+ </listitem>
+
+ <listitem>
+  Each bit is either on or off.
+ </listitem>
+
+ <listitem>
+   The value of the integer is the sum of
+   the powers of 2, i.e. 2<superscript>i</superscript>
+   where i is the position of the bit (starting at 0).
+ </listitem>
+
+ <listitem>
+  The 2<superscript>i</superscript> only counts if
+  the corresponding bit is 1.
+ </listitem>
+
+  <listitem>
+<mediaobject>
+<imageobject>
+<imagedata fileref="bit.jpg" format="JPG"/>
+</imageobject>
+<caption>
+<para>Representation of a 4 byte integer.
+</para>
+</caption>
+</mediaobject>
+  </listitem>
+
+<listitem>
+ What's wrong with this?
+</listitem>
+</itemizedlist>
+
+</foil>
+
+<foil>
+<title>Negative Values</title>
+
+<itemizedlist>
+<listitem>
+ The only possible values are 0, 1, 2, 3, ...., 2<superscript>32</superscript> - 1
+</listitem>
+
+<listitem>
+  We need negative values also!
+</listitem>
+
+<listitem>
+ Subtract  2<superscript>31</superscript>
+</listitem>
+
+<listitem>
+  So an integer is represented as 
+  <?line-break?>
+  Sum<superscript>31</superscript><subscript>i=0</subscript>  2<superscript>i</superscript> * x<subscript>i</subscript>
+     - 2<superscript>31</superscript>
+</listitem>
+
+
+<listitem>
+  <informaltable>
+  <tgroup cols='2'>
+  <tbody>
+  <row><entry>Largest possible integer:</entry><entry> 2147483647</entry></row>
+  <row><entry>Smallest possible integer:</entry><entry> -2147483648</entry></row>
+  </tbody>
+  </tgroup>
+  </informaltable>
+</listitem>
+</itemizedlist>
+
+</foil>
+
+
+<foil>
+<title>Some examples</title>
+
+<itemizedlist>
+<listitem>
+  This is just base 2, rather than decimal/base 10.
+</listitem>
+
+<listitem>
+  What is the corresponding integer value for the binary representation  111?
+</listitem>
+
+<listitem>
+  Write the decimal value 23 in base 2.
+</listitem>
+
+<listitem>
+  Account for the subtraction of 2<superscript>31</superscript> in the above.
+</listitem>
+
+</itemizedlist>
+
+</foil>
+
+
+<foil>
+<title>Problems</title>
+
+ <itemizedlist>
+  <listitem>
+    We can only represent integers with the range  [-2147483648, 2147483647]
+  </listitem>
+  <listitem>
+    1 + 2 = 3
+    <?line-break?>
+     Still in the range.
+  </listitem>
+   <listitem>
+      2147483647 + 1 ?
+    </listitem>
+
+   <listitem>
+      111111...111 + 0000000....001  = 10000000000000000000000...000
+    <?line-break?>
+     We need a 33rd bit to store the result = 2<superscript>32</superscript>
+   </listitem>
+   <listitem>
+      Look at this in R:
+<s:output>
+> 2147483647 + 1
+[1] 2147483648
+> as.integer(as.integer(2147483647) + as.integer(1))
+[1] NA
+Warning message: 
+NAs produced by integer overflow in: as.integer(2147483647) + as.integer(1) 
+> 
+</s:output>
+   </listitem>
+
+  <listitem>
+   In some languages, result is 0.
+    <?line-break?>
+    WHY?
+  </listitem>
+ </itemizedlist>
+
+</foil>
+
+
+<foil>
+<title>Other Approaches</title>
+<itemizedlist>
+<listitem>
+There are other possible approaches and some are used:
+<itemizedlist>
+<listitem>
+ two's complement
+</listitem>
+<listitem>
+ one's-complement
+</listitem>
+</itemizedlist>
+</listitem>
+
+<listitem>
+<ulink
+url="http://winnie.ucdavis.edu/stat141/Winter04/RPackages/Rbits_1.0.tar.gz">Rbits</url>
+package allows you to see the bit patterns in an intger
+</listitem>
+</itemizedlist>
+</foil>
+
+</foilgroup>
+
+<foil>
+<title>Next Topics</title>
+
+<itemizedlist>
+<listitem>
+ Representing Real Numbers
+  <?line-break?>
+  approximations, pitfalls, ...
+</listitem>
+<listitem>
+ Taxonomy of programming languages 
+  and systems for statistics.
+</listitem>
+</itemizedlist>
+
+</foil>
+
+</slides>

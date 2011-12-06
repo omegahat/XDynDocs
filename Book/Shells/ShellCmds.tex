@@ -1,0 +1,234 @@
+
+The directory name can be relative to where you are or absolute. 
+Suppose you are in the directory /home/nolan/stat133, and it contains a directory notes. 
+The next three commands all change the directory to /home/nolan/stat133/notes.
+
+\begin{itemize}
+\item \shellCmd{cd notes} -- The directory name is relative to the current directory
+\item \shellCmd{cd /home/nolan/stat133/notes} -- Here we have supplied
+the full pathname to find the directory
+
+\item \shellCmd{cd \~/stat133/notes} -- We use the symbol \shellCmd{\~} to 
+ refer to the user's root directory, which in this example is /home/nolan.
+
+\item \shellCmd{cd ../} -- This relative change is to the directory above the current directory, i.e. to /home/nolan/stat133
+
+\item \shellCmd{cd ../stat205} -- This relative change is to the directory 
+at the same level of the tree as the current directory i.e. /home/nolan/stat205 
+
+
+\item \shellCmd{tail \textit{filename}} -- shows the last lines of a file
+\end{itemize}
+
+{Example}
+Let's create a system of files and directories that matches the
+handout from Friday.
+
+\begin{verbatim}
+> mkdir Test
+> cd Test
+Test> touch x
+Test> touch file1.tex
+Test> mkdir A
+Test> mkdir A/B
+Test> cd A
+Test/A> touch file2.tex
+Test/A> touch file3.csv
+Test/A> mkdir C
+Test/A> touch C/x
+Test/A> touch B/file4.doc
+Test/A> touch B/file5.txt
+Test/A> mkdir B/D
+Test/A> touch B/D/x
+Test/A> touch B/D/x2
+\end{verbatim}
+
+
+From within the Test directory that we set up 
+we see the directory A and the two files x and file1.tex.
+\begin{verbatim}
+> ls
+A  myfile.tex  x
+\end{verbatim}
+
+The \shellKey{-R} option say recurse your way through the tree of subdirectories excuting the \shellCmd{ls} command as you go.
+
+{\small{
+\begin{verbatim}
+> ls -R
+.:
+A  file1.tex  x
+./A:
+B  C  file2.tex  file3.csv
+./A/B:
+D  file4.doc  file5.txt
+./A/B/D:
+x  x2
+./A/C:
+x
+\end{verbatim}
+}}
+
+
+{\shellArg{*} -- the wild card}
+
+The * symbol matches any number of characters (except the /). It can be quite handy when looking for files that have particular type.
+
+Below we list only those files with the filetype extension of \texttt{tex}
+in the subdirectory A:
+\begin{verbatim}
+> ls A/*.tex
+
+A/report.tex
+
+> ls -R *.tex
+
+ls: No match.
+\end{verbatim}
+
+Can you explain why the second command does not find any files with
+the filetype \texttt{tex}?
+
+{Piping \shellArg{$|$}}
+
+We can construct more complex shell commands by piping or sending the output 
+from one comand to the input of another.
+Below we pipe the output from the \shellArg{ls} command to the 
+\shellCmd{wc} comand.
+
+\begin{verbatim}
+> ls -R | wc
+
+  33      29     140
+\end{verbatim}
+
+\shellCmd{wc} -- short for word count, returns the number of newlines, words, 
+and bytes in the input file.
+Does this mean that there are 33 files in the Example directory?
+
+{\shellCmd{find} --  search for files in a directory hierarchy}
+
+The \shellCmd{find} command may be better suited to the previous task.
+\begin{verbatim}
+> find -name '*.tex'
+
+./A/report.tex
+\end{verbatim}
+
+We can also do fancier finds, such as all tex files 
+in my home area that have been modified within the past 21 days.
+\begin{verbatim}
+> find /home/nolan/ -mtime +21 -name '*.tex' | wc -l
+
+2421
+\end{verbatim}
+
+Or, we can find all those files that do not end with .tex
+in the working directory.
+\begin{verbatim}
+> find . -type f -not -name '*.tex'
+\end{verbatim}
+
+
+{\shellCmd{grep} -- print lines matching a pattern}
+
+With \shellCmd{grep} we can search for patterns within a file.
+The syntax is\\
+\shellCmd{grep [options] PATTERN [FILE...]}.
+
+Suppose we want to find all files that have the words "data frame"
+in them.
+\begin{verbatim}
+> grep -lR 'data frame' *
+
+DataTypes/Assignment.tex
+DataTypes/Lists.tex
+Introduction/introduction.tex
+ShellCmds/.ShellCmds.tex.swp
+Traffic/traffic.tex
+schedule
+\end{verbatim}
+
+
+To invert the match we can use the \shellKey{-v} option
+to the \shellKey{grep} command. 
+
+\begin{verbatim}
+> grep -lRv 'data frame' * | more
+DataTypes/DataTypes.tex
+DataTypes/htmlPDF.pdf
+DataTypes/DataTypes.log
+DataTypes/DataTypes.aux
+DataTypes/DataTypes.pdf
+DataTypes/pdfFiles.tex
+...
+DataTypes/ExampleLatex2.log
+DataTypes/ExampleLatex2.aux
+DataTypes/ExampleLatex2.pdf
+--More--
+\end{verbatim}
+
+Here the \shellCmd{more} command formats the output being sent to the 
+console so that you see one page at a time, rather than have the 
+whole output go whizzing past.
+\\
+To proceed to the next page of output hit the space bar.
+\\
+To stop displaying the output hit \shellCmd{q} 
+
+{Other useful aspects of the Shell commands}
+
+\begin{itemize}
+\item \shellArg{$>$ and $>>$} -- redirection
+
+At times we want to save the output from a command to a file.
+We can do this by redirecting the output to a file. We use the 
+single $>$ to direct the output to a new file (it will also overwrite
+an existing file), and we use the double $>>$ if we want to add
+the output to an existing file.
+
+\item \shellCmd{chmod} -- change permissions on files and directories.
+
+In Unix we can define groups of users, such as all student accounts for 
+Stat133, or all faculty accounts, or all graduate studnet accounts. 
+The \shellCmd{chmod} command allows us to set specific permissions for
+the owner of the file, the group that the owner belongs to, and for
+all other accounts.
+The \shellKey{-l} option on the \shellCmd{ls} command provides the permissions.
+
+\begin{verbatim}
+Test> ls -l
+total 4
+drwxr-xr-x    4 nolan    nolan        4096 Sep 19 11:54 A
+-rw-r--r--    1 nolan    nolan           0 Sep 19 11:53 file1.tex
+-rw-r--r--    1 nolan    nolan           0 Sep 19 11:53 x
+
+Test> chmod g+w *
+Test> ls -l
+total 4
+drwxrwxr-x    4 nolan    nolan        4096 Sep 19 11:54 A
+-rw-rw-r--    1 nolan    nolan           0 Sep 19 11:53 file1.tex
+-rw-rw-r--    1 nolan    nolan           0 Sep 19 11:53 x
+\end{verbatim}
+
+\item \shellCmd{sort} -- sort lines of text files
+\item \shellCmd{uniq} -- remove duplicate lines from a sorted file
+\item \shellCmd{cat} -- concatenate files and print on the standard output
+\item \shellCmd{tail} - output the last part of files
+\end{itemize}
+
+Process controls
+\begin{itemize}
+\item \shellCmd{ps} - report a snapshot of the current processes.
+\item \shellCmd{kill} - send a signal to a process
+\end{itemize}
+
+More advanced shell techniques
+\begin{itemize}
+\item \shellCmd{sed} --a stream editor.  
+A stream editor is used to perform basic text transformations on an 
+input stream (a file or input from  a  pipeline).
+
+\item It is possible to write shell scripts, i.e. programs with
+loops and variables, and excute these at the command line
+\end{itemize}

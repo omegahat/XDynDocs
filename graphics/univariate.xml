@@ -1,0 +1,206 @@
+All univariate plots suck in some ways.
+But they are all useful, especially when
+  customized with color, glyph. 
+  used with multiple variables  on the same plot
+  or added to multi-dimensional plots, e.g. margins on a scatterplot, rugs
+                                            on a dendogram
+
+  examples
+   illustrate the different ways to combine and what one can see.
+
+Go from univariate to specific multivariate/composite.
+
+   Start with a set of numbers (sample)
+      rug
+      histogram
+       compare plot views
+      second set of numbers (i.e. new sample)
+        compare the distributions using what plot
+          categorically located rugs (stripchart(x,y)
+          superimposed/juxtaposed histograms
+      suppose before and after measurements => relationship across observational units
+         parallel coords
+         scatterplot
+         difference => univariate -> histogram
+
+
+<lookup>Synthetic or real data? 
+Do we have to use concrete examples from real data
+and risk switching between datasets to illustrate
+points. Probably a mixture of both.
+Synthetic is okay here because we are using the computer to
+generate it. So it is simulation!  Additionally, we will
+use GUIs to control properties of the plots.
+</lookup>
+
+Summary:
+   Rapid tour of the plot types weaving between univariate and multi and composite
+   Then introduce other plot types and what they are good for in the same manner.
+   Connect the plot types.
+      stacked bar chart -> side by side (bars within a plot and multiple plots)
+       -> boxplots or time series example in Bill's Book on doctorates awarded
+       by year and program/faculty.
+
+
+Introduce a scatterplot 
+    visualize display using GGobi and R.
+       identify mode
+       identify across plots - linked plots.
+
+       identify in R from GGobi - i.e. an event in GGobi
+         handled in R that then prints to the console the
+         entire record.
+
+       spreadsheet - Gnumeric plugin for GGobi.
+
+
+Exhaust the standard plot types
+
+
+
+
+
+
+
+Quantitative - continuous
+	Rug, point graph/strip chart 
+	 	Uses: Used at the bottom of a scatterplot to see one-dimensional 
+		distribution of the two variables.
+		Also used for comparing groups of data (multiple point graphs 
+		juxtaposed side-by-side on the same graph).
+		When there are few data, the rug can show their positions.  
+
+		Construction aspects: The data points are plotted along a line 
+		(invisible for a point graph). For a run, the scale line is used.
+		If there is overlap in a point graph, then the plotting symbols are
+		moved slightly off the line to distinguish them. 
+		 
+		How to read: look for range, clumping, gaps, outliers. 
+
+		Dangers: difficult to see anything with significant overlap of 
+		data points 
+
+		R-command: hist(), breaks, freq, probability, axes,
+
+
+	Histogram
+	 	Uses: Shows the general shape of the distribution of values.
+
+		Construction aspects: area = percent or count, end point convention,
+		discrete values (e.g. soda consumption). Unequal bin widths can
+		better portray the shape of the distriubtion, eg. narrow bins in
+		the peak areas and wide bins in the tail areas.
+		 
+		How to read: The histogram portrays data density. Look for peaks, 
+		modality, tails, and symmetry. Approximate quantiles can be read
+		from a histogram.
+
+		Dangers: Do not mistake for a bar graph. The bin-width can 
+		significantly change the view of the distribution, and the 
+		precision. 
+
+		R-command: hist(), breaks, freq, probability, axes,
+
+
+	Box graph
+	 	Uses: A visual presentation of five percentiles (10, 25, 50, 75, 
+		and 90) and possible outliers. 
+
+<question>
+Does the box help comparisons across boxplots
+by giving an individual object to compare ``on top'' of the
+dashed lines</question>
+
+		Construction aspects: Box denotes the upper and lower quantiles with
+		the median marked in the box. the whiskers extend from either end of 
+		the box to the 10/90th percentile. Observations beyond the whiskers
+		are denoted with separate plotting symbols.
+		 
+		How to read: tails, symmetry, outliers, specific quantiles.
+		Most useful in comparisons across groups.
+
+		Dangers: the width of the box does not have any meaning, symmetry and
+		modality may be hidden. there are many variations on the boxplot,
+		be sure you know what the box and whiskers denote.
+
+		R-command: hist(), breaks, freq, probability, axes,
+
+
+	Percentile plot - Empirical CDF
+	 	Uses: 
+
+		Construction aspects: 
+		 
+		How to read: 
+
+		Dangers: 
+
+		R-command: 
+
+
+	Normal quantile plot
+	 	Uses: 
+
+		Construction aspects: 
+		 
+		How to read: 
+
+		Dangers: 
+
+		R-command: 
+
+
+	Parallel Coordinates
+
+
+Category
+	Bar chart
+	 	Uses: 
+
+		Construction aspects: 
+		 
+		How to read: 
+
+		Dangers: 
+
+		R-command: 
+
+	Dot chart
+	 	Uses: 
+
+		Construction aspects: 
+		 
+		How to read: 
+
+		Dangers: 
+
+		R-command: 
+
+ 	Pie chart
+	 	Uses: 
+
+		Construction aspects: 
+		 
+		How to read: 
+
+		Dangers: 
+
+		R-command: 
+
+	Table
+	 	Uses: 
+
+		Construction aspects: 
+		 
+		How to read: 
+
+		Dangers: 
+
+		R-command: 
+
+        Mosaic plots
+
+
+Quantitative - discrete
+
+  ordered factors

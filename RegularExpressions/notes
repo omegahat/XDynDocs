@@ -1,0 +1,80 @@
+Motivation
+  Applications
+    filters
+    extracting data
+    replacing text.
+  Different 
+literals
+
+Non-literals/metacharacters
+  ^ and $ 
+
+Escaping to get literals
+ . and \.
+ \*
+ In R, need extra-escaping.
+
+\b, \B, \<, \>
+
+
+Character sets: [] and [^]
+  0-9 a-z A-Z
+  named sets.  [[:class-name:]] and [^[:class-name:]]
+    alnum, alpha, blank, cntrl digit, graph, lower, print, punct, space, upper, xdigit.
+
+  special metacharacters not meta inside []
+
+  [^] match the complement of this list, not "don't match what is in this list"
+
+repetition: * (0 or more times), ? (0 or 1), + (at least once)
+
+
+           {m} and  {m,n}  - n >= m
+
+Backreference:
+   \\n,  1 <= n  <= 9
+
+   (.*)-\\1
+
+character, character set, subexpressions or backreference.
+
+Sub-expressions:
+  alternatives:  |
+
+
+greedy, so match as mutch as possible.
+
+
+Substitution.
+
+
+Examples:
+  file names in RSpamData.
+  is HTML message
+
+
+  -999 with NA
+
+  replace all " "
+
+  trim white space.
+     gsub("^[ \t]+|[ \t]+$", "", x)
+
+  domain name of a machine.
+  IP address of a machine.
+
+  Hexadecimal number (RGB)
+
+  replacing From with X-From:
+  the To, Cc, Bcc in the mail messages.
+  boundary string
+  
+
+  Web log:
+  Mail logs:
+
+
+References:
+ Tom Lord's Regex documentation
+ Mastering Regular Expressions
+ Perl

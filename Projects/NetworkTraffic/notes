@@ -1,0 +1,7 @@
+Fix the dates.
+
+Create them as REALs and leave them as UNIX time stamps
+select FROM_UNIXTIME(first_packet) from TCPConnections where conn < 2;
+
+
+What are the 1/0, N/N, etc.

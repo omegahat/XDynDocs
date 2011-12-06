@@ -1,0 +1,85 @@
+\documentclass[11pt]{article}
+\usepackage{times}
+\usepackage{comment}
+\usepackage{fullpage}
+\def\SFunction#1{\textbf{#1()}}
+
+\title{
+ Homework 2 Additional Questions \hfil Stat 141, Winter '06   \\
+}
+\begin{document}
+\maketitle
+
+These are  not required questions but are for those
+who are interested to explore.
+
+\begin{itemize}
+  \item 
+
+  Use the acceptance/rejection method to sample from a Gamma$(2, 3)$
+  density.  If you are feeling adventurous, you can write code for
+  general shape and rate/scale parameters, with scale $\ge 1$.  While
+  one can do it generally, you can do experiments or write the code
+  with a particular (non-trivial) $(\alpha, beta)$ pair.  But you
+  should try it for different pairs then.
+  
+  One could use the uniform density to majorize the target
+  distribution. Determine where the mode lies and what is the density
+  at that value. That tells you what value of $c$ is needed to find $c
+  g(x) \ge f(x), \forall x \in [0, \infty)$.
+
+  To try to reduce the number of rejections, you can find a better 
+  majorizing function, $g(x)$.
+  You can try the double-exponential, defined as 
+$$
+  g_X(x) = \frac{\theta}{2}e^{-\theta \vert x - \eta \vert}
+$$  
+   choosing $\eta$ as the mode of $f_X(x)$.
+
+   Use the computer to generate a sample from the Gamma$(2, 3)$ using
+   these two majorizing densities. Ensure that the results are close to the
+   Gamma$(2, 3)$ density by looking at Q-Q plots, or overlaying the Gamma
+   density on a histogram of the sample values, etc.  
+
+   Note that there are two approaches to sampling from a
+   double-exponential. One is to use the inverse CDF method and the
+   other is to work from \SFunction{rexp} and randomly
+   decide which ones to make negative.
+
+   Do both and determine which is more efficient. Is this
+   efficiency a function of the parameters of the Gamma distribution?
+   Can one calculate the (expected) rejection rate mathematically?
+
+  \item 
+   Consider a Beta$(2, 3)$ random  variable.
+   It is defined for $x \in [0, 1]$.
+   Use the uniform majorizing function
+   to sample from this density.
+   Also, consider the Epanechnikov
+   density.
+   This is defined as 
+$$
+  g_U(x) = \frac{3}{4}(1 - u^2), \qquad u \in [-1, 1]
+$$ 
+   If you scale and shift the range to $[0, 1]$, you end 
+  up with a Beta$(2, 2)$ density which has the ``special''
+  form
+$$
+  g_X(x) = 6x(1-x), \qquad x \in [0, 1]
+$$
+ Find a value of $c$ such that $c g_X(x) \ge f_X(x)$
+ for all $x$ where $f_X(x)$ is the density of the Beta$(2, 3)$.
+ You can use R to get an approximate value for $c$,
+ by plotting the curves and/or evaluating the functions
+ at many different values along the unit interval.
+ 
+ Having decided on a value for $c$ for each majorizing function, plot
+ the sampling regions for the two majorizing functions, i.e. $c g(x)$.
+ Can you tell which one will be have a higher acceptance rate?
+
+ For the Epanechnikov, you can calculate the CDF for this and then use
+ its inverse to generate samples from $g_X(x)$.  
+
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,547 @@
+<?xml version='1.0'?>
+
+<article xmlns:r="http://www.r-project.org"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<artheader>
+ <title>Evaluating Aptness of a Regression Model
+ <footnote>
+   <para>Adapted by Jamie Julin as a dynamic document in R from the
+   article by the same title found in the Datasets and Stories section
+   of the Journal of Statistics Education:
+    <ulink url="http://www.amstat.org/publications/jse/v15n2/datasets.matson.html">
+    http://www.amstat.org/publications/jse/v15n2/datasets.matson.html
+  </ulink>. 
+   </para>
+  </footnote>
+
+</title>
+ <authorgroup><author><firstname>Jack</firstname><surname>Mason</surname></author>
+ <author><firstname>Brian</firstname><surname>Huguenard</surname></author> 
+</authorgroup>
+</artheader>
+
+<invisible>
+<r:init><![CDATA[
+aptness= read.csv("aptness.csv")
+library(digest)
+]]>
+library(lattice)
+
+</r:init>
+</invisible>
+
+<abstract>
+<para>
+The data for <r:expr showCode="false">nrow(aptness)</r:expr> software
+projects is used to develop a linear regression model that uses
+function points (a measure of software project size) to predict
+development effort. The data set is particularly interesting in that
+it violates several of the assumptions required of a linear model; but
+when the data are transformed, the data set satisfies those
+assumptions. In addition to graphical techniques for evaluating model
+aptness, specific tests for normality of the error terms and for slope
+are demonstrated. The data set makes for an excellent case problem for
+demonstrating the development and evaluation of a linear regression
+model.
+</para>
+</abstract>
+
+
+<section><title>Introduction</title>
+
+<para>
+For any organization involved with the creation of computer software,
+the ability to predict development effort plays a key role in the
+effective management of the software development process.  Regression
+models based on a software metric called function points are an
+important tool used in the estimation of software development
+effort. Through these regression models a manager can compare
+estimated development effort across multiple proposed projects and
+make intelligent decisions concerning scheduling and priority of the
+projects. In this paper we develop and evaluate a linear regression
+model that predicts software development work hours based on a
+function point measure of software size.
+</para>
+
+<section>
+<title>Function Point Analysis</title>
+
+<para>
+Function points are a standard metric used for estimating the size of
+software development projects (<citation><biblioref
+linkend="bib:FcnPtGrp05"/></citation>). Function point analysis is a
+structured method of estimating the size and complexity of a software
+system. This estimation process is based on the breaking down of a
+system into smaller components called function points, which measure
+different types of business functionality delivered by the system to
+the end user. Function points provide a means of measuring the system
+functionality perceived by the end user, and are independent of the
+technology (computer language, operating system, etc.) used to
+implement the system. Once a count of the function points for a
+proposed system has been developed, the count can be compared to
+historical function point counts for completed systems. Using the
+known development times of the completed systems, an estimate of the
+development effort required for the proposed system can be generated.
+</para>
+
+<para>
+When a new software project is being planned, the number and types of
+function points for the project can be estimated from the design
+specifications, thus making it possible to estimate development effort
+during the early phases of project planning. In addition, since the
+function point count is derived from the design specifications, any
+changes in the specifications (which occur frequently during software
+development) can be easily accounted for in the estimate of
+development effort.
+</para>
+
+<para>
+There are five basic types of function points: external inputs (data
+coming from the user or some other system), external outputs (reports
+or messages going out to the user or some other system), external
+inquiries (queries coming from outside the system which result in a
+report being sent to the requestor), internal logical files (data
+files that reside within the boundaries of the system), and external
+interface files (data files that reside outside the boundaries of the
+system). Standardized criteria have been developed to allow the
+consistent identification and categorization of function points from
+the design specifications of a proposed system, or from the actual
+features of an existing system (<citation><biblioref
+linkend="bib:FcnPtGrp05"/></citation>). Once an initial count of
+function points has been generated, it is adjusted to allow for the
+overall complexity of the system, using a standardized system of
+weights that account for 14 different system factors (for a more
+detailed account of the adjustment process, see <citation><biblioref
+linkend="bib:FcnPtGrp01"/></citation>). The final adjusted function
+point measure (FP) is then complete, and serves as an objective
+measure of the system's size and complexity.
+</para>
+</section>
+
+
+<section>
+<title>The Data Set</title>
+
+<para>
+The data used in this paper are from <r:expr>nrow(aptness)</r:expr>
+software projects completed at AT&amp;T from 1986 through 1991.  For
+each project five values are recorded: the adjusted function point
+count, the actual work hours devoted to completing the project, the
+operating system used, the database management system used, and the
+programming language used. The adjusted function point count is the
+only predictor variable discussed in detail in this paper. One unique
+aspect of this data set is the fact that the projects represent a
+total of 7,981 man-months or 665 man-years of effort. This is a very
+large set of software projects. The project data represent both new
+project development and project enhancements, and the data are not
+ordered by time or any other variable. <xref
+linkend="fig:histFcnPts"/> and <xref linkend="fig:histWorkHours"/>
+show the distribution of function points and work hours.
+</para>
+
+<figure id="fig:histFcnPts">
+<title>Function Points</title>
+
+<r:plot width="700" height="700" showCode="false">
+densityplot(~ aptness$functionpoints, xlab="Function Points", ylab="Frequency",
+ main="Histogram of Function Points")
+</r:plot>
+
+</figure>
+
+<figure id="fig:histWorkHours">
+<title>Work Hours</title>
+
+<r:plot  width="700" height="700">
+hist(aptness$workhours, 15, xlab="Work Hours", ylab="Frequency",
+ main="Histogram of Work Hours")
+</r:plot>
+
+</figure>
+</section>
+
+<section>
+<title>The Objective</title>
+
+<para>
+This paper presents a methodology for the development of a linear
+regression model for estimating software development effort using
+historical function point data. In developing a useful regression
+model, a number of concerns must be addressed. The first is model
+adequacy, or explanatory power of the independent variable in
+accounting for the variability of the dependent variable. This is
+typically measured by the coefficient of determination, R<superscript>2</superscript>. A large
+value of R<superscript>2</superscript> is a good indication of how well the model fits the
+data. However, it is not the only measure of a good model when the
+model is to be used to make inferences. Linear regression models are
+tied to certain assumptions about the distribution of the error
+terms. If these are seriously violated, then the model is not useful
+for making inferences.  Therefore, it is important to consider the
+aptness of the model for the data before further analysis based on
+that model is undertaken. Model aptness refers to the conformity of
+the behavior of the residuals to the underlying assumptions for the
+error values in the model. When a regression model is built from a set
+of data, it must be shown that the model meets the statistical
+assumptions of a linear model in order to conduct inference. Residual
+analysis is an effective means of examining the assumptions. This
+method is used to check the following statistical assumptions for a
+simple linear regression model:
+</para>
+
+<itemizedlist mark="number">
+<listitem>
+<para>
+the regression function is linear in the parameters, 
+</para>
+</listitem>
+<listitem>
+<para>
+the error terms have constant variance,  
+</para>
+</listitem>
+<listitem>
+<para>
+the error terms are normally distributed, and  
+</para>
+</listitem>
+<listitem>
+<para>
+the error terms are independent. 
+</para>
+</listitem>
+</itemizedlist>
+
+<para>
+If any of the statistical assumptions of the model are not met, then
+the model is not appropriate for the data. The fourth assumption
+(independence of error terms) is relevant when the data constitute a
+time series. Since the data in this paper is not time series data, we
+do not test for independence of the error terms.
+</para>
+
+<para>
+Residual analysis uses some simple graphic methods for studying the
+aptness of a model, as well as some formal statistical tests for doing
+so. In addition, when a model does not satisfy these assumptions,
+certain transformations of the data might be done so that these
+assumptions are reasonably satisfied for the transformed model.
+</para>
+
+</section>
+</section>
+
+<section>
+<title>Methodology</title>
+
+<para>
+The following procedure was used to develop and evaluate the
+regression model:
+</para>
+
+<itemizedlist mark="number">
+<listitem>
+<para>
+Plot the dependent variable against the (various) predictor variable(s). 
+</para>
+</listitem>
+<listitem>
+<para>
+Hypothesize a model.  
+</para>
+</listitem>
+<listitem>
+<para>
+Check if the statistical assumptions for the regression model are
+reasonably satisfied. If so, an appropriate model has been
+identified. If not, repeat steps (2) and (3).
+</para>
+</listitem>
+</itemizedlist>
+
+
+<section>
+<title>Straight Line Model</title>
+
+<invisible>
+<r:code>
+reg1=lm(aptness$workhours~aptness$functionpoints)
+int1=reg1$coefficients[1]
+coef1=reg1$coefficients[2]
+</r:code>
+</invisible>
+
+<para>
+The scatter plot shown in <xref linkend="fig:hoursVSpoints"/>
+indicates that a simple linear regression model might be appropriate
+for our project data. In particular, the fitted regression model is
+
+<informalequation>
+E-est = <r:expr digits="1">int1</r:expr> + <r:expr digits="1">coef1</r:expr>(FP)
+</informalequation>
+
+where E-est is the estimated development hours and FP is the size in
+function points. The coefficient of determination
+(R<superscript>2</superscript>) for this model is <r:expr
+digits="3">cor(aptness$functionpoints,aptness$workhours)^2</r:expr>. The
+results for the simple linear regression model are shown in <xref
+linkend="tab:coeffs"/>.
+</para>
+
+<figure id="fig:hoursVSpoints">
+<title>Scatter plot of work hours against function points</title>
+
+<r:plot  width="700" height="700">
+plot(aptness$functionpoints, aptness$workhours, ylab="Work Hours",
+xlab="Function Points", main="Work Hours vs. Function Points")
+</r:plot>
+
+</figure>
+
+
+<table id="tab:coeffs">
+<title>Coefficients from fitted model</title>
+
+<tgroup cols="1">
+<tbody>
+<row>
+<entry>
+<r:code showCode="false">
+summary(reg1)$coefficients
+</r:code>
+</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+
+
+<para>
+To determine the adequacy of the model, residual analysis should be
+performed. <xref linkend="fig:ResidsVsPoints"/> shows the plot of
+residuals against the independent variable (function points).
+</para>
+
+
+<figure id="fig:ResidsVsPoints">
+<title>Scatter plot of residuals against function points</title>
+
+<r:plot width="700" height="700">
+plot(aptness$functionpoints, reg1$residuals, xlab="Function Points",
+ylab="Residuals", main="Residuals vs Function Points")
+</r:plot>
+
+</figure>
+
+
+<para>
+The spread of residuals around zero increases as function points
+increase for this plot. Ideally, the residuals should fluctuate in a
+more or less uniform band around zero. The residuals shown in <xref
+linkend="fig:ResidsVsPoints"/> get larger as software size in function
+points increases, an indication that the error variance is not
+constant. The project data violate the equal variance assumption.
+</para>
+
+<invisible>
+<r:code>
+ks1 = ks.test(reg1$residuals, "pnorm")
+</r:code>
+</invisible>
+
+<para>
+A normal probability plot of the residuals can be used to test the
+normality of the error terms. The normal probability plot in <xref
+linkend="fig:QQResids"/> is not linear, an indication that this
+assumption is also being violated. A Kolmogorov-Smirnov (K-S) test for
+normality resulted in a p-value less than .001, a second indication
+that the error terms are not normally distributed.
+</para>
+
+
+<figure id="fig:QQResids">
+<title>Normal-quantile plot of residuals</title>
+
+<r:plot  width="700" height="700">
+qqnorm(reg1$residuals, xlab="Residuals", ylab="Percent", main="Normal-quantiles vs. Residuals")
+qqline(reg1$residuals)
+</r:plot>
+</figure>
+
+<para>
+Based on the results of the residual analysis, if inference about
+development effort is to be conducted, then fitting function points by
+simple linear regression model is inappropriate. The model violates
+the constant error variance and normality assumptions.
+</para>
+
+</section>
+
+<section>
+<title>Regression Model Using Transformed Data</title>
+
+<para>
+Some sort of transformation is often used to deal with the lack of
+constant variance. A common way of stabilizing the variance is to
+apply a logarithmic transformation to the data. Applying this
+transformation to the dependent and independent variables and plotting
+the transformed data (<xref linkend="fig:LogHoursVsPoints"/>), a linear
+relationship can be seen between the natural logarithm of development
+effort and the natural logarithm of function points.
+</para>
+
+<invisible>
+<r:code><![CDATA[
+reg2=lm(log(aptness$workhours)~log(aptness$functionpoints))
+int2=reg2$coefficients[1]
+coef2=reg2$coefficients[2]
+]]>
+</r:code>
+</invisible>
+
+<para>
+The regression model built from the transformed project data is as follows: 
+
+<informalequation>
+ln(E-est) = <r:expr digits="1">int2</r:expr> + <r:expr digits="1">coef2</r:expr>*ln(FP)
+</informalequation>
+
+where ln(E-est) is the natural logarithm of estimated development
+hours and ln(FP) is the natural logarithm of function points. The
+coefficient of determination (R<superscript>2</superscript>) for this
+model is <r:expr
+digits="3">cor(log(aptness$functionpoints),log(aptness$workhours))^2</r:expr>. The
+results for this regression are shown in <xref
+linkend="tab:LogCoeffs"/>.
+</para>
+
+
+<figure id="fig:LogHoursVsPoints">
+<title>Scatter plot of log work hours against log function points</title>
+
+<r:plot  width="700" height="700">
+plot(log(aptness$functionpoints), log(aptness$workhours), ylab="Log Work Hours",
+xlab="Log Function Points", main="log Work Hours vs. Log Function Points")
+</r:plot>
+</figure>
+
+
+
+
+
+<table id="tab:LogCoeffs">
+<title>Regression Coeeficients from log fit</title>
+
+<tgroup cols="1">
+<tbody>
+<row>
+<entry>
+
+<r:code showCode="false">
+summary(reg2)$coefficients
+</r:code>
+
+</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+
+<para>
+The next step is to check the equal variance and normality
+assumptions. A scatter plot of the residuals against the independent
+variable (natural logarithm of function points) is shown in <xref
+linkend="fig:ResidsVsLogPoints"/>. No pattern in the residual data is
+apparent. The logarithmic transformation resolved the problem with
+increasing variance of error terms that existed with the project data
+in its original form.
+</para>
+
+
+<figure id="fig:ResidsVsLogPoints">
+<title>Scatter plot of residuals against log function points.</title>
+
+<r:plot  width="700" height="700">
+plot(log(aptness$functionpoints), reg2$residuals, xlab="Log Function Points",
+ylab="Residuals", main="Residuals vs Log Function Points")
+</r:plot>
+</figure>
+
+<invisible>
+<r:code>
+ks2 = ks.test(reg2$residuals, "pnorm")
+</r:code>
+</invisible>
+
+<para>
+To check the error terms for normality, a histogram of the residuals
+and a normal probability plot of residuals are shown in <xref
+linkend="fig:HistResidsLog"/> and <xref linkend="fig:QQResidsLog"/>,
+respectively. The normal probability plot is nearly linear, indicating
+that the error terms are normally distributed. The shape of the
+histogram supports this conclusion. In addition, a K-S test for
+normality resulted in a p-value of <r:expr
+digits="3">ks2$p.value</r:expr>. The K-S test provides further support
+for the error terms being normally distributed.
+</para>
+
+
+<figure id="fig:HistResidsLog">
+<title>Residuals from log-linear fit</title>
+<r:plot  width="700" height="700">
+hist(reg2$residuals,10, main="Histogram of Residuals", xlab="Residual",
+ylab="Frequency")
+</r:plot>
+</figure>
+
+<figure id="fig:QQResidsLog">
+<title>Normal-quantile plots of residuals from log-linear fit</title>
+<r:plot  width="700" height="700">
+qqnorm(reg2$residuals, xlab="Residual", ylab="Percent", main="Normal-quantiles vs. Residuals")
+qqline(reg2$residuals)
+</r:plot>
+</figure>
+
+<para>
+Therefore, the second apparently satisfies the assumptions of equal
+variance and normality. Thus, the log-linear mode is appropriate for
+the transformed project data.
+</para>
+
+</section>
+
+</section>
+
+<ackno>
+ACKNOWLEDGEMENT: The authors wish to acknowledge Linda Hughes and Mary
+Dale of AT&amp;T for their assistance in providing the data set.
+</ackno>
+
+
+<bibliography  xmlns:r="http://www.r-project.org"
+         xmlns:omg="http://www.omegahat.org"
+         xmlns:bioc="http://www.bioconductor.org"
+         xmlns:js="http://www.r-project.org"
+         xmlns:jsx="http://www.ecmascript.org">
+
+<biblioentry id="bib:FcnPtGrp01">
+<title>Function Point Counting Practices Manual, release 4.1.1</title>
+<corpauthor>
+International Function Point Users Group</corpauthor>
+<publisher>
+<ulink url=" http://www.ifpug.org/publications/manual.htm">
+http://www.ifpug.org/publications/manual.htm</ulink></publisher>
+<pubdate>2001</pubdate>
+</biblioentry>
+
+<biblioentry id="bib:FcnPtGrp05">
+<title>About Function Point Analysis</title>
+<corpauthor>
+International Function Point Users Group</corpauthor>
+<publisher><ulink url=" http://www.ifpug.org/about/about.htm">
+http://www.ifpug.org/about/about.htm</ulink></publisher>
+<pubdate>2005</pubdate>
+</biblioentry>
+
+</bibliography>
+</article>

@@ -1,0 +1,105 @@
+\documentclass{article}
+\usepackage{times}
+\usepackage{fullpage}
+
+\def\SVariable#1{\textit{#1}}
+\def\SFunction#1{\textbf{#1()}}
+\def\SArg#1{\textsl{#1}}
+
+\begin{document}
+
+In this homework, we will do several things.
+We will parse HTML/XML output in R to
+get data into R.
+We will also see how  we can mimick a Web browser
+and download pages, specifically dynamic pages,
+from within a programming language like R.
+And finally we will look at measures
+for the commonality of Web pages.
+Specifically, we will explore how 
+Web pages that are returned for a Google
+search refer to each other and/or common pages.
+
+
+The first task is to go to the Google
+web site using your browser and enter a query.
+We want to retrieve the results and
+construct a vector of the links for
+the queries.
+To do this, we need to parse the HTML
+file returned by Google and extract the relevant
+\verb+<a href="...">+ elements.
+Save the result of the Google query 
+to a file on your disk.
+Then, use 
+\SFunction{htmlTreeParse}
+to parse the resulting file.
+This will create a parse tree 
+with all the elements.
+
+
+Write a function that traverses the tree
+and extracts all the links for the query.
+Ignore the standard links to other Google
+services, etc. and just return the ones
+that are for the search.
+You'll have to figure out how to identify those
+generally.
+
+Now, for each of the URLs returned by Google,
+fetch the links in that page.
+Use the hybrid parsing technique (i.e. via the 
+\SArg{handlers} argument) to 
+gather all these links.
+
+
+Now we will try to setup a mechanism
+to run the query directly from R
+and avoid having to go to the browser
+and save the file.
+We want a function, call it \SFunction{google}, that
+we can call with a query.
+The function will send the query to the Google
+Web server and get the result back.
+To do this, you need to
+use a socket connection and send the
+request using the low-level HTTP protocol
+that the Web browser and the Web server 
+use to communicate.
+Before we can send the query, we must establish
+a communication channel between R and the Web server.
+\begin{verbatim}
+ con = socketConnection("www.google.com", 80, open = "w+", blocking = TRUE)
+\end{verbatim}
+We can then send and receive HTTP communications
+between R and the Google server.
+
+For the query "a simple query" that we would enter in the
+Google text field for the search, the HTTP request is
+\begin{verbatim}
+GET /search?hl=en&ie=ISO-8859-1&oe=ISO-8859-1&q=a+simple+query&btnG=Google+Search
+\end{verbatim}
+When sending the query, we have to map certain characters to their
+hexadecimal equivalent.
+See \SFunction{htmlSubstituteCharacters} and
+\SVariable{HTMLCharacterSet}.
+
+To read the result back into R can be tricky.
+We have to handle different possible communication mechanisms
+from the Web server.  It can be as simple as using
+\SFunction{readLines}.
+If the server sends the response back in ``chunks'',
+then we have to be more careful.
+See \SFunction{readChunks}
+and related functions.
+
+
+
+
+
+Look at www.kartoo.com
+
+
+
+\end{document}
+

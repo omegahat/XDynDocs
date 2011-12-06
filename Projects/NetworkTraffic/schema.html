@@ -1,0 +1,558 @@
+<HTML xmlns:bib="http://www.bibliography.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Field Descriptions for TCP connections  Attributes</title>
+</head>
+<body>
+<h1>Field Descriptions for TCP connections  Attributes</h1>
+<table>
+<tr>
+<th>Field name</th>
+<th>Description</th>
+</tr>
+  <tr>
+<td>conn</td>
+<td>Unique identifier for each connection in the relation.</td>
+</tr>
+
+  <tr>
+<td>host_a</td>
+<td>The IP address of the a machine involved in the
+	connection. This is usually the machine that initiated the connection.
+        </td>
+</tr>
+
+  <tr>
+<td>host_b</td>
+<td>The IP address of the 'b' machine in the connection.
+         This is usually the machine that was contacted by the 
+         host a machine.
+        </td>
+</tr>
+
+  <tr>
+<td>port_a</td>
+<td>The port number used by the application on the a host
+	machine for this connection. Port numbers can be associated
+        with services and applications by relating them to the
+	Services table in the database.
+         If this is a low number (e.g. less than 1024), it corresponds
+        to a well-known service. This is more likely to be the case
+        for the port_b field below as clients connect to servers 
+        on their well known ports.
+          </td>
+</tr>
+
+  <tr>
+<td>port_b</td>
+<td>The port number for the b host machine in the
+	connection. If this is a server machine, the port will
+        indicate what the application is that created the connection.
+        This is found by relating the port number to the Services table.
+       </td>
+</tr>
+
+  <tr>
+<td>first_packet</td>
+<td>The time of the first packet sent in the connection,
+	i.e. the  SYN packet establishing the connection.
+        This time is UNIX time, i.e. the number seconds since midnight on
+	January 1st, 1970. </td>
+</tr>
+
+  <tr>
+<td>last_packet</td>
+<td>The time of the last packet in the connection, again in
+	UNIX time.</td>
+</tr>
+
+  <tr>
+<td>total_packets_a2b</td>
+<td>The total number of packets sent from host a to host b
+	in this connection.</td>
+</tr>
+
+  <tr>
+<td>total_packets_b2a</td>
+<td>The total number of packets sent from host b to host a
+	in this connection.</td>
+</tr>
+
+  <tr>
+<td>resets_sent_a2b</td>
+<td>The number of communications from host a to host b within the connection that
+	 requested that the connection be reset.  These are packets
+         with the RST flag set.</td>
+</tr>
+
+  <tr>
+<td>resets_sent_b2a</td>
+<td>The number of packets with the RST flag set sent from
+	host b to host a.</td>
+</tr>
+
+  <tr>
+<td>ack_pkts_sent_a2b</td>
+<td>The number of packets that had the ACKnowledgement flag
+	set, i.e. providing feedback to host b from host a that it had
+ 	seen certain packets. </td>
+</tr>
+
+  <tr>
+<td>ack_pkts_sent_b2a</td>
+<td>The number of ACKnowledgement packets sent from host b
+	to host a.</td>
+</tr>
+
+  <tr>
+<td>pure_acks_sent_a2b</td>
+<td>The number of packets from host a to host b that only had the ACKnowledgement
+	flag set and not any of the DATA, SYN, FIN or RST flags set.</td>
+</tr>
+
+  <tr>
+<td>pure_acks_sent_b2a</td>
+<td>Same as the previous but for packets from host b to host a.</td>
+</tr>
+
+  <tr>
+<td>sack_pkts_sent_a2b</td>
+<td>The number of packets from host a to host b containing
+	an ACKnowlesgemet and a Selective ACKnowledgement flag. </td>
+</tr>
+
+  <tr>
+<td>sack_pkts_sent_b2a</td>
+<td>Same as previous but for host b to host a packets.</td>
+</tr>
+
+  <tr>
+<td>dsack_pkts_sent_a2b</td>
+<td>The number of packets containing a Delayed ACKnowledgement flag sent from
+	host a to host b. </td>
+</tr>
+
+  <tr>
+<td>dsack_pkts_sent_b2a</td>
+<td>Same as above for host b to host a packets.</td>
+</tr>
+
+  <tr>
+<td>max_sack_blks_ack_a2b</td>
+<td>Most SACKnowledgement blocks in a single
+	ACKnowledgement from host a to host b.</td>
+</tr>
+
+  <tr>
+<td>max_sack_blks_ack_b2a</td>
+<td>Same as previous for reverse direction.</td>
+</tr>
+
+  <tr>
+<td>unique_bytes_sent_a2b</td>
+<td>The total number of non-retransmitted  bytes sent from host a to
+	host b.  This can be used along with the total number of
+	transmitted bytes to determine how many bytes were
+	re-transmitted and hence "lost". </td>
+</tr>
+
+  <tr>
+<td>unique_bytes_sent_b2a</td>
+<td>Same as above for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>actual_data_pkts_a2b</td>
+<td>The number of segments of data sent from host a to host
+	b.</td>
+</tr>
+
+  <tr>
+<td>actual_data_pkts_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>actual_data_bytes_a2b</td>
+<td>The number of bytes of data sent from host a to host b.</td>
+</tr>
+
+  <tr>
+<td>actual_data_bytes_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>rexmt_data_pkts_a2b</td>
+<td>The number of retransmitted packets from host a to host b.</td>
+</tr>
+
+  <tr>
+<td>rexmt_data_pkts_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>rexmt_data_bytes_a2b</td>
+<td>The number of retransmitted bytes from host a to host b.</td>
+</tr>
+
+  <tr>
+<td>rexmt_data_bytes_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>zwnd_probe_pkts_a2b</td>
+<td>The number of zero window probe packets sent from host a to
+	host b.  These are packets inquiring about the buffer size on
+	the other machine.</td>
+</tr>
+
+  <tr>
+<td>zwnd_probe_pkts_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>zwnd_probe_bytes_a2b</td>
+<td>The number of zero window probe bytes sent from host a to
+	host b.  These are packets inquiring about the buffer size on
+	the other machine.</td>
+</tr>
+
+  <tr>
+<td>zwnd_probe_bytes_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>outoforder_pkts_a2b</td>
+<td>The number of out of order packets that were sent from
+  	   host a to host b, i.e. received out of order by host b.</td>
+</tr>
+
+  <tr>
+<td>outoforder_pkts_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>pushed_data_pkts_a2b</td>
+<td>The number of packets sent from host a to host b with
+	the  PUSH bit set, i.e. basic transfer of data rather than
+	transmission control.</td>
+</tr>
+
+  <tr>
+<td>pushed_data_pkts_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>SYN_pkts_sent_a2b</td>
+<td>The number of SYNchronization packets sent from host a
+	to host b.</td>
+</tr>
+
+  <tr>
+<td>FIN_pkts_sent_a2b</td>
+<td>The number of FINish packets sent from host a
+	to host b.</td>
+</tr>
+
+  <tr>
+<td>SYN_pkts_sent_b2a</td>
+<td>Same as two previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>FIN_pkts_sent_b2a</td>
+<td>Same as above but for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>req_1323_ws_a2b</td>
+<td>Logical value indicating whether the '1323' window
+	scaling was requested by host a.</td>
+</tr>
+
+  <tr>
+<td>req_1323_ts_a2b</td>
+<td>Logical value indicating whether the '1323' time stamp
+	was requested by host a.</td>
+</tr>
+
+  <tr>
+<td>req_1323_ws_b2a</td>
+<td>Logical value indicating whether the '1323' window
+	scaling was requested by host b.</td>
+</tr>
+
+  <tr>
+<td>req_1323_ts_b2a</td>
+<td>Logical value indicating whether the '1323' time stamp
+	was requested by host b.</td>
+</tr>
+
+  <tr>
+<td>adv_wind_scale_a2b</td>
+<td>Window scale factor for host a to host b.</td>
+</tr>
+
+  <tr>
+<td>adv_wind_scale_b2a</td>
+<td>Window scale factor for host b to host s.</td>
+</tr>
+
+  <tr>
+<td>req_sack_a2b</td>
+<td>Logical value indicating whether host a requested
+	Synchronized Acknowledgements</td>
+</tr>
+
+  <tr>
+<td>req_sack_b2a</td>
+<td>Logical value indicating whether host b requested
+	Synchronized Acknowledgements</td>
+</tr>
+
+  <tr>
+<td>sacks_sent_a2b</td>
+<td>The number of SACKs sent from host a to host b.</td>
+</tr>
+
+  <tr>
+<td>sacks_sent_b2a</td>
+<td>The number of SACKs sent from host b to host a.</td>
+</tr>
+
+  <tr>
+<td>urgent_data_pkts_a2b</td>
+<td>Number of packets sent from a to host b with the URGENT
+	bit set.</td>
+</tr>
+
+  <tr>
+<td>urgent_data_pkts_b2a</td>
+<td>Number of packets sent from b to host a with the URGENT
+	bit set.</td>
+</tr>
+
+  <tr>
+<td>urgent_data_bytes_a2b</td>
+<td>Number of bytes sent from a to host b in packets with the URGENT
+	bit set.</td>
+</tr>
+
+  <tr>
+<td>urgent_data_bytes_b2a</td>
+<td>Number of bytes sent from b to host a in packets with the URGENT
+	bit set.</td>
+</tr>
+
+  <tr>
+<td>mss_requested_a2b</td>
+<td>Maximum segment size in communication from host a to
+	host b.</td>
+</tr>
+
+  <tr>
+<td>mss_requested_b2a</td>
+<td>Maximum segment size in communication from host b to
+	host a.</td>
+</tr>
+
+  <tr>
+<td>max_segm_size_a2b</td>
+<td>Largest amount of data in a segment sent from host a to
+	host b.</td>
+</tr>
+
+  <tr>
+<td>max_segm_size_b2a</td>
+<td>Largest amount of data in a segment sent from host b to
+	host a.</td>
+</tr>
+
+  <tr>
+<td>min_segm_size_a2b</td>
+<td>Smallest amount of data in a segment sent from host a to
+	host b.</td>
+</tr>
+
+  <tr>
+<td>min_segm_size_b2a</td>
+<td>Smallest amount of data in a segment sent from host b to
+	host a.</td>
+</tr>
+
+  <tr>
+<td>avg_segm_size_a2b</td>
+<td>Average segment size sent from host a to host b, given
+	by the number of data bytes sent divided by the number of packets.</td>
+</tr>
+
+  <tr>
+<td>avg_segm_size_b2a</td>
+<td>Average segment size sent from host b to host a, given
+	by the number of data bytes sent divided by the number of packets.</td>
+</tr>
+
+  <tr>
+<td>max_win_adv_a2b</td>
+<td>The maximum window size advertized by host a to host b
+	in this connection.</td>
+</tr>
+
+  <tr>
+<td>max_win_adv_b2a</td>
+<td>The maximum window size advertized by host b to host a
+	in this connection.</td>
+</tr>
+
+  <tr>
+<td>min_win_adv_a2b</td>
+<td>The minimum window size advertized by host a to host b
+	in this connection.</td>
+</tr>
+
+  <tr>
+<td>min_win_adv_b2a</td>
+<td>The minimum window size advertized by host b to host a
+	in this connection.</td>
+</tr>
+
+  <tr>
+<td>zero_win_adv_a2b</td>
+<td>The number of ZERO windows advertized by host a to host
+	b.</td>
+</tr>
+
+  <tr>
+<td>zero_win_adv_b2a</td>
+<td>The number of ZERO windows advertized by host b to host
+	a.</td>
+</tr>
+
+  <tr>
+<td>avg_win_adv_a2b</td>
+<td>Average window advertisement by host a to host b,
+                </td>
+</tr>
+
+  <tr>
+<td>avg_win_adv_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>initial_window_bytes_a2b</td>
+<td>The number of bytes in the initial window from host a to
+	host b.</td>
+</tr>
+
+  <tr>
+<td>initial_window_bytes_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>initial_window_pkts_a2b</td>
+<td>The number of segments in intial window from host a to host
+	b.</td>
+</tr>
+
+  <tr>
+<td>initial_window_pkts_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>ttl_stream_length_a2b</td>
+<td></td>
+</tr>
+
+  <tr>
+<td>ttl_stream_length_b2a</td>
+<td></td>
+</tr>
+
+  <tr>
+<td>missed_data_a2b</td>
+<td>The number of bytes that were dropped by host b.  This
+	is the total stream length from a to b - number of unique bytes sent.</td>
+</tr>
+
+  <tr>
+<td>missed_data_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>truncated_data_a2b</td>
+<td>Not used.</td>
+</tr>
+
+  <tr>
+<td>truncated_data_b2a</td>
+<td>Not used.</td>
+</tr>
+
+  <tr>
+<td>truncated_packets_a2b</td>
+<td></td>
+</tr>
+
+  <tr>
+<td>truncated_packets_b2a</td>
+<td></td>
+</tr>
+
+  <tr>
+<td>data_xmit_time_a2b</td>
+<td>Number of seconds from from first to last transmission
+	from host a to host b.</td>
+</tr>
+
+  <tr>
+<td>data_xmit_time_b2a</td>
+<td>Number of seconds from from first to last transmission
+	from host b to host a.</td>
+</tr>
+
+  <tr>
+<td>idletime_max_a2b</td>
+<td>Maximum idle time for host a in communicating with host
+	b on this connection.</td>
+</tr>
+
+  <tr>
+<td>idletime_max_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+
+  <tr>
+<td>hardware_dups_a2b</td>
+<td>Not used.</td>
+</tr>
+
+  <tr>
+<td>hardware_dups_b2a</td>
+<td>Not used.</td>
+</tr>
+
+  <tr>
+<td>throughput_a2b</td>
+<td>The throughput for this side of the connection. This is
+	the number of bytes divided by connection duration from
+	host a to host b.</td>
+</tr>
+
+  <tr>
+<td>throughput_b2a</td>
+<td>Same as previous for host b to host a.</td>
+</tr>
+</table>
+</body>
+</HTML>

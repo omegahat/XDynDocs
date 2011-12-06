@@ -1,0 +1,7 @@
+remove the "" around the fields.
+
+cd 04
+sh ../quote *.csv
+
+
+This creates all the .csv1 files.

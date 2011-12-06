@@ -1,0 +1,126 @@
+\section{Motivation}
+What are the problems with dealing with data delivered in ASCII files?
+rectangular tables? etc.  Essentially, each user must provide the
+meta-information and this is wasteful, error prone and makes it more
+difficult to automate.
+
+We want the ability to exchange files  that are easy to transport
+e.g. in mail, and are application-independent.
+But we also want to be able to supply meta-information
+not only about variable names and data types, but also 
+things such as documentation about a dataset, missing value
+identifiers, author information, complex data types that are
+efficiently represented (e.g. longitudinal data,
+graphs).  And importantly, we will want
+to include additional information in the future
+either generally or for particular projects/domains/disciplines.
+So we need an extensible format that can handle arbitrary data
+and that is 
+
+R's format is fine, so is Matlab's, SAS's etc. but they are tied
+currently to a particular piece of software and are not easily
+extensible at the representation level but only in the languages.  XDR
+is fine in that it is general.  All of these are binary and so harder
+to work with directly in mail, etc.
+
+XML is designed to meet most of these needs.  What is XML? It is the
+eXtensible Markup Language.  If we think about what we want it is
+simply a way to describe the many aspects of data in a general way.
+We want to be able to convey a sequence of integers or real values, a
+data frame, a complex data structure consisting of several fields of
+different types or a complex graph with associations/connections
+between nodes, or text documents consisting of chapters, sections,
+code, data, etc.  For this to work, we need only be able to identify
+the different pieces of the data (e.g. the numbers, the nodes and
+edges in the graph, the records in a data frame).  And to do this, we
+need a language to identify or markup these different elements within
+the data and to describe their characteristics.
+
+XML provides a general markup language.  It is possibly helpful to
+think of XML by considering its more specific relation, HTML used to
+specify Web pages.  In HTML, we have a fixed set of tags or elements
+that we can use to create a page.  These include things like <P> for
+paragraph, <H1>, <H2>, etc. for section headers and titles, <table>,
+<tr> and <th> for elements of a table and its rows and cells, and then
+things like links such as <a href="myPage.html">Click here</a>
+which uses attributes of the <a> element to specify the location
+to which the browser would jump when the reader clicks the link.
+
+HTML also permits the specification of document information such as
+the title that is separate from the body or content.
+\begin{verbatim}
+<html>
+<head>
+<title>A Title for the browser's Window</title>
+<link style....>
+</head>
+<body>
+</body>
+</html>
+\end{verbatim}
+
+XML by itself is not very useful.  It is just another attempt to
+encourage the use of a standard that can be used for exchanging data.
+If anything, it is a constraint as we should use it to increase the
+number of people and applications with we can share data
+but it is something we have to implement.
+And that is where those that have developed XML have helped
+greatly. is What makes it powerful is
+that there is software in almost all programming languages
+to parse, process, create and generally work with XML
+documents.
+
+Why is XML really important and not just another standard
+that we can optionally use?
+The reason is that it is become pervasive.
+Web Services, databases, etc.  are 
+
+\section{Basics of XML}
+Definition  of terms.
+Examples
+
+Considerations
+ closing tags
+ case sensitive
+ namespaces
+
+\section{Parsing}
+XSL and specific programming language interfaces.
+
+\subsection{Basic Tree Model - DOM}
+
+\subsection{Hybrid in situ replacement}
+
+\subsection{Efficiency and SAX}
+
+\subsection{Example - Case Study}
+
+\subsubsection{DataSets}
+ GGobi, OIM, etc.
+PMML.
+
+\subsection{e.g. GML}
+Geographic
+
+\subsection{Genetics/Bioinformatics}
+
+\subsubsection{PubMed}
+\subsubsection{HTML Documents}
+
+\section{Web Services SOAP}
+
+\section{Meta Programming}
+Reading Schema and WSDL files
+to create.
+
+
+
+\section{Dynamic Content and Documents}
+XSL and including output from Statistics.
+
+\section{Creating XML}
+Code to generate XML.
+
+\section{Designing an XML DTD/Schema/Document Class}
+
+Relate to schema for RDBMS. Synchronize example with that chapter.

@@ -1,0 +1,69 @@
+\documentclass[12pt]{article}
+
+\usepackage{fullpage}
+\usepackage{times}
+\def\SPAM{SPAM}
+
+\def\TA{Yu Chuan}
+\def\SA{Sandy and Erica}
+\def\InstructorMail{\texttt{nolan@stat.berkeley.edu}}
+\def\TAMail{\texttt{yuchuan@stat.berkeley.edu}}
+
+\def\SFunctionRef#1{\textbf{#1}}
+\def\Rpackage#1{\textit{#1}}
+\usepackage{hyperref}
+
+\begin{document}
+
+\textbf{Stat 133, Fall 04 \\
+Homework 1: Chip History\\
+Due:  Monday, 13 Sep}
+
+\medskip
+
+A small set of information about the history of chip manufacturing 
+appears on the web 
+\url{http://www.stat.berkeley.edu/users/nolan/stat133/data/chip.txt}.
+These data are from the HowStuffWorks website,
+\url{http://computer.howstuffworks.com/microprocessor1.htm}.
+
+Your tasks in this homework are to:
+\begin{itemize}
+\item  ``Read" the data into R using one of the R functions:
+\SFunctionRef{readLines}, \SFunctionRef{read.table}, or \SFunctionRef{scan}.
+Explain in a brief comment the reasoning behind your choice of function to use.
+
+\item Explore the data visually for patterns over time, and for relationships
+between variables (eg. transistors, clock speed, mips).
+Consider using the R functions
+\SFunctionRef{plot}, \SFunctionRef{hist}, \SFunctionRef{boxplot}, and 
+\SFunctionRef{pairs}.
+%In your analysis consider the log transformation, and ratios of variables.
+
+%\item Describe in one or two paragraphs what you have found in
+%two of your plots.
+\end{itemize}
+
+%Write your assignment up as a PDF or HTML file. 
+%To do this, you can use Word, PageMaker, Mozilla composer, LaTeX, etc.
+%You can generate figures/plots in different formats in R that should
+%suit your needs.  
+
+Use the class bulletin board to ask questions, discuss
+tools, etc. or ask \TA{} or me in class, office hours, $\ldots$.
+
+Save two of your best plots as a PDF file and the R code in plain text file. 
+Submit your work via email attachments to \TAMail{}.
+Make certain to also save a copy of what you submit.
+
+%You should submit via e-mail 
+%\begin{itemize}
+%\item the written assignment
+%\item any other auxillary material such as plots, etc.
+%  that are not directly  contained in the written assignment
+%  (See for example the R function \SFunctionRef{pdf} for how to create
+%  plots in pdf).
+%\end{itemize}
+
+
+\end{document}

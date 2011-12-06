@@ -1,0 +1,14 @@
+Package: IDynDocs
+Version: 0.1-0
+Title: Interactive and Dynamic Documents with XML/XSL
+Description:
+  Support for processing and rendering dynamic and interactive
+  documents using XML and XSL and wxWidgets.
+Maintainer: Duncan Temple Lang <duncan@wald.ucdavis.edu>
+Author: Deborah Nolan, Duncan Temple Lang
+Depends: methods, XML, Sxslt
+Suggests: digest, RwxWidgets, RwxDevice 
+LazyLoad: yes
+License: GPL2
+         
+

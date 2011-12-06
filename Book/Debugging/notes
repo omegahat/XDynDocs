@@ -1,0 +1,154 @@
+Debugging is in many ways like data analysis. We are trying to 
+find explanations for things that we encounter and try to explain
+them as best we can. There is something very result-driven about
+debugging that makes it more managable than the open-ended data
+analysis process.  And of course, what we are actually doing in
+the process of debugging is actually data analysis, and
+even data gathering and experimental design. We are interpreting
+the data from the crashes, errors
+
+
+Need to have already mastered a debugger.
+ browser(), options(error = recover),
+ trace
+Post-mortem debugging
+ options(error = {dump.frames("myDump", to.file = TRUE); q()})
+ load("myDump.rda")
+ debugger()
+
+Learn this before you need it so you are not mixing two
+things.
+How can we convince you to take the time to learn this?
+Perhaps some anecdotal evidence and real-time illustration?
+CGI example
+
+Can use our code and a previously dumped call stack.
+
+Debug in groups and have people argue their case.
+
+Random changes are not terrible if they help you to
+generate hypotheses. But then it is an experiment
+and should be thought of more formally.
+
+The act of explaining the steps - to another person or in writing to
+"yourself" as documentation - often brings the issue to the fore.
+I can't recall how many times I have said "never mind, I see the
+problem".
+
+
+
+Test from another direction to verify or eliminate the "depth"
+or stage of the bug.  In other words, if the same inputs
+give the same outputs using another implementation, either
+both or right or both or wrong. But moving through the 
+different input-output elements, i.e. up and down the call stack
+can allow us to find where the "error" occurs.
+
+
+Reading the "problem" statement from Terry Parr's article, I can
+formulate a hypothesis about the problem. It is the & in the URL.  I
+can verify that this is still a possible reason after he says that
+http://foo.com/y?event.accept&address=ZWxrQHJlZG works because it does
+not have a &.  I of course have worked in this field for a long time
+and am bringing knowledge of HTML and entities to the table.  I am not
+humble enough to know that this might not be the right answer, but am
+confident enought to go ahead and follow this explanation before
+thinking of other possible reasons.
+
+Using Google to find help.  Identify the pertinent part of the error
+message.  Then put it into Google, as a literal string, i.e. quoted.
+How to know what results to look at and believe.
+Indentation so it is a reply, not just a question.
+The person who answered?
+The quality of the Web site on which the page is located? Has than
+been helpful in the past? Or do they typically talk about,
+e.g. "Windows" or "Java", and not high-level languages on Mac...
+
+
+Of course, you are trying to do something specific when you find a
+bug.  However, take the time to step back when you have finally solved
+the problem and recap what you have done in the process of solving the
+problem.  Think about how you could have expedited the process.  What
+were the tell-tale clues, i.e. the important ones? and what were the
+different hypotheses/possible explanations you thought of?  In
+hindsight, could you have eliminated any of them with more thought?
+with some simple experiments/tests?  What were the Web search queries
+you made?  Can you improve them now that you know what you were really
+looking for?
+
+Having a simple, inefficient, obvious solution to the problem can give
+you perspective.  When porting RSPerl to Windows, there were numerous
+steps. But one of them was something that may just have been a real
+technical impediment. But having a simpler test case that tested
+things in a different way allowed me to a) verify that the task was
+possible, and b) narrow down and identify where the problem in the
+other code might be.  
+
+
+There are general debugging strategies and also particulars for
+different languages. In C/C++, one can get memory corruption and some 
+strategies for debugging involve other tools such as valgrind,
+and sometimes we even write stand-alone simple applications.
+We also force memory management ourselves with different routines to
+NULL stuff out so that we see it change.
+
+This context-specific differences can be tricky and require 
+using general approaches, but also making the most of the context
+to ask particular questions, shape hypotheses, etc. Context is very important.
+
+
+Recognize the difference between
+   a typo
+   a syntax error 
+   and a run-time error
+
+Where did they occur in the processing of your code.
+
+
+R is different from other languages, especially compiled
+languages and those with pointers.
+Firstly, we can edit a function and put it back into 
+the R environment and immediately use this updated version,
+even in subsequent calls within the existing computation.
+There is no need to recompile. We can continue on from where we were.
+Secondly, using print()/cat() statements to look at things is not
+as bad as in other languages because passing a value to
+print/format/cat is guaranteed not to change the object itself.
+There are no side-effects (except for graphics and assignments)
+so the debugging code is not going to introduce problems that
+will emerge again when the debugging code is removed.
+That said, using print/format/cat is not an efficient way to 
+go about debugging. You have to add the code and you have
+to remov the code later on.
+
+It is much better to put calls to browser()/recover() where one would put 
+code so that you can then look at the output and perform
+dynamic inquiries, not those set before the code is being
+run. That is we are analyzing the values at run-time and then
+deciding what else to look at. This is like what we do in EDA
+where we examine the data and see what models might fit, what
+variables are relevant, etc. rather than assuming a particular model
+is appropriate before looking at the data.
+
+
+
+Read the error message and comprehend it. Don't assume you know what
+it says. We often assume it is the same message we got "last time"
+and go about changing the same piece of code, only to find that
+in all the output, it was actually a different message and we have
+undone working code.
+
+Elevate warnings to errors so that you can trap them when they occur.
+
+
+Exceptions and tryCatch
+
+Safe-guarding your code against errors.
+This is a good thing to do so that others (including yourself) don't have to go through
+the debugging process.  Handle special and boundary cases.
+Check the types of the values, the length of values, are they NAs.
+
+Client server debugging is hard and we have to try to ask questions
+of the server using the client software.
+
+

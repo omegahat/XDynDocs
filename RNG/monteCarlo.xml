@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE book SYSTEM "file:///usr/share/sgml/docbook/xml-dtd-4.1.2-1.0-8/docbookx.dtd">
+
+<section>
+<title> Simulation Studies </title>
+
+<para/>
+
+<para/>
+Mention MCMC, Gibbs sampling, and computer experiments.
+
+</section>
+
+</chapter>

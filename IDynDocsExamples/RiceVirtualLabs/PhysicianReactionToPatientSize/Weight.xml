@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+
+<article xmlns:r="http://www.r-project.org">
+
+ <artheader>
+  <title>
+Physicians' Reactions Patient Size
+ <footnote>
+   <para>Adapted from the Rice Virtual Lab on
+    <ulink href="http://www.ruf.rice.edu/%7Elane/case_studies/weight/index.html">
+    Physicians' Reactions to Patient Size</ulink>. Originally written by David Lane.
+    Adapted as a dynamic document by Nan Lui.
+   </para>
+  </footnote>
+ </title>
+ </artheader>
+
+<invisible>
+<r:init>
+library(lattice)
+library(plotrix)
+library(e1071)
+wNt=read.table("weightData.txt", header=TRUE)
+wNt$WEIGHT = factor(wNt$WEIGHT, labels=c("Average","Overweight"))
+avg = wNt$TIME[wNt$WEIGHT == "Average"]
+over = wNt$TIME[wNt$WEIGHT == "Overweight"]
+  </r:init>
+ </invisible>
+
+
+<section>
+<title>
+Background
+</title>
+
+<para>
+Currently, almost one in every two Americans is overweight and one in
+every five is obese. These individuals face discrimination on a daily
+basis in employment, education, and relationship contexts. They are
+viewed as having a physical, moral and emotional impairment and there
+is a tendency for others to hold them responsible for their
+condition. Physicians -- people who are trained to treat all their
+patients warmly and have access to literature suggesting
+uncontrollable and hereditary aspects of obesity -- also believe obese
+individuals are undisciplined and suffer from controllability
+issues. The current research, conducted by <ulink
+url="http://www.ruf.rice.edu/%7Ehebl/">Mikki Hebl</ulink> at Rice
+University and Jingping Xu, examines physicians' treatment of obesity
+in their patients more systematically by extending past research to
+look at physicians' behavioral intentions as well as their expressed
+attitudes toward male and female patients who are of average weight,
+overweight, or obese. Although past studies tend to compare only
+overweight and average-weight individuals, this study provides a novel
+look at multiple increments of overweight by including both overweight
+and obesity. However, to simplify the presentation of this case study,
+only the average and overweight conditions will be presented.
+</para>
+
+</section>
+
+<section>
+<title>
+Experimental Design
+</title>
+
+<para>
+A total of 122 primary care physicians affiliated with one of three
+major hospitals in the Texas Medical Center of Houston participated in
+the study. These physicians were sent a packet containing <!--xref
+linkend="figform1" endterm="a medical chart"/ --> similar to the one
+they view upon seeing a patient. This chart portrayed a patient who
+was displaying symptoms of a migraine headache but was otherwise
+healthy. Two variables (the gender and the weight of the patient) were
+manipulated across six different versions of the medical charts. The
+weight of the patient, described in terms of Body Mass Index (BMI),
+was average (BMI = 23), overweight (BMI = 30), or obese (BMI =
+36). Physicians were randomly assigned to receive one of the six
+charts, were asked to look over the chart carefully, and then complete
+two medical forms.  The second form asked physicians which of 42 tests
+that they would recommend giving to the patient. The second form asked
+physicians to indicate how much time they believed they would spend
+with the patient, and to describe the reactions that they would have
+toward this patient.
+</para>
+
+<para>
+In this presentation, only the question on how much time the
+physicians believed they would spend with the patient is
+analyzed. Although three patient weight conditions were used in the
+study (average, overweight, and obese) only the average and overweight
+conditions will be analyzed. Therefore, there are two levels of
+patient weight (average and overweight) and one dependent variable
+(time spent).
+</para>
+</section>
+
+
+<section>
+<title>
+Descriptive Statistics
+</title>
+
+<para>
+Histograms of the time expected to be spent with the average-weight
+and overweight patients are shown below.
+</para>
+
+<figure id="fig:histogram">
+
+<r:plot showCode="false" width="900" height="800">
+histogram(~TIME | WEIGHT, data=wNt)
+
+<!-- Nan's code
+par(mfrow=c(2,1), mai=c(0.5, 0.5, 0.5, 0.5))
+
+hist(wNt[wNt[,1]=="Average",2], xlab="", main="Average Weight", xlim=c(0, 60), breaks=12) 
+hist(wNt[wNt[,1]=="Overweight",2], xlab="", main="Overweight", xlim=c(0, 60), breaks=12)
+-->
+
+
+</r:plot>
+</figure>
+
+<r:code>
+res = tapply(wNt$TIME, wNt$WEIGHT, function(x) {
+  c(length(x), mean(x), median(x), min(x), max(x), quantile(x, p=0.25), 
+  quantile(x, p=0.75), sd(x), std.error(x), skewness(x), kurtosis(x) ) })
+
+ res = sapply(res, function(x) x)
+ rownames(res) = c("N", "Mean", "Median", 
+  "Minimum", "Maximum", "25th Perc", "75th Perc", 
+  "SD", "STD Err", "Skew", "Kurtosis")
+  res
+</r:code>
+
+<para>
+Box plots comparing the time expected to be spent with the
+average-weight and overweight patients are shown below.
+</para>
+
+<figure id="fig:boxplot">
+
+<r:plot showCode="false" width="900" height="800">
+bwplot(TIME ~ WEIGHT, data=wNt)
+<!-- boxplot(TIME ~ WEIGHT, data=wNt, ylab="Expected Time")  -->
+</r:plot>
+
+</figure>
+
+</section>
+
+<section>
+<title>
+Inferential Statistics
+</title>
+
+<para>
+An independent t test was used to test for differences between
+groups. This test assumes normality and homogeneity of
+variance. Although the distributions are not quite normal, they are
+not so deviant as to make the test invalid. The standard deviations
+for the average group and the overweight group are 
+
+<r:code  showCode="false" digits="3">
+res["SD",]
+</r:code>
+
+Therefore there is no reason to suspect a violation of the homogeneity
+of variance assumption.
+
+<invisible>
+<r:code>
+TwNt = t.test( TIME ~ WEIGHT, data=wNt)
+pval = TwNt$p.value
+sig=pval &lt; 0.05
+</r:code>
+</invisible>
+
+</para>
+
+<para>
+The t(69) statistic is <r:expr digits="3">TwNt$statistic</r:expr>, and
+the p-value is <r:expr digits="3">pval</r:expr>.  The t-test is
+<r:expr> if(!sig)"not"</r:expr> significant. We <r:expr>
+if(!sig)"do not"</r:expr> reject the null hypothesis of no difference
+between groups at the 5 percent level.  The 95% confidence interval on
+the difference between means extends from <r:expr
+digits="3">TwNt$conf.int[1]</r:expr> to <r:expr
+digits="3">TwNt$conf.int[2]</r:expr>. Therefore, there is
+<r:expr>if(!sig)"no"</r:expr> strong evidence that physicians expect
+to spend less time with overweight patients.
+</para>
+
+</section>
+</article>

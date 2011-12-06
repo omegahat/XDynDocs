@@ -1,0 +1,32 @@
+<article>
+<para>
+This example is inspired by an example on the Franz Lisp web site
+illustrating how to access and work with earthquake data.  What we
+want to do is is fetch the data from the USGS (or any other site such
+as www.data.scec.org) and then look at the statistical characteristics
+of this data.  Then we want to display this data on maps.  These will
+involve static maps using R's graphics facilities and also dynamic
+graphics using Google Earth.  The data are available in CSV and also
+XML formats.  There are RSS feeds as well as more complete XML
+formats.  Of course, the CVS format is simple to work with in R since
+there is direct support.  Creating XML for Google Earth will require
+knowledge of the XML format used by GE.
+
+</para>
+<para>
+We might also look at the populations affected by an earthquake.  This
+would involve resolving locations with city names and then population
+information from, e.g., census data.  This is the merging across
+several different data sources.
+</para>
+<para>
+We also might want to look at some characteristics over time.
+And also look at the frequency of different magnitudes.
+</para>
+<para>
+USGS provides KMZ files. We want to add to these with "meta-data".
+</para>
+
+
+
+</article>

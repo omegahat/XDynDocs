@@ -1,0 +1,13 @@
+#!/bin/sh
+
+
+while test -n "${1}" ; do
+  echo "${1}"
+  if test -r "${1}1" ; then
+    echo "Skipping ${1}"
+  else
+    perl -np ../quote.pl ${1} > ${1}1
+  fi
+  shift
+done
+

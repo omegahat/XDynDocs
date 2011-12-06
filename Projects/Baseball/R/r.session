@@ -1,0 +1,3982 @@
+(pts/29)winnie[~-51]>R
+WARNING: ignoring environment value of R_HOME
+
+R : Copyright 2003, The R Foundation for Statistical Computing
+Version 1.8.1  (2003-11-21), ISBN 3-900051-00-3
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for a HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> q()
+Save workspace image? [y/n/c]: n
+(pts/29)winnie[~-52]>cd Classes/
+(pts/29)winnie[~/Classes-53]>ls
+network.R  network.R~  queries	Stat141  tmp.sql
+(pts/29)winnie[~/Classes-54]>mkdir StatComp
+(pts/29)winnie[~/Classes-55]>cd StatComp/
+(pts/29)winnie[StatComp-56]>ls
+(pts/29)winnie[StatComp-57]>mkdir Code
+(pts/29)winnie[StatComp-58]>cd Code/
+(pts/29)winnie[Code-59]>ls
+(pts/29)winnie[Code-60]>mkdir -p Baseball/R
+(pts/29)winnie[Code-61]>cd Baseball/R
+(pts/29)winnie[R-62]>ls
+(pts/29)winnie[R-63]>R
+WARNING: ignoring environment value of R_HOME
+
+R : Copyright 2003, The R Foundation for Statistical Computing
+Version 1.8.1  (2003-11-21), ISBN 3-900051-00-3
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for a HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(RMySQL)
+> m = dbDriver("MySQL")
+> con = dbConnection(m, group = "BDB")
+Error: couldn't find function "dbConnection"
+> con = dbConnect(m, group = "BDB")
+> rs = dbSendQuery(con, "select nameFirst, nameLast, Salaries.yearID, Salaries.salary FROM Master, Teams, Salaries WhERE Salaries.yearID > 200 AND Salaries.yearID = Teams.yearID;")
+> 
+> d = fetch(rs, n = 100)
+> d
+    nameFirst nameLast yearID salary
+1        Hank    Aaron   1985 170000
+2        Hank    Aaron   1985 170000
+3        Hank    Aaron   1985 170000
+4        Hank    Aaron   1985 170000
+5        Hank    Aaron   1985 170000
+6        Hank    Aaron   1985 170000
+7        Hank    Aaron   1985 170000
+8        Hank    Aaron   1985 170000
+9        Hank    Aaron   1985 170000
+10       Hank    Aaron   1985 170000
+11       Hank    Aaron   1985 170000
+12       Hank    Aaron   1985 170000
+13       Hank    Aaron   1985 170000
+14       Hank    Aaron   1985 170000
+15       Hank    Aaron   1985 170000
+16       Hank    Aaron   1985 170000
+17       Hank    Aaron   1985 170000
+18       Hank    Aaron   1985 170000
+19       Hank    Aaron   1985 170000
+20       Hank    Aaron   1985 170000
+21       Hank    Aaron   1985 170000
+22       Hank    Aaron   1985 170000
+23       Hank    Aaron   1985 170000
+24       Hank    Aaron   1985 170000
+25       Hank    Aaron   1985 170000
+26       Hank    Aaron   1985 170000
+27       Hank    Aaron   1985 147500
+28       Hank    Aaron   1985 147500
+29       Hank    Aaron   1985 147500
+30       Hank    Aaron   1985 147500
+31       Hank    Aaron   1985 147500
+32       Hank    Aaron   1985 147500
+33       Hank    Aaron   1985 147500
+34       Hank    Aaron   1985 147500
+35       Hank    Aaron   1985 147500
+36       Hank    Aaron   1985 147500
+37       Hank    Aaron   1985 147500
+38       Hank    Aaron   1985 147500
+39       Hank    Aaron   1985 147500
+40       Hank    Aaron   1985 147500
+41       Hank    Aaron   1985 147500
+42       Hank    Aaron   1985 147500
+43       Hank    Aaron   1985 147500
+44       Hank    Aaron   1985 147500
+45       Hank    Aaron   1985 147500
+46       Hank    Aaron   1985 147500
+47       Hank    Aaron   1985 147500
+48       Hank    Aaron   1985 147500
+49       Hank    Aaron   1985 147500
+50       Hank    Aaron   1985 147500
+51       Hank    Aaron   1985 147500
+52       Hank    Aaron   1985 147500
+53       Hank    Aaron   1985 875000
+54       Hank    Aaron   1985 875000
+55       Hank    Aaron   1985 875000
+56       Hank    Aaron   1985 875000
+57       Hank    Aaron   1985 875000
+58       Hank    Aaron   1985 875000
+59       Hank    Aaron   1985 875000
+60       Hank    Aaron   1985 875000
+61       Hank    Aaron   1985 875000
+62       Hank    Aaron   1985 875000
+63       Hank    Aaron   1985 875000
+64       Hank    Aaron   1985 875000
+65       Hank    Aaron   1985 875000
+66       Hank    Aaron   1985 875000
+67       Hank    Aaron   1985 875000
+68       Hank    Aaron   1985 875000
+69       Hank    Aaron   1985 875000
+70       Hank    Aaron   1985 875000
+71       Hank    Aaron   1985 875000
+72       Hank    Aaron   1985 875000
+73       Hank    Aaron   1985 875000
+74       Hank    Aaron   1985 875000
+75       Hank    Aaron   1985 875000
+76       Hank    Aaron   1985 875000
+77       Hank    Aaron   1985 875000
+78       Hank    Aaron   1985 875000
+79       Hank    Aaron   1985  62500
+80       Hank    Aaron   1985  62500
+81       Hank    Aaron   1985  62500
+82       Hank    Aaron   1985  62500
+83       Hank    Aaron   1985  62500
+84       Hank    Aaron   1985  62500
+85       Hank    Aaron   1985  62500
+86       Hank    Aaron   1985  62500
+87       Hank    Aaron   1985  62500
+88       Hank    Aaron   1985  62500
+89       Hank    Aaron   1985  62500
+90       Hank    Aaron   1985  62500
+91       Hank    Aaron   1985  62500
+92       Hank    Aaron   1985  62500
+93       Hank    Aaron   1985  62500
+94       Hank    Aaron   1985  62500
+95       Hank    Aaron   1985  62500
+96       Hank    Aaron   1985  62500
+97       Hank    Aaron   1985  62500
+98       Hank    Aaron   1985  62500
+99       Hank    Aaron   1985  62500
+100      Hank    Aaron   1985  62500
+> dbClearResult(rs)
+[1] TRUE
+> rs = dbSendQuery(con, "select nameFirst, nameLast, Salaries.yearID, Salaries.salary FROM Master, Teams, Salaries WhERE Salaries.yearID > 2000 AND Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID;")
+> d = fetch(rs, n = 100)
+> d
+     nameFirst    nameLast yearID   salary
+1       Garret    Anderson   2001  4500000
+2       Kimera      Bartee   2001   270000
+3         Gary   DiSarcina   2001   320000
+4        David    Eckstein   2001   200000
+5        Darin      Erstad   2001  3450000
+6        Jorge    Fabregas   2001   500000
+7        Benji         Gil   2001   350000
+8         Troy       Glaus   2001  1250000
+9   Shigetoshi    Hasegawa   2001  1500000
+10   Glenallen        Hill   2001  1500000
+11        Mike       Holtz   2001   705000
+12       Wally      Joyner   2001   200000
+13        Adam     Kennedy   2001   280000
+14        Alan      Levine   2001   715000
+15         Ben      Molina   2001   350000
+16        Jose      Nieves   2001   232000
+17       Ramon       Ortiz   2001   250000
+18     Orlando    Palmeiro   2001   900000
+19        Troy    Percival   2001  3400000
+20         Lou        Pote   2001   215000
+21         Pat        Rapp   2001  2000000
+22         Tim      Salmon   2001  6500000
+23       Scott Schoeneweis   2001   275000
+24       Scott     Spiezio   2001  1125000
+25      Ismael      Valdes   2001  2500000
+26          Mo      Vaughn   2001 13166667
+27      Jarrod    Washburn   2001   270000
+28         Ben       Weber   2001   203500
+29        Matt        Wise   2001   207500
+30       Shawn      Wooten   2001   200500
+31       Brian    Anderson   2001  4125000
+32         Rod     Barajas   2001   208000
+33      Miguel     Batista   2001   400000
+34       Danny    Bautista   2001   675000
+35         Jay        Bell   2001  8050000
+36        Nick   Bierbrodt   2001   200000
+37        Greg    Colbrunn   2001  1600000
+38       Midre    Cummings   2001   425000
+39       David    Dellucci   2001   325000
+40     Erubiel      Durazo   2001   260000
+41       Steve      Finley   2001  5375000
+42        Luis    Gonzalez   2001  4833333
+43        Mark       Grace   2001  3000000
+44       Randy     Johnson   2001 13350000
+45  Byung-Hyun         Kim   2001   762500
+46       Danny     Klassen   2001   227500
+47        Matt      Mantei   2001  3583333
+48      Damian      Miller   2001  1250000
+49        Mike      Morgan   2001   700000
+50     Armando     Reynoso   2001  2000000
+51      Reggie     Sanders   2001  1500000
+52        Curt   Schilling   2001  6500000
+53        Russ    Springer   2001  1700000
+54        Todd Stottlemyre   2001  8000000
+55        Greg    Swindell   2001  2533333
+56        Matt    Williams   2001  9000000
+57       Bobby        Witt   2001   500000
+58        Tony      Womack   2001  4000000
+59        Kurt      Abbott   2001   600000
+60        Paul        Bako   2001   450000
+61        Rico      Brogna   2001  1500000
+62        John     Burkett   2001  1750000
+63      Rafael      Furcal   2001   355000
+64         Tom     Glavine   2001  9500000
+65         Wes       Helms   2001   210000
+66      Andruw       Jones   2001  8200000
+67     Chipper       Jones   2001 10333333
+68       Brian      Jordan   2001  9100000
+69       Kerry  Ligtenberg   2001  1200000
+70       Keith    Lockhart   2001   800000
+71      George     Lombard   2001   202500
+72        Javy       Lopez   2001  7750000
+73        Greg      Maddux   2001 12500000
+74       Jason     Marquis   2001   205000
+75        Dave    Martinez   2001  1500000
+76       Kevin   McGlinchy   2001   242000
+77       Kevin    Millwood   2001  3100000
+78       Eddie       Perez   2001   650000
+79      Odalis       Perez   2001   220000
+80        Mike   Remlinger   2001  1600000
+81        John      Rocker   2001  1900000
+82       Chris    Seelbach   2001   200000
+83         Joe   Slusarski   2001   360000
+84        John      Smoltz   2001  8000000
+85       Scott   Sobkowiak   2001   200000
+86        B.J.     Surhoff   2001  4833333
+87        Marc      Valdes   2001   375000
+88     Quilvio       Veras   2001  3900000
+89        Brad      Voyles   2001   200000
+90       Brady    Anderson   2001  7200000
+91      Albert       Belle   2001 12049040
+92        Mike     Bordick   2001  4500000
+93        Jeff      Conine   2001  3000000
+94      Delino   DeShields   2001  4333667
+95       Brook     Fordyce   2001   825000
+96         Jay     Gibbons   2001   200000
+97       Buddy       Groom   2001  2000000
+98       Jerry    Hairston   2001   235000
+99         Pat     Hentgen   2001  4500000
+100      Jason     Johnson   2001   350000
+> dbClearResult(rs)
+[1] TRUE
+> rs = dbSendQuery(con, "select CONCAT(nameFirst, " ", nameLast), Salaries.yearID, Salaries.salary FROM Master, Teams, Salaries WhERE Salaries.yearID > 2000 AND Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID;")
+Error: syntax error
+> 
+> rs = dbSendQuery(con, "select CONCAT(nameFirst, ' ', nameLast), Salaries.yearID, Salaries.salary FROM Master, Teams, Salaries WhERE Salaries.yearID > 2000 AND Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID;")
+> d = fetch(rs, n = 100)
+> d
+    CONCAT(nameFirst, ' ', nameLast) yearID   salary
+1                    Garret Anderson   2001  4500000
+2                      Kimera Bartee   2001   270000
+3                     Gary DiSarcina   2001   320000
+4                     David Eckstein   2001   200000
+5                       Darin Erstad   2001  3450000
+6                     Jorge Fabregas   2001   500000
+7                          Benji Gil   2001   350000
+8                         Troy Glaus   2001  1250000
+9                Shigetoshi Hasegawa   2001  1500000
+10                    Glenallen Hill   2001  1500000
+11                        Mike Holtz   2001   705000
+12                      Wally Joyner   2001   200000
+13                      Adam Kennedy   2001   280000
+14                       Alan Levine   2001   715000
+15                        Ben Molina   2001   350000
+16                       Jose Nieves   2001   232000
+17                       Ramon Ortiz   2001   250000
+18                  Orlando Palmeiro   2001   900000
+19                     Troy Percival   2001  3400000
+20                          Lou Pote   2001   215000
+21                          Pat Rapp   2001  2000000
+22                        Tim Salmon   2001  6500000
+23                 Scott Schoeneweis   2001   275000
+24                     Scott Spiezio   2001  1125000
+25                     Ismael Valdes   2001  2500000
+26                         Mo Vaughn   2001 13166667
+27                   Jarrod Washburn   2001   270000
+28                         Ben Weber   2001   203500
+29                         Matt Wise   2001   207500
+30                      Shawn Wooten   2001   200500
+31                    Brian Anderson   2001  4125000
+32                       Rod Barajas   2001   208000
+33                    Miguel Batista   2001   400000
+34                    Danny Bautista   2001   675000
+35                          Jay Bell   2001  8050000
+36                    Nick Bierbrodt   2001   200000
+37                     Greg Colbrunn   2001  1600000
+38                    Midre Cummings   2001   425000
+39                    David Dellucci   2001   325000
+40                    Erubiel Durazo   2001   260000
+41                      Steve Finley   2001  5375000
+42                     Luis Gonzalez   2001  4833333
+43                        Mark Grace   2001  3000000
+44                     Randy Johnson   2001 13350000
+45                    Byung-Hyun Kim   2001   762500
+46                     Danny Klassen   2001   227500
+47                       Matt Mantei   2001  3583333
+48                     Damian Miller   2001  1250000
+49                       Mike Morgan   2001   700000
+50                   Armando Reynoso   2001  2000000
+51                    Reggie Sanders   2001  1500000
+52                    Curt Schilling   2001  6500000
+53                     Russ Springer   2001  1700000
+54                  Todd Stottlemyre   2001  8000000
+55                     Greg Swindell   2001  2533333
+56                     Matt Williams   2001  9000000
+57                        Bobby Witt   2001   500000
+58                       Tony Womack   2001  4000000
+59                       Kurt Abbott   2001   600000
+60                         Paul Bako   2001   450000
+61                       Rico Brogna   2001  1500000
+62                      John Burkett   2001  1750000
+63                     Rafael Furcal   2001   355000
+64                       Tom Glavine   2001  9500000
+65                         Wes Helms   2001   210000
+66                      Andruw Jones   2001  8200000
+67                     Chipper Jones   2001 10333333
+68                      Brian Jordan   2001  9100000
+69                  Kerry Ligtenberg   2001  1200000
+70                    Keith Lockhart   2001   800000
+71                    George Lombard   2001   202500
+72                        Javy Lopez   2001  7750000
+73                       Greg Maddux   2001 12500000
+74                     Jason Marquis   2001   205000
+75                     Dave Martinez   2001  1500000
+76                   Kevin McGlinchy   2001   242000
+77                    Kevin Millwood   2001  3100000
+78                       Eddie Perez   2001   650000
+79                      Odalis Perez   2001   220000
+80                    Mike Remlinger   2001  1600000
+81                       John Rocker   2001  1900000
+82                    Chris Seelbach   2001   200000
+83                     Joe Slusarski   2001   360000
+84                       John Smoltz   2001  8000000
+85                   Scott Sobkowiak   2001   200000
+86                      B.J. Surhoff   2001  4833333
+87                       Marc Valdes   2001   375000
+88                     Quilvio Veras   2001  3900000
+89                       Brad Voyles   2001   200000
+90                    Brady Anderson   2001  7200000
+91                      Albert Belle   2001 12049040
+92                      Mike Bordick   2001  4500000
+93                       Jeff Conine   2001  3000000
+94                  Delino DeShields   2001  4333667
+95                     Brook Fordyce   2001   825000
+96                       Jay Gibbons   2001   200000
+97                       Buddy Groom   2001  2000000
+98                    Jerry Hairston   2001   235000
+99                       Pat Hentgen   2001  4500000
+100                    Jason Johnson   2001   350000
+> dbClearResult(rs)
+[1] TRUE
+> rs = dbSendQuery(con, "select CONCAT(nameFirst, ' ', nameLast) AS Name, Salaries.yearID, Salaries.salary FROM Master, Teams, Salaries WhERE Salaries.yearID > 2000 AND Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID;")
+> d = fetch(rs, n = 100)
+> d
+                   Name yearID   salary
+1       Garret Anderson   2001  4500000
+2         Kimera Bartee   2001   270000
+3        Gary DiSarcina   2001   320000
+4        David Eckstein   2001   200000
+5          Darin Erstad   2001  3450000
+6        Jorge Fabregas   2001   500000
+7             Benji Gil   2001   350000
+8            Troy Glaus   2001  1250000
+9   Shigetoshi Hasegawa   2001  1500000
+10       Glenallen Hill   2001  1500000
+11           Mike Holtz   2001   705000
+12         Wally Joyner   2001   200000
+13         Adam Kennedy   2001   280000
+14          Alan Levine   2001   715000
+15           Ben Molina   2001   350000
+16          Jose Nieves   2001   232000
+17          Ramon Ortiz   2001   250000
+18     Orlando Palmeiro   2001   900000
+19        Troy Percival   2001  3400000
+20             Lou Pote   2001   215000
+21             Pat Rapp   2001  2000000
+22           Tim Salmon   2001  6500000
+23    Scott Schoeneweis   2001   275000
+24        Scott Spiezio   2001  1125000
+25        Ismael Valdes   2001  2500000
+26            Mo Vaughn   2001 13166667
+27      Jarrod Washburn   2001   270000
+28            Ben Weber   2001   203500
+29            Matt Wise   2001   207500
+30         Shawn Wooten   2001   200500
+31       Brian Anderson   2001  4125000
+32          Rod Barajas   2001   208000
+33       Miguel Batista   2001   400000
+34       Danny Bautista   2001   675000
+35             Jay Bell   2001  8050000
+36       Nick Bierbrodt   2001   200000
+37        Greg Colbrunn   2001  1600000
+38       Midre Cummings   2001   425000
+39       David Dellucci   2001   325000
+40       Erubiel Durazo   2001   260000
+41         Steve Finley   2001  5375000
+42        Luis Gonzalez   2001  4833333
+43           Mark Grace   2001  3000000
+44        Randy Johnson   2001 13350000
+45       Byung-Hyun Kim   2001   762500
+46        Danny Klassen   2001   227500
+47          Matt Mantei   2001  3583333
+48        Damian Miller   2001  1250000
+49          Mike Morgan   2001   700000
+50      Armando Reynoso   2001  2000000
+51       Reggie Sanders   2001  1500000
+52       Curt Schilling   2001  6500000
+53        Russ Springer   2001  1700000
+54     Todd Stottlemyre   2001  8000000
+55        Greg Swindell   2001  2533333
+56        Matt Williams   2001  9000000
+57           Bobby Witt   2001   500000
+58          Tony Womack   2001  4000000
+59          Kurt Abbott   2001   600000
+60            Paul Bako   2001   450000
+61          Rico Brogna   2001  1500000
+62         John Burkett   2001  1750000
+63        Rafael Furcal   2001   355000
+64          Tom Glavine   2001  9500000
+65            Wes Helms   2001   210000
+66         Andruw Jones   2001  8200000
+67        Chipper Jones   2001 10333333
+68         Brian Jordan   2001  9100000
+69     Kerry Ligtenberg   2001  1200000
+70       Keith Lockhart   2001   800000
+71       George Lombard   2001   202500
+72           Javy Lopez   2001  7750000
+73          Greg Maddux   2001 12500000
+74        Jason Marquis   2001   205000
+75        Dave Martinez   2001  1500000
+76      Kevin McGlinchy   2001   242000
+77       Kevin Millwood   2001  3100000
+78          Eddie Perez   2001   650000
+79         Odalis Perez   2001   220000
+80       Mike Remlinger   2001  1600000
+81          John Rocker   2001  1900000
+82       Chris Seelbach   2001   200000
+83        Joe Slusarski   2001   360000
+84          John Smoltz   2001  8000000
+85      Scott Sobkowiak   2001   200000
+86         B.J. Surhoff   2001  4833333
+87          Marc Valdes   2001   375000
+88        Quilvio Veras   2001  3900000
+89          Brad Voyles   2001   200000
+90       Brady Anderson   2001  7200000
+91         Albert Belle   2001 12049040
+92         Mike Bordick   2001  4500000
+93          Jeff Conine   2001  3000000
+94     Delino DeShields   2001  4333667
+95        Brook Fordyce   2001   825000
+96          Jay Gibbons   2001   200000
+97          Buddy Groom   2001  2000000
+98       Jerry Hairston   2001   235000
+99          Pat Hentgen   2001  4500000
+100       Jason Johnson   2001   350000
+> dbClearResult(rs)
+[1] TRUE
+> rs = dbSendQuery(con, "select CONCAT(nameFirst, ' ', nameLast) AS Name, Salaries.yearID, Salaries.salary FROM Master, Teams, Salaries WhERE Salaries.yearID > 2000 AND Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID;")
+> d = fetch(rs, n = -1)
+> dim(d)
+[1] 2533    3
+> dbClearResult(rs)
+[1] TRUE
+> rs = dbSendQuery(con, "select Salaries.yearID AS year, Team.name AS team, SUM(Salaries.salary) FROM Master, Teams, Salaries WhERE Salaries.yearID > 2000 AND Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID GROUP BY team, year;")
+Error in mysqlExecStatement(conn, statement, ...) : 
+	RS-DBI driver: (could not run statement: Unknown table 'Team' in field list)
+> rs = dbSendQuery(con, "select Salaries.yearID AS year, Teams.name AS team, SUM(Salaries.salary) FROM Master, Teams, Salaries WhERE Salaries.yearID > 2000 AND Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID GROUP BY team, year;")
+> d = fetch(rs, n = -1)
+> d
+   year                  team SUM(Salaries.salary)
+1  2001        Anaheim Angels             47535167
+2  2002        Anaheim Angels             61721667
+3  2003        Anaheim Angels             79031667
+4  2001  Arizona Diamondbacks             85082999
+5  2002  Arizona Diamondbacks            102819999
+6  2003  Arizona Diamondbacks             80657000
+7  2001        Atlanta Braves             91936166
+8  2002        Atlanta Braves             92870367
+9  2003        Atlanta Braves            106243667
+10 2001     Baltimore Orioles             67599540
+11 2002     Baltimore Orioles             60493487
+12 2003     Baltimore Orioles             73877500
+13 2001        Boston Red Sox            110035833
+14 2002        Boston Red Sox            108366060
+15 2003        Boston Red Sox             99946500
+16 2001          Chicago Cubs             64715833
+17 2002          Chicago Cubs             75690833
+18 2003          Chicago Cubs             79868333
+19 2001     Chicago White Sox             65653667
+20 2002     Chicago White Sox             57052833
+21 2003     Chicago White Sox             51010000
+22 2001       Cincinnati Reds             48986000
+23 2002       Cincinnati Reds             45050390
+24 2003       Cincinnati Reds             59355667
+25 2001     Cleveland Indians             93152001
+26 2002     Cleveland Indians             78909449
+27 2003     Cleveland Indians             48584834
+28 2001      Colorado Rockies             71541334
+29 2002      Colorado Rockies             56851043
+30 2003      Colorado Rockies             67179667
+31 2001        Detroit Tigers             53416167
+32 2002        Detroit Tigers             55048000
+33 2003        Detroit Tigers             49168000
+34 2001       Florida Marlins             35762500
+35 2002       Florida Marlins             41979917
+36 2003       Florida Marlins             49450000
+37 2001        Houston Astros             60612667
+38 2002        Houston Astros             63448417
+39 2003        Houston Astros             71040000
+40 2001    Kansas City Royals             35422500
+41 2002    Kansas City Royals             47257000
+42 2003    Kansas City Royals             40518000
+43 2001   Los Angeles Dodgers            109105953
+44 2002   Los Angeles Dodgers             94850953
+45 2003   Los Angeles Dodgers            105572620
+46 2001     Milwaukee Brewers             43886833
+47 2002     Milwaukee Brewers             50287833
+48 2003     Milwaukee Brewers             40627000
+49 2001       Minnesota Twins             24130000
+50 2002       Minnesota Twins             40425000
+51 2003       Minnesota Twins             55505000
+52 2001        Montreal Expos             35159500
+53 2002        Montreal Expos             38670500
+54 2003        Montreal Expos             51948500
+55 2001         New York Mets             93174428
+56 2002         New York Mets             94633593
+57 2003         New York Mets            116876429
+58 2001      New York Yankees            112287143
+59 2002      New York Yankees            125928583
+60 2003      New York Yankees            152749814
+61 2001     Oakland Athletics             33810750
+62 2002     Oakland Athletics             40004167
+63 2003     Oakland Athletics             50260834
+64 2001 Philadelphia Phillies             41663833
+65 2002 Philadelphia Phillies             57954999
+66 2003 Philadelphia Phillies             70780000
+67 2001    Pittsburgh Pirates             57760833
+68 2002    Pittsburgh Pirates             42323599
+69 2003    Pittsburgh Pirates             54812429
+70 2001      San Diego Padres             39182833
+71 2002      San Diego Padres             41425000
+72 2003      San Diego Padres             45210000
+73 2001  San Francisco Giants             63280167
+74 2002  San Francisco Giants             78299835
+75 2003  San Francisco Giants             82852167
+76 2001      Seattle Mariners             74720834
+77 2002      Seattle Mariners             80282668
+78 2003      Seattle Mariners             86959167
+79 2001   St. Louis Cardinals             78538333
+80 2002   St. Louis Cardinals             74660875
+81 2003   St. Louis Cardinals             83786666
+82 2001  Tampa Bay Devil Rays             56980000
+83 2002  Tampa Bay Devil Rays             34380000
+84 2003  Tampa Bay Devil Rays             19630000
+85 2001         Texas Rangers             88633500
+86 2002         Texas Rangers            105526122
+87 2003         Texas Rangers            103491667
+88 2001     Toronto Blue Jays             76895999
+89 2002     Toronto Blue Jays             76864333
+90 2003     Toronto Blue Jays             51269000
+> rs = dbSendQuery(con, "select Salaries.yearID AS year, Team.name AS team, SUM(Salaries.salary) FROM Master, Teams, Salaries WhERE  AND Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID GROUP BY team, year;")
+Error in mysqlExecStatement(conn, statement, ...) : 
+	RS-DBI driver: (could not run statement: You have an error in your SQL syntax.  Check the manual that corresponds to your MySQL server version for the right syntax to use near 'AND Salaries.yearID = Teams.yearID AND Master.playerID = Salari)
+> rs = dbSendQuery(con, "select Salaries.yearID AS year, Team.name AS team, SUM(Salaries.salary) FROM Master, Teams, Salaries WhERE Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID GROUP BY team, year;")
+Error in mysqlExecStatement(conn, statement, ...) : 
+	RS-DBI driver: (could not run statement: Unknown table 'Team' in field list)
+> rs = dbSendQuery(con, "select Salaries.yearID AS year, Teams.name AS team, SUM(Salaries.salary) FROM Master, Teams, Salaries WhERE Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID GROUP BY team, year;")
+> fetch(rs, n = -1)
+    year                  team SUM(Salaries.salary)
+1   1997        Anaheim Angels             31135472
+2   1998        Anaheim Angels             41281000
+3   1999        Anaheim Angels             55388166
+4   2000        Anaheim Angels             51464167
+5   2001        Anaheim Angels             47535167
+6   2002        Anaheim Angels             61721667
+7   2003        Anaheim Angels             79031667
+8   1998  Arizona Diamondbacks             32347000
+9   1999  Arizona Diamondbacks             68703999
+10  2000  Arizona Diamondbacks             81027833
+11  2001  Arizona Diamondbacks             85082999
+12  2002  Arizona Diamondbacks            102819999
+13  2003  Arizona Diamondbacks             80657000
+14  1985        Atlanta Braves             14807000
+15  1986        Atlanta Braves             17102786
+16  1987        Atlanta Braves             16544560
+17  1988        Atlanta Braves             12728174
+18  1989        Atlanta Braves             11112334
+19  1990        Atlanta Braves             14555501
+20  1991        Atlanta Braves             18403500
+21  1992        Atlanta Braves             34625333
+22  1993        Atlanta Braves             41641417
+23  1994        Atlanta Braves             49383513
+24  1995        Atlanta Braves             47235445
+25  1996        Atlanta Braves             49698500
+26  1997        Atlanta Braves             52278500
+27  1998        Atlanta Braves             61186000
+28  1999        Atlanta Braves             73140000
+29  2000        Atlanta Braves             84537836
+30  2001        Atlanta Braves             91936166
+31  2002        Atlanta Braves             92870367
+32  2003        Atlanta Braves            106243667
+33  1985     Baltimore Orioles             11560712
+34  1986     Baltimore Orioles             13001258
+35  1987     Baltimore Orioles             13900273
+36  1988     Baltimore Orioles             13532075
+37  1989     Baltimore Orioles              8275167
+38  1990     Baltimore Orioles              9680084
+39  1991     Baltimore Orioles             17519000
+40  1992     Baltimore Orioles             23780667
+41  1993     Baltimore Orioles             29096500
+42  1994     Baltimore Orioles             38849769
+43  1995     Baltimore Orioles             43942521
+44  1996     Baltimore Orioles             54490315
+45  1997     Baltimore Orioles             58516400
+46  1998     Baltimore Orioles             72355634
+47  1999     Baltimore Orioles             80605863
+48  2000     Baltimore Orioles             81447435
+49  2001     Baltimore Orioles             67599540
+50  2002     Baltimore Orioles             60493487
+51  2003     Baltimore Orioles             73877500
+52  1985        Boston Red Sox             10897560
+53  1986        Boston Red Sox             14402239
+54  1987        Boston Red Sox             10144167
+55  1988        Boston Red Sox             13896092
+56  1989        Boston Red Sox             17481748
+57  1990        Boston Red Sox             20558333
+58  1991        Boston Red Sox             35167500
+59  1992        Boston Red Sox             43610584
+60  1993        Boston Red Sox             37120583
+61  1994        Boston Red Sox             37859084
+62  1995        Boston Red Sox             32455518
+63  1996        Boston Red Sox             42393500
+64  1997        Boston Red Sox             43558750
+65  1998        Boston Red Sox             56757000
+66  1999        Boston Red Sox             63497500
+67  2000        Boston Red Sox             77940333
+68  2001        Boston Red Sox            110035833
+69  2002        Boston Red Sox            108366060
+70  2003        Boston Red Sox             99946500
+71  1985     California Angels             14427894
+72  1986     California Angels             14427258
+73  1987     California Angels             12843499
+74  1988     California Angels             11947388
+75  1989     California Angels             15097833
+76  1990     California Angels             21720000
+77  1991     California Angels             33060001
+78  1992     California Angels             34749334
+79  1993     California Angels             28588334
+80  1994     California Angels             25156218
+81  1995     California Angels             31223171
+82  1996     California Angels             28738000
+83  1985          Chicago Cubs             12702917
+84  1986          Chicago Cubs             17208165
+85  1987          Chicago Cubs             14307999
+86  1988          Chicago Cubs             13119198
+87  1989          Chicago Cubs             10668000
+88  1990          Chicago Cubs             13624000
+89  1991          Chicago Cubs             23175667
+90  1992          Chicago Cubs             29829686
+91  1993          Chicago Cubs             39386666
+92  1994          Chicago Cubs             36287333
+93  1995          Chicago Cubs             29505834
+94  1996          Chicago Cubs             33081000
+95  1997          Chicago Cubs             42155333
+96  1998          Chicago Cubs             50838000
+97  1999          Chicago Cubs             62343000
+98  2000          Chicago Cubs             60539333
+99  2001          Chicago Cubs             64715833
+100 2002          Chicago Cubs             75690833
+101 2003          Chicago Cubs             79868333
+102 1985     Chicago White Sox              9846178
+103 1986     Chicago White Sox             10418819
+104 1987     Chicago White Sox              4253958
+105 1988     Chicago White Sox              6390000
+106 1989     Chicago White Sox              7265410
+107 1990     Chicago White Sox              9491500
+108 1991     Chicago White Sox             16919667
+109 1992     Chicago White Sox             30160833
+110 1993     Chicago White Sox             39696166
+111 1994     Chicago White Sox             39183836
+112 1995     Chicago White Sox             46961282
+113 1996     Chicago White Sox             45139500
+114 1997     Chicago White Sox             57740000
+115 1998     Chicago White Sox             38335000
+116 1999     Chicago White Sox             25620000
+117 2000     Chicago White Sox             31133500
+118 2001     Chicago White Sox             65653667
+119 2002     Chicago White Sox             57052833
+120 2003     Chicago White Sox             51010000
+121 1985       Cincinnati Reds              8359917
+122 1986       Cincinnati Reds             11906388
+123 1987       Cincinnati Reds              9281500
+124 1988       Cincinnati Reds              8888409
+125 1989       Cincinnati Reds             11072000
+126 1990       Cincinnati Reds             14370000
+127 1991       Cincinnati Reds             26305333
+128 1992       Cincinnati Reds             35931499
+129 1993       Cincinnati Reds             44879666
+130 1994       Cincinnati Reds             40961833
+131 1995       Cincinnati Reds             43144670
+132 1996       Cincinnati Reds             42526334
+133 1997       Cincinnati Reds             49768000
+134 1998       Cincinnati Reds             23005000
+135 1999       Cincinnati Reds             33962761
+136 2000       Cincinnati Reds             46867200
+137 2001       Cincinnati Reds             48986000
+138 2002       Cincinnati Reds             45050390
+139 2003       Cincinnati Reds             59355667
+140 1985     Cleveland Indians              6551666
+141 1986     Cleveland Indians              7809500
+142 1987     Cleveland Indians              8513750
+143 1988     Cleveland Indians              8936500
+144 1989     Cleveland Indians              9094500
+145 1990     Cleveland Indians             14487000
+146 1991     Cleveland Indians             17635000
+147 1992     Cleveland Indians              9373044
+148 1993     Cleveland Indians             18561000
+149 1994     Cleveland Indians             30490500
+150 1995     Cleveland Indians             37937835
+151 1996     Cleveland Indians             48107360
+152 1997     Cleveland Indians             56802460
+153 1998     Cleveland Indians             60800166
+154 1999     Cleveland Indians             72978462
+155 2000     Cleveland Indians             75880771
+156 2001     Cleveland Indians             93152001
+157 2002     Cleveland Indians             78909449
+158 2003     Cleveland Indians             48584834
+159 1993      Colorado Rockies             10353500
+160 1994      Colorado Rockies             23887333
+161 1995      Colorado Rockies             34154717
+162 1996      Colorado Rockies             40179823
+163 1997      Colorado Rockies             43559667
+164 1998      Colorado Rockies             50484648
+165 1999      Colorado Rockies             61935837
+166 2000      Colorado Rockies             61111190
+167 2001      Colorado Rockies             71541334
+168 2002      Colorado Rockies             56851043
+169 2003      Colorado Rockies             67179667
+170 1985        Detroit Tigers             10348143
+171 1986        Detroit Tigers             12335714
+172 1987        Detroit Tigers             12122881
+173 1988        Detroit Tigers             12869571
+174 1989        Detroit Tigers             15146404
+175 1990        Detroit Tigers             17593238
+176 1991        Detroit Tigers             23838333
+177 1992        Detroit Tigers             27322834
+178 1993        Detroit Tigers             38150165
+179 1994        Detroit Tigers             41446501
+180 1995        Detroit Tigers             37044168
+181 1996        Detroit Tigers             23438000
+182 1997        Detroit Tigers             17272000
+183 1998        Detroit Tigers             24065000
+184 1999        Detroit Tigers             36489666
+185 2000        Detroit Tigers             58265167
+186 2001        Detroit Tigers             53416167
+187 2002        Detroit Tigers             55048000
+188 2003        Detroit Tigers             49168000
+189 1993       Florida Marlins             19330545
+190 1994       Florida Marlins             21633000
+191 1995       Florida Marlins             24515781
+192 1996       Florida Marlins             31132000
+193 1997       Florida Marlins             48583000
+194 1998       Florida Marlins             41322667
+195 1999       Florida Marlins             21085000
+196 2000       Florida Marlins             19872000
+197 2001       Florida Marlins             35762500
+198 2002       Florida Marlins             41979917
+199 2003       Florida Marlins             49450000
+200 1985        Houston Astros              9993051
+201 1986        Houston Astros              9873276
+202 1987        Houston Astros             12608371
+203 1988        Houston Astros             12286167
+204 1989        Houston Astros             15029500
+205 1990        Houston Astros             18330000
+206 1991        Houston Astros             12852500
+207 1992        Houston Astros             15407500
+208 1993        Houston Astros             30210500
+209 1994        Houston Astros             33126000
+210 1995        Houston Astros             34169834
+211 1996        Houston Astros             28487000
+212 1997        Houston Astros             34777500
+213 1998        Houston Astros             42374000
+214 1999        Houston Astros             54914000
+215 2000        Houston Astros             51289111
+216 2001        Houston Astros             60612667
+217 2002        Houston Astros             63448417
+218 2003        Houston Astros             71040000
+219 1985    Kansas City Royals              9321179
+220 1986    Kansas City Royals             13043698
+221 1987    Kansas City Royals             11828056
+222 1988    Kansas City Royals             14556562
+223 1989    Kansas City Royals             18683568
+224 1990    Kansas City Royals             23361084
+225 1991    Kansas City Royals             26319834
+226 1992    Kansas City Royals             33893834
+227 1993    Kansas City Royals             41346167
+228 1994    Kansas City Royals             40541334
+229 1995    Kansas City Royals             29532834
+230 1996    Kansas City Royals             20281250
+231 1997    Kansas City Royals             34655000
+232 1998    Kansas City Royals             36862500
+233 1999    Kansas City Royals             26225000
+234 2000    Kansas City Royals             23433000
+235 2001    Kansas City Royals             35422500
+236 2002    Kansas City Royals             47257000
+237 2003    Kansas City Royals             40518000
+238 1985   Los Angeles Dodgers             10967917
+239 1986   Los Angeles Dodgers             14913776
+240 1987   Los Angeles Dodgers             13675403
+241 1988   Los Angeles Dodgers             16850515
+242 1989   Los Angeles Dodgers             21071562
+243 1990   Los Angeles Dodgers             21318704
+244 1991   Los Angeles Dodgers             32790664
+245 1992   Los Angeles Dodgers             44788166
+246 1993   Los Angeles Dodgers             39331999
+247 1994   Los Angeles Dodgers             38000001
+248 1995   Los Angeles Dodgers             39273201
+249 1996   Los Angeles Dodgers             35355000
+250 1997   Los Angeles Dodgers             45380304
+251 1998   Los Angeles Dodgers             48820000
+252 1999   Los Angeles Dodgers             80862453
+253 2000   Los Angeles Dodgers             87924286
+254 2001   Los Angeles Dodgers            109105953
+255 2002   Los Angeles Dodgers             94850953
+256 2003   Los Angeles Dodgers            105572620
+257 1985     Milwaukee Brewers             11284107
+258 1986     Milwaukee Brewers              9943642
+259 1987     Milwaukee Brewers              7293224
+260 1988     Milwaukee Brewers              8402000
+261 1989     Milwaukee Brewers             12483000
+262 1990     Milwaukee Brewers             19719167
+263 1991     Milwaukee Brewers             23115500
+264 1992     Milwaukee Brewers             31013667
+265 1993     Milwaukee Brewers             23806834
+266 1994     Milwaukee Brewers             24350500
+267 1995     Milwaukee Brewers             17798825
+268 1996     Milwaukee Brewers             21730000
+269 1997     Milwaukee Brewers             23655338
+270 1998     Milwaukee Brewers             33914904
+271 1999     Milwaukee Brewers             43377395
+272 2000     Milwaukee Brewers             36505333
+273 2001     Milwaukee Brewers             43886833
+274 2002     Milwaukee Brewers             50287833
+275 2003     Milwaukee Brewers             40627000
+276 1985       Minnesota Twins              5764821
+277 1986       Minnesota Twins              8748167
+278 1987       Minnesota Twins              6397500
+279 1988       Minnesota Twins             12462666
+280 1989       Minnesota Twins             14581666
+281 1990       Minnesota Twins             14602000
+282 1991       Minnesota Twins             23361833
+283 1992       Minnesota Twins             28027834
+284 1993       Minnesota Twins             28217933
+285 1994       Minnesota Twins             28438500
+286 1995       Minnesota Twins             25410500
+287 1996       Minnesota Twins             23117000
+288 1997       Minnesota Twins             34072500
+289 1998       Minnesota Twins             27927500
+290 1999       Minnesota Twins             21257500
+291 2000       Minnesota Twins             16519500
+292 2001       Minnesota Twins             24130000
+293 2002       Minnesota Twins             40425000
+294 2003       Minnesota Twins             55505000
+295 1985        Montreal Expos              9470166
+296 1986        Montreal Expos             11103600
+297 1987        Montreal Expos              6942052
+298 1988        Montreal Expos              9603333
+299 1989        Montreal Expos             13807389
+300 1990        Montreal Expos             16586388
+301 1991        Montreal Expos             10732333
+302 1992        Montreal Expos             15822334
+303 1993        Montreal Expos             18899333
+304 1994        Montreal Expos             19098000
+305 1995        Montreal Expos             12364000
+306 1996        Montreal Expos             16264500
+307 1997        Montreal Expos             19295500
+308 1998        Montreal Expos             10641500
+309 1999        Montreal Expos             17903000
+310 2000        Montreal Expos             32994333
+311 2001        Montreal Expos             35159500
+312 2002        Montreal Expos             38670500
+313 2003        Montreal Expos             51948500
+314 1985         New York Mets             10834762
+315 1986         New York Mets             15393714
+316 1987         New York Mets             13846714
+317 1988         New York Mets             15269314
+318 1989         New York Mets             19885071
+319 1990         New York Mets             21722834
+320 1991         New York Mets             32590001
+321 1992         New York Mets             44602002
+322 1993         New York Mets             39043667
+323 1994         New York Mets             30956583
+324 1995         New York Mets             27674992
+325 1996         New York Mets             24479500
+326 1997         New York Mets             39800400
+327 1998         New York Mets             52077999
+328 1999         New York Mets             65092092
+329 2000         New York Mets             79509776
+330 2001         New York Mets             93174428
+331 2002         New York Mets             94633593
+332 2003         New York Mets            116876429
+333 1985      New York Yankees             14238204
+334 1986      New York Yankees             18494253
+335 1987      New York Yankees             17099714
+336 1988      New York Yankees             19441152
+337 1989      New York Yankees             17114375
+338 1990      New York Yankees             20912318
+339 1991      New York Yankees             27344168
+340 1992      New York Yankees             37543334
+341 1993      New York Yankees             42624900
+342 1994      New York Yankees             45840334
+343 1995      New York Yankees             48874851
+344 1996      New York Yankees             54191792
+345 1997      New York Yankees             62241545
+346 1998      New York Yankees             66806867
+347 1999      New York Yankees             86734359
+348 2000      New York Yankees             92338260
+349 2001      New York Yankees            112287143
+350 2002      New York Yankees            125928583
+351 2003      New York Yankees            152749814
+352 1985     Oakland Athletics              9058606
+353 1986     Oakland Athletics              9779421
+354 1987     Oakland Athletics             11680839
+355 1988     Oakland Athletics              9690000
+356 1989     Oakland Athletics             15613070
+357 1990     Oakland Athletics             19887501
+358 1991     Oakland Athletics             36999167
+359 1992     Oakland Athletics             41035000
+360 1993     Oakland Athletics             37812333
+361 1994     Oakland Athletics             34172500
+362 1995     Oakland Athletics             37739225
+363 1996     Oakland Athletics             21243000
+364 1997     Oakland Athletics             24018500
+365 1998     Oakland Athletics             21303000
+366 1999     Oakland Athletics             24431833
+367 2000     Oakland Athletics             31971333
+368 2001     Oakland Athletics             33810750
+369 2002     Oakland Athletics             40004167
+370 2003     Oakland Athletics             50260834
+371 1985 Philadelphia Phillies             10124966
+372 1986 Philadelphia Phillies             11590166
+373 1987 Philadelphia Phillies             11514233
+374 1988 Philadelphia Phillies             13838000
+375 1989 Philadelphia Phillies             10604000
+376 1990 Philadelphia Phillies             13173667
+377 1991 Philadelphia Phillies             22487332
+378 1992 Philadelphia Phillies             24383834
+379 1993 Philadelphia Phillies             28538334
+380 1994 Philadelphia Phillies             31599000
+381 1995 Philadelphia Phillies             30555945
+382 1996 Philadelphia Phillies             34314500
+383 1997 Philadelphia Phillies             36656500
+384 1998 Philadelphia Phillies             36297500
+385 1999 Philadelphia Phillies             31692500
+386 2000 Philadelphia Phillies             47308000
+387 2001 Philadelphia Phillies             41663833
+388 2002 Philadelphia Phillies             57954999
+389 2003 Philadelphia Phillies             70780000
+390 1985    Pittsburgh Pirates              9072500
+391 1986    Pittsburgh Pirates             10843500
+392 1987    Pittsburgh Pirates              7652000
+393 1988    Pittsburgh Pirates              5998500
+394 1989    Pittsburgh Pirates             12737500
+395 1990    Pittsburgh Pirates             15556000
+396 1991    Pittsburgh Pirates             23634667
+397 1992    Pittsburgh Pirates             33944167
+398 1993    Pittsburgh Pirates             24822467
+399 1994    Pittsburgh Pirates             24217250
+400 1995    Pittsburgh Pirates             18355345
+401 1996    Pittsburgh Pirates             23017500
+402 1997    Pittsburgh Pirates             10771667
+403 1998    Pittsburgh Pirates             15065000
+404 1999    Pittsburgh Pirates             24697666
+405 2000    Pittsburgh Pirates             28928334
+406 2001    Pittsburgh Pirates             57760833
+407 2002    Pittsburgh Pirates             42323599
+408 2003    Pittsburgh Pirates             54812429
+409 1985      San Diego Padres             11191583
+410 1986      San Diego Padres             11380693
+411 1987      San Diego Padres             11065796
+412 1988      San Diego Padres              9561002
+413 1989      San Diego Padres             14195000
+414 1990      San Diego Padres             17588334
+415 1991      San Diego Padres             22150001
+416 1992      San Diego Padres             26854167
+417 1993      San Diego Padres             25511333
+418 1994      San Diego Padres             14916333
+419 1995      San Diego Padres             26382334
+420 1996      San Diego Padres             28348172
+421 1997      San Diego Padres             37363672
+422 1998      San Diego Padres             46861500
+423 1999      San Diego Padres             49768179
+424 2000      San Diego Padres             54821000
+425 2001      San Diego Padres             39182833
+426 2002      San Diego Padres             41425000
+427 2003      San Diego Padres             45210000
+428 1985  San Francisco Giants              8221714
+429 1986  San Francisco Giants              8947000
+430 1987  San Francisco Giants              6750000
+431 1988  San Francisco Giants             12380000
+432 1989  San Francisco Giants             14962834
+433 1990  San Francisco Giants             19335333
+434 1991  San Francisco Giants             30967666
+435 1992  San Francisco Giants             33163168
+436 1993  San Francisco Giants             35050000
+437 1994  San Francisco Giants             42529666
+438 1995  San Francisco Giants             36462777
+439 1996  San Francisco Giants             37144725
+440 1997  San Francisco Giants             35592378
+441 1998  San Francisco Giants             42565834
+442 1999  San Francisco Giants             46595057
+443 2000  San Francisco Giants             53737826
+444 2001  San Francisco Giants             63280167
+445 2002  San Francisco Giants             78299835
+446 2003  San Francisco Giants             82852167
+447 1985      Seattle Mariners              4613000
+448 1986      Seattle Mariners              5958309
+449 1987      Seattle Mariners              2263500
+450 1988      Seattle Mariners              7342450
+451 1989      Seattle Mariners              9779500
+452 1990      Seattle Mariners             12553667
+453 1991      Seattle Mariners             15691833
+454 1992      Seattle Mariners             23179833
+455 1993      Seattle Mariners             32696333
+456 1994      Seattle Mariners             29228500
+457 1995      Seattle Mariners             36481311
+458 1996      Seattle Mariners             41328501
+459 1997      Seattle Mariners             41540661
+460 1998      Seattle Mariners             54087036
+461 1999      Seattle Mariners             54125003
+462 2000      Seattle Mariners             58915000
+463 2001      Seattle Mariners             74720834
+464 2002      Seattle Mariners             80282668
+465 2003      Seattle Mariners             86959167
+466 1985   St. Louis Cardinals             11817083
+467 1986   St. Louis Cardinals              9875010
+468 1987   St. Louis Cardinals             11758000
+469 1988   St. Louis Cardinals             12880000
+470 1989   St. Louis Cardinals             16078833
+471 1990   St. Louis Cardinals             20523334
+472 1991   St. Louis Cardinals             21860001
+473 1992   St. Louis Cardinals             27583836
+474 1993   St. Louis Cardinals             23367334
+475 1994   St. Louis Cardinals             29275601
+476 1995   St. Louis Cardinals             37101000
+477 1996   St. Louis Cardinals             40269667
+478 1997   St. Louis Cardinals             45456667
+479 1998   St. Louis Cardinals             54672521
+480 1999   St. Louis Cardinals             49778195
+481 2000   St. Louis Cardinals             61453863
+482 2001   St. Louis Cardinals             78538333
+483 2002   St. Louis Cardinals             74660875
+484 2003   St. Louis Cardinals             83786666
+485 1998  Tampa Bay Devil Rays             27280000
+486 1999  Tampa Bay Devil Rays             38870000
+487 2000  Tampa Bay Devil Rays             62765129
+488 2001  Tampa Bay Devil Rays             56980000
+489 2002  Tampa Bay Devil Rays             34380000
+490 2003  Tampa Bay Devil Rays             19630000
+491 1985         Texas Rangers              7676500
+492 1986         Texas Rangers              6743119
+493 1987         Texas Rangers               880000
+494 1988         Texas Rangers              5342131
+495 1989         Texas Rangers             11893781
+496 1990         Texas Rangers             14874372
+497 1991         Texas Rangers             18224500
+498 1992         Texas Rangers             30128167
+499 1993         Texas Rangers             36376959
+500 1994         Texas Rangers             32973597
+501 1995         Texas Rangers             34581451
+502 1996         Texas Rangers             39041528
+503 1997         Texas Rangers             53448838
+504 1998         Texas Rangers             56572095
+505 1999         Texas Rangers             76709931
+506 2000         Texas Rangers             70795921
+507 2001         Texas Rangers             88633500
+508 2002         Texas Rangers            105526122
+509 2003         Texas Rangers            103491667
+510 1985     Toronto Blue Jays              8726186
+511 1986     Toronto Blue Jays             12644380
+512 1987     Toronto Blue Jays             10562834
+513 1988     Toronto Blue Jays             12141225
+514 1989     Toronto Blue Jays             15649666
+515 1990     Toronto Blue Jays             17606834
+516 1991     Toronto Blue Jays             16902417
+517 1992     Toronto Blue Jays             44788666
+518 1993     Toronto Blue Jays             47279166
+519 1994     Toronto Blue Jays             43433668
+520 1995     Toronto Blue Jays             50590000
+521 1996     Toronto Blue Jays             30555083
+522 1997     Toronto Blue Jays             47079833
+523 1998     Toronto Blue Jays             51376000
+524 1999     Toronto Blue Jays             45444333
+525 2000     Toronto Blue Jays             44838332
+526 2001     Toronto Blue Jays             76895999
+527 2002     Toronto Blue Jays             76864333
+528 2003     Toronto Blue Jays             51269000
+> rs = dbSendQuery(con, "select Salaries.yearID AS Year, Teams.name AS Team, SUM(Salaries.salary) AS Payroll FROM Master, Teams, Salaries WhERE Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID GROUP BY Team, Year ORDER BY Team, Year;")
+> fetch(rs, n = -1)
+    Year                  Team   Payroll
+1   1997        Anaheim Angels  31135472
+2   1998        Anaheim Angels  41281000
+3   1999        Anaheim Angels  55388166
+4   2000        Anaheim Angels  51464167
+5   2001        Anaheim Angels  47535167
+6   2002        Anaheim Angels  61721667
+7   2003        Anaheim Angels  79031667
+8   1998  Arizona Diamondbacks  32347000
+9   1999  Arizona Diamondbacks  68703999
+10  2000  Arizona Diamondbacks  81027833
+11  2001  Arizona Diamondbacks  85082999
+12  2002  Arizona Diamondbacks 102819999
+13  2003  Arizona Diamondbacks  80657000
+14  1985        Atlanta Braves  14807000
+15  1986        Atlanta Braves  17102786
+16  1987        Atlanta Braves  16544560
+17  1988        Atlanta Braves  12728174
+18  1989        Atlanta Braves  11112334
+19  1990        Atlanta Braves  14555501
+20  1991        Atlanta Braves  18403500
+21  1992        Atlanta Braves  34625333
+22  1993        Atlanta Braves  41641417
+23  1994        Atlanta Braves  49383513
+24  1995        Atlanta Braves  47235445
+25  1996        Atlanta Braves  49698500
+26  1997        Atlanta Braves  52278500
+27  1998        Atlanta Braves  61186000
+28  1999        Atlanta Braves  73140000
+29  2000        Atlanta Braves  84537836
+30  2001        Atlanta Braves  91936166
+31  2002        Atlanta Braves  92870367
+32  2003        Atlanta Braves 106243667
+33  1985     Baltimore Orioles  11560712
+34  1986     Baltimore Orioles  13001258
+35  1987     Baltimore Orioles  13900273
+36  1988     Baltimore Orioles  13532075
+37  1989     Baltimore Orioles   8275167
+38  1990     Baltimore Orioles   9680084
+39  1991     Baltimore Orioles  17519000
+40  1992     Baltimore Orioles  23780667
+41  1993     Baltimore Orioles  29096500
+42  1994     Baltimore Orioles  38849769
+43  1995     Baltimore Orioles  43942521
+44  1996     Baltimore Orioles  54490315
+45  1997     Baltimore Orioles  58516400
+46  1998     Baltimore Orioles  72355634
+47  1999     Baltimore Orioles  80605863
+48  2000     Baltimore Orioles  81447435
+49  2001     Baltimore Orioles  67599540
+50  2002     Baltimore Orioles  60493487
+51  2003     Baltimore Orioles  73877500
+52  1985        Boston Red Sox  10897560
+53  1986        Boston Red Sox  14402239
+54  1987        Boston Red Sox  10144167
+55  1988        Boston Red Sox  13896092
+56  1989        Boston Red Sox  17481748
+57  1990        Boston Red Sox  20558333
+58  1991        Boston Red Sox  35167500
+59  1992        Boston Red Sox  43610584
+60  1993        Boston Red Sox  37120583
+61  1994        Boston Red Sox  37859084
+62  1995        Boston Red Sox  32455518
+63  1996        Boston Red Sox  42393500
+64  1997        Boston Red Sox  43558750
+65  1998        Boston Red Sox  56757000
+66  1999        Boston Red Sox  63497500
+67  2000        Boston Red Sox  77940333
+68  2001        Boston Red Sox 110035833
+69  2002        Boston Red Sox 108366060
+70  2003        Boston Red Sox  99946500
+71  1985     California Angels  14427894
+72  1986     California Angels  14427258
+73  1987     California Angels  12843499
+74  1988     California Angels  11947388
+75  1989     California Angels  15097833
+76  1990     California Angels  21720000
+77  1991     California Angels  33060001
+78  1992     California Angels  34749334
+79  1993     California Angels  28588334
+80  1994     California Angels  25156218
+81  1995     California Angels  31223171
+82  1996     California Angels  28738000
+83  1985          Chicago Cubs  12702917
+84  1986          Chicago Cubs  17208165
+85  1987          Chicago Cubs  14307999
+86  1988          Chicago Cubs  13119198
+87  1989          Chicago Cubs  10668000
+88  1990          Chicago Cubs  13624000
+89  1991          Chicago Cubs  23175667
+90  1992          Chicago Cubs  29829686
+91  1993          Chicago Cubs  39386666
+92  1994          Chicago Cubs  36287333
+93  1995          Chicago Cubs  29505834
+94  1996          Chicago Cubs  33081000
+95  1997          Chicago Cubs  42155333
+96  1998          Chicago Cubs  50838000
+97  1999          Chicago Cubs  62343000
+98  2000          Chicago Cubs  60539333
+99  2001          Chicago Cubs  64715833
+100 2002          Chicago Cubs  75690833
+101 2003          Chicago Cubs  79868333
+102 1985     Chicago White Sox   9846178
+103 1986     Chicago White Sox  10418819
+104 1987     Chicago White Sox   4253958
+105 1988     Chicago White Sox   6390000
+106 1989     Chicago White Sox   7265410
+107 1990     Chicago White Sox   9491500
+108 1991     Chicago White Sox  16919667
+109 1992     Chicago White Sox  30160833
+110 1993     Chicago White Sox  39696166
+111 1994     Chicago White Sox  39183836
+112 1995     Chicago White Sox  46961282
+113 1996     Chicago White Sox  45139500
+114 1997     Chicago White Sox  57740000
+115 1998     Chicago White Sox  38335000
+116 1999     Chicago White Sox  25620000
+117 2000     Chicago White Sox  31133500
+118 2001     Chicago White Sox  65653667
+119 2002     Chicago White Sox  57052833
+120 2003     Chicago White Sox  51010000
+121 1985       Cincinnati Reds   8359917
+122 1986       Cincinnati Reds  11906388
+123 1987       Cincinnati Reds   9281500
+124 1988       Cincinnati Reds   8888409
+125 1989       Cincinnati Reds  11072000
+126 1990       Cincinnati Reds  14370000
+127 1991       Cincinnati Reds  26305333
+128 1992       Cincinnati Reds  35931499
+129 1993       Cincinnati Reds  44879666
+130 1994       Cincinnati Reds  40961833
+131 1995       Cincinnati Reds  43144670
+132 1996       Cincinnati Reds  42526334
+133 1997       Cincinnati Reds  49768000
+134 1998       Cincinnati Reds  23005000
+135 1999       Cincinnati Reds  33962761
+136 2000       Cincinnati Reds  46867200
+137 2001       Cincinnati Reds  48986000
+138 2002       Cincinnati Reds  45050390
+139 2003       Cincinnati Reds  59355667
+140 1985     Cleveland Indians   6551666
+141 1986     Cleveland Indians   7809500
+142 1987     Cleveland Indians   8513750
+143 1988     Cleveland Indians   8936500
+144 1989     Cleveland Indians   9094500
+145 1990     Cleveland Indians  14487000
+146 1991     Cleveland Indians  17635000
+147 1992     Cleveland Indians   9373044
+148 1993     Cleveland Indians  18561000
+149 1994     Cleveland Indians  30490500
+150 1995     Cleveland Indians  37937835
+151 1996     Cleveland Indians  48107360
+152 1997     Cleveland Indians  56802460
+153 1998     Cleveland Indians  60800166
+154 1999     Cleveland Indians  72978462
+155 2000     Cleveland Indians  75880771
+156 2001     Cleveland Indians  93152001
+157 2002     Cleveland Indians  78909449
+158 2003     Cleveland Indians  48584834
+159 1993      Colorado Rockies  10353500
+160 1994      Colorado Rockies  23887333
+161 1995      Colorado Rockies  34154717
+162 1996      Colorado Rockies  40179823
+163 1997      Colorado Rockies  43559667
+164 1998      Colorado Rockies  50484648
+165 1999      Colorado Rockies  61935837
+166 2000      Colorado Rockies  61111190
+167 2001      Colorado Rockies  71541334
+168 2002      Colorado Rockies  56851043
+169 2003      Colorado Rockies  67179667
+170 1985        Detroit Tigers  10348143
+171 1986        Detroit Tigers  12335714
+172 1987        Detroit Tigers  12122881
+173 1988        Detroit Tigers  12869571
+174 1989        Detroit Tigers  15146404
+175 1990        Detroit Tigers  17593238
+176 1991        Detroit Tigers  23838333
+177 1992        Detroit Tigers  27322834
+178 1993        Detroit Tigers  38150165
+179 1994        Detroit Tigers  41446501
+180 1995        Detroit Tigers  37044168
+181 1996        Detroit Tigers  23438000
+182 1997        Detroit Tigers  17272000
+183 1998        Detroit Tigers  24065000
+184 1999        Detroit Tigers  36489666
+185 2000        Detroit Tigers  58265167
+186 2001        Detroit Tigers  53416167
+187 2002        Detroit Tigers  55048000
+188 2003        Detroit Tigers  49168000
+189 1993       Florida Marlins  19330545
+190 1994       Florida Marlins  21633000
+191 1995       Florida Marlins  24515781
+192 1996       Florida Marlins  31132000
+193 1997       Florida Marlins  48583000
+194 1998       Florida Marlins  41322667
+195 1999       Florida Marlins  21085000
+196 2000       Florida Marlins  19872000
+197 2001       Florida Marlins  35762500
+198 2002       Florida Marlins  41979917
+199 2003       Florida Marlins  49450000
+200 1985        Houston Astros   9993051
+201 1986        Houston Astros   9873276
+202 1987        Houston Astros  12608371
+203 1988        Houston Astros  12286167
+204 1989        Houston Astros  15029500
+205 1990        Houston Astros  18330000
+206 1991        Houston Astros  12852500
+207 1992        Houston Astros  15407500
+208 1993        Houston Astros  30210500
+209 1994        Houston Astros  33126000
+210 1995        Houston Astros  34169834
+211 1996        Houston Astros  28487000
+212 1997        Houston Astros  34777500
+213 1998        Houston Astros  42374000
+214 1999        Houston Astros  54914000
+215 2000        Houston Astros  51289111
+216 2001        Houston Astros  60612667
+217 2002        Houston Astros  63448417
+218 2003        Houston Astros  71040000
+219 1985    Kansas City Royals   9321179
+220 1986    Kansas City Royals  13043698
+221 1987    Kansas City Royals  11828056
+222 1988    Kansas City Royals  14556562
+223 1989    Kansas City Royals  18683568
+224 1990    Kansas City Royals  23361084
+225 1991    Kansas City Royals  26319834
+226 1992    Kansas City Royals  33893834
+227 1993    Kansas City Royals  41346167
+228 1994    Kansas City Royals  40541334
+229 1995    Kansas City Royals  29532834
+230 1996    Kansas City Royals  20281250
+231 1997    Kansas City Royals  34655000
+232 1998    Kansas City Royals  36862500
+233 1999    Kansas City Royals  26225000
+234 2000    Kansas City Royals  23433000
+235 2001    Kansas City Royals  35422500
+236 2002    Kansas City Royals  47257000
+237 2003    Kansas City Royals  40518000
+238 1985   Los Angeles Dodgers  10967917
+239 1986   Los Angeles Dodgers  14913776
+240 1987   Los Angeles Dodgers  13675403
+241 1988   Los Angeles Dodgers  16850515
+242 1989   Los Angeles Dodgers  21071562
+243 1990   Los Angeles Dodgers  21318704
+244 1991   Los Angeles Dodgers  32790664
+245 1992   Los Angeles Dodgers  44788166
+246 1993   Los Angeles Dodgers  39331999
+247 1994   Los Angeles Dodgers  38000001
+248 1995   Los Angeles Dodgers  39273201
+249 1996   Los Angeles Dodgers  35355000
+250 1997   Los Angeles Dodgers  45380304
+251 1998   Los Angeles Dodgers  48820000
+252 1999   Los Angeles Dodgers  80862453
+253 2000   Los Angeles Dodgers  87924286
+254 2001   Los Angeles Dodgers 109105953
+255 2002   Los Angeles Dodgers  94850953
+256 2003   Los Angeles Dodgers 105572620
+257 1985     Milwaukee Brewers  11284107
+258 1986     Milwaukee Brewers   9943642
+259 1987     Milwaukee Brewers   7293224
+260 1988     Milwaukee Brewers   8402000
+261 1989     Milwaukee Brewers  12483000
+262 1990     Milwaukee Brewers  19719167
+263 1991     Milwaukee Brewers  23115500
+264 1992     Milwaukee Brewers  31013667
+265 1993     Milwaukee Brewers  23806834
+266 1994     Milwaukee Brewers  24350500
+267 1995     Milwaukee Brewers  17798825
+268 1996     Milwaukee Brewers  21730000
+269 1997     Milwaukee Brewers  23655338
+270 1998     Milwaukee Brewers  33914904
+271 1999     Milwaukee Brewers  43377395
+272 2000     Milwaukee Brewers  36505333
+273 2001     Milwaukee Brewers  43886833
+274 2002     Milwaukee Brewers  50287833
+275 2003     Milwaukee Brewers  40627000
+276 1985       Minnesota Twins   5764821
+277 1986       Minnesota Twins   8748167
+278 1987       Minnesota Twins   6397500
+279 1988       Minnesota Twins  12462666
+280 1989       Minnesota Twins  14581666
+281 1990       Minnesota Twins  14602000
+282 1991       Minnesota Twins  23361833
+283 1992       Minnesota Twins  28027834
+284 1993       Minnesota Twins  28217933
+285 1994       Minnesota Twins  28438500
+286 1995       Minnesota Twins  25410500
+287 1996       Minnesota Twins  23117000
+288 1997       Minnesota Twins  34072500
+289 1998       Minnesota Twins  27927500
+290 1999       Minnesota Twins  21257500
+291 2000       Minnesota Twins  16519500
+292 2001       Minnesota Twins  24130000
+293 2002       Minnesota Twins  40425000
+294 2003       Minnesota Twins  55505000
+295 1985        Montreal Expos   9470166
+296 1986        Montreal Expos  11103600
+297 1987        Montreal Expos   6942052
+298 1988        Montreal Expos   9603333
+299 1989        Montreal Expos  13807389
+300 1990        Montreal Expos  16586388
+301 1991        Montreal Expos  10732333
+302 1992        Montreal Expos  15822334
+303 1993        Montreal Expos  18899333
+304 1994        Montreal Expos  19098000
+305 1995        Montreal Expos  12364000
+306 1996        Montreal Expos  16264500
+307 1997        Montreal Expos  19295500
+308 1998        Montreal Expos  10641500
+309 1999        Montreal Expos  17903000
+310 2000        Montreal Expos  32994333
+311 2001        Montreal Expos  35159500
+312 2002        Montreal Expos  38670500
+313 2003        Montreal Expos  51948500
+314 1985         New York Mets  10834762
+315 1986         New York Mets  15393714
+316 1987         New York Mets  13846714
+317 1988         New York Mets  15269314
+318 1989         New York Mets  19885071
+319 1990         New York Mets  21722834
+320 1991         New York Mets  32590001
+321 1992         New York Mets  44602002
+322 1993         New York Mets  39043667
+323 1994         New York Mets  30956583
+324 1995         New York Mets  27674992
+325 1996         New York Mets  24479500
+326 1997         New York Mets  39800400
+327 1998         New York Mets  52077999
+328 1999         New York Mets  65092092
+329 2000         New York Mets  79509776
+330 2001         New York Mets  93174428
+331 2002         New York Mets  94633593
+332 2003         New York Mets 116876429
+333 1985      New York Yankees  14238204
+334 1986      New York Yankees  18494253
+335 1987      New York Yankees  17099714
+336 1988      New York Yankees  19441152
+337 1989      New York Yankees  17114375
+338 1990      New York Yankees  20912318
+339 1991      New York Yankees  27344168
+340 1992      New York Yankees  37543334
+341 1993      New York Yankees  42624900
+342 1994      New York Yankees  45840334
+343 1995      New York Yankees  48874851
+344 1996      New York Yankees  54191792
+345 1997      New York Yankees  62241545
+346 1998      New York Yankees  66806867
+347 1999      New York Yankees  86734359
+348 2000      New York Yankees  92338260
+349 2001      New York Yankees 112287143
+350 2002      New York Yankees 125928583
+351 2003      New York Yankees 152749814
+352 1985     Oakland Athletics   9058606
+353 1986     Oakland Athletics   9779421
+354 1987     Oakland Athletics  11680839
+355 1988     Oakland Athletics   9690000
+356 1989     Oakland Athletics  15613070
+357 1990     Oakland Athletics  19887501
+358 1991     Oakland Athletics  36999167
+359 1992     Oakland Athletics  41035000
+360 1993     Oakland Athletics  37812333
+361 1994     Oakland Athletics  34172500
+362 1995     Oakland Athletics  37739225
+363 1996     Oakland Athletics  21243000
+364 1997     Oakland Athletics  24018500
+365 1998     Oakland Athletics  21303000
+366 1999     Oakland Athletics  24431833
+367 2000     Oakland Athletics  31971333
+368 2001     Oakland Athletics  33810750
+369 2002     Oakland Athletics  40004167
+370 2003     Oakland Athletics  50260834
+371 1985 Philadelphia Phillies  10124966
+372 1986 Philadelphia Phillies  11590166
+373 1987 Philadelphia Phillies  11514233
+374 1988 Philadelphia Phillies  13838000
+375 1989 Philadelphia Phillies  10604000
+376 1990 Philadelphia Phillies  13173667
+377 1991 Philadelphia Phillies  22487332
+378 1992 Philadelphia Phillies  24383834
+379 1993 Philadelphia Phillies  28538334
+380 1994 Philadelphia Phillies  31599000
+381 1995 Philadelphia Phillies  30555945
+382 1996 Philadelphia Phillies  34314500
+383 1997 Philadelphia Phillies  36656500
+384 1998 Philadelphia Phillies  36297500
+385 1999 Philadelphia Phillies  31692500
+386 2000 Philadelphia Phillies  47308000
+387 2001 Philadelphia Phillies  41663833
+388 2002 Philadelphia Phillies  57954999
+389 2003 Philadelphia Phillies  70780000
+390 1985    Pittsburgh Pirates   9072500
+391 1986    Pittsburgh Pirates  10843500
+392 1987    Pittsburgh Pirates   7652000
+393 1988    Pittsburgh Pirates   5998500
+394 1989    Pittsburgh Pirates  12737500
+395 1990    Pittsburgh Pirates  15556000
+396 1991    Pittsburgh Pirates  23634667
+397 1992    Pittsburgh Pirates  33944167
+398 1993    Pittsburgh Pirates  24822467
+399 1994    Pittsburgh Pirates  24217250
+400 1995    Pittsburgh Pirates  18355345
+401 1996    Pittsburgh Pirates  23017500
+402 1997    Pittsburgh Pirates  10771667
+403 1998    Pittsburgh Pirates  15065000
+404 1999    Pittsburgh Pirates  24697666
+405 2000    Pittsburgh Pirates  28928334
+406 2001    Pittsburgh Pirates  57760833
+407 2002    Pittsburgh Pirates  42323599
+408 2003    Pittsburgh Pirates  54812429
+409 1985      San Diego Padres  11191583
+410 1986      San Diego Padres  11380693
+411 1987      San Diego Padres  11065796
+412 1988      San Diego Padres   9561002
+413 1989      San Diego Padres  14195000
+414 1990      San Diego Padres  17588334
+415 1991      San Diego Padres  22150001
+416 1992      San Diego Padres  26854167
+417 1993      San Diego Padres  25511333
+418 1994      San Diego Padres  14916333
+419 1995      San Diego Padres  26382334
+420 1996      San Diego Padres  28348172
+421 1997      San Diego Padres  37363672
+422 1998      San Diego Padres  46861500
+423 1999      San Diego Padres  49768179
+424 2000      San Diego Padres  54821000
+425 2001      San Diego Padres  39182833
+426 2002      San Diego Padres  41425000
+427 2003      San Diego Padres  45210000
+428 1985  San Francisco Giants   8221714
+429 1986  San Francisco Giants   8947000
+430 1987  San Francisco Giants   6750000
+431 1988  San Francisco Giants  12380000
+432 1989  San Francisco Giants  14962834
+433 1990  San Francisco Giants  19335333
+434 1991  San Francisco Giants  30967666
+435 1992  San Francisco Giants  33163168
+436 1993  San Francisco Giants  35050000
+437 1994  San Francisco Giants  42529666
+438 1995  San Francisco Giants  36462777
+439 1996  San Francisco Giants  37144725
+440 1997  San Francisco Giants  35592378
+441 1998  San Francisco Giants  42565834
+442 1999  San Francisco Giants  46595057
+443 2000  San Francisco Giants  53737826
+444 2001  San Francisco Giants  63280167
+445 2002  San Francisco Giants  78299835
+446 2003  San Francisco Giants  82852167
+447 1985      Seattle Mariners   4613000
+448 1986      Seattle Mariners   5958309
+449 1987      Seattle Mariners   2263500
+450 1988      Seattle Mariners   7342450
+451 1989      Seattle Mariners   9779500
+452 1990      Seattle Mariners  12553667
+453 1991      Seattle Mariners  15691833
+454 1992      Seattle Mariners  23179833
+455 1993      Seattle Mariners  32696333
+456 1994      Seattle Mariners  29228500
+457 1995      Seattle Mariners  36481311
+458 1996      Seattle Mariners  41328501
+459 1997      Seattle Mariners  41540661
+460 1998      Seattle Mariners  54087036
+461 1999      Seattle Mariners  54125003
+462 2000      Seattle Mariners  58915000
+463 2001      Seattle Mariners  74720834
+464 2002      Seattle Mariners  80282668
+465 2003      Seattle Mariners  86959167
+466 1985   St. Louis Cardinals  11817083
+467 1986   St. Louis Cardinals   9875010
+468 1987   St. Louis Cardinals  11758000
+469 1988   St. Louis Cardinals  12880000
+470 1989   St. Louis Cardinals  16078833
+471 1990   St. Louis Cardinals  20523334
+472 1991   St. Louis Cardinals  21860001
+473 1992   St. Louis Cardinals  27583836
+474 1993   St. Louis Cardinals  23367334
+475 1994   St. Louis Cardinals  29275601
+476 1995   St. Louis Cardinals  37101000
+477 1996   St. Louis Cardinals  40269667
+478 1997   St. Louis Cardinals  45456667
+479 1998   St. Louis Cardinals  54672521
+480 1999   St. Louis Cardinals  49778195
+481 2000   St. Louis Cardinals  61453863
+482 2001   St. Louis Cardinals  78538333
+483 2002   St. Louis Cardinals  74660875
+484 2003   St. Louis Cardinals  83786666
+485 1998  Tampa Bay Devil Rays  27280000
+486 1999  Tampa Bay Devil Rays  38870000
+487 2000  Tampa Bay Devil Rays  62765129
+488 2001  Tampa Bay Devil Rays  56980000
+489 2002  Tampa Bay Devil Rays  34380000
+490 2003  Tampa Bay Devil Rays  19630000
+491 1985         Texas Rangers   7676500
+492 1986         Texas Rangers   6743119
+493 1987         Texas Rangers    880000
+494 1988         Texas Rangers   5342131
+495 1989         Texas Rangers  11893781
+496 1990         Texas Rangers  14874372
+497 1991         Texas Rangers  18224500
+498 1992         Texas Rangers  30128167
+499 1993         Texas Rangers  36376959
+500 1994         Texas Rangers  32973597
+501 1995         Texas Rangers  34581451
+502 1996         Texas Rangers  39041528
+503 1997         Texas Rangers  53448838
+504 1998         Texas Rangers  56572095
+505 1999         Texas Rangers  76709931
+506 2000         Texas Rangers  70795921
+507 2001         Texas Rangers  88633500
+508 2002         Texas Rangers 105526122
+509 2003         Texas Rangers 103491667
+510 1985     Toronto Blue Jays   8726186
+511 1986     Toronto Blue Jays  12644380
+512 1987     Toronto Blue Jays  10562834
+513 1988     Toronto Blue Jays  12141225
+514 1989     Toronto Blue Jays  15649666
+515 1990     Toronto Blue Jays  17606834
+516 1991     Toronto Blue Jays  16902417
+517 1992     Toronto Blue Jays  44788666
+518 1993     Toronto Blue Jays  47279166
+519 1994     Toronto Blue Jays  43433668
+520 1995     Toronto Blue Jays  50590000
+521 1996     Toronto Blue Jays  30555083
+522 1997     Toronto Blue Jays  47079833
+523 1998     Toronto Blue Jays  51376000
+524 1999     Toronto Blue Jays  45444333
+525 2000     Toronto Blue Jays  44838332
+526 2001     Toronto Blue Jays  76895999
+527 2002     Toronto Blue Jays  76864333
+528 2003     Toronto Blue Jays  51269000
+> d = dbGetQuery(con, "select Salaries.yearID AS Year, Teams.name AS Team, SUM(Salaries.salary) AS Payroll FROM Master, Teams, Salaries WhERE Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID GROUP BY Team, Year ORDER BY Team, Year;")
+> d
+*** output flushed ***
+> dbListResults()
+Error in dbListResults() : No direct or inherited method for function "dbListResults" for this call
+> dbListResults(con)
+[[1]]
+<MySQLResult:(4554,0,7)> 
+
+> dbClearResult(dbListResults(con)[[1]])
+[1] TRUE
+> dbListResults(con)
+*** output flushed ***
+> class(d[,1])
+[1] "numeric"
+> dim(d)
+[1] 528   3
+> d
+    Year                  Team   Payroll
+1   1997        Anaheim Angels  31135472
+2   1998        Anaheim Angels  41281000
+3   1999        Anaheim Angels  55388166
+4   2000        Anaheim Angels  51464167
+5   2001        Anaheim Angels  47535167
+6   2002        Anaheim Angels  61721667
+7   2003        Anaheim Angels  79031667
+8   1998  Arizona Diamondbacks  32347000
+9   1999  Arizona Diamondbacks  68703999
+10  2000  Arizona Diamondbacks  81027833
+11  2001  Arizona Diamondbacks  85082999
+12  2002  Arizona Diamondbacks 102819999
+13  2003  Arizona Diamondbacks  80657000
+14  1985        Atlanta Braves  14807000
+15  1986        Atlanta Braves  17102786
+16  1987        Atlanta Braves  16544560
+17  1988        Atlanta Braves  12728174
+18  1989        Atlanta Braves  11112334
+19  1990        Atlanta Braves  14555501
+20  1991        Atlanta Braves  18403500
+21  1992        Atlanta Braves  34625333
+22  1993        Atlanta Braves  41641417
+23  1994        Atlanta Braves  49383513
+24  1995        Atlanta Braves  47235445
+25  1996        Atlanta Braves  49698500
+26  1997        Atlanta Braves  52278500
+27  1998        Atlanta Braves  61186000
+28  1999        Atlanta Braves  73140000
+29  2000        Atlanta Braves  84537836
+30  2001        Atlanta Braves  91936166
+31  2002        Atlanta Braves  92870367
+32  2003        Atlanta Braves 106243667
+33  1985     Baltimore Orioles  11560712
+34  1986     Baltimore Orioles  13001258
+35  1987     Baltimore Orioles  13900273
+36  1988     Baltimore Orioles  13532075
+37  1989     Baltimore Orioles   8275167
+38  1990     Baltimore Orioles   9680084
+39  1991     Baltimore Orioles  17519000
+40  1992     Baltimore Orioles  23780667
+41  1993     Baltimore Orioles  29096500
+42  1994     Baltimore Orioles  38849769
+43  1995     Baltimore Orioles  43942521
+44  1996     Baltimore Orioles  54490315
+45  1997     Baltimore Orioles  58516400
+46  1998     Baltimore Orioles  72355634
+47  1999     Baltimore Orioles  80605863
+48  2000     Baltimore Orioles  81447435
+49  2001     Baltimore Orioles  67599540
+50  2002     Baltimore Orioles  60493487
+51  2003     Baltimore Orioles  73877500
+52  1985        Boston Red Sox  10897560
+53  1986        Boston Red Sox  14402239
+54  1987        Boston Red Sox  10144167
+55  1988        Boston Red Sox  13896092
+56  1989        Boston Red Sox  17481748
+57  1990        Boston Red Sox  20558333
+58  1991        Boston Red Sox  35167500
+59  1992        Boston Red Sox  43610584
+60  1993        Boston Red Sox  37120583
+61  1994        Boston Red Sox  37859084
+62  1995        Boston Red Sox  32455518
+63  1996        Boston Red Sox  42393500
+64  1997        Boston Red Sox  43558750
+65  1998        Boston Red Sox  56757000
+66  1999        Boston Red Sox  63497500
+67  2000        Boston Red Sox  77940333
+68  2001        Boston Red Sox 110035833
+69  2002        Boston Red Sox 108366060
+70  2003        Boston Red Sox  99946500
+71  1985     California Angels  14427894
+72  1986     California Angels  14427258
+73  1987     California Angels  12843499
+74  1988     California Angels  11947388
+75  1989     California Angels  15097833
+76  1990     California Angels  21720000
+77  1991     California Angels  33060001
+78  1992     California Angels  34749334
+79  1993     California Angels  28588334
+80  1994     California Angels  25156218
+81  1995     California Angels  31223171
+82  1996     California Angels  28738000
+83  1985          Chicago Cubs  12702917
+84  1986          Chicago Cubs  17208165
+85  1987          Chicago Cubs  14307999
+86  1988          Chicago Cubs  13119198
+87  1989          Chicago Cubs  10668000
+88  1990          Chicago Cubs  13624000
+89  1991          Chicago Cubs  23175667
+90  1992          Chicago Cubs  29829686
+91  1993          Chicago Cubs  39386666
+92  1994          Chicago Cubs  36287333
+93  1995          Chicago Cubs  29505834
+94  1996          Chicago Cubs  33081000
+95  1997          Chicago Cubs  42155333
+96  1998          Chicago Cubs  50838000
+97  1999          Chicago Cubs  62343000
+98  2000          Chicago Cubs  60539333
+99  2001          Chicago Cubs  64715833
+100 2002          Chicago Cubs  75690833
+101 2003          Chicago Cubs  79868333
+102 1985     Chicago White Sox   9846178
+103 1986     Chicago White Sox  10418819
+104 1987     Chicago White Sox   4253958
+105 1988     Chicago White Sox   6390000
+106 1989     Chicago White Sox   7265410
+107 1990     Chicago White Sox   9491500
+108 1991     Chicago White Sox  16919667
+109 1992     Chicago White Sox  30160833
+110 1993     Chicago White Sox  39696166
+111 1994     Chicago White Sox  39183836
+112 1995     Chicago White Sox  46961282
+113 1996     Chicago White Sox  45139500
+114 1997     Chicago White Sox  57740000
+115 1998     Chicago White Sox  38335000
+116 1999     Chicago White Sox  25620000
+117 2000     Chicago White Sox  31133500
+118 2001     Chicago White Sox  65653667
+119 2002     Chicago White Sox  57052833
+120 2003     Chicago White Sox  51010000
+121 1985       Cincinnati Reds   8359917
+122 1986       Cincinnati Reds  11906388
+123 1987       Cincinnati Reds   9281500
+124 1988       Cincinnati Reds   8888409
+125 1989       Cincinnati Reds  11072000
+126 1990       Cincinnati Reds  14370000
+127 1991       Cincinnati Reds  26305333
+128 1992       Cincinnati Reds  35931499
+129 1993       Cincinnati Reds  44879666
+130 1994       Cincinnati Reds  40961833
+131 1995       Cincinnati Reds  43144670
+132 1996       Cincinnati Reds  42526334
+133 1997       Cincinnati Reds  49768000
+134 1998       Cincinnati Reds  23005000
+135 1999       Cincinnati Reds  33962761
+136 2000       Cincinnati Reds  46867200
+137 2001       Cincinnati Reds  48986000
+138 2002       Cincinnati Reds  45050390
+139 2003       Cincinnati Reds  59355667
+140 1985     Cleveland Indians   6551666
+141 1986     Cleveland Indians   7809500
+142 1987     Cleveland Indians   8513750
+143 1988     Cleveland Indians   8936500
+144 1989     Cleveland Indians   9094500
+145 1990     Cleveland Indians  14487000
+146 1991     Cleveland Indians  17635000
+147 1992     Cleveland Indians   9373044
+148 1993     Cleveland Indians  18561000
+149 1994     Cleveland Indians  30490500
+150 1995     Cleveland Indians  37937835
+151 1996     Cleveland Indians  48107360
+152 1997     Cleveland Indians  56802460
+153 1998     Cleveland Indians  60800166
+154 1999     Cleveland Indians  72978462
+155 2000     Cleveland Indians  75880771
+156 2001     Cleveland Indians  93152001
+157 2002     Cleveland Indians  78909449
+158 2003     Cleveland Indians  48584834
+159 1993      Colorado Rockies  10353500
+160 1994      Colorado Rockies  23887333
+161 1995      Colorado Rockies  34154717
+162 1996      Colorado Rockies  40179823
+163 1997      Colorado Rockies  43559667
+164 1998      Colorado Rockies  50484648
+165 1999      Colorado Rockies  61935837
+166 2000      Colorado Rockies  61111190
+167 2001      Colorado Rockies  71541334
+168 2002      Colorado Rockies  56851043
+169 2003      Colorado Rockies  67179667
+170 1985        Detroit Tigers  10348143
+171 1986        Detroit Tigers  12335714
+172 1987        Detroit Tigers  12122881
+173 1988        Detroit Tigers  12869571
+174 1989        Detroit Tigers  15146404
+175 1990        Detroit Tigers  17593238
+176 1991        Detroit Tigers  23838333
+177 1992        Detroit Tigers  27322834
+178 1993        Detroit Tigers  38150165
+179 1994        Detroit Tigers  41446501
+180 1995        Detroit Tigers  37044168
+181 1996        Detroit Tigers  23438000
+182 1997        Detroit Tigers  17272000
+183 1998        Detroit Tigers  24065000
+184 1999        Detroit Tigers  36489666
+185 2000        Detroit Tigers  58265167
+186 2001        Detroit Tigers  53416167
+187 2002        Detroit Tigers  55048000
+188 2003        Detroit Tigers  49168000
+189 1993       Florida Marlins  19330545
+190 1994       Florida Marlins  21633000
+191 1995       Florida Marlins  24515781
+192 1996       Florida Marlins  31132000
+193 1997       Florida Marlins  48583000
+194 1998       Florida Marlins  41322667
+195 1999       Florida Marlins  21085000
+196 2000       Florida Marlins  19872000
+197 2001       Florida Marlins  35762500
+198 2002       Florida Marlins  41979917
+199 2003       Florida Marlins  49450000
+200 1985        Houston Astros   9993051
+201 1986        Houston Astros   9873276
+202 1987        Houston Astros  12608371
+203 1988        Houston Astros  12286167
+204 1989        Houston Astros  15029500
+205 1990        Houston Astros  18330000
+206 1991        Houston Astros  12852500
+207 1992        Houston Astros  15407500
+208 1993        Houston Astros  30210500
+209 1994        Houston Astros  33126000
+210 1995        Houston Astros  34169834
+211 1996        Houston Astros  28487000
+212 1997        Houston Astros  34777500
+213 1998        Houston Astros  42374000
+214 1999        Houston Astros  54914000
+215 2000        Houston Astros  51289111
+216 2001        Houston Astros  60612667
+217 2002        Houston Astros  63448417
+218 2003        Houston Astros  71040000
+219 1985    Kansas City Royals   9321179
+220 1986    Kansas City Royals  13043698
+221 1987    Kansas City Royals  11828056
+222 1988    Kansas City Royals  14556562
+223 1989    Kansas City Royals  18683568
+224 1990    Kansas City Royals  23361084
+225 1991    Kansas City Royals  26319834
+226 1992    Kansas City Royals  33893834
+227 1993    Kansas City Royals  41346167
+228 1994    Kansas City Royals  40541334
+229 1995    Kansas City Royals  29532834
+230 1996    Kansas City Royals  20281250
+231 1997    Kansas City Royals  34655000
+232 1998    Kansas City Royals  36862500
+233 1999    Kansas City Royals  26225000
+234 2000    Kansas City Royals  23433000
+235 2001    Kansas City Royals  35422500
+236 2002    Kansas City Royals  47257000
+237 2003    Kansas City Royals  40518000
+238 1985   Los Angeles Dodgers  10967917
+239 1986   Los Angeles Dodgers  14913776
+240 1987   Los Angeles Dodgers  13675403
+241 1988   Los Angeles Dodgers  16850515
+242 1989   Los Angeles Dodgers  21071562
+243 1990   Los Angeles Dodgers  21318704
+244 1991   Los Angeles Dodgers  32790664
+245 1992   Los Angeles Dodgers  44788166
+246 1993   Los Angeles Dodgers  39331999
+247 1994   Los Angeles Dodgers  38000001
+248 1995   Los Angeles Dodgers  39273201
+249 1996   Los Angeles Dodgers  35355000
+250 1997   Los Angeles Dodgers  45380304
+251 1998   Los Angeles Dodgers  48820000
+252 1999   Los Angeles Dodgers  80862453
+253 2000   Los Angeles Dodgers  87924286
+254 2001   Los Angeles Dodgers 109105953
+255 2002   Los Angeles Dodgers  94850953
+256 2003   Los Angeles Dodgers 105572620
+257 1985     Milwaukee Brewers  11284107
+258 1986     Milwaukee Brewers   9943642
+259 1987     Milwaukee Brewers   7293224
+260 1988     Milwaukee Brewers   8402000
+261 1989     Milwaukee Brewers  12483000
+262 1990     Milwaukee Brewers  19719167
+263 1991     Milwaukee Brewers  23115500
+264 1992     Milwaukee Brewers  31013667
+265 1993     Milwaukee Brewers  23806834
+266 1994     Milwaukee Brewers  24350500
+267 1995     Milwaukee Brewers  17798825
+268 1996     Milwaukee Brewers  21730000
+269 1997     Milwaukee Brewers  23655338
+270 1998     Milwaukee Brewers  33914904
+271 1999     Milwaukee Brewers  43377395
+272 2000     Milwaukee Brewers  36505333
+273 2001     Milwaukee Brewers  43886833
+274 2002     Milwaukee Brewers  50287833
+275 2003     Milwaukee Brewers  40627000
+276 1985       Minnesota Twins   5764821
+277 1986       Minnesota Twins   8748167
+278 1987       Minnesota Twins   6397500
+279 1988       Minnesota Twins  12462666
+280 1989       Minnesota Twins  14581666
+281 1990       Minnesota Twins  14602000
+282 1991       Minnesota Twins  23361833
+283 1992       Minnesota Twins  28027834
+284 1993       Minnesota Twins  28217933
+285 1994       Minnesota Twins  28438500
+286 1995       Minnesota Twins  25410500
+287 1996       Minnesota Twins  23117000
+288 1997       Minnesota Twins  34072500
+289 1998       Minnesota Twins  27927500
+290 1999       Minnesota Twins  21257500
+291 2000       Minnesota Twins  16519500
+292 2001       Minnesota Twins  24130000
+293 2002       Minnesota Twins  40425000
+294 2003       Minnesota Twins  55505000
+295 1985        Montreal Expos   9470166
+296 1986        Montreal Expos  11103600
+297 1987        Montreal Expos   6942052
+298 1988        Montreal Expos   9603333
+299 1989        Montreal Expos  13807389
+300 1990        Montreal Expos  16586388
+301 1991        Montreal Expos  10732333
+302 1992        Montreal Expos  15822334
+303 1993        Montreal Expos  18899333
+304 1994        Montreal Expos  19098000
+305 1995        Montreal Expos  12364000
+306 1996        Montreal Expos  16264500
+307 1997        Montreal Expos  19295500
+308 1998        Montreal Expos  10641500
+309 1999        Montreal Expos  17903000
+310 2000        Montreal Expos  32994333
+311 2001        Montreal Expos  35159500
+312 2002        Montreal Expos  38670500
+313 2003        Montreal Expos  51948500
+314 1985         New York Mets  10834762
+315 1986         New York Mets  15393714
+316 1987         New York Mets  13846714
+317 1988         New York Mets  15269314
+318 1989         New York Mets  19885071
+319 1990         New York Mets  21722834
+320 1991         New York Mets  32590001
+321 1992         New York Mets  44602002
+322 1993         New York Mets  39043667
+323 1994         New York Mets  30956583
+324 1995         New York Mets  27674992
+325 1996         New York Mets  24479500
+326 1997         New York Mets  39800400
+327 1998         New York Mets  52077999
+328 1999         New York Mets  65092092
+329 2000         New York Mets  79509776
+330 2001         New York Mets  93174428
+331 2002         New York Mets  94633593
+332 2003         New York Mets 116876429
+333 1985      New York Yankees  14238204
+334 1986      New York Yankees  18494253
+335 1987      New York Yankees  17099714
+336 1988      New York Yankees  19441152
+337 1989      New York Yankees  17114375
+338 1990      New York Yankees  20912318
+339 1991      New York Yankees  27344168
+340 1992      New York Yankees  37543334
+341 1993      New York Yankees  42624900
+342 1994      New York Yankees  45840334
+343 1995      New York Yankees  48874851
+344 1996      New York Yankees  54191792
+345 1997      New York Yankees  62241545
+346 1998      New York Yankees  66806867
+347 1999      New York Yankees  86734359
+348 2000      New York Yankees  92338260
+349 2001      New York Yankees 112287143
+350 2002      New York Yankees 125928583
+351 2003      New York Yankees 152749814
+352 1985     Oakland Athletics   9058606
+353 1986     Oakland Athletics   9779421
+354 1987     Oakland Athletics  11680839
+355 1988     Oakland Athletics   9690000
+356 1989     Oakland Athletics  15613070
+357 1990     Oakland Athletics  19887501
+358 1991     Oakland Athletics  36999167
+359 1992     Oakland Athletics  41035000
+360 1993     Oakland Athletics  37812333
+361 1994     Oakland Athletics  34172500
+362 1995     Oakland Athletics  37739225
+363 1996     Oakland Athletics  21243000
+364 1997     Oakland Athletics  24018500
+365 1998     Oakland Athletics  21303000
+366 1999     Oakland Athletics  24431833
+367 2000     Oakland Athletics  31971333
+368 2001     Oakland Athletics  33810750
+369 2002     Oakland Athletics  40004167
+370 2003     Oakland Athletics  50260834
+371 1985 Philadelphia Phillies  10124966
+372 1986 Philadelphia Phillies  11590166
+373 1987 Philadelphia Phillies  11514233
+374 1988 Philadelphia Phillies  13838000
+375 1989 Philadelphia Phillies  10604000
+376 1990 Philadelphia Phillies  13173667
+377 1991 Philadelphia Phillies  22487332
+378 1992 Philadelphia Phillies  24383834
+379 1993 Philadelphia Phillies  28538334
+380 1994 Philadelphia Phillies  31599000
+381 1995 Philadelphia Phillies  30555945
+382 1996 Philadelphia Phillies  34314500
+383 1997 Philadelphia Phillies  36656500
+384 1998 Philadelphia Phillies  36297500
+385 1999 Philadelphia Phillies  31692500
+386 2000 Philadelphia Phillies  47308000
+387 2001 Philadelphia Phillies  41663833
+388 2002 Philadelphia Phillies  57954999
+389 2003 Philadelphia Phillies  70780000
+390 1985    Pittsburgh Pirates   9072500
+391 1986    Pittsburgh Pirates  10843500
+392 1987    Pittsburgh Pirates   7652000
+393 1988    Pittsburgh Pirates   5998500
+394 1989    Pittsburgh Pirates  12737500
+395 1990    Pittsburgh Pirates  15556000
+396 1991    Pittsburgh Pirates  23634667
+397 1992    Pittsburgh Pirates  33944167
+398 1993    Pittsburgh Pirates  24822467
+399 1994    Pittsburgh Pirates  24217250
+400 1995    Pittsburgh Pirates  18355345
+401 1996    Pittsburgh Pirates  23017500
+402 1997    Pittsburgh Pirates  10771667
+403 1998    Pittsburgh Pirates  15065000
+404 1999    Pittsburgh Pirates  24697666
+405 2000    Pittsburgh Pirates  28928334
+406 2001    Pittsburgh Pirates  57760833
+407 2002    Pittsburgh Pirates  42323599
+408 2003    Pittsburgh Pirates  54812429
+409 1985      San Diego Padres  11191583
+410 1986      San Diego Padres  11380693
+411 1987      San Diego Padres  11065796
+412 1988      San Diego Padres   9561002
+413 1989      San Diego Padres  14195000
+414 1990      San Diego Padres  17588334
+415 1991      San Diego Padres  22150001
+416 1992      San Diego Padres  26854167
+417 1993      San Diego Padres  25511333
+418 1994      San Diego Padres  14916333
+419 1995      San Diego Padres  26382334
+420 1996      San Diego Padres  28348172
+421 1997      San Diego Padres  37363672
+422 1998      San Diego Padres  46861500
+423 1999      San Diego Padres  49768179
+424 2000      San Diego Padres  54821000
+425 2001      San Diego Padres  39182833
+426 2002      San Diego Padres  41425000
+427 2003      San Diego Padres  45210000
+428 1985  San Francisco Giants   8221714
+429 1986  San Francisco Giants   8947000
+430 1987  San Francisco Giants   6750000
+431 1988  San Francisco Giants  12380000
+432 1989  San Francisco Giants  14962834
+433 1990  San Francisco Giants  19335333
+434 1991  San Francisco Giants  30967666
+435 1992  San Francisco Giants  33163168
+436 1993  San Francisco Giants  35050000
+437 1994  San Francisco Giants  42529666
+438 1995  San Francisco Giants  36462777
+439 1996  San Francisco Giants  37144725
+440 1997  San Francisco Giants  35592378
+441 1998  San Francisco Giants  42565834
+442 1999  San Francisco Giants  46595057
+443 2000  San Francisco Giants  53737826
+444 2001  San Francisco Giants  63280167
+445 2002  San Francisco Giants  78299835
+446 2003  San Francisco Giants  82852167
+447 1985      Seattle Mariners   4613000
+448 1986      Seattle Mariners   5958309
+449 1987      Seattle Mariners   2263500
+450 1988      Seattle Mariners   7342450
+451 1989      Seattle Mariners   9779500
+452 1990      Seattle Mariners  12553667
+453 1991      Seattle Mariners  15691833
+454 1992      Seattle Mariners  23179833
+455 1993      Seattle Mariners  32696333
+456 1994      Seattle Mariners  29228500
+457 1995      Seattle Mariners  36481311
+458 1996      Seattle Mariners  41328501
+459 1997      Seattle Mariners  41540661
+460 1998      Seattle Mariners  54087036
+461 1999      Seattle Mariners  54125003
+462 2000      Seattle Mariners  58915000
+463 2001      Seattle Mariners  74720834
+464 2002      Seattle Mariners  80282668
+465 2003      Seattle Mariners  86959167
+466 1985   St. Louis Cardinals  11817083
+467 1986   St. Louis Cardinals   9875010
+468 1987   St. Louis Cardinals  11758000
+469 1988   St. Louis Cardinals  12880000
+470 1989   St. Louis Cardinals  16078833
+471 1990   St. Louis Cardinals  20523334
+472 1991   St. Louis Cardinals  21860001
+473 1992   St. Louis Cardinals  27583836
+474 1993   St. Louis Cardinals  23367334
+475 1994   St. Louis Cardinals  29275601
+476 1995   St. Louis Cardinals  37101000
+477 1996   St. Louis Cardinals  40269667
+478 1997   St. Louis Cardinals  45456667
+479 1998   St. Louis Cardinals  54672521
+480 1999   St. Louis Cardinals  49778195
+481 2000   St. Louis Cardinals  61453863
+482 2001   St. Louis Cardinals  78538333
+483 2002   St. Louis Cardinals  74660875
+484 2003   St. Louis Cardinals  83786666
+485 1998  Tampa Bay Devil Rays  27280000
+486 1999  Tampa Bay Devil Rays  38870000
+487 2000  Tampa Bay Devil Rays  62765129
+488 2001  Tampa Bay Devil Rays  56980000
+489 2002  Tampa Bay Devil Rays  34380000
+490 2003  Tampa Bay Devil Rays  19630000
+491 1985         Texas Rangers   7676500
+492 1986         Texas Rangers   6743119
+493 1987         Texas Rangers    880000
+494 1988         Texas Rangers   5342131
+495 1989         Texas Rangers  11893781
+496 1990         Texas Rangers  14874372
+497 1991         Texas Rangers  18224500
+498 1992         Texas Rangers  30128167
+499 1993         Texas Rangers  36376959
+500 1994         Texas Rangers  32973597
+501 1995         Texas Rangers  34581451
+502 1996         Texas Rangers  39041528
+503 1997         Texas Rangers  53448838
+504 1998         Texas Rangers  56572095
+505 1999         Texas Rangers  76709931
+506 2000         Texas Rangers  70795921
+507 2001         Texas Rangers  88633500
+508 2002         Texas Rangers 105526122
+509 2003         Texas Rangers 103491667
+510 1985     Toronto Blue Jays   8726186
+511 1986     Toronto Blue Jays  12644380
+512 1987     Toronto Blue Jays  10562834
+513 1988     Toronto Blue Jays  12141225
+514 1989     Toronto Blue Jays  15649666
+515 1990     Toronto Blue Jays  17606834
+516 1991     Toronto Blue Jays  16902417
+517 1992     Toronto Blue Jays  44788666
+518 1993     Toronto Blue Jays  47279166
+519 1994     Toronto Blue Jays  43433668
+520 1995     Toronto Blue Jays  50590000
+521 1996     Toronto Blue Jays  30555083
+522 1997     Toronto Blue Jays  47079833
+523 1998     Toronto Blue Jays  51376000
+524 1999     Toronto Blue Jays  45444333
+525 2000     Toronto Blue Jays  44838332
+526 2001     Toronto Blue Jays  76895999
+527 2002     Toronto Blue Jays  76864333
+528 2003     Toronto Blue Jays  51269000
+> unique(d[,2])
+ [1] "Anaheim Angels"        "Arizona Diamondbacks"  "Atlanta Braves"       
+ [4] "Baltimore Orioles"     "Boston Red Sox"        "California Angels"    
+ [7] "Chicago Cubs"          "Chicago White Sox"     "Cincinnati Reds"      
+[10] "Cleveland Indians"     "Colorado Rockies"      "Detroit Tigers"       
+[13] "Florida Marlins"       "Houston Astros"        "Kansas City Royals"   
+[16] "Los Angeles Dodgers"   "Milwaukee Brewers"     "Minnesota Twins"      
+[19] "Montreal Expos"        "New York Mets"         "New York Yankees"     
+[22] "Oakland Athletics"     "Philadelphia Phillies" "Pittsburgh Pirates"   
+[25] "San Diego Padres"      "San Francisco Giants"  "Seattle Mariners"     
+[28] "St. Louis Cardinals"   "Tampa Bay Devil Rays"  "Texas Rangers"        
+[31] "Toronto Blue Jays"    
+> unique(d[,1])
+ [1] 1997 1998 1999 2000 2001 2002 2003 1985 1986 1987 1988 1989 1990 1991 1992
+[16] 1993 1994 1995 1996
+> ?matplot
+WARNING: terminal is not fully functional
+-  (press RETURN)
+matplot                 package:base                 R Documentation
+
+Plot Columns of Matrices
+
+Description:
+
+     Plot the columns of one matrix against the columns of another.
+
+Usage:
+
+     matplot(x, y, type = "p", lty = 1:5, lwd = 1, pch = NULL, col = 1:6,
+             cex = NULL, xlab = NULL, ylab = NULL, xlim = NULL, ylim = NULL,
+             ..., add = FALSE, verbose = getOption("verbose"))
+     matpoints(x, y, type = "p", lty = 1:5, lwd = 1, pch = NULL, col = 1:6, ...)     matlines (x, y, type = "l", lty = 1:5, lwd = 1, pch = NULL, col = 1:6, ...)
+Arguments:
+
+     x,y: vectors or matrices of data for plotting.  The number of rows
+          should match.  If one of them are missing, the other is taken
+          as 'y' and an 'x' vector of '1:n' is used. Missing values
+          ('NA's) are allowed.
+
+: 
+    type: character string (length 1 vector) or vector of 1-character
+          strings indicating the type of plot for each column of 'y',
+          see 'plot' for all possible 'type's.  The first character of
+          'type' defines the first plot, the second character the
+          second, etc. Characters in 'type' are cycled through; e.g.,
+          '"pl"' alternately plots points and lines.
+
+ lty,lwd: vector of line types and widths. The first element is for the
+          first column, the second element for the second column, etc.,
+          even if lines are not plotted for all columns. Line types
+          will be used cyclically until all plots are drawn.
+
+     pch: character string or vector of 1-characters or integers for
+          plotting characters, see 'points'. The first character is the
+          plotting-character for the first plot, the second for the
+          second, etc.  The default is the digits (1 through 9, 0) then
+          the letters. 
+
+     col: vector of colors.  Colors are used cyclically.
+
+     cex: vector of character expansion sizes, used cyclically.
+
+xlab, ylab: titles for x and y axes, as in 'plot'.
+
+:q
+> > ?by
+WARNING: terminal is not fully functional
+-  (press RETURN)
+by                   package:base                   R Documentation
+
+Apply a Function to a Data Frame split by Factors
+
+Description:
+
+     Function 'by' is an object-oriented wrapper for 'tapply' applied
+     to data frames.
+
+Usage:
+
+     by(data, INDICES, FUN, ...)
+
+Arguments:
+
+    data: an R object, normally a data frame, possibly a matrix.
+
+ INDICES: a factor or a list of factors, each of length 'nrow(x)'.
+
+     FUN: a function to be applied to data frame subsets of 'x'.
+
+     ...: further arguments to 'FUN'.
+
+ 
+Details:
+
+     A data frame is split by row into data frames subsetted by the
+     values of one or more factors, and function 'FUN' is applied to
+     each subset in term.
+
+     Object 'data' will be coerced to a data frame by default.
+
+Value:
+
+     A list of class '"by"', giving the results for each subset.
+
+See Also:
+
+     'tapply'
+
+Examples:
+
+     data(warpbreaks)
+     attach(warpbreaks)
+     by(warpbreaks[, 1:2], tension, summary)
+     by(warpbreaks[, 1], list(wool=wool, tension=tension), summary)
+     by(warpbreaks, tension, function(x) lm(breaks ~ wool, data=x))
+
+:q
+> > by(d, d[,2], function(x) x)
+d[, 2]: Anaheim Angels
+  Year           Team  Payroll
+1 1997 Anaheim Angels 31135472
+2 1998 Anaheim Angels 41281000
+3 1999 Anaheim Angels 55388166
+4 2000 Anaheim Angels 51464167
+5 2001 Anaheim Angels 47535167
+6 2002 Anaheim Angels 61721667
+7 2003 Anaheim Angels 79031667
+------------------------------------------------------------ 
+d[, 2]: Arizona Diamondbacks
+   Year                 Team   Payroll
+8  1998 Arizona Diamondbacks  32347000
+9  1999 Arizona Diamondbacks  68703999
+10 2000 Arizona Diamondbacks  81027833
+11 2001 Arizona Diamondbacks  85082999
+12 2002 Arizona Diamondbacks 102819999
+13 2003 Arizona Diamondbacks  80657000
+------------------------------------------------------------ 
+d[, 2]: Atlanta Braves
+   Year           Team   Payroll
+14 1985 Atlanta Braves  14807000
+15 1986 Atlanta Braves  17102786
+16 1987 Atlanta Braves  16544560
+17 1988 Atlanta Braves  12728174
+18 1989 Atlanta Braves  11112334
+19 1990 Atlanta Braves  14555501
+20 1991 Atlanta Braves  18403500
+21 1992 Atlanta Braves  34625333
+22 1993 Atlanta Braves  41641417
+23 1994 Atlanta Braves  49383513
+24 1995 Atlanta Braves  47235445
+25 1996 Atlanta Braves  49698500
+26 1997 Atlanta Braves  52278500
+27 1998 Atlanta Braves  61186000
+28 1999 Atlanta Braves  73140000
+29 2000 Atlanta Braves  84537836
+30 2001 Atlanta Braves  91936166
+31 2002 Atlanta Braves  92870367
+32 2003 Atlanta Braves 106243667
+------------------------------------------------------------ 
+d[, 2]: Baltimore Orioles
+   Year              Team  Payroll
+33 1985 Baltimore Orioles 11560712
+34 1986 Baltimore Orioles 13001258
+35 1987 Baltimore Orioles 13900273
+36 1988 Baltimore Orioles 13532075
+37 1989 Baltimore Orioles  8275167
+38 1990 Baltimore Orioles  9680084
+39 1991 Baltimore Orioles 17519000
+40 1992 Baltimore Orioles 23780667
+41 1993 Baltimore Orioles 29096500
+42 1994 Baltimore Orioles 38849769
+43 1995 Baltimore Orioles 43942521
+44 1996 Baltimore Orioles 54490315
+45 1997 Baltimore Orioles 58516400
+46 1998 Baltimore Orioles 72355634
+47 1999 Baltimore Orioles 80605863
+48 2000 Baltimore Orioles 81447435
+49 2001 Baltimore Orioles 67599540
+50 2002 Baltimore Orioles 60493487
+51 2003 Baltimore Orioles 73877500
+------------------------------------------------------------ 
+d[, 2]: Boston Red Sox
+   Year           Team   Payroll
+52 1985 Boston Red Sox  10897560
+53 1986 Boston Red Sox  14402239
+54 1987 Boston Red Sox  10144167
+55 1988 Boston Red Sox  13896092
+56 1989 Boston Red Sox  17481748
+57 1990 Boston Red Sox  20558333
+58 1991 Boston Red Sox  35167500
+59 1992 Boston Red Sox  43610584
+60 1993 Boston Red Sox  37120583
+61 1994 Boston Red Sox  37859084
+62 1995 Boston Red Sox  32455518
+63 1996 Boston Red Sox  42393500
+64 1997 Boston Red Sox  43558750
+65 1998 Boston Red Sox  56757000
+66 1999 Boston Red Sox  63497500
+67 2000 Boston Red Sox  77940333
+68 2001 Boston Red Sox 110035833
+69 2002 Boston Red Sox 108366060
+70 2003 Boston Red Sox  99946500
+------------------------------------------------------------ 
+d[, 2]: California Angels
+   Year              Team  Payroll
+71 1985 California Angels 14427894
+72 1986 California Angels 14427258
+73 1987 California Angels 12843499
+74 1988 California Angels 11947388
+75 1989 California Angels 15097833
+76 1990 California Angels 21720000
+77 1991 California Angels 33060001
+78 1992 California Angels 34749334
+79 1993 California Angels 28588334
+80 1994 California Angels 25156218
+81 1995 California Angels 31223171
+82 1996 California Angels 28738000
+------------------------------------------------------------ 
+d[, 2]: Chicago Cubs
+    Year         Team  Payroll
+83  1985 Chicago Cubs 12702917
+84  1986 Chicago Cubs 17208165
+85  1987 Chicago Cubs 14307999
+86  1988 Chicago Cubs 13119198
+87  1989 Chicago Cubs 10668000
+88  1990 Chicago Cubs 13624000
+89  1991 Chicago Cubs 23175667
+90  1992 Chicago Cubs 29829686
+91  1993 Chicago Cubs 39386666
+92  1994 Chicago Cubs 36287333
+93  1995 Chicago Cubs 29505834
+94  1996 Chicago Cubs 33081000
+95  1997 Chicago Cubs 42155333
+96  1998 Chicago Cubs 50838000
+97  1999 Chicago Cubs 62343000
+98  2000 Chicago Cubs 60539333
+99  2001 Chicago Cubs 64715833
+100 2002 Chicago Cubs 75690833
+101 2003 Chicago Cubs 79868333
+------------------------------------------------------------ 
+d[, 2]: Chicago White Sox
+    Year              Team  Payroll
+102 1985 Chicago White Sox  9846178
+103 1986 Chicago White Sox 10418819
+104 1987 Chicago White Sox  4253958
+105 1988 Chicago White Sox  6390000
+106 1989 Chicago White Sox  7265410
+107 1990 Chicago White Sox  9491500
+108 1991 Chicago White Sox 16919667
+109 1992 Chicago White Sox 30160833
+110 1993 Chicago White Sox 39696166
+111 1994 Chicago White Sox 39183836
+112 1995 Chicago White Sox 46961282
+113 1996 Chicago White Sox 45139500
+114 1997 Chicago White Sox 57740000
+115 1998 Chicago White Sox 38335000
+116 1999 Chicago White Sox 25620000
+117 2000 Chicago White Sox 31133500
+118 2001 Chicago White Sox 65653667
+119 2002 Chicago White Sox 57052833
+120 2003 Chicago White Sox 51010000
+------------------------------------------------------------ 
+d[, 2]: Cincinnati Reds
+    Year            Team  Payroll
+121 1985 Cincinnati Reds  8359917
+122 1986 Cincinnati Reds 11906388
+123 1987 Cincinnati Reds  9281500
+124 1988 Cincinnati Reds  8888409
+125 1989 Cincinnati Reds 11072000
+126 1990 Cincinnati Reds 14370000
+127 1991 Cincinnati Reds 26305333
+128 1992 Cincinnati Reds 35931499
+129 1993 Cincinnati Reds 44879666
+130 1994 Cincinnati Reds 40961833
+131 1995 Cincinnati Reds 43144670
+132 1996 Cincinnati Reds 42526334
+133 1997 Cincinnati Reds 49768000
+134 1998 Cincinnati Reds 23005000
+135 1999 Cincinnati Reds 33962761
+136 2000 Cincinnati Reds 46867200
+137 2001 Cincinnati Reds 48986000
+138 2002 Cincinnati Reds 45050390
+139 2003 Cincinnati Reds 59355667
+------------------------------------------------------------ 
+d[, 2]: Cleveland Indians
+    Year              Team  Payroll
+140 1985 Cleveland Indians  6551666
+141 1986 Cleveland Indians  7809500
+142 1987 Cleveland Indians  8513750
+143 1988 Cleveland Indians  8936500
+144 1989 Cleveland Indians  9094500
+145 1990 Cleveland Indians 14487000
+146 1991 Cleveland Indians 17635000
+147 1992 Cleveland Indians  9373044
+148 1993 Cleveland Indians 18561000
+149 1994 Cleveland Indians 30490500
+150 1995 Cleveland Indians 37937835
+151 1996 Cleveland Indians 48107360
+152 1997 Cleveland Indians 56802460
+153 1998 Cleveland Indians 60800166
+154 1999 Cleveland Indians 72978462
+155 2000 Cleveland Indians 75880771
+156 2001 Cleveland Indians 93152001
+157 2002 Cleveland Indians 78909449
+158 2003 Cleveland Indians 48584834
+------------------------------------------------------------ 
+d[, 2]: Colorado Rockies
+    Year             Team  Payroll
+159 1993 Colorado Rockies 10353500
+160 1994 Colorado Rockies 23887333
+161 1995 Colorado Rockies 34154717
+162 1996 Colorado Rockies 40179823
+163 1997 Colorado Rockies 43559667
+164 1998 Colorado Rockies 50484648
+165 1999 Colorado Rockies 61935837
+166 2000 Colorado Rockies 61111190
+167 2001 Colorado Rockies 71541334
+168 2002 Colorado Rockies 56851043
+169 2003 Colorado Rockies 67179667
+------------------------------------------------------------ 
+d[, 2]: Detroit Tigers
+    Year           Team  Payroll
+170 1985 Detroit Tigers 10348143
+171 1986 Detroit Tigers 12335714
+172 1987 Detroit Tigers 12122881
+173 1988 Detroit Tigers 12869571
+174 1989 Detroit Tigers 15146404
+175 1990 Detroit Tigers 17593238
+176 1991 Detroit Tigers 23838333
+177 1992 Detroit Tigers 27322834
+178 1993 Detroit Tigers 38150165
+179 1994 Detroit Tigers 41446501
+180 1995 Detroit Tigers 37044168
+181 1996 Detroit Tigers 23438000
+182 1997 Detroit Tigers 17272000
+183 1998 Detroit Tigers 24065000
+184 1999 Detroit Tigers 36489666
+185 2000 Detroit Tigers 58265167
+186 2001 Detroit Tigers 53416167
+187 2002 Detroit Tigers 55048000
+188 2003 Detroit Tigers 49168000
+------------------------------------------------------------ 
+d[, 2]: Florida Marlins
+    Year            Team  Payroll
+189 1993 Florida Marlins 19330545
+190 1994 Florida Marlins 21633000
+191 1995 Florida Marlins 24515781
+192 1996 Florida Marlins 31132000
+193 1997 Florida Marlins 48583000
+194 1998 Florida Marlins 41322667
+195 1999 Florida Marlins 21085000
+196 2000 Florida Marlins 19872000
+197 2001 Florida Marlins 35762500
+198 2002 Florida Marlins 41979917
+199 2003 Florida Marlins 49450000
+------------------------------------------------------------ 
+d[, 2]: Houston Astros
+    Year           Team  Payroll
+200 1985 Houston Astros  9993051
+201 1986 Houston Astros  9873276
+202 1987 Houston Astros 12608371
+203 1988 Houston Astros 12286167
+204 1989 Houston Astros 15029500
+205 1990 Houston Astros 18330000
+206 1991 Houston Astros 12852500
+207 1992 Houston Astros 15407500
+208 1993 Houston Astros 30210500
+209 1994 Houston Astros 33126000
+210 1995 Houston Astros 34169834
+211 1996 Houston Astros 28487000
+212 1997 Houston Astros 34777500
+213 1998 Houston Astros 42374000
+214 1999 Houston Astros 54914000
+215 2000 Houston Astros 51289111
+216 2001 Houston Astros 60612667
+217 2002 Houston Astros 63448417
+218 2003 Houston Astros 71040000
+------------------------------------------------------------ 
+d[, 2]: Kansas City Royals
+    Year               Team  Payroll
+219 1985 Kansas City Royals  9321179
+220 1986 Kansas City Royals 13043698
+221 1987 Kansas City Royals 11828056
+222 1988 Kansas City Royals 14556562
+223 1989 Kansas City Royals 18683568
+224 1990 Kansas City Royals 23361084
+225 1991 Kansas City Royals 26319834
+226 1992 Kansas City Royals 33893834
+227 1993 Kansas City Royals 41346167
+228 1994 Kansas City Royals 40541334
+229 1995 Kansas City Royals 29532834
+230 1996 Kansas City Royals 20281250
+231 1997 Kansas City Royals 34655000
+232 1998 Kansas City Royals 36862500
+233 1999 Kansas City Royals 26225000
+234 2000 Kansas City Royals 23433000
+235 2001 Kansas City Royals 35422500
+236 2002 Kansas City Royals 47257000
+237 2003 Kansas City Royals 40518000
+------------------------------------------------------------ 
+d[, 2]: Los Angeles Dodgers
+    Year                Team   Payroll
+238 1985 Los Angeles Dodgers  10967917
+239 1986 Los Angeles Dodgers  14913776
+240 1987 Los Angeles Dodgers  13675403
+241 1988 Los Angeles Dodgers  16850515
+242 1989 Los Angeles Dodgers  21071562
+243 1990 Los Angeles Dodgers  21318704
+244 1991 Los Angeles Dodgers  32790664
+245 1992 Los Angeles Dodgers  44788166
+246 1993 Los Angeles Dodgers  39331999
+247 1994 Los Angeles Dodgers  38000001
+248 1995 Los Angeles Dodgers  39273201
+249 1996 Los Angeles Dodgers  35355000
+250 1997 Los Angeles Dodgers  45380304
+251 1998 Los Angeles Dodgers  48820000
+252 1999 Los Angeles Dodgers  80862453
+253 2000 Los Angeles Dodgers  87924286
+254 2001 Los Angeles Dodgers 109105953
+255 2002 Los Angeles Dodgers  94850953
+256 2003 Los Angeles Dodgers 105572620
+------------------------------------------------------------ 
+d[, 2]: Milwaukee Brewers
+    Year              Team  Payroll
+257 1985 Milwaukee Brewers 11284107
+258 1986 Milwaukee Brewers  9943642
+259 1987 Milwaukee Brewers  7293224
+260 1988 Milwaukee Brewers  8402000
+261 1989 Milwaukee Brewers 12483000
+262 1990 Milwaukee Brewers 19719167
+263 1991 Milwaukee Brewers 23115500
+264 1992 Milwaukee Brewers 31013667
+265 1993 Milwaukee Brewers 23806834
+266 1994 Milwaukee Brewers 24350500
+267 1995 Milwaukee Brewers 17798825
+268 1996 Milwaukee Brewers 21730000
+269 1997 Milwaukee Brewers 23655338
+270 1998 Milwaukee Brewers 33914904
+271 1999 Milwaukee Brewers 43377395
+272 2000 Milwaukee Brewers 36505333
+273 2001 Milwaukee Brewers 43886833
+274 2002 Milwaukee Brewers 50287833
+275 2003 Milwaukee Brewers 40627000
+------------------------------------------------------------ 
+d[, 2]: Minnesota Twins
+    Year            Team  Payroll
+276 1985 Minnesota Twins  5764821
+277 1986 Minnesota Twins  8748167
+278 1987 Minnesota Twins  6397500
+279 1988 Minnesota Twins 12462666
+280 1989 Minnesota Twins 14581666
+281 1990 Minnesota Twins 14602000
+282 1991 Minnesota Twins 23361833
+283 1992 Minnesota Twins 28027834
+284 1993 Minnesota Twins 28217933
+285 1994 Minnesota Twins 28438500
+286 1995 Minnesota Twins 25410500
+287 1996 Minnesota Twins 23117000
+288 1997 Minnesota Twins 34072500
+289 1998 Minnesota Twins 27927500
+290 1999 Minnesota Twins 21257500
+291 2000 Minnesota Twins 16519500
+292 2001 Minnesota Twins 24130000
+293 2002 Minnesota Twins 40425000
+294 2003 Minnesota Twins 55505000
+------------------------------------------------------------ 
+d[, 2]: Montreal Expos
+    Year           Team  Payroll
+295 1985 Montreal Expos  9470166
+296 1986 Montreal Expos 11103600
+297 1987 Montreal Expos  6942052
+298 1988 Montreal Expos  9603333
+299 1989 Montreal Expos 13807389
+300 1990 Montreal Expos 16586388
+301 1991 Montreal Expos 10732333
+302 1992 Montreal Expos 15822334
+303 1993 Montreal Expos 18899333
+304 1994 Montreal Expos 19098000
+305 1995 Montreal Expos 12364000
+306 1996 Montreal Expos 16264500
+307 1997 Montreal Expos 19295500
+308 1998 Montreal Expos 10641500
+309 1999 Montreal Expos 17903000
+310 2000 Montreal Expos 32994333
+311 2001 Montreal Expos 35159500
+312 2002 Montreal Expos 38670500
+313 2003 Montreal Expos 51948500
+------------------------------------------------------------ 
+d[, 2]: New York Mets
+    Year          Team   Payroll
+314 1985 New York Mets  10834762
+315 1986 New York Mets  15393714
+316 1987 New York Mets  13846714
+317 1988 New York Mets  15269314
+318 1989 New York Mets  19885071
+319 1990 New York Mets  21722834
+320 1991 New York Mets  32590001
+321 1992 New York Mets  44602002
+322 1993 New York Mets  39043667
+323 1994 New York Mets  30956583
+324 1995 New York Mets  27674992
+325 1996 New York Mets  24479500
+326 1997 New York Mets  39800400
+327 1998 New York Mets  52077999
+328 1999 New York Mets  65092092
+329 2000 New York Mets  79509776
+330 2001 New York Mets  93174428
+331 2002 New York Mets  94633593
+332 2003 New York Mets 116876429
+------------------------------------------------------------ 
+d[, 2]: New York Yankees
+    Year             Team   Payroll
+333 1985 New York Yankees  14238204
+334 1986 New York Yankees  18494253
+335 1987 New York Yankees  17099714
+336 1988 New York Yankees  19441152
+337 1989 New York Yankees  17114375
+338 1990 New York Yankees  20912318
+339 1991 New York Yankees  27344168
+340 1992 New York Yankees  37543334
+341 1993 New York Yankees  42624900
+342 1994 New York Yankees  45840334
+343 1995 New York Yankees  48874851
+344 1996 New York Yankees  54191792
+345 1997 New York Yankees  62241545
+346 1998 New York Yankees  66806867
+347 1999 New York Yankees  86734359
+348 2000 New York Yankees  92338260
+349 2001 New York Yankees 112287143
+350 2002 New York Yankees 125928583
+351 2003 New York Yankees 152749814
+------------------------------------------------------------ 
+d[, 2]: Oakland Athletics
+    Year              Team  Payroll
+352 1985 Oakland Athletics  9058606
+353 1986 Oakland Athletics  9779421
+354 1987 Oakland Athletics 11680839
+355 1988 Oakland Athletics  9690000
+356 1989 Oakland Athletics 15613070
+357 1990 Oakland Athletics 19887501
+358 1991 Oakland Athletics 36999167
+359 1992 Oakland Athletics 41035000
+360 1993 Oakland Athletics 37812333
+361 1994 Oakland Athletics 34172500
+362 1995 Oakland Athletics 37739225
+363 1996 Oakland Athletics 21243000
+364 1997 Oakland Athletics 24018500
+365 1998 Oakland Athletics 21303000
+366 1999 Oakland Athletics 24431833
+367 2000 Oakland Athletics 31971333
+368 2001 Oakland Athletics 33810750
+369 2002 Oakland Athletics 40004167
+370 2003 Oakland Athletics 50260834
+------------------------------------------------------------ 
+d[, 2]: Philadelphia Phillies
+    Year                  Team  Payroll
+371 1985 Philadelphia Phillies 10124966
+372 1986 Philadelphia Phillies 11590166
+373 1987 Philadelphia Phillies 11514233
+374 1988 Philadelphia Phillies 13838000
+375 1989 Philadelphia Phillies 10604000
+376 1990 Philadelphia Phillies 13173667
+377 1991 Philadelphia Phillies 22487332
+378 1992 Philadelphia Phillies 24383834
+379 1993 Philadelphia Phillies 28538334
+380 1994 Philadelphia Phillies 31599000
+381 1995 Philadelphia Phillies 30555945
+382 1996 Philadelphia Phillies 34314500
+383 1997 Philadelphia Phillies 36656500
+384 1998 Philadelphia Phillies 36297500
+385 1999 Philadelphia Phillies 31692500
+386 2000 Philadelphia Phillies 47308000
+387 2001 Philadelphia Phillies 41663833
+388 2002 Philadelphia Phillies 57954999
+389 2003 Philadelphia Phillies 70780000
+------------------------------------------------------------ 
+d[, 2]: Pittsburgh Pirates
+    Year               Team  Payroll
+390 1985 Pittsburgh Pirates  9072500
+391 1986 Pittsburgh Pirates 10843500
+392 1987 Pittsburgh Pirates  7652000
+393 1988 Pittsburgh Pirates  5998500
+394 1989 Pittsburgh Pirates 12737500
+395 1990 Pittsburgh Pirates 15556000
+396 1991 Pittsburgh Pirates 23634667
+397 1992 Pittsburgh Pirates 33944167
+398 1993 Pittsburgh Pirates 24822467
+399 1994 Pittsburgh Pirates 24217250
+400 1995 Pittsburgh Pirates 18355345
+401 1996 Pittsburgh Pirates 23017500
+402 1997 Pittsburgh Pirates 10771667
+403 1998 Pittsburgh Pirates 15065000
+404 1999 Pittsburgh Pirates 24697666
+405 2000 Pittsburgh Pirates 28928334
+406 2001 Pittsburgh Pirates 57760833
+407 2002 Pittsburgh Pirates 42323599
+408 2003 Pittsburgh Pirates 54812429
+------------------------------------------------------------ 
+d[, 2]: San Diego Padres
+    Year             Team  Payroll
+409 1985 San Diego Padres 11191583
+410 1986 San Diego Padres 11380693
+411 1987 San Diego Padres 11065796
+412 1988 San Diego Padres  9561002
+413 1989 San Diego Padres 14195000
+414 1990 San Diego Padres 17588334
+415 1991 San Diego Padres 22150001
+416 1992 San Diego Padres 26854167
+417 1993 San Diego Padres 25511333
+418 1994 San Diego Padres 14916333
+419 1995 San Diego Padres 26382334
+420 1996 San Diego Padres 28348172
+421 1997 San Diego Padres 37363672
+422 1998 San Diego Padres 46861500
+423 1999 San Diego Padres 49768179
+424 2000 San Diego Padres 54821000
+425 2001 San Diego Padres 39182833
+426 2002 San Diego Padres 41425000
+427 2003 San Diego Padres 45210000
+------------------------------------------------------------ 
+d[, 2]: San Francisco Giants
+    Year                 Team  Payroll
+428 1985 San Francisco Giants  8221714
+429 1986 San Francisco Giants  8947000
+430 1987 San Francisco Giants  6750000
+431 1988 San Francisco Giants 12380000
+432 1989 San Francisco Giants 14962834
+433 1990 San Francisco Giants 19335333
+434 1991 San Francisco Giants 30967666
+435 1992 San Francisco Giants 33163168
+436 1993 San Francisco Giants 35050000
+437 1994 San Francisco Giants 42529666
+438 1995 San Francisco Giants 36462777
+439 1996 San Francisco Giants 37144725
+440 1997 San Francisco Giants 35592378
+441 1998 San Francisco Giants 42565834
+442 1999 San Francisco Giants 46595057
+443 2000 San Francisco Giants 53737826
+444 2001 San Francisco Giants 63280167
+445 2002 San Francisco Giants 78299835
+446 2003 San Francisco Giants 82852167
+------------------------------------------------------------ 
+d[, 2]: Seattle Mariners
+    Year             Team  Payroll
+447 1985 Seattle Mariners  4613000
+448 1986 Seattle Mariners  5958309
+449 1987 Seattle Mariners  2263500
+450 1988 Seattle Mariners  7342450
+451 1989 Seattle Mariners  9779500
+452 1990 Seattle Mariners 12553667
+453 1991 Seattle Mariners 15691833
+454 1992 Seattle Mariners 23179833
+455 1993 Seattle Mariners 32696333
+456 1994 Seattle Mariners 29228500
+457 1995 Seattle Mariners 36481311
+458 1996 Seattle Mariners 41328501
+459 1997 Seattle Mariners 41540661
+460 1998 Seattle Mariners 54087036
+461 1999 Seattle Mariners 54125003
+462 2000 Seattle Mariners 58915000
+463 2001 Seattle Mariners 74720834
+464 2002 Seattle Mariners 80282668
+465 2003 Seattle Mariners 86959167
+------------------------------------------------------------ 
+d[, 2]: St. Louis Cardinals
+    Year                Team  Payroll
+466 1985 St. Louis Cardinals 11817083
+467 1986 St. Louis Cardinals  9875010
+468 1987 St. Louis Cardinals 11758000
+469 1988 St. Louis Cardinals 12880000
+470 1989 St. Louis Cardinals 16078833
+471 1990 St. Louis Cardinals 20523334
+472 1991 St. Louis Cardinals 21860001
+473 1992 St. Louis Cardinals 27583836
+474 1993 St. Louis Cardinals 23367334
+475 1994 St. Louis Cardinals 29275601
+476 1995 St. Louis Cardinals 37101000
+477 1996 St. Louis Cardinals 40269667
+478 1997 St. Louis Cardinals 45456667
+479 1998 St. Louis Cardinals 54672521
+480 1999 St. Louis Cardinals 49778195
+481 2000 St. Louis Cardinals 61453863
+482 2001 St. Louis Cardinals 78538333
+483 2002 St. Louis Cardinals 74660875
+484 2003 St. Louis Cardinals 83786666
+------------------------------------------------------------ 
+d[, 2]: Tampa Bay Devil Rays
+    Year                 Team  Payroll
+485 1998 Tampa Bay Devil Rays 27280000
+486 1999 Tampa Bay Devil Rays 38870000
+487 2000 Tampa Bay Devil Rays 62765129
+488 2001 Tampa Bay Devil Rays 56980000
+489 2002 Tampa Bay Devil Rays 34380000
+490 2003 Tampa Bay Devil Rays 19630000
+------------------------------------------------------------ 
+d[, 2]: Texas Rangers
+    Year          Team   Payroll
+491 1985 Texas Rangers   7676500
+492 1986 Texas Rangers   6743119
+493 1987 Texas Rangers    880000
+494 1988 Texas Rangers   5342131
+495 1989 Texas Rangers  11893781
+496 1990 Texas Rangers  14874372
+497 1991 Texas Rangers  18224500
+498 1992 Texas Rangers  30128167
+499 1993 Texas Rangers  36376959
+500 1994 Texas Rangers  32973597
+501 1995 Texas Rangers  34581451
+502 1996 Texas Rangers  39041528
+503 1997 Texas Rangers  53448838
+504 1998 Texas Rangers  56572095
+505 1999 Texas Rangers  76709931
+506 2000 Texas Rangers  70795921
+507 2001 Texas Rangers  88633500
+508 2002 Texas Rangers 105526122
+509 2003 Texas Rangers 103491667
+------------------------------------------------------------ 
+d[, 2]: Toronto Blue Jays
+    Year              Team  Payroll
+510 1985 Toronto Blue Jays  8726186
+511 1986 Toronto Blue Jays 12644380
+512 1987 Toronto Blue Jays 10562834
+513 1988 Toronto Blue Jays 12141225
+514 1989 Toronto Blue Jays 15649666
+515 1990 Toronto Blue Jays 17606834
+516 1991 Toronto Blue Jays 16902417
+517 1992 Toronto Blue Jays 44788666
+518 1993 Toronto Blue Jays 47279166
+519 1994 Toronto Blue Jays 43433668
+520 1995 Toronto Blue Jays 50590000
+521 1996 Toronto Blue Jays 30555083
+522 1997 Toronto Blue Jays 47079833
+523 1998 Toronto Blue Jays 51376000
+524 1999 Toronto Blue Jays 45444333
+525 2000 Toronto Blue Jays 44838332
+526 2001 Toronto Blue Jays 76895999
+527 2002 Toronto Blue Jays 76864333
+528 2003 Toronto Blue Jays 51269000
+> dd = by(d, d[,2], function(x) x)
+> dim(dd)
+[1] 31
+> length(dd)
+[1] 31
+> class(dd)
+[1] "by"
+> dd[[1]]
+  Year           Team  Payroll
+1 1997 Anaheim Angels 31135472
+2 1998 Anaheim Angels 41281000
+3 1999 Anaheim Angels 55388166
+4 2000 Anaheim Angels 51464167
+5 2001 Anaheim Angels 47535167
+6 2002 Anaheim Angels 61721667
+7 2003 Anaheim Angels 79031667
+> dd[[2]]
+   Year                 Team   Payroll
+8  1998 Arizona Diamondbacks  32347000
+9  1999 Arizona Diamondbacks  68703999
+10 2000 Arizona Diamondbacks  81027833
+11 2001 Arizona Diamondbacks  85082999
+12 2002 Arizona Diamondbacks 102819999
+13 2003 Arizona Diamondbacks  80657000
+> plot(0, xlim = range(d[,"Year"]), ylim = range(d[,"Salary"]), type = "n")
+Error in "[.data.frame"(d, , "Salary") : undefined columns selected
+> colnames(d)
+[1] "Year"    "Team"    "Payroll"
+> plot(0, xlim = range(d[,"Year"]), ylim = range(d[,"Payroll"]), type = "n")
+> dd = by(d, d[,2], function(x) x)
+> sapply(1:length(dd), function(i) lines(dd[[i]][,1], dd[[i]][,3]))
+[[1]]
+NULL
+
+[[2]]
+NULL
+
+[[3]]
+NULL
+
+[[4]]
+NULL
+
+[[5]]
+NULL
+
+[[6]]
+NULL
+
+[[7]]
+NULL
+
+[[8]]
+NULL
+
+[[9]]
+NULL
+
+[[10]]
+NULL
+
+[[11]]
+NULL
+
+[[12]]
+NULL
+
+[[13]]
+NULL
+
+[[14]]
+NULL
+
+[[15]]
+NULL
+
+[[16]]
+NULL
+
+[[17]]
+NULL
+
+[[18]]
+NULL
+
+[[19]]
+NULL
+
+[[20]]
+NULL
+
+[[21]]
+NULL
+
+[[22]]
+NULL
+
+[[23]]
+NULL
+
+[[24]]
+NULL
+
+[[25]]
+NULL
+
+[[26]]
+NULL
+
+[[27]]
+NULL
+
+[[28]]
+NULL
+
+[[29]]
+NULL
+
+[[30]]
+NULL
+
+[[31]]
+NULL
+
+> plot(0, xlim = range(d[,"Year"]), ylim = range(d[,"Payroll"]), type = "n")
+> sapply(1:length(dd), function(i) lines(dd[[i]][,1], dd[[i]][,3], col = i))
+[[1]]
+NULL
+
+[[2]]
+NULL
+
+[[3]]
+NULL
+
+[[4]]
+NULL
+
+[[5]]
+NULL
+
+[[6]]
+NULL
+
+[[7]]
+NULL
+
+[[8]]
+NULL
+
+[[9]]
+NULL
+
+[[10]]
+NULL
+
+[[11]]
+NULL
+
+[[12]]
+NULL
+
+[[13]]
+NULL
+
+[[14]]
+NULL
+
+[[15]]
+NULL
+
+[[16]]
+NULL
+
+[[17]]
+NULL
+
+[[18]]
+NULL
+
+[[19]]
+NULL
+
+[[20]]
+NULL
+
+[[21]]
+NULL
+
+[[22]]
+NULL
+
+[[23]]
+NULL
+
+[[24]]
+NULL
+
+[[25]]
+NULL
+
+[[26]]
+NULL
+
+[[27]]
+NULL
+
+[[28]]
+NULL
+
+[[29]]
+NULL
+
+[[30]]
+NULL
+
+[[31]]
+NULL
+
+> names(dd)
+ [1] "Anaheim Angels"        "Arizona Diamondbacks"  "Atlanta Braves"       
+ [4] "Baltimore Orioles"     "Boston Red Sox"        "California Angels"    
+ [7] "Chicago Cubs"          "Chicago White Sox"     "Cincinnati Reds"      
+[10] "Cleveland Indians"     "Colorado Rockies"      "Detroit Tigers"       
+[13] "Florida Marlins"       "Houston Astros"        "Kansas City Royals"   
+[16] "Los Angeles Dodgers"   "Milwaukee Brewers"     "Minnesota Twins"      
+[19] "Montreal Expos"        "New York Mets"         "New York Yankees"     
+[22] "Oakland Athletics"     "Philadelphia Phillies" "Pittsburgh Pirates"   
+[25] "San Diego Padres"      "San Francisco Giants"  "Seattle Mariners"     
+[28] "St. Louis Cardinals"   "Tampa Bay Devil Rays"  "Texas Rangers"        
+[31] "Toronto Blue Jays"    
+> legend(min(d[,"Year"]), max(d[,"Payroll"]), names(dd))
+> source("plot.R")
+Error in parse(file, n, text, prompt) : syntax error on line 2
+> source("plot.R")
+> plotPayrolls(d)
+Error in "[.data.frame"(dd[[i]], , "Salary") : 
+	undefined columns selected
+> source("plot.R")
+> plotPayrolls(d)
+> source("plot.R")
+> plotPayrolls(d)
+> source("plot.R")
+> plotPayrolls(d)
+> source("plot.R")
+> plotPayrolls(d)
+> source("plot.R")
+> plotPayrolls(d)
+> source("plot.R")
+> plotPayrolls(d)
+> d
+*** output flushed ***
+> by(d, d[,1], max)
+Error in Summary.data.frame(..., na.rm = na.rm) : 
+	only defined on a data frame with all numeric or complex variables
+> by(d, as.factor(d[,1]), max)
+Error in Summary.data.frame(..., na.rm = na.rm) : 
+	only defined on a data frame with all numeric or complex variables
+> as.factor(d[,1])
+*** output flushed ***
+> by(d, as.factor(d[,1]), function(x)max)
+*** output flushed ***
+> by(d, d[,1], function(x) max(x[,3]))
+d[, 1]: 1985
+[1] 14807000
+------------------------------------------------------------ 
+d[, 1]: 1986
+[1] 18494253
+------------------------------------------------------------ 
+d[, 1]: 1987
+[1] 17099714
+------------------------------------------------------------ 
+d[, 1]: 1988
+[1] 19441152
+------------------------------------------------------------ 
+d[, 1]: 1989
+[1] 21071562
+------------------------------------------------------------ 
+d[, 1]: 1990
+[1] 23361084
+------------------------------------------------------------ 
+d[, 1]: 1991
+[1] 36999167
+------------------------------------------------------------ 
+d[, 1]: 1992
+[1] 44788666
+------------------------------------------------------------ 
+d[, 1]: 1993
+[1] 47279166
+------------------------------------------------------------ 
+d[, 1]: 1994
+[1] 49383513
+------------------------------------------------------------ 
+d[, 1]: 1995
+[1] 50590000
+------------------------------------------------------------ 
+d[, 1]: 1996
+[1] 54490315
+------------------------------------------------------------ 
+d[, 1]: 1997
+[1] 62241545
+------------------------------------------------------------ 
+d[, 1]: 1998
+[1] 72355634
+------------------------------------------------------------ 
+d[, 1]: 1999
+[1] 86734359
+------------------------------------------------------------ 
+d[, 1]: 2000
+[1] 92338260
+------------------------------------------------------------ 
+d[, 1]: 2001
+[1] 112287143
+------------------------------------------------------------ 
+d[, 1]: 2002
+[1] 125928583
+------------------------------------------------------------ 
+d[, 1]: 2003
+[1] 152749814
+> m = by(d, d[,1], function(x) max(x[,3]))
+> dim(m)
+[1] 19
+> length(m)
+[1] 19
+> unlist(m)
+d[, 1]: 1985
+[1] 14807000
+------------------------------------------------------------ 
+d[, 1]: 1986
+[1] 18494253
+------------------------------------------------------------ 
+d[, 1]: 1987
+[1] 17099714
+------------------------------------------------------------ 
+d[, 1]: 1988
+[1] 19441152
+------------------------------------------------------------ 
+d[, 1]: 1989
+[1] 21071562
+------------------------------------------------------------ 
+d[, 1]: 1990
+[1] 23361084
+------------------------------------------------------------ 
+d[, 1]: 1991
+[1] 36999167
+------------------------------------------------------------ 
+d[, 1]: 1992
+[1] 44788666
+------------------------------------------------------------ 
+d[, 1]: 1993
+[1] 47279166
+------------------------------------------------------------ 
+d[, 1]: 1994
+[1] 49383513
+------------------------------------------------------------ 
+d[, 1]: 1995
+[1] 50590000
+------------------------------------------------------------ 
+d[, 1]: 1996
+[1] 54490315
+------------------------------------------------------------ 
+d[, 1]: 1997
+[1] 62241545
+------------------------------------------------------------ 
+d[, 1]: 1998
+[1] 72355634
+------------------------------------------------------------ 
+d[, 1]: 1999
+[1] 86734359
+------------------------------------------------------------ 
+d[, 1]: 2000
+[1] 92338260
+------------------------------------------------------------ 
+d[, 1]: 2001
+[1] 112287143
+------------------------------------------------------------ 
+d[, 1]: 2002
+[1] 125928583
+------------------------------------------------------------ 
+d[, 1]: 2003
+[1] 152749814
+> as.vector(m)
+ [1]  14807000  18494253  17099714  19441152  21071562  23361084  36999167
+ [8]  44788666  47279166  49383513  50590000  54490315  62241545  72355634
+[15]  86734359  92338260 112287143 125928583 152749814
+> unlist(m)
+*** output flushed ***
+> m[[1]]
+[1] 14807000
+> names(m)
+ [1] "1985" "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993" "1994"
+[11] "1995" "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003"
+> mx = by(d, d[,1], function(x) max(x[,3]))
+> maxPayroll = as.vector(mx)
+> names(maxPayroll) = names(mx)
+> mx
+*** output flushed ***
+> maxPayroll
+     1985      1986      1987      1988      1989      1990      1991      1992 
+ 14807000  18494253  17099714  19441152  21071562  23361084  36999167  44788666 
+     1993      1994      1995      1996      1997      1998      1999      2000 
+ 47279166  49383513  50590000  54490315  62241545  72355634  86734359  92338260 
+     2001      2002      2003 
+112287143 125928583 152749814 
+> as.character(d[,1])
+  [1] "1997" "1998" "1999" "2000" "2001" "2002" "2003" "1998" "1999" "2000"
+ [11] "2001" "2002" "2003" "1985" "1986" "1987" "1988" "1989" "1990" "1991"
+ [21] "1992" "1993" "1994" "1995" "1996" "1997" "1998" "1999" "2000" "2001"
+ [31] "2002" "2003" "1985" "1986" "1987" "1988" "1989" "1990" "1991" "1992"
+ [41] "1993" "1994" "1995" "1996" "1997" "1998" "1999" "2000" "2001" "2002"
+ [51] "2003" "1985" "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993"
+ [61] "1994" "1995" "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003"
+ [71] "1985" "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993" "1994"
+ [81] "1995" "1996" "1985" "1986" "1987" "1988" "1989" "1990" "1991" "1992"
+ [91] "1993" "1994" "1995" "1996" "1997" "1998" "1999" "2000" "2001" "2002"
+[101] "2003" "1985" "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993"
+[111] "1994" "1995" "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003"
+[121] "1985" "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993" "1994"
+[131] "1995" "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003" "1985"
+[141] "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993" "1994" "1995"
+[151] "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003" "1993" "1994"
+[161] "1995" "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003" "1985"
+[171] "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993" "1994" "1995"
+[181] "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003" "1993" "1994"
+[191] "1995" "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003" "1985"
+[201] "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993" "1994" "1995"
+[211] "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003" "1985" "1986"
+[221] "1987" "1988" "1989" "1990" "1991" "1992" "1993" "1994" "1995" "1996"
+[231] "1997" "1998" "1999" "2000" "2001" "2002" "2003" "1985" "1986" "1987"
+[241] "1988" "1989" "1990" "1991" "1992" "1993" "1994" "1995" "1996" "1997"
+[251] "1998" "1999" "2000" "2001" "2002" "2003" "1985" "1986" "1987" "1988"
+[261] "1989" "1990" "1991" "1992" "1993" "1994" "1995" "1996" "1997" "1998"
+[271] "1999" "2000" "2001" "2002" "2003" "1985" "1986" "1987" "1988" "1989"
+[281] "1990" "1991" "1992" "1993" "1994" "1995" "1996" "1997" "1998" "1999"
+[291] "2000" "2001" "2002" "2003" "1985" "1986" "1987" "1988" "1989" "1990"
+[301] "1991" "1992" "1993" "1994" "1995" "1996" "1997" "1998" "1999" "2000"
+[311] "2001" "2002" "2003" "1985" "1986" "1987" "1988" "1989" "1990" "1991"
+[321] "1992" "1993" "1994" "1995" "1996" "1997" "1998" "1999" "2000" "2001"
+[331] "2002" "2003" "1985" "1986" "1987" "1988" "1989" "1990" "1991" "1992"
+[341] "1993" "1994" "1995" "1996" "1997" "1998" "1999" "2000" "2001" "2002"
+[351] "2003" "1985" "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993"
+[361] "1994" "1995" "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003"
+[371] "1985" "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993" "1994"
+[381] "1995" "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003" "1985"
+[391] "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993" "1994" "1995"
+[401] "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003" "1985" "1986"
+[411] "1987" "1988" "1989" "1990" "1991" "1992" "1993" "1994" "1995" "1996"
+[421] "1997" "1998" "1999" "2000" "2001" "2002" "2003" "1985" "1986" "1987"
+[431] "1988" "1989" "1990" "1991" "1992" "1993" "1994" "1995" "1996" "1997"
+[441] "1998" "1999" "2000" "2001" "2002" "2003" "1985" "1986" "1987" "1988"
+[451] "1989" "1990" "1991" "1992" "1993" "1994" "1995" "1996" "1997" "1998"
+[461] "1999" "2000" "2001" "2002" "2003" "1985" "1986" "1987" "1988" "1989"
+[471] "1990" "1991" "1992" "1993" "1994" "1995" "1996" "1997" "1998" "1999"
+[481] "2000" "2001" "2002" "2003" "1998" "1999" "2000" "2001" "2002" "2003"
+[491] "1985" "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993" "1994"
+[501] "1995" "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003" "1985"
+[511] "1986" "1987" "1988" "1989" "1990" "1991" "1992" "1993" "1994" "1995"
+[521] "1996" "1997" "1998" "1999" "2000" "2001" "2002" "2003"
+> maxPayroll[as.character(d[,1])]
+     1997      1998      1999      2000      2001      2002      2003      1998 
+ 62241545  72355634  86734359  92338260 112287143 125928583 152749814  72355634 
+     1999      2000      2001      2002      2003      1985      1986      1987 
+ 86734359  92338260 112287143 125928583 152749814  14807000  18494253  17099714 
+     1988      1989      1990      1991      1992      1993      1994      1995 
+ 19441152  21071562  23361084  36999167  44788666  47279166  49383513  50590000 
+     1996      1997      1998      1999      2000      2001      2002      2003 
+ 54490315  62241545  72355634  86734359  92338260 112287143 125928583 152749814 
+     1985      1986      1987      1988      1989      1990      1991      1992 
+ 14807000  18494253  17099714  19441152  21071562  23361084  36999167  44788666 
+     1993      1994      1995      1996      1997      1998      1999      2000 
+ 47279166  49383513  50590000  54490315  62241545  72355634  86734359  92338260 
+     2001      2002      2003      1985      1986      1987      1988      1989 
+112287143 125928583 152749814  14807000  18494253  17099714  19441152  21071562 
+     1990      1991      1992      1993      1994      1995      1996      1997 
+ 23361084  36999167  44788666  47279166  49383513  50590000  54490315  62241545 
+     1998      1999      2000      2001      2002      2003      1985      1986 
+ 72355634  86734359  92338260 112287143 125928583 152749814  14807000  18494253 
+     1987      1988      1989      1990      1991      1992      1993      1994 
+ 17099714  19441152  21071562  23361084  36999167  44788666  47279166  49383513 
+     1995      1996      1985      1986      1987      1988      1989      1990 
+ 50590000  54490315  14807000  18494253  17099714  19441152  21071562  23361084 
+     1991      1992      1993      1994      1995      1996      1997      1998 
+ 36999167  44788666  47279166  49383513  50590000  54490315  62241545  72355634 
+     1999      2000      2001      2002      2003      1985      1986      1987 
+ 86734359  92338260 112287143 125928583 152749814  14807000  18494253  17099714 
+     1988      1989      1990      1991      1992      1993      1994      1995 
+ 19441152  21071562  23361084  36999167  44788666  47279166  49383513  50590000 
+     1996      1997      1998      1999      2000      2001      2002      2003 
+ 54490315  62241545  72355634  86734359  92338260 112287143 125928583 152749814 
+     1985      1986      1987      1988      1989      1990      1991      1992 
+ 14807000  18494253  17099714  19441152  21071562  23361084  36999167  44788666 
+     1993      1994      1995      1996      1997      1998      1999      2000 
+ 47279166  49383513  50590000  54490315  62241545  72355634  86734359  92338260 
+     2001      2002      2003      1985      1986      1987      1988      1989 
+112287143 125928583 152749814  14807000  18494253  17099714  19441152  21071562 
+     1990      1991      1992      1993      1994      1995      1996      1997 
+ 23361084  36999167  44788666  47279166  49383513  50590000  54490315  62241545 
+     1998      1999      2000      2001      2002      2003      1993      1994 
+ 72355634  86734359  92338260 112287143 125928583 152749814  47279166  49383513 
+     1995      1996      1997      1998      1999      2000      2001      2002 
+ 50590000  54490315  62241545  72355634  86734359  92338260 112287143 125928583 
+     2003      1985      1986      1987      1988      1989      1990      1991 
+152749814  14807000  18494253  17099714  19441152  21071562  23361084  36999167 
+     1992      1993      1994      1995      1996      1997      1998      1999 
+ 44788666  47279166  49383513  50590000  54490315  62241545  72355634  86734359 
+     2000      2001      2002      2003      1993      1994      1995      1996 
+ 92338260 112287143 125928583 152749814  47279166  49383513  50590000  54490315 
+     1997      1998      1999      2000      2001      2002      2003      1985 
+ 62241545  72355634  86734359  92338260 112287143 125928583 152749814  14807000 
+     1986      1987      1988      1989      1990      1991      1992      1993 
+ 18494253  17099714  19441152  21071562  23361084  36999167  44788666  47279166 
+     1994      1995      1996      1997      1998      1999      2000      2001 
+ 49383513  50590000  54490315  62241545  72355634  86734359  92338260 112287143 
+     2002      2003      1985      1986      1987      1988      1989      1990 
+125928583 152749814  14807000  18494253  17099714  19441152  21071562  23361084 
+     1991      1992      1993      1994      1995      1996      1997      1998 
+ 36999167  44788666  47279166  49383513  50590000  54490315  62241545  72355634 
+     1999      2000      2001      2002      2003      1985      1986      1987 
+ 86734359  92338260 112287143 125928583 152749814  14807000  18494253  17099714 
+     1988      1989      1990      1991      1992      1993      1994      1995 
+ 19441152  21071562  23361084  36999167  44788666  47279166  49383513  50590000 
+     1996      1997      1998      1999      2000      2001      2002      2003 
+ 54490315  62241545  72355634  86734359  92338260 112287143 125928583 152749814 
+     1985      1986      1987      1988      1989      1990      1991      1992 
+ 14807000  18494253  17099714  19441152  21071562  23361084  36999167  44788666 
+     1993      1994      1995      1996      1997      1998      1999      2000 
+ 47279166  49383513  50590000  54490315  62241545  72355634  86734359  92338260 
+     2001      2002      2003      1985      1986      1987      1988      1989 
+112287143 125928583 152749814  14807000  18494253  17099714  19441152  21071562 
+     1990      1991      1992      1993      1994      1995      1996      1997 
+ 23361084  36999167  44788666  47279166  49383513  50590000  54490315  62241545 
+     1998      1999      2000      2001      2002      2003      1985      1986 
+ 72355634  86734359  92338260 112287143 125928583 152749814  14807000  18494253 
+     1987      1988      1989      1990      1991      1992      1993      1994 
+ 17099714  19441152  21071562  23361084  36999167  44788666  47279166  49383513 
+     1995      1996      1997      1998      1999      2000      2001      2002 
+ 50590000  54490315  62241545  72355634  86734359  92338260 112287143 125928583 
+     2003      1985      1986      1987      1988      1989      1990      1991 
+152749814  14807000  18494253  17099714  19441152  21071562  23361084  36999167 
+     1992      1993      1994      1995      1996      1997      1998      1999 
+ 44788666  47279166  49383513  50590000  54490315  62241545  72355634  86734359 
+     2000      2001      2002      2003      1985      1986      1987      1988 
+ 92338260 112287143 125928583 152749814  14807000  18494253  17099714  19441152 
+     1989      1990      1991      1992      1993      1994      1995      1996 
+ 21071562  23361084  36999167  44788666  47279166  49383513  50590000  54490315 
+     1997      1998      1999      2000      2001      2002      2003      1985 
+ 62241545  72355634  86734359  92338260 112287143 125928583 152749814  14807000 
+     1986      1987      1988      1989      1990      1991      1992      1993 
+ 18494253  17099714  19441152  21071562  23361084  36999167  44788666  47279166 
+     1994      1995      1996      1997      1998      1999      2000      2001 
+ 49383513  50590000  54490315  62241545  72355634  86734359  92338260 112287143 
+     2002      2003      1985      1986      1987      1988      1989      1990 
+125928583 152749814  14807000  18494253  17099714  19441152  21071562  23361084 
+     1991      1992      1993      1994      1995      1996      1997      1998 
+ 36999167  44788666  47279166  49383513  50590000  54490315  62241545  72355634 
+     1999      2000      2001      2002      2003      1985      1986      1987 
+ 86734359  92338260 112287143 125928583 152749814  14807000  18494253  17099714 
+     1988      1989      1990      1991      1992      1993      1994      1995 
+ 19441152  21071562  23361084  36999167  44788666  47279166  49383513  50590000 
+     1996      1997      1998      1999      2000      2001      2002      2003 
+ 54490315  62241545  72355634  86734359  92338260 112287143 125928583 152749814 
+     1985      1986      1987      1988      1989      1990      1991      1992 
+ 14807000  18494253  17099714  19441152  21071562  23361084  36999167  44788666 
+     1993      1994      1995      1996      1997      1998      1999      2000 
+ 47279166  49383513  50590000  54490315  62241545  72355634  86734359  92338260 
+     2001      2002      2003      1985      1986      1987      1988      1989 
+112287143 125928583 152749814  14807000  18494253  17099714  19441152  21071562 
+     1990      1991      1992      1993      1994      1995      1996      1997 
+ 23361084  36999167  44788666  47279166  49383513  50590000  54490315  62241545 
+     1998      1999      2000      2001      2002      2003      1985      1986 
+ 72355634  86734359  92338260 112287143 125928583 152749814  14807000  18494253 
+     1987      1988      1989      1990      1991      1992      1993      1994 
+ 17099714  19441152  21071562  23361084  36999167  44788666  47279166  49383513 
+     1995      1996      1997      1998      1999      2000      2001      2002 
+ 50590000  54490315  62241545  72355634  86734359  92338260 112287143 125928583 
+     2003      1985      1986      1987      1988      1989      1990      1991 
+152749814  14807000  18494253  17099714  19441152  21071562  23361084  36999167 
+     1992      1993      1994      1995      1996      1997      1998      1999 
+ 44788666  47279166  49383513  50590000  54490315  62241545  72355634  86734359 
+     2000      2001      2002      2003      1998      1999      2000      2001 
+ 92338260 112287143 125928583 152749814  72355634  86734359  92338260 112287143 
+     2002      2003      1985      1986      1987      1988      1989      1990 
+125928583 152749814  14807000  18494253  17099714  19441152  21071562  23361084 
+     1991      1992      1993      1994      1995      1996      1997      1998 
+ 36999167  44788666  47279166  49383513  50590000  54490315  62241545  72355634 
+     1999      2000      2001      2002      2003      1985      1986      1987 
+ 86734359  92338260 112287143 125928583 152749814  14807000  18494253  17099714 
+     1988      1989      1990      1991      1992      1993      1994      1995 
+ 19441152  21071562  23361084  36999167  44788666  47279166  49383513  50590000 
+     1996      1997      1998      1999      2000      2001      2002      2003 
+ 54490315  62241545  72355634  86734359  92338260 112287143 125928583 152749814 
+> d[,3] <- d[,3]/maxPayroll[as.character(d[,1])]
+> 
+> plotPayrolls(d)
+> d = dbGetQuery(con, "select Salaries.yearID AS Year, Teams.name AS Team, SUM(Salaries.salary) AS Payroll FROM Master, Teams, Salaries WhERE Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID GROUP BY Team, Year ORDER BY Team, Year;")
+> d
+*** output flushed ***
+> bx = by(d, d[,"Year"], function(x) x)
+> boxplot(bx)
+Error in x[floor(d)] + x[ceiling(d)] : non-numeric argument to binary operator
+> boxplot
+function (x, ...) 
+UseMethod("boxplot")
+<environment: namespace:base>
+> ?boxplot
+WARNING: terminal is not fully functional
+-  (press RETURN)
+boxplot                 package:base                 R Documentation
+
+Box Plots
+
+Description:
+
+     Produce box-and-whisker plot(s) of the given (grouped) values.
+
+Usage:
+
+     boxplot(x, ...)
+
+     ## S3 method for class 'formula':
+     boxplot(formula, data = NULL, ..., subset)
+
+     ## Default S3 method:
+     boxplot(x, ..., range = 1.5, width = NULL, varwidth = FALSE,
+             notch = FALSE, outline = TRUE, names, boxwex = 0.8, plot = TRUE,
+             border = par("fg"), col = NULL, log = "", pars = NULL,
+             horizontal = FALSE, add = FALSE, at = NULL)
+
+Arguments:
+
+: 
+ formula: a formula, such as 'y ~ x'.
+
+    data: a data.frame (or list) from which the variables in 'formula'
+          should be taken.
+
+  subset: an optional vector specifying a subset of observations to be
+          used for plotting.
+
+       x: for specifying data from which the boxplots are to be
+          produced as well as for giving graphical parameters. 
+          Additional unnamed  arguments specify further data, either as
+          separate vectors (each corresponding to a component boxplot)
+          or as a single list containing such vectors.  'NA's are
+          allowed in the data.
+
+     ...: For the 'formula' method, arguments to the default method and
+          graphical parameters.
+
+          For the default method, unnamed arguments are additional data
+          vectors, and named arguments are graphical parameters in
+          addition to the ones given by argument 'pars'. 
+
+   range: this determines how far the plot whiskers extend out from the
+          box.  If 'range' is positive, the whiskers extend to the most
+:  
+          extreme data point which is no more than 'range' times the
+          interquartile range from the box. A value of zero causes the
+          whiskers to extend to the data extremes.
+
+   width: a vector giving the relative widths of the boxes making up
+          the plot.
+
+varwidth: if 'varwidth' is 'TRUE', the boxes are drawn with widths
+          proportional to the square-roots of the number of
+          observations in the groups.
+
+   notch: if 'notch' is 'TRUE', a notch is drawn in each side of the
+          boxes.  If the notches of two plots do not overlap then the
+          medians are significantly different at the 5 percent level.
+
+ outline: if 'outline' is not true, the boxplot lines are not drawn.
+
+   names: group labels which will be printed under each boxplot.
+
+  boxwex: a scale factor to be applied to all boxes.  When there are
+          only a few groups, the appearance of the plot can be improved
+          by making the boxes narrower.
+
+    plot: if 'TRUE' (the default) then a boxplot is produced.  If not,
+          the summaries which the boxplots are based on are returned.
+
+  border: an optional vector of colors for the outlines of the
+          boxplots.  The values in 'border' are recycled if the length
+          of 'border' is less than the number of plots.
+
+     col: if 'col' is non-null it is assumed to contain colors to be
+          used to col the bodies of the box plots.
+
+     log: character indicating if x or y or both coordinates should be
+          plotted in log scale.
+
+    pars: a list of graphical parameters; these are passed to 'bxp' (if
+          'plot' is true).
+
+horizontal: logical indicating if the boxplots should be horizontal;
+          default 'FALSE' means vertical boxes.
+
+     add: logical, if true _add_ boxplot to current plot.
+
+      at: numeric vector giving the locations where the boxplots should
+          be drawn, particularly when 'add = TRUE'; defaults to '1:n'
+          where 'n' is the number of boxes.
+: 
+
+Details:
+
+     The generic function 'boxplot' currently has a default method
+     ('boxplot.default') and a formula interface ('boxplot.formula').
+
+Value:
+
+     List with the following components: 
+
+   stats: a matrix, each column contains the extreme of the lower
+          whisker, the lower hinge, the median, the upper hinge and the
+          extreme of the upper whisker for one group/plot.
+
+       n: a vector with the number of observations in each group.
+
+    conf: a matrix where each column contains the lower and upper
+          extremes of the notch.
+
+     out: the values of any data points which lie beyond the extremes
+          of the whiskers.
+
+   group: a vector of the same length as 'out' whose elements indicate
+          which group the outlier belongs to
+: 
+
+   names: a vector of names for the groups
+
+References:
+
+     Becker, R. A., Chambers, J. M. and Wilks, A. R. (1988) _The New S
+     Language_. Wadsworth & Brooks/Cole.
+
+     See also 'boxplot.stats'.
+
+See Also:
+
+     'boxplot.stats' which does the computation, 'bxp' for the
+     plotting; and 'stripchart' for an alternative (with small data
+     sets).
+
+Examples:
+
+     ## boxplot on a formula:
+     data(InsectSprays)
+     boxplot(count ~ spray, data = InsectSprays, col = "lightgray")
+     # *add* notches (somewhat funny here):
+     boxplot(count ~ spray, data = InsectSprays,
+             notch = TRUE, add = TRUE, col = "blue")
+:q
+> > 
+> max(d[,3])
+[1] 152749814
+> which(max(d[,3]))
+Error in which(max(d[, 3])) : argument to "which" is not logical
+> which(d[,3] == max(d[,3]))
+[1] 351
+> d[351,]
+    Year             Team   Payroll
+351 2003 New York Yankees 152749814
+> 
+> 
+> 
+> w = dbGetQuery(con, " SELECT SeriesPost.yearID AS Year, Teams.name AS Team FROM Teams, SeriesPost 
+   WHERE SeriesPost.round = 'WS' 
+     AND Teams.teamID = SeriesPost.teamIDwinner
+     AND Teams.yearID = SeriesPost.yearID;")
+Error: syntax error
+> Error: syntax error
+> Error: syntax error
+> Error: syntax error
+> 
+> w = dbGetQuery(con, " SELECT SeriesPost.yearID AS Year, Teams.name AS Team FROM Teams, SeriesPost  WHERE SeriesPost.round = 'WS'    AND Teams.teamID = SeriesPost.teamIDwinner     AND Teams.yearID = SeriesPost.yearID;")
+> w
+    Year                    Team
+1   1884        Providence Grays
+2   1885 Chicago White Stockings
+3   1886        St. Louis Browns
+4   1887      Detroit Wolverines
+5   1888         New York Giants
+6   1889         New York Giants
+7   1890    Brooklyn Bridegrooms
+8   1903         Boston Pilgrims
+9   1905         New York Giants
+10  1906       Chicago White Sox
+11  1907            Chicago Cubs
+12  1908            Chicago Cubs
+13  1909      Pittsburgh Pirates
+14  1910  Philadelphia Athletics
+15  1911  Philadelphia Athletics
+16  1912          Boston Red Sox
+17  1913  Philadelphia Athletics
+18  1914           Boston Braves
+19  1915          Boston Red Sox
+20  1916          Boston Red Sox
+21  1917       Chicago White Sox
+22  1918          Boston Red Sox
+23  1919         Cincinnati Reds
+24  1920       Cleveland Indians
+25  1921         New York Giants
+26  1922         New York Giants
+27  1923        New York Yankees
+28  1924     Washington Senators
+29  1925      Pittsburgh Pirates
+30  1926     St. Louis Cardinals
+31  1927        New York Yankees
+32  1928        New York Yankees
+33  1929  Philadelphia Athletics
+34  1930  Philadelphia Athletics
+35  1931     St. Louis Cardinals
+36  1932        New York Yankees
+37  1933         New York Giants
+38  1934     St. Louis Cardinals
+39  1935          Detroit Tigers
+40  1936        New York Yankees
+41  1937        New York Yankees
+42  1938        New York Yankees
+43  1939        New York Yankees
+44  1940         Cincinnati Reds
+45  1941        New York Yankees
+46  1942     St. Louis Cardinals
+47  1943        New York Yankees
+48  1944     St. Louis Cardinals
+49  1945          Detroit Tigers
+50  1946     St. Louis Cardinals
+51  1947        New York Yankees
+52  1948       Cleveland Indians
+53  1949        New York Yankees
+54  1950        New York Yankees
+55  1951        New York Yankees
+56  1952        New York Yankees
+57  1953        New York Yankees
+58  1954         New York Giants
+59  1955        Brooklyn Dodgers
+60  1956        New York Yankees
+61  1957        Milwaukee Braves
+62  1958        New York Yankees
+63  1959     Los Angeles Dodgers
+64  1960      Pittsburgh Pirates
+65  1961        New York Yankees
+66  1962        New York Yankees
+67  1963     Los Angeles Dodgers
+68  1964     St. Louis Cardinals
+69  1965     Los Angeles Dodgers
+70  1966       Baltimore Orioles
+71  1967     St. Louis Cardinals
+72  1968          Detroit Tigers
+73  1969           New York Mets
+74  1970       Baltimore Orioles
+75  1971      Pittsburgh Pirates
+76  1972       Oakland Athletics
+77  1973       Oakland Athletics
+78  1974       Oakland Athletics
+79  1975         Cincinnati Reds
+80  1976         Cincinnati Reds
+81  1977        New York Yankees
+82  1978        New York Yankees
+83  1979      Pittsburgh Pirates
+84  1980   Philadelphia Phillies
+85  1981     Los Angeles Dodgers
+86  1982     St. Louis Cardinals
+87  1983       Baltimore Orioles
+88  1984          Detroit Tigers
+89  1985      Kansas City Royals
+90  1986           New York Mets
+91  1987         Minnesota Twins
+92  1988     Los Angeles Dodgers
+93  1989       Oakland Athletics
+94  1990         Cincinnati Reds
+95  1991         Minnesota Twins
+96  1992       Toronto Blue Jays
+97  1993       Toronto Blue Jays
+98  1995          Atlanta Braves
+99  1996        New York Yankees
+100 1997         Florida Marlins
+101 1998        New York Yankees
+102 1999        New York Yankees
+103 2000        New York Yankees
+104 2001    Arizona Diamondbacks
+105 2002          Anaheim Angels
+106 2003         Florida Marlins
+> length(unique(w[,1]))
+[1] 106
+> source("plot.R")
+> d = dbGetQuery(con, "select Salaries.yearID AS Year, Teams.name AS Team, SUM(Salaries.salary) AS Payroll FROM Master, Teams, Salaries WhERE Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID GROUP BY Team, Year ORDER BY Team, Year;")
+> boxplot(Payroll ~ Year, data = d)
+> plotPayrolls(d, add = FALSE)
+> plotPayrolls
+*** output flushed ***
+> boxplot(Payroll ~ Year, data = d)
+> source("plot.R")
+> boxplot(Payroll ~ Year, data = d)
+> plotPayrolls(d, add = TRUE)
+> plotPayrolls(d, add = TRUE)
+> plotPayrolls(d, add = FALSE)
+> library(lattice)
+> ?boxplot
+WARNING: terminal is not fully functional
+-  (press RETURN) 
+boxplot                 package:base                 R Documentation
+
+Box Plots
+
+Description:
+
+     Produce box-and-whisker plot(s) of the given (grouped) values.
+
+Usage:
+
+     boxplot(x, ...)
+
+     ## S3 method for class 'formula':
+     boxplot(formula, data = NULL, ..., subset)
+
+     ## Default S3 method:
+     boxplot(x, ..., range = 1.5, width = NULL, varwidth = FALSE,
+             notch = FALSE, outline = TRUE, names, boxwex = 0.8, plot = TRUE,
+             border = par("fg"), col = NULL, log = "", pars = NULL,
+             horizontal = FALSE, add = FALSE, at = NULL)
+
+Arguments:
+
+ formula: a formula, such as 'y ~ x'.
+: 
+
+    data: a data.frame (or list) from which the variables in 'formula'
+          should be taken.
+
+  subset: an optional vector specifying a subset of observations to be
+          used for plotting.
+
+       x: for specifying data from which the boxplots are to be
+          produced as well as for giving graphical parameters. 
+          Additional unnamed  arguments specify further data, either as
+          separate vectors (each corresponding to a component boxplot)
+          or as a single list containing such vectors.  'NA's are
+          allowed in the data.
+
+     ...: For the 'formula' method, arguments to the default method and
+          graphical parameters.
+
+          For the default method, unnamed arguments are additional data
+          vectors, and named arguments are graphical parameters in
+          addition to the ones given by argument 'pars'. 
+
+   range: this determines how far the plot whiskers extend out from the
+          box.  If 'range' is positive, the whiskers extend to the most
+          extreme data point which is no more than 'range' times the
+: 
+          interquartile range from the box. A value of zero causes the
+          whiskers to extend to the data extremes.
+
+   width: a vector giving the relative widths of the boxes making up
+          the plot.
+
+varwidth: if 'varwidth' is 'TRUE', the boxes are drawn with widths
+          proportional to the square-roots of the number of
+          observations in the groups.
+
+   notch: if 'notch' is 'TRUE', a notch is drawn in each side of the
+          boxes.  If the notches of two plots do not overlap then the
+          medians are significantly different at the 5 percent level.
+
+ outline: if 'outline' is not true, the boxplot lines are not drawn.
+
+   names: group labels which will be printed under each boxplot.
+
+  boxwex: a scale factor to be applied to all boxes.  When there are
+          only a few groups, the appearance of the plot can be improved
+          by making the boxes narrower.
+
+    plot: if 'TRUE' (the default) then a boxplot is produced.  If not,
+          the summaries which the boxplots are based on are returned.
+: 
+
+  border: an optional vector of colors for the outlines of the
+          boxplots.  The values in 'border' are recycled if the length
+          of 'border' is less than the number of plots.
+
+     col: if 'col' is non-null it is assumed to contain colors to be
+          used to col the bodies of the box plots.
+
+     log: character indicating if x or y or both coordinates should be
+          plotted in log scale.
+
+    pars: a list of graphical parameters; these are passed to 'bxp' (if
+          'plot' is true).
+
+horizontal: logical indicating if the boxplots should be horizontal;
+          default 'FALSE' means vertical boxes.
+
+     add: logical, if true _add_ boxplot to current plot.
+
+      at: numeric vector giving the locations where the boxplots should
+          be drawn, particularly when 'add = TRUE'; defaults to '1:n'
+          where 'n' is the number of boxes.
+
+Details:
+:q
+> > boxplot(Payroll ~ Year, data = d,at = 1985:2003)
+> plotPayrolls(d, add = FALSE)
+> boxplot(Payroll ~ Year, data = d,at = 1985:2003, add = TRUE)
+> jpeg("PayrollYear.jpg")
+> plotPayrolls(d, add = FALSE)
+> boxplot(Payroll ~ Year, data = d,at = 1985:2003, add = TRUE)
+> dev.off()
+X11 
+  2 
+> plotPayrolls(d, add = FALSE)
+> boxplot(Payroll ~ Year, data = d,at = 1985:2003, add = TRUE, col="red", lwd=2)
+> plotPayrolls(d, add = FALSE)
+> boxplot(Payroll ~ Year, data = d,at = 1985:2003, add = TRUE, col="red", lwd=2, notch = TRUE)
+> jpeg("PayrollYear.jpg")
+> plotPayrolls(d, add = FALSE)
+> boxplot(Payroll ~ Year, data = d,at = 1985:2003, add = TRUE, col="red", lwd=2, notch = TRUE)
+> dev.off()
+X11 
+  2 
+> jpeg("PayrollYear.jpg")
+> plotPayrolls(d, add = FALSE, main = "Payroll for Baseball Teams over years")
+> boxplot(Payroll ~ Year, data = d,at = 1985:2003, add = TRUE, col="red", lwd=2, notch = TRUE)
+> dev.off()
+X11 
+  2 
+> jpeg
+function (filename = "Rplot%03d.jpeg", width = 480, height = 480, 
+    pointsize = 12, quality = 75, gamma = 1, colortype = getOption("X11colortype"), 
+    maxcubesize = 256, bg = "white") 
+.Internal(X11(paste("jpeg::", quality, ":", filename, sep = ""), 
+    width, height, pointsize, gamma, colortype, maxcubesize, 
+    bg))
+<environment: namespace:base>
+> 
+> X11 
+  2 
+> save.image()
+> 

@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<faq xmlns:r="http://www.r-project.org">
+<title>FAQ for Interactive and Dynamic Documents</title>
+
+<question>
+I am using an interactive element and putting HTML markup inside it.
+However, when I apply the ihtml.xsl stylesheet to convert the document
+to 'iHTML', I get messages about the HTML elements not being
+recognized or having no template and they appear in the resulting
+document in red and not interpreted by the HTML browser, but merely
+displayed as text. What's the problem and how can I fix it?
+<answer>
+<para>
+The problem is that we are using docbook for marking up most
+of the document. The interactive elements are (currently)
+specific to HTML and so it is often more convenient to put
+the HTML in as-is rather than using Docbook markup
+which would get transformed to the same HTML.
+However, when the XSL processor sees the HTML, there
+are no templates in effect to map those elements
+and so it uses its catch-all rule of outputting the
+content as regular text so it is easy to see as 
+"unprocessed".
+</para>
+<para>
+There are two possible solutions. 
+One is to use docbook markup and things will be transformed properly.
+But that is not what we require here.
+Instead, in order to use regular HTML markup, simply
+ensure that the HTML elements within the interactive 
+node are identified as HTML elements and not docbook.
+We have added a template to ihtml.xsl to copy all 
+HTML nodes through as regular nodes and so they will appear
+correctly.
+How does one identify one or more elements as HTML elements?
+Firstly, somewhere in the document declare the HTML namespace.
+<programlisting>
+    xmlns:html='http://www.w3.org/TR/REC-html40'
+</programlisting>
+Then instead of &lt;a&gt;, use 
+&lt;html:a&gt;
+This gets tedious. If there is a single container
+HTML node such as a table, you can identify
+all the nodes within it as HTML nodes
+by declaring the default namespace to be the HTML URI, e.g.
+<programlisting><![CDATA[
+<interactive>
+<table xmlns='http://www.w3.org/TR/REC-html40'>
+  <tr><th>...</th>....</tr>
+  <tr>...</tr>
+</table>
+</interactive>
+]]></programlisting>
+In this way, the table, tr, th nodes will be recognized as HTML.
+</para>
+</answer>
+</question>
+
+<question>
+How do I know which tags to use?
+<answer>
+We use Docbook with some extensions.
+These are documented in Rdocbook.xml in 
+the inst/docs/ directory of this package.
+</answer>
+</question>
+
+<question>
+How do I pull in the contents of one file into
+another when processing the XML?
+<answer>
+The simple way  to do this dynamically is to use XInclude.
+It is as simple as 
+<![CDATA[
+<xi:include href="otherFile.txt" xmlns:xi="http://www.w3.org/2001/XInclude" parse="text"/>
+]]>
+So we have the href.
+The namespace definition for the xi prefix is important so that the XML processor recognizes the include 
+element as part of XInclude.
+If the other file is an XML file that we want to process in the same way as the main XML file,
+then we just change the value of the parse attribute to xml instead of text.
+</answer>
+</question>
+
+<question>
+Okay, but is there any way to do pull in just part of another document?
+<answer>
+Yes. Instead of specifying an file name or URL for the value of the href attribute
+in the &lt;xi:include&gt; node, you can provide an XPointer.
+</answer>
+</question>
+
+<question>
+I want to use LaTeX to write the text of the document, 
+but I would also like to be able to use XML to identify
+the code nodes. (There are lots of good reasons to do this.)
+How do I go about this?
+<answer>
+<para>
+The first thing to do is create your document using the following XML template:
+<programlisting><![CDATA[
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org">
+<para>
+
+ ....
+
+</para>
+</article>
+]]></programlisting>
+You put your content within the &lt;para&gt; node 
+as regular LaTeX content.
+However, you can also add in any XML nodes you want
+such as r:code, r:plot, and so on.
+</para>
+<para>
+The next step is to process the document and that involves converting
+it to pure LaTeX.  We use the XSL files from the dblatex project for
+this.  We have to modify these slightly as they expect a regular
+DocBook file and convert that to LaTeX.  We want to allow text such as
+\section to remain as is.  So we need to avoid the escaping of \.  We
+do this by avoiding all the mapping of characters in texmap.  To do
+this, we have to comment out the contents of the mapping.
+</para>
+</answer>
+</question>
+
+<question>
+I have a table that is too big to fit on a single page.
+How can I easily break it up into separate pages?
+<answer>
+<para>
+An approach is described at <ulink url="http://www.sagehill.net/docbookxsl/PageBreaking.html"/>.
+The basics are add
+<programlisting><![CDATA[
+<?dbfo keep-together="auto" ?>
+]]></programlisting>
+to the DocBook table node.
+We can set this permanently via the formal.object.properties attribute set
+</para>
+
+<para>
+You still have to do a little more as this doesn't do it with the
+basic DocBook style sheets.
+But use XSL/OmegahatXSL/fo/Rfo.xsl or 
+XSL/dynRFO.xsl and things will work.
+Note that FOP (0.94) seems to make
+a mistake with 
+</para>
+</answer>
+</question>
+
+<question>
+When I run FOP to produce PDF, I get a message saying
+<computeroutput>
+SEVERE: Couldn't find hyphenation pattern en
+</computeroutput>
+What should I do?
+<answer>
+The "SEVERE" is a little dramatic; fop will still create the PDF
+if the FO is valid.
+Download the fop-hyph.jar file from
+<ulink url="http://offo.sourceforge.net/hyphenation/#FOP+XML+Hyphenation+Patterns"/>
+i.e. chase the links to sourceforge and fetch the file
+offo-hyphenation-fop-stable.zip.  Extract the file
+offo-hyphenation-fop-stable/fop-hyph.jar from this and copy it to the
+lib/ directory in the fop installation.  If you do not have permission
+to write into that directory, set the environment varable
+FOP_HYPHENATION_PATH to the fully qualified name of that jar file.
+
+</answer>
+</question>
+
+<question>
+When I run FOP, I get error messages about not being able to read
+the dimensions of a background image.
+It says
+<programlisting>
+SEVERE: Cannot read background image dimensions: url(http://docbook.sourceforge.net/release/images/draft.png)
+</programlisting>
+What can I do?
+<answer>
+In this particular case, it is quite easy.
+It means that the DocBook  XSL files were applied with 
+the draft.mode parameter set/defaulting to "yes".
+When running these, specify a value of "no".
+For example, with xsltproc, use 
+<programlisting>
+ xsltproc  --stringparam draft.mode no fo.xsl doc.xml
+</programlisting>
+And with the dynDoc function in R, use 
+<programlisting>
+ dynDoc("doc.xml", "FO", draft.mode = "no")
+</programlisting>
+</answer>
+</question>
+
+<question>
+FOP is sluggish, slow or just seems to take a long time to run
+<answer>
+Check if it is going off to the network to download images.
+</answer>
+</question>
+
+<question>
+I am having trouble with catalogs. I have specified a rewrite rule
+in a catalog and it doesn't seem to be used.
+
+<answer>
+<para>
+There's a couple of potential issues here.  The most obvious is that
+you are doing something "silly", i.e. it will be simple when you find
+the result.  One such thing is that your rule has a / or does not have
+a / at the end of it and you are not quite matching correctly because
+of this.  For example, you might have a / at the end of the
+uriStartString attribute but no / at the end of the rewritePrefix
+attribute.  So a URL such as http://www.omegahat.org/FOO/bar.xsl would
+turn into /home/duncan/FOObar.xsl, i.e. without the / separating the
+FOO and bar.xsl!
+</para>
+
+<para>
+I was in a situation where I couldn't figure out what
+was wrong. It turned out that I had a rewriteURL node
+in my catalog and it was ignored.  And so it should have
+been rewriteURI, i.e. with  an I at the end, not an L.
+This is hard to see with a casual look.
+Instead, we can validate the document, e.g.,
+<r:code>
+xmlTreeParse("mycatalog.xml", validate = TRUE)
+</r:code>
+If that fails, then it will tell you what the errors were.
+</para>
+<para>
+If that doesn't fail, then the likely explanation is that
+ there is another rule that is preceeding yours.
+If you are getting back a value that you didn't expect,
+then you will want to search through the catalogs
+in effect for a rule that gives you that result
+and figure out why it trumps yours.
+You can use <r:func>XML:::catalogDump</r:func>
+to get a look at the top-most catalog.
+</para>
+<para>
+You could also use
+<r:func>xmlCatalogAdd</r:func>
+to add your specific rule to the catalog
+and see if it works as you expect after
+that. If so, then this helps to verify that
+the rule is correct.
+</para>
+<para>
+If you are getting an empty character back from
+<r:code>
+ catalogResolve("your uri")
+</r:code>
+then there is no other rule and something is curious.
+You might explicitly call
+<r:code>
+ catalogLoad("mycatalog.xml")
+</r:code>
+to force it to be loaded.
+Alternatively, set the environment variable
+XML_CATALOG_FILES to the fully qualified
+name of your file, i.e. <file>/home/duncan/mycatalog.xml</file>
+and then load the XML package.
+</para>
+</answer>
+</question>
+
+<question topic="FO">
+How do I create a table in FO that has
+no lines except one below the header?
+<answer>
+Add a border-bottom="solid" attribute to the
+fo:table-row node in the fo:table-header node.
+
+</answer>
+</question>
+
+<question>
+I go to all the trouble of using SVG and it doesn't show
+up when I transform to HTML.  What's the problem?
+<answer>
+You probably omitted to put a <code>format = "SVG</code>
+attribute on the graphic node.
+</answer>
+</question>
+
+<question>
+Why don't you just use TeX or LaTeX?
+<answer>
+Because we can do much more with the XML-based documents than simply
+render them.  For one, we can quite readily render an XML document in
+various formats such as PDF and HTML.  We can project them into
+different views for different audiences - effectively generating quite
+different documents from the single original "archive" or source
+document.  Supporting branches and alternatives is quite complex in
+LaTeX and would leave the user exposed to more of the details.
+Further, we like to be able to programmatically operate on a document
+to, e.g., extract all the code, find all the code in a particular
+section, update references to a particular function (e.g. when it
+moves to a different package).  And a non-trivial consideration is
+that TeX/LaTeX is not widely used outside of the sciences and it is
+primarily for mathematical content. It produces excellent output and
+is a quite wonderful program. However, it can yield very obscure error
+messages and can be challenging to learn.  The combination of XML
+tools and the widespread use of XML in office suites makes it a
+reasonable format for representing rich documents that are more than
+just presentation descriptions.
+</answer>
+</question>
+
+<question>
+If you want to generate PDF and HTML from a single source,
+why not use latex2html or tth?
+<answer>
+Either of these works fine for many purposes.  And of course, you can
+write your document using XML and convert it to LaTeX using the
+db2latex stylesheets we provide.  But the simple answer is that these
+tools don't handle all LaTeX documents and tth doesn't know about
+LaTeX extensions, i.e.  add on LaTeX packages, and further, latex2html
+doesn't do a wonderful job.  We're hoping that we can use MathML and
+exploit the much greater control via XSL than with latex2html or tth.
+And we really do want to use XML so that we have programmatic access to the
+document for rich operations that are not possible when dealing with
+simple LaTeX documents.
+</answer>
+</question>
+
+<question>
+Why not use Sweave?
+<answer>
+Sweave is terrific. And it was developed about a year after we first
+presented the XML/XSL approach and it shares much of the same vision
+regarding dynamic report generation. Further, it has been relatively
+widely adopted within the R community.  However, we are trying to do
+more and more easily.  We want interactive documents, as well as
+dynamic documents.  We want programmatic access to the documents to be
+able to fetch different pieces of the document and be able to
+transform them in place.  And we want to use standard tools for this.
+XPath, XSL, XML parsing, etc. allow us to do this and give us a real
+opportunity to build some rich tools simply.  But perhaps the most
+important reason for "going beyond" Sweave is that Sweave has text and
+code chunks.  The syntax cannot support hierarchical or nested chunks.
+When would one want this?  Perhaps never, but in fact, frequently
+would be a better answer.  If we want to run the code in chunks in the
+second section of the document, we cannot do this easily and correctly
+with Sweave.  The section is part of a text chunk. We can use regular
+expressions to find all sections, but this relies on a convention and
+cannot handle "conditional" aspects of a document.  If we want to
+handle branching/alternatives, this can be done with top-level flat
+identifiers to identify a thread, but is trivially expressed in XML
+because it supports hierarchical data.  In short, XML is a very
+general format for arbitrary data structures while Sweave and the
+noweb syntax is limited to linear, non-hierarchical structures.
+If we don't need such hierarchy, Sweave is more than sufficient.
+If we want to experiment with such hierarchical structures, we
+can't with Sweave.
+</answer>
+</question>
+
+
+<question>
+Docbook has so many possible tags or XML elements.
+It is overwhelming. What can I do?
+<answer>
+<para>
+Use the ones you need. But how do you find those?
+One way is to look at existing Docbook documents and
+see what elements they use. Since they are XML documents,
+we can easily find how often each element was used.
+</para>
+<para>
+Let's look at the Subversion book which is available
+from
+<ulink url="http://svnbook.red-bean.com/trac/changeset/3082/tags/en-1.4-final/src/en/book?old_path=%2F&amp;format=zip"/>
+Having unzipped this file to extract the contents, we can use the command
+<r:code>
+z = xmlElementSummary("tags/en-1.4-final/src/en/book")
+z$nodeCounts[1:30]
+<r:output>
+          para        command          title        literal       filename 
+          2237            965            714            699            536 
+      listitem         screen       refsect1          quote         option 
+           506            457            372            363            339 
+  varlistentry           term           xref       emphasis          entry 
+           279            279            274            185            171 
+   replaceable          sect2 programlisting      indexterm        primary 
+           166            122            100             83             83 
+         sect1      firstterm      secondary       refentry     refnamediv 
+            78             76             76             75             75 
+       refname     refpurpose       tertiary       footnote          sect3 
+            75             75             73             63             56 
+</r:output>
+</r:code>
+So we see a lot of para, command, title, literal, filename and
+listitem tags. These are for a technical book detailing
+shell commands and hence the number of 'command' elements.
+</para>
+<para>
+The book <ulink url="http://www.diveintopython.org/">Dive into Python</ulink> is also 
+<ulink url="http://www.diveintopython.org/download/diveintopython-xml-5.4.zip">available as an XML  document</ulink>.
+So we can do the same thing.
+We first have to filter out some files which are not valid XML by themselves.
+<r:code>
+dive.xml = list.files("~/Downloads/diveintopython-5.4/xml/", pattern = "\\.xml$", recursive = TRUE)
+i = grep("^entities|appendix", dive.xml)
+dive.xml = dive.xml[-i]
+dive = xmlElementSummary(paste("~/Downloads/diveintopython-5.4/xml", dive.xml, sep = "/"))
+</r:code>
+</para>
+</answer>
+</question>
+
+<question>
+I have an XML document with code and text.
+How can I get just the code out out it, i.e. an R script
+containing all the code with the text discarded?
+<answer>
+In literate programming/Sweave circles, this is called tangling.
+And there is a tangle.xsl file in the XSL/OmegahatXSL/
+directory of this package when it is installed.
+You can run this within R via
+<r:func>xsltApplyStyleSheet</r:func>, e.g.
+<r:code>
+xsltApplyStyleSheet("myDoc.xml", system.file("XSL", "OmegahatXSL", "tangle.xsl", package = "IDynDocs"))
+</r:code>
+You can use the style sheet directly from the command line
+with 
+<programlisting>
+xsltproc  .../XSL/OmegahatXSL/tangle.xsl  myDoc.xml > myDoc.R 
+</programlisting>
+
+And final
+
+</answer>
+</question>
+
+
+<question>
+I'm getting error messages when converting
+an XML file to HTML or PDF/FO (i.e. running xsltproc)
+something like
+<programlisting>
+No localization exists for "xml" or "". Using default "en".
+</programlisting>
+<answer>
+I've found this when one uses a lang
+attribute on an XML node within the XML document.
+Change this to, e.g. language, which is the attribute
+for the programlisting element, for instance.
+</answer>
+</question>
+<question>
+When I try to create a .fo or .pdf file,
+I get a lot of messages on the screen 
+like
+<programlisting>
+xsl:attribute-set : use-attribute-sets recursion detected
+</programlisting>
+What's the problem?
+<answer>
+If your version of libxslt is 
+less than 1.1.17, install a more recent version of libxslt.
+</answer>
+</question>
+<question>
+When trying to create an HTML or FO/PDF files,
+I get errors of the form
+<programlisting>
+warning: failed to load external entity "http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl"
+compilation error: file /home/duncan/Classes/StatComputing/XDynDocs/inst/XSL/OmegahatXSL/html/Rhtml.xsl line 4 element import
+</programlisting>
+What's the problem?
+<answer>
+Most likely, you don't have the docbook XSL files installed or in
+a place that xsltproc can find them.
+Download them from <ulink url="http://sourceforge.net/project/showfiles.php?group_id=21935#files"/>
+and then extract the files.
+Next, update the entry in the catalog.xml file to point to
+where the docbook-xsl files are located.
+</answer>
+</question>
+
+</faq>
+
+

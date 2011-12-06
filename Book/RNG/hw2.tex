@@ -1,0 +1,255 @@
+\documentclass[11pt]{article}
+\usepackage{times}
+\usepackage{comment}
+\usepackage{fullpage}
+\def\SFunction#1{\textbf{#1()}}
+
+\title{
+ Homework 2  \hfil Stat 141, Winter '06   \\
+ Due Friday, 2nd February - Hand in discussion section and via handin
+ program on gcox.
+}
+\begin{document}
+\maketitle
+
+You are to hand in a typed report that outlines what you did along
+with the reasoning. Include figures, tables, etc.  and the R code as
+an appendix.  Hand-in a printed copy in class and email a single
+archive (zip or tar) file containing the PDF file containing the
+write-up/report, and the R code.  Please ask questions in the
+newsgroup, office hours and class.
+
+
+\begin{enumerate}
+
+\item Timing of algorithms.  We usually think of random variables and
+  associated density functions as being neat mathematical functions
+  expressed as a function of the value and some parameters.  Mixture
+  distributions are slightly more general versions of random variables
+  and densities, but require more complex parameters.  The idea of a
+  mixture is relatively simple.  To sample from one we have a two step
+  random process.  We have $k$ simpler/regular densities and first
+  select which one of these $k$ densities to sample from.  Having
+  selected the component of the mixture, we generate a value from that
+  density in the usual manner for that density, and then we have a
+  value from the mixture distribution.  To specify a mixture we
+  therefore have to specify the probability of selecting component
+  $1$, $2$, $\ldots$, $3$ -- $(p_1, p_2, $\ldots$, p_k)$ -- and the
+  form and parameters for each of the $k$ component densities.
+
+  In this question, we will focus on a mixture of $k$ Normals.  Your
+  job is to write a function that returns $n$ sample values from a
+  mixture of Normals.  It should accept three parameters: the number
+  of sample values ($n$), the probabilities for sampling from each
+  component ($p$ above), and an object representing the densities of
+  the components.  For the latter, one might choose to use a $k \times
+  2$ matrix to represent these parameters or a list of length $k$, each
+  a named vector giving the mean and SD.  Alternatively one might use
+  a list of functions to represent the densities with each having its
+  own parameters stored within the function (e.g. using lexical
+  scoping). This is the most general approach and allows one to have
+  different types of distributions within the mixture.  One can create
+  a new class to represent these also and provide methods for the
+  class and to transform from one form to another.  You can choose for
+  yourselves.
+
+\begin{comment}
+ You can also write the code to be more general
+ to accept different types of base random variables and even allow
+ different types of distributions within the same mixture, e.g. \alpha
+ Normal (mu sigma2) + (1- \alpha) Exp(theta), but you don't have to! 
+\end{comment}
+ 
+ You will write two versions of the function
+ in order to compare two algorithms.
+ These are as follows.
+ \begin{enumerate}
+ \item The simplest way is to select which of the $k$ distributions to
+   use for each of the $n$ points and then iterate over these n ``component
+   identifiers'' for the distribution from which to sample and take a
+   sample of size 1 from the corresponding density.
+  
+ \item An alternative approach is to generate the component identifiers
+   for the $n$ deviates but then to determine how many observations
+   are to be taken from each of the $k$ components.  Then iterate over
+   the $k$ components and generate the appropriate number of random
+   values from each of these.
+ \end{enumerate}
+
+ These two approaches produce the same results qualitatively, but 
+ are different in terms of how fast they are.
+
+ Generating the identifiers for the components is a sample from
+ a multinomial distribution with parameters $p$.  You can use
+ \SFunction{sample} to do this relatively easily in R.
+
+ Write functions for each approach.  Make certain they produce similar
+ results.  You might use Q-Q plots (see \SFunction{qqplot}) to compare
+ the output from the two functions.  If you don't see a strong linear
+ relationship, this suggests there is a bug in one or both functions!
+
+ Next, perform multiple runs of each of these $2$ functions for
+ different sample sizes (e.g. 1, 2, 5, 10, 100, 1000, 10000) to find
+ out how much time each function takes to complete.  Use
+ \SFunction{system.time} to determine how long the commands take to
+ complete.  Use \SFunction{sapply} to loop over different sample sizes
+ to get a matrix of sample run-times for the different sample sizes.
+ Then plot these times against sample size and see how the two
+ approaches perform. (Scatterplot, boxplots, etc.)  Which algorithm is
+ better?  Or does it depend on sample size? Is it likely to depend on
+ the parameters in the component densities? or the number of
+ components in the mixture, i.e. $k$?
+  
+ When measuring times, especially for very short runs, 
+ make certain to think about how to get accurate answers.
+ Simple statistical theory tells us how to do this!
+% make the runs long and take numerous samples.
+% if the runs are too short, then we can't get the relevant
+% resolution
+
+
+\item Acceptance/Reject Sampling
+
+  The acceptance-rejection method for sampling from a density also works 
+  for multi-dimensional random vectors.  In this problem, you are
+  given an R function which represents a 2-dimensional joint density
+  defined on the square $[0, 100] \times [0, 100]$.  
+  The function is available via the command
+\begin{verbatim}
+source(url("http://eeyore.ucdavis.edu/stat141/homework/nodeDensity.R"))
+\end{verbatim}
+ which defines the variable \SFunction{nodeDensity}.
+
+ You should create a picture of it by generating values from a grid
+ using \SFunction{outer}, and plotting the results with
+ \SFunction{persp} and/or \SFunction{contour}, e.g.
+\begin{verbatim}
+x = 0:100
+z = outer(x, x, nodeDensity)
+persp(x, x, z, col = "lightblue", theta = 40, phi = 40,
+         xlab = "0 to 100",  ylab = "0 to 100")
+\end{verbatim}
+ (Explore the view using different values of theta and phi
+  and/or other arguments for persp.)
+  The idea is that this is geographical region in which people live
+  and the density represents population density.  There are two
+  visible peaks that run along an arc of zero-density.  That arc is a
+  river in which nobody lives, but most people live along the river.
+  Fewer people live away from the river and there is another
+  region in the top right in which nobody lives.
+
+  Your job is to write an R function that generates sample values from
+  this density.  You can use a simple uniform majorizing function and
+  the acceptance-rejection mechanism, i.e. generate pairs $(x, y)$
+  randomly from $[0, 100] \times [0, 100]$ and then generate a uniform
+  $(0, c g(x, y))$.
+ 
+  Generate different samples and produce plots to illustrate how good
+  the sampling is.  Determine the efficiency, i.e the proportion of
+  acceptances achieved with this acceptance-rejection scheme.
+
+
+  For those of you who want to work with some slightly difficult
+  univariate densities, there are two additional questions available
+  at
+  \texttt{http://eeyore.ucdavis.edu/stat141/Homeworks/hw2-bonus.pdf}.
+     
+\item Bootstrap
+
+In this problem, we will explore the bootstrap in the context of
+simple linear regression.
+We have a regular linear model given by 
+$$
+ Y = \beta_0 + \beta_1X + \epsilon = X\beta + \epsilon
+$$ 
+but the distribution of $\epsilon$ depends on which device was
+ used to get the value of each $y$.  We will consider the case where
+ there are two possible devices and each gives rise to errors that
+ have a double-exponential distribution, each distribution with its
+ own parameter.  They are each centered at $0$ so essentially have
+ only a scale parameter.
+So the densities for the two $\epsilon$s are
+$$ \theta_i e^{-\vert x\vert \theta_i}$$ where $\theta_1$ and
+$\theta_2$ are for device A and B.
+
+The data are available via the command
+\begin{verbatim}
+load(url("http://eeyore.ucdavis.edu/stat141/data/linearModelData.rda"))
+\end{verbatim}
+This gives a data frame -- \texttt{devices} --- with variables named
+$Y$, $X$ and $device$, the latter indicating which device was used to
+make the measurement for that record.
+
+
+If we knew the parameters of the two double-exponential distributions,
+we would also know the variances and we could use weighted least
+squares.  This would be a good thing to do to get better estimates of
+$\beta$.  One approach is to fit the model for each group separately
+and get initial estimates for the two double-exponential parameters.
+See \SFunction{lm}.  Then we can use these in the weights to fit the
+model for all the observations.
+
+Regardless of how we get the estimate of the $\beta$ vector, we know
+that the usual assumptions of Normality used to calculate Standard
+Errors (SEs) for $\beta_0$ and $\beta_1$ are invalid. So we can turn
+to the bootstrap to estimate the variance-covariance matrix for
+$\hat\beta$ and to get (joint or marginal) confidence intervals for
+each parameter.
+
+
+There are several ways to structure the bootstrap mechanism
+for this problem.
+\begin{enumerate}
+\item Sample the $(X, Y)$ pairs, either randomly or in proportion to
+  the number of observations for each device, and then perform the entire
+  estimation procedure.
+
+\item Perform the initial estimation of the double-exponential
+  parameters via the 6separate models for each device, and then fit the
+  model for all the data together using weighted least squares.  You
+  now have $n$ residuals made up of those from the two groups.
+  Generate $Y^*$ from $X\hat{\beta} + \epsilon^*$ where $\epsilon^*$
+  are sampled from the $n$ empirical residuals from the
+  appropriate group.
+  This is a non-parametric bootstrap since it uses the 
+  observed residuals as the source of errors
+  rather than a distribution.
+  
+
+\item Estimate the two double-exponential parameters and then 
+    bootstrap by generating $\epsilon^*$ from these two distributions
+    to give $Y^* = X\hat{\beta} + \epsilon^*$.
+    This is the parametric bootstrap as we are assuming/using a 
+    form for the density of the errors.
+\end{enumerate}
+You can also sample from the $X$s if they are to be considered random.
+
+Try each of these approaches and compute and report the means and
+variance-covariance matrix for $\beta_0$ and $\beta_1$ for each.  Are
+they very similar? Are they close to the values from regular Normal
+theory?
+
+\begin{comment}
+For the original problem I was going to give.
+
+Another approach arises from plotting $Y \sim X$.  There is an obvious
+linear component.  All the errors are non-negative.  So one could try
+to find $\min(Y \vert X)$ and then do the regression on those elements,
+essentially ``thinning'' the data and removing the ``errors''.
+\end{comment}
+
+ Look at the bootstrap samples which give rise to the extreme values
+ of the statistic and comment.
+
+ You should write the bootstrapping method yourself in this case
+ to work through the details. However, there is also a package
+ in R named \textbf{boot} which provides a good general bootstrapping
+ function with numerous advanced options.
+
+\begin{comment}
+%\item Cross validation 
+  k-nearest neighbors of 3 univariate distribution.
+\end{comment}
+
+\end{enumerate}
+\end{document}

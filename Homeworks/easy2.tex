@@ -1,0 +1,67 @@
+\documentclass[12pt]{article}
+
+\usepackage{fullpage}
+\usepackage{times}
+\def\SPAM{SPAM}
+
+\def\TA{Gang}
+\def\InstructorMail{\texttt{nolan@stat.berkeley.edu}}
+\def\TAMail{\texttt{liang@stat.berkeley.edu}}
+
+\def\SFunctionRef#1{\textbf{#1}}
+\def\Rpackage#1{\textit{#1}}
+\usepackage{hyperref}
+
+\begin{document}
+
+\noindent
+\textbf{Stat 133, Spring 04 \\
+Homework 2: Read One E-mail Message\\
+Due:  Friday, 13 Feb}
+
+\medskip
+
+The \SPAM package can be found on the web at 
+\url{http://winnie.ucdavis.edu/stat141/Winter04/RPackages/index.html}.
+These data are from the Spam Assassin website,
+\url{http://spamassassin.org/publiccorpus}.
+The data and associated R functions have been incorporated into an R package
+called \Rpackage{RSpamData}.
+
+\medskip
+
+Your tasks in this homework are to:
+\begin{itemize}
+\item  Download and install \Rpackage{RSpamData} into your SCF account or your home PC.
+
+\item Use \SFunctionRef{readLines} to read in one message from the hard\_ham messages.
+To determine which message you are to read, take the last two characters of your SCF login
+and map them to the digits 00001 through 0078, where aa maps to 00001, ab maps to 00002,
+... ba maps to 00027, bb maps to 00028, and so on. 
+Your message will be the one that begins with this 5 digit number.
+
+\item Split the message into two parts, one containing the header and one the body.
+
+\item The header is made up of name:value pairs. Some of these span more than one line
+in the header. 
+Fold the multiple lines into one long line so that the header is a character vector, 
+with each element corresponding to a header field.
+
+%\item Represent the header as a named vector, where the name of the element is the header
+%field and the element in the vector is the value of the field.
+
+\end{itemize}
+
+Use the class bulletin board to ask questions, discuss
+tools, etc. or ask \TA{} or me in class, office hours, $\ldots$
+
+You should submit via e-mail 
+the R code that you used to process your e-mail message.
+(See the R function \SFunctionRef{history} and \SFunctionRef{savehistory} 
+for ways of accessing and saving the R commands you executed in your R session.)
+
+Submit your work via email to \TAMail{}.
+Make certain to also save a copy of what you submit.
+You will be using this code in your first project.
+
+\end{document}

@@ -1,0 +1,13 @@
+Package: NaieveBayes
+Version: 1.0
+Date: 2004/02/12
+Title: Functions for Naieve Bayes spam filter probabilities
+Author: Duncan Temple Lang <duncan@research.bell-labs.com>
+Maintainer: Duncan Temple Lang <duncan@research.bell-labs.com>
+Description: Provides basic functions for computing probabilities
+ involved in the computations of the Naieve Bayes classifier 
+ for classifying mail messages as SPAM or HAM.  These are 
+ to be used in the cross-validation process to determine a
+ threshold.
+License: BSD
+

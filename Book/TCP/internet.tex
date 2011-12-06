@@ -1,0 +1,160 @@
+
+\section{Introduction}
+
+Intrusion detection systems monitor the use of computers and networks, 
+searching for unauthorized use and attempts to deny users access to services.
+In order to develop an effective intrusion detection system, 
+researchers need a means of evaluating the system and its ability to detect 
+intrusions.  
+The Information Systems Technology Group at Lincoln Laboratory at MIT 
+prepared a body of data for this purpose.  
+These data represent the activity over a nine-week period of a 
+Local Area Network consisting of hundreds of computers and thousands of 
+additional, external computers on the Internet.
+For confidentiality reasons, network traffic on a real network could
+not be used, and due to the time constraints and unreliabilty in cleaning
+real data to remove sensitive information, the Lincoln Labs simulated 
+the network activity. 
+
+The simulation was carefully designed to represent real network activity
+on a local Air Force base.  (The project was sponsored by the Defense Advanced 
+Research Projects Agency and Air Force Research Laboratory.
+For several months, the Lab collected 
+statistics on the activity of the Air Force base network, including
+how people such as administrative assistants, managers, programmers,
+and system administrators, performed their day-to-day activities, like 
+preparing documents, reading and responding to email, downloading data 
+from the Web, compiling and testing programs, and repairing systems.
+The simulation generated random activity that matched summary statistical
+measures of the real network.  For example, the simulation "wrote" email 
+using unclassified documents that matched the word frequencies of the 
+real email content.  Over twenty network services were simulated
+including mail, web, and file transfer services, and the activity of 
+each of these services was 'sniffed' and recorded. 
+In addition to simulating normal activity, 32 different types of 
+attacks were inserted in the data. These were a mix of older,
+current, and novel attacks, some of which were chosen from publicly
+documented attacks.
+In order to develop techniques for detecting intrusions into networked 
+systems, we first must be able to characterize the normal and anomalous
+behavior of the system.
+The data we will focus on includes all the TCP (Transmission Control Protocol) 
+information that identifies which machines and applications were communicating
+on the network.  
+
+
+\section{The Internet and Transmission Control Protocol}
+When an application like your Web browser needs to contact
+the outside world to retrieve a web page, the communication is handled 
+using Transmission Control Protocol (TCP) and Internet Protocol (IP).
+These protocols are a set of conventions for using networks to transfer
+data on the internet.
+For example, to download the page http://www.nytimes.com, the web browser on
+your computer connects to the machine that hosts the www.nytimes.com 
+Web site, and proceeds directly to the Web site "department''. 
+Each department has its own door or \textit{port}.
+This is port 80 for HTTP - the HyperText Transfer Protocol - used for
+accessing Web pages.  
+The browser establishes a 2-way (bi-directional)
+connection with the www.nytimes.com machine on this port, and 
+it uses this connection to send and receive information.
+The browser sends information such as
+\begin{verbatim}
+ GET /index.html HTTP/1.1
+ \end{verbatim}
+requesting a particular page for you to browse, and 
+the Web server sends the resulting page back along this connection.
+
+But how does the Web browser find the www.nytimes.com machine?
+Further, rather than sending entire files across the internet, 
+the delivery system breaks the communications into
+smaller segments and sends them in separate packets.  
+But what if packets get lost on their travels from one application 
+to the other, or what if they arrive out of order?  
+The protocols provide ways to correct for all of these problems. 
+
+In order to answer the first question, we need to understand the 
+topology of the internet. 
+The internet is made up of several physical networks that are
+connected by routers or gateways, computers that are connected
+to multiple networks that shuffle packets from one network to another.
+But, to the user, the internet is a single virtual network. 
+To find a computer on a network, it must have 
+an Internet address, or IP address.
+These are unique 32-bit integers assigned by a central authority,
+INTERNIC, the Internet Network Information Center.
+IP addresses are typically expressed as four 8-bit integers, 
+e.g. 128.xx.xxx.xx, but conceptually, the address consists of a 
+pair of identifiers, a network ID and a host ID. 
+The host ID represents a connection to a network.
+If a computer belongs to more than one network then
+it must have more than one IP address, and if a computer moves
+from one network to another then its IP address must change.
+
+The TCP and IP protocols are very flexible in that almost any 
+underlying physical network can be used to transfer data.
+The Internet Protocol is an abstraction of the physical, interconnected
+networks; it defines a packet delivery system that is
+unreliable, best-effort, and connectionless.
+That is, it is a packet delivery system becuase the information
+to be transferred is divided into small packets, it is
+unreliable because delivery of packets in not guaranteed,
+best-effort because packets are discared only when network
+resources are exhausted or the network fails, and 
+connectionless because packets are sent independently
+from eahc other and as a result may arrive out of order,
+or be lost or duplicated.
+
+
+The Address Resolution Protocol resolves IP addresses with the physical
+address.  The physical address of the machine is tied to the physical
+characteristics of the network.  
+The ARP forms a network communication system that accepts IP data
+and uses the physical address to get it to its destination.
+
+
+
+========================
+
+Coceptual Layers
+Application, Transfer Service, Connectionless Packet delivery,
+Network
+
+Layers of service and protocol
+
+Application program
+Application communication
+FTP, SMTP, ...
+
+Transfer Service Makes connection
+TCP, UDP
+
+Connectionless packet delivery system
+IP accept request to send packet
+
+Network Communication - accepts IP data and 
+uses physical address to get it there
+ARP (address resolution)
+
+Datagram
+encapsulation
+Fragmentation
+Time to live 
+Checksum
+
+Routing
+Direct delivery
+Indirect delivery
+Routing table
+ICMP
+
+=======================================
+Lincoln Labs -- creation of the data
+
+From Duncan's setup.xml
+
+
+==============================
+Our manipulation of the data 
+
+Examples of the code to get data out and plot.

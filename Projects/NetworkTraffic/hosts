@@ -1,0 +1,62 @@
+Outside Hosts
+IP Address Hostname Operating System Notes
+135.13.216.191 alpha.apple.edu Redhat 5.0 kernel 2.0.32
+135.8.60.182 beta.banana.edu Solaris 2.5.1  
+194.27.251.21 gamma.grape.mil SunOS 4.1.4  
+194.7.248.153 delta.peach.mil Redhat 5.0 kernel 2.0.32
+195.115.218.108 epsilon.pear.com Solaris 2.5.1  
+195.73.151.50 lambda.orange.com SunOS 4.1.4  
+196.37.75.158 jupiter.cherry.org Redhat 5.0 kernel 2.0.32
+196.227.33.189 saturn.kiwi.org Solaris 2.5.1  
+197.182.91.233 mars.avocado.net SunOS 4.1.4  
+197.218.177.69 pluto.plum.net Redhat 5.0 kernel 2.0.32
+192.168.1.30 monitor MacOS SNMP monitor
+192.168.1.10 calvin.world.net   Outside gateway
+192.168.1.20 aesop.world.net   Outside Web Server
+
+Routers & Hubs
+IP Address Hostname Operating System Notes
+172.16.112.1 loud.world.net   Cisco 2514 Router
+192.168.1.1 loud.world.net   Cisco 2514 Router
+172.16.112.5 None.   Hewlett-Packard EtherTwist Hub
+192.168.1.2 None.   Hewlett-Packard EtherTwist Hub
+
+Inside Hosts
+IP Address Hostname Operating System Notes
+172.16.12.10 plato.eyrie.af.mil Solaris Not part of simulation
+172.16.112.10 locke.eyrie.af.mil SunOS inside sniffer
+172.16.112.20 hobbes.eyrie.af.mil Redhat 5.0 Inside gateway
+172.16.112.50 pascal.eyrie.af.mil Solaris 2.5.1  
+172.16.112.100 hume.eyrie.af.mil Windows NT 4.0
+172.16.112.149 eagle.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.112.194 falcon.eyrie.af.mil Solaris 2.5.1  
+172.16.112.207 robin.eyrie.af.mil SunOS 4.1.4  
+172.16.113.50 zeno.eyrie.af.mil SunOS 4.1.4  
+172.16.113.84 duck.eyrie.af.mil SunOS 4.1.4  
+172.16.113.105 swallow.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.113.204 goose.eyrie.af.mil Solaris 2.5.1  
+172.16.114.50 marx.eyrie.af.mil Redhat 4.0 kernel 2.0.27
+172.16.114.148 crow.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.114.168 finch.eyrie.af.mil SunOS 4.1.4  
+172.16.114.169 swan.eyrie.af.mil Solaris 2.5.1  
+172.16.114.207 pigeon.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.115.5 pc1.eyrie.af.mil Windows 95  
+172.16.115.87 pc2.eyrie.af.mil Windows 95  
+172.16.115.234 pc0.eyrie.af.mil Window NT 4.0 Build 1381, Service Pack 1
+172.16.116.44 pc5.eyrie.af.mil Windows 3.1  
+172.16.116.194 pc3.eyrie.af.mil Windows 95  
+172.16.116.201 pc4.eyrie.af.mil Windows 95  
+172.16.117.52 pc7.eyrie.af.mil Windows 3.1  
+172.16.117.103 pc9.eyrie.af.mil MacOS  
+172.16.117.111 pc8.eyrie.af.mil MacOS  
+172.16.117.132 pc6.eyrie.af.mil Windows 3.1  
+172.16.118.10 linux1.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.118.20 linux2.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.118.30 linux3.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.118.40 linux4.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.118.50 linux5.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.118.60 linux6.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.118.70 linux7.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.118.80 linux8.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.118.90 linux9.eyrie.af.mil Redhat 5.0 kernel 2.0.32
+172.16.118.100 linux10.eyrie.af.mil Redhat 5.0 kernel 2.0.32

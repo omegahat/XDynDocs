@@ -1,0 +1,159 @@
+\documentclass[11pt,timesroman]{article}
+\begin{document}
+\baselineskip=18pt
+
+\Goal{Make it easier to read a DBMS book after reading this material
+and to understand how to use a database from within a statistical system
+and  when to understand when it is appropriate to use an RDBMS to
+manage data.
+}
+
+\section{Introduction}
+Introduce different scenarios  as to how we come to use a database
+\begin{itemize}
+\item in industry, data collected from manufacturing process in
+  databases and interested in the production process and improving,
+  e.g., yield.
+\item a clinical trial where data is gathered on observational units 
+  for a variety of different purposes
+\item information is gathered for tracking inventory and sales in
+  Wal-Mart.  Different groups decide to ``mine'' it for 
+ relationships to see if they can improve the Supply Chain Network
+  (SCN), marketing strategies, etc.
+
+\item you are starting a study   with different types of data (images,
+ numbers, files, etc.) and a
+ large quantity of it (e.g. from a collection source such as a
+ computer network).  Rather than using some ad hoc solution to manage
+ the data without knowing precisely how you will use it, you choose to 
+ keep your options open and to use a general database system to manage
+ the data.  S-Net is an example.
+\end{itemize}
+
+
+Cover topics such as 
+\begin{itemize}
+\item imposed on users because of corporate/instutional approaches to
+  gathering and managing data 
+\item meta-data
+\item synchronization
+\item client-server computing
+\item security
+\item performance (specialized)
+\item  connections to data frames and statistical data ``models''
+\item live data
+\end{itemize}
+
+\section{Basic Model - for statisticians forced to access a database}
+\subsection{Relational Components - the Table}
+ The basic unit is a table.  \\
+ Query gives us back a table. \\
+ algebra means we are always dealing with a table. \\
+ Deal first exclusively with a single table.
+
+ What is different from a data frame in S. 
+ \begin{itemize}
+ \item live/transactional data that means we get updated results if we 
+   re-run the same query.  This is different from R's functional
+   programming model.
+\item uniqueness of rownames, etc.?
+\item meta-information, schema and type information and checking.
+\item NULLs and NAs
+ \end{itemize}
+
+\subsubsection{Queries and Query Language - SQL}
+ Again, limit to a single table for now.
+
+ Notion: Subsetting is the thing we do most of. That is one of the
+ main reasons why we use S.
+
+ Subsetting by records and columns/variables. - restrict and projection
+
+ Translate the technology concepts for the audience and illustrate how
+ to think about and exploit RDBMS from a statistical perspective. \\
+   i.e. Relate to S.
+
+
+\subsubsection{Data Types}
+ Basic data types 
+ 
+ Handling dates and times.
+
+\subsubsection{Functions - Record and Aggregate}
+
+
+\subsection{Multiple Tables and the Relational Model}
+
+\subsubsection{Why - Motivation}
+ Redundancy elimination, etc.
+
+\subsubsection{Keys} 
+  The relational logic
+
+\subsubsection{Join}
+
+\subsubsection{Examples}
+ In both R with multiple data frames and then with tables.
+
+\section{Accessing RDBMS from R}
+Concepts of the model - RSDBI \\
+  RODBC, RMySQL, RPgSQL 
+
+Basics of the model
+\begin{itemize}
+\item driver
+\item connection
+\item query \\
+       basic and dynamic content (e.g. from variables within R)
+\item result set \\ 
+       fetching in blocks
+
+\end{itemize}
+
+\subsection{Accessing RDBMS from other Systems}
+Commonalities of the model.
+\subsubsection{Perl/Python}
+\subsubsection{Java}
+JDBC
+\subsubsection{Windows/Excel}
+ADO
+
+
+\section{SQL for Smart Statisticians}
+Cookbook for tips on how to get results from a database
+in ways that may be challenging or more useful for statistical
+work.
+
+Advanced issues.
+
+
+\section{Understanding how a Database works}
+
+\section{Alternatives to Databases}
+Flat files, file systems, XML, Object databases, etc.
+
+\section{Managing and Designing your own Database}
+\subsection{When to use a RDBMS}
+ When to use ad hoc/application/project-specific solutions and
+when to move to a database.  Rules of thumb.
+
+\subsection{How to setup a database server}
+The server software, not designing the database schema themselves.
+
+\subsubsection{Basic Commands}
+CREATE DATABASE
+CREATE TABLE
+\subsubsection{Access, Privileges, Security}
+
+\subsection{Designing Schema}
+
+\subsection{Consistency}
+\subsubsection{Handling transactions and elimation of records}
+
+\subsubsection{Data Collection and Triggers}
+
+
+
+
+
+\end{document} 

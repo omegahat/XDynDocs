@@ -1,0 +1,397 @@
+<article xmlns:r="http://www.r-project.org">
+
+<title>
+A Case Study in using RSPerl: Reading mail archives
+</title>
+
+
+<section>
+<title>Introduction</title>
+<para>
+This short document describes an approach to obtaining data about
+email messages into R so that we can do some analysis on it.
+We might be interested in analyzing a mailing list's archives
+to see changes over time, contributors, etc.
+Alternatively, we might want to mine our own mail boxes
+and see how subject matters change over time, volume varies
+by day of week, examine SPAM messages, the distribution of attachments
+and so on.
+</para>
+<para>
+The anatomy of an email message is reasonably straightforward.
+We have a header containing name-value pairs  identified by
+<literallayout>
+name: value
+</literallayout>
+This is slightly more complicated to read because the value string can be
+continue across multiple lines, identified by leading whitespace.
+In R, we might use the function <s:func>read.dcf</s:func>
+to parse the message header, but unfortunately 
+</para>
+</section>
+
+<section>
+<title>Installing the software</title>
+<para>
+Of course, you will need to have the relevant Perl modules installed.
+You can see if they are already available with
+<sh:code>
+perl -e 'use Mail::Box::Mbox;'
+echo $?
+</sh:code>
+If this does show 0,  then the module is not accessible.
+You may need to tell Perl where to find it by setting
+the PERL5LIB environment variable appropriately, or
+more likely, you will have to install it.
+The command
+<sh:code>
+perl -MCPAN -e shell
+</sh:code>
+will bring you into an interactive Perl session that
+will step you through installing packages.
+At the prompt, type 
+<sh:code>
+install Mail::Box::Mbox
+</sh:code>
+and follow along, answering questions as appropriately.  I had some
+issues with the tests hanging (i.e. not completing) on some packages,
+so didn't run them the second time around.
+There are issues about where the packages will be installed.
+You can specify this in various ways, but you should read the documentation
+for the CPAN module directly rather than 
+</para>
+<para>
+In order for things to work properly, we need to make certain the RSPerl is installed
+with support for dynamically loading Perl modules we will use (implicitly) that
+have compiled C code.
+<sh:code>
+R CMD INSTALL --configure-args='--with-modules="Fcntl IO List::Util Mail::Box::Parser::C POSIX Sys::Hostname Time::HiRes"' /tmp/R/RSPerl
+</sh:code>o
+</para>
+
+</section>
+
+<section>
+<title></title>
+<para>
+<r:code>
+library(RSPerl)
+</r:code>
+<r:code>
+.PerlPackage("Mail::Box::Mbox")
+folder = .PerlNew("Mail::Box::Mbox", 
+                  folder = path.expand("~/Classes/StatComputing/trunk/R/RSPerl"),
+                  access = 'r')
+</r:code>
+
+<r:code>
+.PerlPackage("Mail::Box::Manager")
+mgr = .PerlNew("Mail::Box::Manager")
+folder = mgr$open(folder = path.expand("~/Classes/StatComputing/trunk/R/RSPerl"),
+                     access = 'r')
+</r:code>
+</para>
+
+<para>
+Now we can find out things about the  mailbox
+such as how big it is (in bytes), the number of
+messages and certain characteristics about how
+it is arranged.
+<r:code>
+folder$size()   # bytes.
+folder$nrMessages()
+folder$type()   #  mbox
+folder$organization()  # FILE
+folder$url()
+</r:code>
+</para>
+
+<para>
+We can get the list of messages
+<r:code>
+msgs = folder$messages()
+</r:code>
+And then we can access the elements in this list as regular message objects.
+<r:code>
+m = msgs[[1]]
+
+class(m)
+<r:output>
+[1] "Mail::Box::Mbox::Message" "PerlHashReference"       
+[3] "PerlReference"           
+</r:output>
+</r:code>
+</para>
+
+<para>
+Alternatively, if we want to work with message ids, we can use find.
+<r:code>
+ids = folder$messageIds()
+length(ids)
+
+m = folder$find(ids[3])
+</r:code>
+</para>
+
+
+<r:code>
+#XXX  All return NULL.  But that is the nature of the mail box - there are no to's and cc's.
+m$destinations()
+m$to()
+m$cc()
+
+# XXX  
+m$get('Content-Type')
+</r:code>
+
+
+We can find out who the mail is from using
+<r:code>
+m$from()  # Mail::Address
+</r:code>
+Note that this can return more than one address.
+To get the actual sender of the message, we use
+<r:code>
+m$sender()
+</r:code>
+What can we do with this Mail::Address object?
+<r:code>
+names(getPerlMethods(m$sender()))
+</r:code>
+
+<para>
+<r:code>
+h = m$head()
+h$knownNames()
+h$names()
+</r:code>
+Now we can fetch individual values.
+We get the status with
+<r:code> 
+f = h$get("status")
+</r:code>
+and this returns a Perl object of class
+"Mail::Message::Field::Fast".
+
+</para>
+
+<para>
+To get all the values, we can loop over the names and fetch the field
+and then its contents.
+We have to be careful about fields with multiple entries, such as "received", which will
+be returned as  a list of field objects.
+<r:code>
+fields = sapply(h$names(), function(x) {
+                              tmp = h$get(x)
+                              if(inherits(tmp, "PerlReference"))
+                                  tmp$content()
+                              else
+                                 sapply(tmp, function(x) x$content())
+                           })
+</r:code>
+</para>
+
+<para>
+Now we turn to the body of the message.
+<r:code>
+m$body()  # Mail::Message::Body::Delayed
+</r:code>
+The fact that this is "delayed" means that 
+the Perl code has not yet analyzed the content and created
+an object of the approriate type.
+Merely operating on the body however will lead to this
+processing being done. So
+<r:code>
+m$body()$lines() 
+class(m$body())
+</r:code>
+We can determine if a message is delayed using
+<r:code>
+m$isDelayed()
+</r:code>
+This returns a 1 or a 0 indicating delayed or not.
+</para>
+
+<para>
+How many of the messages have an attachment?
+<r:code>
+hasAttachment = as.logical(sapply(msgs, function(x) {
+                                          x$body()$isMultipart()
+                                        }))
+sum(hasAttachment)
+</r:code>
+Note that we call isMultipart on the body of the message.
+We can do it on the message itself, but this can return
+a NULL.
+</para>
+<para>
+<r:code>
+i = which(hasAttachment)
+sapply(msgs[i], function(m) class(m$body()))
+</r:code>
+Some are delayed and some are of class
+"Mail::Message::Body::Multipart".
+</para>
+<para>
+How many parts are there for each message?
+<r:code>
+sapply(msgs[i], function(x) length(x$body()$parts()))
+</r:code>
+Two of these have 3 parts, so let's look at them.
+<r:code>
+m = msgs[i][ sapply(msgs[i], function(x) length(x$body()$parts())) == 3 ]
+p = m[[1]]$parts()
+</r:code>
+Each element in <r:var>p</r:var> is of class Mail::Message::Part.
+This is like an email message as it has a head and body.
+We can find the information in the header with
+<r:code>
+p[[1]]$head()$names()
+</r:code>
+and get the content with
+<r:code>
+p[[1]]$body()$lines()
+</r:code>
+How would we deal with binary data?
+</para>
+
+<para>
+<!-- If we don't specify the access argument when opening the folder -->
+We must make certain to close it to remove the lock when we are
+finished with the folder
+<r:code>
+folder$close()
+</r:code>
+If you don't do this, any subsequent attempts to read the file
+will wait for several seconds and then fail,
+giving a message about not being able to acquire the lock
+on the file.
+If that does happen, you can remove the lock file manually,
+e.g.  from within R unlink("RSPerl.lock").
+</para>
+<para>
+Note that if we terminate the R or Perl session (with
+<r:func>q</r:func> or <r:func>.PerlTerminate</r:func>) and are using a
+Mail::Box::Manager, the lock will be removed automatically.
+</para>
+</section>
+
+<section>
+<title>Dealing with Binary attachments</title>
+
+<r:code>
+library(RSPerl)
+.PerlPackage("Mail::Box::Mbox")
+f = .PerlNew("Mail::Box::Mbox", folder = path.expand("~/Classes/StatComputing/trunk/R/RDA.mbox"))
+m = f$messages()  # note that this is the message and not a list containing the message.
+m$isMultipart()
+</r:code>
+
+<r:code>
+e = m$body()$parts()[[2]]
+
+e$head()$names()
+e$head()$get("content-transfer-encoding")$content()
+</r:code>
+
+<r:code>
+library(RCurl)
+dd = base64Decode(e$body()$lines(), mode = "raw")
+</r:code>
+And now we need to be able to pass this to 
+load as a connection of raw data.
+</section>
+
+<section>
+<title>Threading</title> 
+<para>
+  Allow an R function to be specified for the iterator.
+</para>
+<r:code>
+.PerlExpr("use Mail::Thread;")
+messagesRef = folder$messages(convert = FALSE)
+threader = .PerlNew("Mail::Thread", messagesRef)
+</r:code>
+
+<para>
+Currently, we use an alternative approach.
+<s:code>
+.PerlFile("../getThreader.pl")
+threader = .Perl("getThreader", folder)
+</s:code>
+</para>
+
+<para>
+<s:code>
+threader$thread()
+</s:code>
+</para>
+
+
+<section>
+<title></title>
+<para>
+<r:code>
+rootset$recurse_down(function(msg)  x$messageId() )
+</r:code>
+</epara>
+</section>
+
+</section>
+
+
+<section>
+<title>Attachments</title>
+<para>
+I have created a simple folder with 3 messages, 2 of which have attachments.
+One of them has 7 elements in the message and all but one is 
+
+<r:code>
+ff = .PerlNew("Mail::Box::Mbox", folder = "/home/duncan/MailTest")
+msgs = ff$messages()
+> length(msgs)
+[1] 3
+> msgs[[1]]$isMultipart()
+> msgs[[2]]$isMultipart()
+> msgs[[3]]$isMultipart()
+> pp = msgs[[3]]$parts()
+> length(pp)
+[1] 7
+> class(pp)
+[1] "list"
+> class(pp[[1]])
+[1] "Mail::Message::Part" "PerlHashReference"   "PerlReference"      
+> pp[[2]]$body()$lines()
+
+
+pp[[2]]$get('Content-Type')
+Here now![1] "APPLICATION/MSWORD"
+
+sapply(pp, function(x) x$get('Content-Type'))
+</r:code>
+</para>
+
+<para>
+To get the text of the message
+
+<r:code>
+folder = .PerlNew("Mail::Box::Mbox", folder = "R-HelpArchive/R-Help.archive") 
+msgs = folder$messages()
+ 
+tmp = lapply(msgs, function(m) list(id = m$messageId(), body = m$body()$lines() ))
+
+bodies = lapply(tmp, function(x) x$body)
+names(bodies) = sapply(tmp, function(x) x$id)
+</r:code>
+</para>
+
+</section>
+
+
+<bibitem>
+  http://perl.overmeer.net/mailbox/
+  http://perl.overmeer.net/mailbox/html/Mail::Box::Mbox::Message/
+  http://search.cpan.org/~markov/Mail-Box-2.073/lib/Mail/Box-Overview.pod
+</bibitem>
+
+</article>

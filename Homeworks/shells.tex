@@ -1,0 +1,255 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage}
+\usepackage{times}
+\usepackage{comment}
+
+\title{Homework 1 \hfill Stat 141 Winter '05 \\
+Due:  Friday, 21st January, 12pm 
+}
+
+\begin{document}
+\maketitle{}
+
+\textbf{Keywords:} shells, basic programming, UNIX tools, shell
+scripting, redirection, line-oriented filtering.
+
+In this homework, you will use the Unix shell to do some programming
+to compute simple summary statistics and
+derived datasets from the original, raw data.  The purpose of
+this exercise is to get started with programming using the quite
+general and ``primitive'' shell language and to become familiar with some of the
+Unix tools that are very useful when transforming inputs to create
+derived data or simple summary statistics.  As with all the homeworks for this class, you are
+encouraged to do more than you are asked, and to explore different
+approaches. Take this homework as a starting point for exploring new
+things and include them in what you hand-in. And also raise questions
+in class, or section, or the mailing list or in office hours. And think about what else one
+might want to do and whether and how it could be done using these tools.
+
+
+The context in which we will explore the shell and the tools is Web site log files.
+When one visits a Web site, the browser sends a request for the
+specified page.  The Web server processes the request, verifying that
+the requester has the right to access its contents, and sends it back
+to the client.  All this is done using HTTP - the HyperText Transfer
+Protocol.  While processing the request, the server also writes a
+record of the transaction to a ``log'' file.  Our data are these
+raw log files.
+There are two basic formats for a log file.
+The files we will see are in the ``long'' format which means they
+have 2 extra fields - the referral URI telling us from which page
+the request was made,  and information about the 
+client software, e.g. browser and operating system details.
+The referral URI can tell us about how the client got to the page
+they requested  and can provide us with important information about 
+how people navigate through a Web site.
+
+
+Each line in the log file looks something like the following:
+\small{
+\begin{verbatim}
+82.232.52.22 - - [09/Jan/2005:04:13:59 -0800] "GET /RSPython/html.css HTTP/1.1" 
+ 404 1327  "http://www.omegahat.org/RSPython/"
+ "Mozilla/5.0 (Windows; U; Windows NT 5.1; fr-FR; rv:1.7.5) Gecko/20041108 Firefox/1.0"
+\end{verbatim}
+}
+(\small{This is all on one line in the log file but is displayed as
+  several lines here for formatting on the page.})
+
+The fields are
+\begin{enumerate}
+\item the IP address of the client machine making the request;
+\item -  reserved;
+\item -  reserved;
+\item the time and date (with offset from GMT) all enclosed in square
+  brackets ([]);
+\item the HTTP command request, in quotes;
+\item the return status;
+\item the number of bytes returned in the response from the server;
+\item the referring page which might be the page from which  the user
+  clicked on a link to this page being requested, or a the container
+  page if the request is for an image, etc. inside that page;
+\item a description of the client software (e.g. the browser).
+\end{enumerate}
+Use Google to find more information about the Apache
+Web log format(s), or look directly at the Apache documentation,
+or ask about this on the mailing list.
+
+The log files are available as a compressed tar (a so-called ``tape archive'') file, i.e. with 
+extension .tar.gz.
+You can fetch them  on gcox as 
+\verb+~duncan/OmegahatWebLogs.tar.gz+.
+Alternatively, you can download it from 
+the class Web site via
+\verb+http://eeyore.ucdavis.edu/stat141/data/OmegahatWebLogs.tar.gz+
+In either case, you can extract the individual file using
+the GNU tar program via
+\begin{verbatim}
+  tar zxf OmegahatWebLogs.tar.gz
+\end{verbatim}
+or
+\begin{verbatim}
+  gunzip -c OmegahatWebLogs.tar.gz | tar xf -
+\end{verbatim}
+Take some time to understand the difference and why they are equivalent.
+
+
+
+A single request may generate multiple lines in the log
+file. Why? Because when we request a page that contains images, for 
+example, we will also generate requests for those images.
+What other sort of HTML page will give rise to multiple
+requests? 
+% frames
+% icons for the URI bar.
+
+Robots, spider or crawlers are are programs that crawl the Web and
+build catalogs of Web sites. They are also often called simply `bots'.
+The search engines such as Google has one to build its collection of 8
+billion Web documents.  Sometimes these are of interest, other times
+we want to filter these records out before looking at ``regular'' or
+human traffic.
+
+
+On this Web site, at least in the log files, there are no files  
+that are served up by the Web server
+whose names contain spaces. 
+This makes matters easier and can be used.
+How can we verify this in the log files?
+
+\textbf{Questions}
+\begin{enumerate}
+\item How many requests were there across all of the log files?
+% wc -l is fine, but to get just the number.
+% wc -l | tail -n 1 | sed -e 's/total//'
+
+\item Get the starting and ending dates for each log file?
+% head and tail. Perhaps need to ensure there are no comments
+% grep -v '^#' omegahat.log | head -1 | cut -d ' ' -f 4 | sed -e 's/\[//'
+%% Play with the order in which you filter.
+
+
+\item  How many non-robot queries are there in the log file omegahat.log.1?
+How many robots accessed the site?  Of course, you have to
+  specify a criterion for identifying robots.  What are the IP
+  addresses of the robots? Are some of them related? % e.g. same subnet
+                                % but different machine.
+
+% This is tricky when done entirely correctly.
+% If we define a robot entry as one looking for robots.txt, then we
+% just search for that and do a wc.
+% 
+%
+%
+
+\item How many different  IP addresses accessed the Web site?
+% cut  -d ' ' -f 1 omegahat.log | sort | uniq | wc -l
+And, for all the log files together,  create a table listing the 5 IP addresses that had
+the greatest number of queries and the actual number of queries
+they generated.
+%cat omegahat.log | cut -d ' ' -f 1 | sort | uniq -c | sort | tail -n
+%5
+You can use nslookup (or dig) to find the name associated with these IP
+addresses,
+e.g. \verb+ nslookup 65.54.188.109+
+
+
+\item What are the popular (i.e. most visited) pages? 
+This can be done as a single,  long  command.
+To make it easier to call, write it as a script
+that is invokable as, say, popularPages.
+In what ways can it be made  more flexible?
+
+
+\item Identify the top $n$  most active IP addresses across all the
+  log files.   For each of these, create a file whose name is the IP address
+  and whose contents are the files requested by that IP address.
+  Write a shell script to do this as a single call. 
+  You can use $n  = 30$, but the script should allow the user to
+  specify $n$ as a command line argument. 
+
+
+\begin{comment}
+
+\item What are the top 10 referral pages, i.e. field 8 (including the
+ two fields of '-')?
+ Write code that computes this and, for each of these pages/URIs,
+ creates  a separate file containing all the files
+ that had this as the referral page.
+ In other words, if 
+
+
+\item What ``browsers'' were used to access these sites?
+Order them by number of requests.
+
+\item Create a frequency table of the different operating systems used
+  by the  clients.
+
+
+\item Work on all of the files omegahat.log, omegahat.log.1,
+  omegahat.log.2, omegahat.log.3 and compute the list of most popular
+  requested pages across the entire period.
+  Your code should be able to handle any number of files and should be
+  a shell script.
+% Write a script to loop over these
+\end{comment}
+
+\end{enumerate}
+
+You should submit the results and the command(s) used to generate
+them.  You should provide a description of the code and how it works.
+You can also discuss alternative approaches and whether they are
+faster or slower, more cumbersome to develop, etc.
+For example, when using filters via ``pipes'', you might think about
+whether the order matters in terms of the answer or the speed
+and comment on this.
+
+
+Also, think about and comment on what is awkward about the programming
+task and using the shell's language? What features of a programming
+language could make it easier to express these computations?  We'll
+use this to think about what languages like R, Matlab, etc.  might
+provide to make describing these tasks easier and to learn about when
+we might chose to use one approach rather than another.
+
+\vskip.2in
+
+\textbf{How to Submit:}
+Send a single tar file.  It should contain
+any scripts you used to do the computations and a PDF document 
+that describes your solutions to each of the questions
+along with the actual results.  In other words,
+annotate the  code and solutions so that you could read it 
+in 6 months. 
+
+\vskip.2in
+\textbf{Potentially Useful Tools}
+Emacs, vi, cut, find, tail, head, grep, wc, sort, uniq, sed, more,
+paste, join.
+
+Make certain to look at the help pages (via the man command) for these
+commands and the different command-line arguments they accept. These
+can help greatly.
+
+\end{document}
+
+Perfect the commands by experimenting interactively.
+
+
+line-oriented tools
+
+streaming tools that can't look back or forward.  Need to maintain
+state.  Perl is more appropriate for this.
+
+
+Quoting is a pain in the shell and requires some thought.
+
+Shell commands are used extensively in  tools such as make.
+
+
+Part of our world is to extract data from a file
+and then use this to build the filter to be applied to
+other files. In this way, we are doing EDA.
+
+
+Use temporary files.

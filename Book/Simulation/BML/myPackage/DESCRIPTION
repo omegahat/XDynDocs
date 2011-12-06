@@ -1,0 +1,9 @@
+Package: myPackage
+Title: Real Simple
+Version: 0.1-0
+License: BSD
+Import: graphics
+Author: Duncan Temple Lang
+Maintainer: Duncan <me@you.edu>
+Description: Simple package
+

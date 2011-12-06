@@ -1,0 +1,26 @@
+\frametitle {Supernova Data - Try different K}
+\begin{itemize}
+\item K = 2
+\begin{table}
+\begin{tabular}{cr|rr}
+& & \multicolumn{2}{c}{Prediction}\\
+& & Other & Supernova\\
+\hline
+\multirow{2}{*}{\rotatebox{90}{Actual}} & Other &  484 &  16\\
+& Supernova & 38 &  462\\
+\end{tabular}
+\end{table}
+Error: 5.4\%
+
+\item K = 8
+\begin{table}
+\begin{tabular}{cr|rr}
+& & \multicolumn{2}{c}{Prediction}\\
+& & Other & Supernova\\
+\hline
+\multirow{2}{*}{\rotatebox{90}{Actual}} & Other &  480 &  20\\
+& Supernova & 37 &  463\\
+\end{tabular}
+\end{table}
+Error: 5.7\%
+\end{itemize}

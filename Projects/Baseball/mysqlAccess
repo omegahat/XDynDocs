@@ -1,0 +1,39 @@
+if(file.exists("passwords.rda")) {
+ load("passwords.rda")
+} else {
+ d = read.table("200501_91042_roster.txt", sep="\t" , header = TRUE, as.is = TRUE)  
+
+ passwd = paste(substring(d$SID, 5), as.integer(runif(nrow(d), 100, 999)), sep = "")
+ names(passwd) = login = gsub("@.*$", "", as.character(d$Email))
+ save(passwd, file = "passwords.rda")
+}
+
+if(FALSE) {
+sql = paste("GRANT SELECT ON BaseballDatabank03.* TO ",  paste("'", names(passwd), "'", sep = ""),
+                "@'localhost' IDENTIFIED BY ",  paste("'", passwd, "'", sep = ""), sep = "")
+cat(sql, sep = "\n", file = "mysqlAccounts.sql")
+}
+
+for(i in names(passwd) ) {
+
+  if(!file.exists(paste("~", i, sep = ""))) {
+    cat("No home directory for ", i, "\n")
+    next
+  }
+
+  f = paste("~", i, "/.my.cnf", sep = "")
+#  f = paste(i, ".my.cnf", sep = "")
+  if(file.exists(f)) {
+    cat("File exists for ", i, "\n")
+    next
+  }
+
+ cat(f, "\n")
+
+  con = file(f, "w")
+  cat('\n[client]\npassword="', passwd[i], '"\n', sep = "", file = con)
+  close(con)
+
+  system(paste("chmod og-rw ", f, " ; chown ", i, ".", i, " ", f, sep = "))
+}
+

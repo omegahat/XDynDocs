@@ -1,0 +1,17 @@
+\frametitle {Best Linear Model}
+\begin{tiny}
+\begin{verbatim}
+Call:
+lm(formula = log(price) ~ carat + cut + color + clarity + totaldepth +
+    table + width + height + depth, data = dia.train)
+
+Residual standard error: 0.1353 on 48502 degrees of freedom
+  (16 observations deleted due to missingness)
+Multiple R-Squared: 0.9822,     Adjusted R-squared: 0.9822
+F-statistic: 1.165e+05 on 23 and 48502 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\end{tiny}
+Look at MSE on test set for \verb|price|.
+MSE (on original scale) = 309308.8
+

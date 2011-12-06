@@ -1,0 +1,48 @@
+
+\section{Overview}
+This chapter discusses some of the ways that we can make the results
+of statistical analyses or the template for the analyses and methods
+themselves accessible to people who are not familiar with the R
+language.  This is a very important part of the statistical
+collaboration or consulting process. In today's digital age and also
+given the prevalence of data-related problems, using the Web or
+dynamic electronic techniques to allow the large number of consumers
+of statistical analyses to do the basics themselves by using crafted
+templates is important as there are relatively few statisticians.
+So we want to find ways to make our work available to scientists, etc.
+in a way that puts them in control without them having to learn
+a  new programming language and an awful lot of complex statistics.
+
+There are several technologies that allow us to present 
+analyses  templates that use R in a way that a researcher
+can enter their own inputs and control the analysis at a high level.
+One of them combines HTML forms in a Web browser and CGI scripts
+on a Web server that sends the inputs from the user's browser
+to a (remote) machine that performs the calculations and presents
+the report, potentially with some additional files.
+
+A second is that we make use of many people's familiarity with
+Microsoft Excel on Windows. We let the scientist prepare the inputs in
+Excel by giving them a template to edit and fill-in.  Then we connect
+R with Excel and have R extract the relevant pieces and create the
+results in an Excel file. The Excel template workbook can contain
+interactive elements such as selection menus, radio buttons, spinboxes
+to make it easier for the user and more constrained so that the inputs
+are less ``free form''.
+
+A third approach extends the idea of using a template GUI (Graphical
+User Interface) in Excel or HTML to building a general GUI.
+In HTML and Excel forms, the set of interactive controls is somewhat
+limited and the layout is more constrained.  However, 
+we can use one of several packages in R to program our own general
+GUI entirely with R commands. We will illustrate some examples for 
+doing this and focus on the RwxWidgets package.
+
+We also look at creating ``dynamic documents'' using
+XML and XSL and also Sweave.
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

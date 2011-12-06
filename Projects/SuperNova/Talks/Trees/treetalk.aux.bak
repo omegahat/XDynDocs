@@ -1,0 +1,83 @@
+\relax 
+\ifx\hyper@anchor\@undefined
+\global \let \oldcontentsline\contentsline
+\gdef \contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global \let \oldnewlabel\newlabel
+\gdef \newlabel#1#2{\newlabelxx{#1}#2}
+\gdef \newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\let \contentsline\oldcontentsline
+\let \newlabel\oldnewlabel}
+\else
+\global \let \hyper@last\relax 
+\fi
+
+\@writefile{toc}{\beamer@endinputifotherversion {3.01pt}}
+\@writefile{nav}{\beamer@endinputifotherversion {3.01pt}}
+\@writefile{nav}{\headcommand {\slideentry {0}{0}{1}{1/1}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {1}{1}}}
+\@writefile{nav}{\headcommand {\sectionentry {1}{Outline}{2}{Outline}{0}}}
+\@writefile{nav}{\headcommand {\beamer@sectionpages {1}{1}}}
+\@writefile{nav}{\headcommand {\beamer@subsectionpages {1}{1}}}
+\@writefile{nav}{\headcommand {\slideentry {1}{0}{2}{2/2}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {2}{2}}}
+\@writefile{nav}{\headcommand {\slideentry {1}{0}{3}{3/3}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {3}{3}}}
+\@writefile{nav}{\headcommand {\slideentry {1}{0}{4}{4/4}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {4}{4}}}
+\@writefile{nav}{\headcommand {\slideentry {1}{0}{5}{5/5}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {5}{5}}}
+\@writefile{toc}{\beamer@sectionintoc {2}{Growing trees}{6}{0}{1}}
+\@writefile{nav}{\headcommand {\sectionentry {2}{Growing trees}{6}{Growing trees}{0}}}
+\@writefile{nav}{\headcommand {\beamer@sectionpages {2}{5}}}
+\@writefile{nav}{\headcommand {\beamer@subsectionpages {2}{5}}}
+\@writefile{nav}{\headcommand {\slideentry {2}{0}{6}{6/6}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {6}{6}}}
+\@writefile{nav}{\headcommand {\slideentry {2}{0}{7}{7/7}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {7}{7}}}
+\@writefile{nav}{\headcommand {\slideentry {2}{0}{8}{8/8}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {8}{8}}}
+\@writefile{nav}{\headcommand {\slideentry {2}{0}{9}{9/9}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {9}{9}}}
+\@writefile{nav}{\headcommand {\slideentry {2}{0}{10}{10/10}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {10}{10}}}
+\@writefile{toc}{\beamer@sectionintoc {3}{Pruning trees}{11}{0}{2}}
+\@writefile{nav}{\headcommand {\sectionentry {3}{Pruning trees}{11}{Pruning trees}{0}}}
+\@writefile{nav}{\headcommand {\beamer@sectionpages {6}{10}}}
+\@writefile{nav}{\headcommand {\beamer@subsectionpages {6}{10}}}
+\@writefile{nav}{\headcommand {\slideentry {3}{0}{11}{11/11}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {11}{11}}}
+\@writefile{nav}{\headcommand {\slideentry {3}{0}{12}{12/12}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {12}{12}}}
+\@writefile{toc}{\beamer@sectionintoc {4}{Supernova}{13}{0}{3}}
+\@writefile{nav}{\headcommand {\sectionentry {4}{Supernova}{13}{Supernova}{0}}}
+\@writefile{nav}{\headcommand {\beamer@sectionpages {11}{12}}}
+\@writefile{nav}{\headcommand {\beamer@subsectionpages {11}{12}}}
+\@writefile{nav}{\headcommand {\slideentry {4}{0}{13}{13/13}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {13}{13}}}
+\@writefile{nav}{\headcommand {\slideentry {4}{0}{14}{14/14}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {14}{14}}}
+\@writefile{nav}{\headcommand {\slideentry {4}{0}{15}{15/15}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {15}{15}}}
+\@writefile{nav}{\headcommand {\slideentry {4}{0}{16}{16/16}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {16}{16}}}
+\@writefile{nav}{\headcommand {\slideentry {4}{0}{17}{17/17}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {17}{17}}}
+\@writefile{nav}{\headcommand {\slideentry {4}{0}{18}{18/18}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {18}{18}}}
+\@writefile{nav}{\headcommand {\slideentry {4}{0}{19}{19/19}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {19}{19}}}
+\citation{546466}
+\citation{rpart}
+\citation{cart84}
+\bibstyle{plainnat}
+\bibdata{refs}
+\bibcite{cart84}{\hyperlink {beamerbibcart84}{Breiman et\nobreakspace  {}al.(1984)Breiman, Friedman, Olshen, and Stone}}
+\bibcite{546466}{\hyperlink {beamerbib546466}{Ripley and Hjort(1995)}}
+\bibcite{rpart}{\hyperlink {beamerbibrpart}{Therneau and port\nobreakspace  {}by Brian Ripley\nobreakspace  {}<ripley@stats.ox.ac.uk>.(2006)}}
+\@writefile{nav}{\headcommand {\slideentry {4}{0}{20}{20/20}{}{0}}}
+\@writefile{nav}{\headcommand {\beamer@framepages {20}{20}}}
+\@writefile{nav}{\headcommand {\beamer@partpages {1}{20}}}
+\@writefile{nav}{\headcommand {\beamer@subsectionpages {13}{20}}}
+\@writefile{nav}{\headcommand {\beamer@sectionpages {13}{20}}}
+\@writefile{nav}{\headcommand {\beamer@documentpages {20}}}
+\@writefile{nav}{\headcommand {\def \inserttotalframenumber {20}}}

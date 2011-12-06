@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE book SYSTEM "file:///usr/share/sgml/docbook/xml-dtd-4.1.2-1.0-8/docbookx.dtd">
+<chapter>
+<title>Structured Data</title>
+<section id="MarkedUpData">
+<title>Introduction</title>
+
+In the past chapter, we examined ways to process data using regular
+expressions. In this context, we wrote a program or script to extract
+the information we wanted from the data. It was up to us to identify
+the patterns in the text files. In other words, each consumer of the
+file was responsible for working out its structure and extracting the
+relevant data.  In some cases, identifying patterns is very
+complicated, or even impossible. Instead, we must
+special case certain data or records.
+
+<para/>
+
+What if the data was more structured and identifying patterns was
+easier?  What if instead of each consumer having to identify the
+patterns and guessing the structure, we encode it in the file itself.
+If the data were self-describing, we would be better off.  If datasets
+with the same structure adhered to a particular format, then it would
+be easy to write code that read that data. And if we can describe
+that format, we might
+
+
+</section>
+</chapter>

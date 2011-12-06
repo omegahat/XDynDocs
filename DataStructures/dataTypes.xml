@@ -1,0 +1,559 @@
+<?xml version="1.0"?>
+<!DOCTYPE book SYSTEM "file:///usr/share/sgml/docbook/xml-dtd-4.1.2-1.0-8/docbookx.dtd">
+<chapter xmlns:s="http://cm.bell-labs.com/stat/S4">
+<title>Data Types</title>
+
+<section id="Basic Data Types" xreflabel="Basic Data Types">
+<title>Basic Types</title> 
+
+Data are often numerical.  When we measure mass, velocity, exam
+scores, income, age, etc. we record the values as numbers.  In some
+cases, they are real numbers, i.e. including fractions of a unit.  In
+other cases, the values a simple integers.  Some values can only be
+positive, some are restricted to a particular range.  In addition to
+real and integer values, we also have variables that take on values
+from a finite set of elements.  For example, a logical value is either
+<emphasis>true</emphasis> or <emphasis>false</emphasis>.  A variable
+representing color might be restricted to a set
+<emphasis>red</emphasis>, <emphasis>green</emphasis> or
+<emphasis>blue</emphasis>.  And of course, text or characters are a
+different type of data. A words, a phrase, a paragraph, a mail
+message, the contents of an Web page are textual data.  A grade in a
+class is often a letter from the set {A, B, C, D, F} or phrase from
+the set {Pass, Failed}.
+
+<para />
+
+ In statistics, we talk of a <emphasis>variable</emphasis>.  In
+mathematical statistics, a <emphasis>random variable</emphasis> is a
+symbolic concept that can be realized when we sample measurements from
+a distriubtion.  In statistical computing, a variable is again
+conceptual and generall refers to a collection of values recorded on
+different observational units in the same manner.  So weight, grade in
+a course, etc. are variables.
+
+
+<para/>
+
+In general, values will have units and when we record the value, we
+often omit the unit.  This is unfortunate and it is good to try to
+keep the units associated with the values or with a variable,
+i.e. the collection of values.
+
+
+</section>
+
+<section>
+<title>Representing Numbers in the Computer</title>
+
+When we enter a number in a file or in a spreadsheet, we don't have to
+given any serious thought to how it will be represented in the
+computer and that its meaning is clear when we map it from our
+application to the computer.  We are fortunate that this has been
+worked out for us a long time ago and it is something we can quickly
+gloss over and assume will be done correctly. Since we are studying
+statistical computing and computational statistics, we ought to at
+least understand when things can possibly go wrong and, like all good
+software, handle the special cases that might lead to erroneous
+results.  In other words, we should understand the limits of
+the computer and when these limits are likely to be encountered. 
+
+<para/>
+The main lessons to take out of this section are the following:
+<itemizedlist>
+ <listitem>
+  representing real numbers in a computer always involves
+   an approximation and a potential loss of significant digits.
+ </listitem>
+ <listitem>
+   testing for the equality of two real numbers 
+   is not a realistic way to think when dealing with 
+   the numbers in a computer.  Two equal  values
+   may not have the same representation in the computer
+   because of the approximate representation and so 
+   we must ask is the difference less than the discernable 
+   amount as measured on the particular computer.
+ </listitem>
+ <listitem>
+   performing arithmetic on very small or very large numbers
+   can lead to errors that are not possible in abstract mathematics.
+   We can get underflow and overflow, and the order in which we do 
+   arithmetic can be important.
+   This is something to be aware of when writing low-level software to
+   to do computations.
+ </listitem>
+ <listitem>
+(Of dubious importance?)
+  the more bits we use to represent a number, the greater
+  the precision of the representation and the more memory we 
+  consume.  Also, if the natural representation of the machine
+  does not use that number of bits and representation, arithmetic,
+  etc. will be slower as it must be externally specified, i.e. off the chip.
+ </listitem>
+</itemizedlist>
+
+In order to understand these points properly, we need to first look at
+how numbers are represented on a computer.  We will start with the
+basic type, an integer.  Once we understand integer representation and
+their limitations, we can move to representing real numbers.
+The different parts of this representation are made up of integers.
+
+Before talking of integers, let us first remind ourselves that the
+basic unit in a computer is an on-off or binary state. This is
+referred to as a bit.  Interestingly, it was a statistician from Bell
+Labs who coined the term "bit".  While the machine is made up of bits,
+we typically work at the level of of (computer) words and higher level
+entities.
+
+<section>
+<title>Integers</title> 
+
+When we work with integers or whole numbers, we know that there are
+infinitely many of them.  Now the computer is a finite state machine
+and can only hold a finite amount of information, albeit a very, very
+large amount.  If we wanted to represent an arbitrary integer, we
+could do this by having the computer store all the digits in the
+number along with whether it is positive or negative.  Now, when we
+want add two integers, we would have to use an algorithm that
+performed the standard decimal addition by
+traversing the digits from right to left, adding them and carrying the
+extra term to the higher values.  Representing each digit
+would require us to encode 0, 1, ... 9 in some way which
+we have to do in terms of 4 bits.
+Now many operations in a typical computer typically try to work 
+at the level of words, i.e. bringing a word of memory onto a
+register or from disk to RAM.  So we would be wasting half
+a word on each digit since we are only using 4 bits.
+And each time we add two integers, we have to do complicated
+arithmetic on an arbitrary number of digits.
+
+<para/> Clever people who designed and developed computers realized
+that it is significantly more efficient if we use a "better" way to
+store integers.  If we take advantage of the on-off nature of bits, we
+can represent numbers using base 2 rather decimal (base 10).  And if
+we use a fixed number of binary digits, then we can do the
+computations not in software but on the chip itself and be much, much
+faster.  Before we get to the exact representation, we need to
+consider two things.  Representing a number using base 2, base 10 or
+any other base is irrelevant. It is easy to switch between the
+different bases and there is no loss of information.  Restricting the
+number of (binary) digits we use to store a number makes the number of
+different possible numbers that we can represent finite. So we have
+now gone from our symbolic, mathematical world with an infinite number
+of integers to a very finite one with only a fixed number of possible
+integers.  This restriction means that we have to be careful when we
+encounter an integer that doesn't fit into this fixed collection of
+possible integers that we can represent in the computer.
+
+
+<para/> With this quite major change in the way we need to think about
+doing basic arithmetic on integers, let's look at how we can represent
+an integer on a computer.  In many computers, integers are represented
+using 4 bytes, or 32 bits.  We use a binary representation.  We think
+of the integer being represented as being the sum of terms that are
+either included or not.  In other words, each integer is
+
+ sum<superscript>32</superscript><subscript>i = 1</subscript>
+    x<subscript>i</subscript> x  2<superscript>i - 1</superscript>
+
+and each x<subscript>i</subscript> is either 0 or 1 to indicate
+that we should include that term in the sum.
+
+<para/>
+A picture  might also be helpful in providing a different
+perspective on this.
+
+<figure>
+<caption>
+Think of putting 1s and 0s in the different buckets
+here. To represent a number, we put a 1 in the bucket
+when we want to include that term. The number is then
+the sum of the values for the buckets with a 1 in them.
+</caption>
+</figure>
+
+<para/>
+
+That is a good way to represent an integer in a computer.  We are
+exploiting the on-off, or binary, nature of the machine and its gates.
+But of course, as we have written this, we only have non-negative
+integers.  So the simple thing we can do is to subtract from this
+value, the smallest (i.e. largest negative) integer.  This is
+2<superscript>31</superscript>.
+So far so good. Now we have values between
+-2<superscript>31</superscript> = -2147483648
+and 
+ sum<superscript>32</superscript><subscript>i = 1</subscript>
+     2<superscript>i - 1</superscript> = 2147483647.
+You might want to verify that every integer between
+this values has a unique representation,
+i.e. set of coefficients {x<subscript>i</subscript>: 0 &lt; i &lt; 33 }
+in this scheme.
+
+<exercise>
+<question>
+Illustrate how to represent the integer 429 
+in this scheme. In other words, what are 
+the {x<subscript>i</subscript>}?
+</question>
+<answer>
+Firstly, 
+<equation>
+429 = 256 + 128 + 32 + 8 + 4 + 1 
+</equation>
+and so 
+<equation>
+429 = 2<superscript>8</superscript> + 
+      2<superscript>7</superscript> + 
+      2<superscript>5</superscript> + 
+      2<superscript>3</superscript> + 
+      2<superscript>2</superscript> + 
+      2<superscript>0</superscript> +   
+</equation>
+</answer>
+</exercise>
+
+Hexadecimal notation is also used when working with computers. The
+representation uses base 16 rather than base 2.  The logic is the
+same. We need 16 `digits', so we use 0, 1, 2, ..., 9, A, B, C, D, E,
+F.  To represent the value 12, we use the letter C.  To represent the
+value 19, we need (16 + 3), so we use 1 *
+16<superscript>1</superscript> + 3 * 16<superscript>0</superscript> to
+get 13. This is of course not the 13 in decimal notation; it is in
+base 16 and reads as the expression above.
+16<superscript>2</superscript> is 256 and
+16<superscript>2</superscript> is 4096.  To represent a decimal value
+such as 429 in hexadecimal, we can use a simple iterative technique to
+switch bases.  256 (or 16<superscript>2</superscript>) divides 429
+once, with a remainder of 173.  So we know 429 as a hexadecimal value
+starts with 1 * (16<superscript>2</superscript>).  173 is divisable by
+the next lower power (2-1 = 1) of 16, 16<superscript>1</superscript>
+10 times with 13 as a remainder.
+So the next term in our hexadecimal representation is 
+10 * 16<superscript>1</superscript>.
+Now the value 10 here causes us some problems. It is 
+two digits and we wouldn't be able to tell if that
+means 1 * 16<superscript>1</superscript> and 0 *
+	16<superscript>0</superscript>.
+Of course, in this special case, the last term is, but
+in general we cannot have a two digit term as the coefficient
+for on or our base elements (i.e. 16<superscript>1</superscript>).
+Instead, we need to use our hexadecimal digits.
+And, as we saw, 10 is represented by A.
+To finish off representing the decimal integer 429
+in hexadecimal, we not that the remainder 13 from the last
+step is less than 16 and so we represent it as
+  13 * 16<superscript>0</superscript>,
+and in hexadecimal this is D.
+So 
+   429<subscript>10</subscript> = 1AD
+
+
+
+
+
+<section>
+<title>Operations and Errors</title>
+<keywordset>
+<keyword>
+underflow
+</keyword>
+<keyword>
+overflow
+</keyword>
+</keywordset>
+
+
+The computer will take care of adding integers together for us. We can
+think of addition, subtraction, multiplication and division as being
+essentially built-in to the computer.  When we add integers, there is
+a "carry" step with which we are familiar.  Now consider what happens
+when we add a value to a very large positive integer such that it
+exceeds the range of the integer representation, 2147483647.  Without
+loss of generality (because of the carry operation), let's just look
+at adding 1 to the maximum value:
+<equation>
+ 2147483647 + 1 = 2147483648 = 2<superscript>32</superscript>
+</equation>
+When adding these numbers, we can promote them to real values and do
+the computations with only the error associated with that class of
+numbers in the computer, and this is basically 0.  But when we try to
+map the result back to a integer, what happens?  In our
+representation, all the coefficients are 0 except the one for
+2<superscript>31</superscript> which is not in our representation.  So
+we are in trouble in terms of representing this as an integer.  The
+result we might get is -2147483648, i.e. with all the coefficients
+being 0 and the 33rd value just dropped.  In R, we promote the result
+from an integer to a numeric value and we get no loss of information.
+If we try bring it to an integer, we get a warning and the result is a
+undefined value, <NA />.  So when working with these types of numbers,
+we have to be careful.  R and other packages will take care of many
+details. You should be aware of them as not all systems will do
+this. Try this in Excel, Matlab. If the system only provides the
+resolution of number or text or whatever (e.g. date), it is not an
+issue but we have lost information as we no longer validate that the
+values are integer-valued.
+
+</section>
+
+
+</section>
+
+
+
+
+<seeAlso>http://www.math.grin.edu/~stone/courses/fundamentals/IEEE-reals.html</seeAlso>
+<seeAlso>Bob Gray's notes</seeAlso>
+
+Let's think about how we might represent a real number in the
+computer.  First, let's think about how to represent any real number
+in a standard way. 
+Scientific notation gives us
+<quote>
+  mantissa x base<superscript>exponent</superscript>
+</quote>
+So we can represent
+the number 123.456 in base 10 (decimal)
+as 
+<quote>
+  1.23456 x 10<superscript>2</superscript>
+</quote>
+We could also represent it as
+<quote>
+  12.3456 x 10<superscript>1</superscript>
+</quote>
+
+So how do we get this to be unique.  Well, we can insist that the
+mantissa be positive and less than the base.
+<equation>
+   1 &ltq; mantissa &lt; base
+</equation>
+This normalizes the value.  And this means that there is always one
+significant digit before the decimal value.
+
+We can represent any real number this way.  So can we use this in the
+computer?  Of course, otherwise we wouldn't have introduced it.
+Generally, we don't store a number to arbitrary precision, i.e. with
+an arbitrary number of digits.  Instead, we typically approximate a
+number and then store that in the computer.
+
+Suppose we use 8 bytes.  The first bit of these 8 bytes indicates the
+sign of the number (i.e. positive or negative).  A 1 here means the
+value is negative.
+So our number is really represented as 
+<equation>
+ -1<superscript>x<subscript>0</subscript></superscript> mantissa x base<superscript>exponent</superscript>
+</equation>
+Our base is 2. So that leaves the mantissa and exponent.  Typically,
+we will use 11 bits for the exponent.  And that leaves 8 bytes * 8
+bits - 1 - 11 = 52 bits left for the mantissa.  So the exponent has
+2<superscript>11</superscript> = 2048 possible values.  Somehow we
+need these 2048 values to support a suitable range of values.  We need
+to represent large and small numbers. To do this, we need negative and
+positive values for the exponent.  We need the negative values to
+represent small numbers, e.g 2<superscript>-30</superscript>, and
+positive values of the exponent for large real values.  In order to do
+this, we can still use an integer representation for the exponent, but
+we apply a shift or bias.  What we mean by this is that we store a
+value between 1 and 2047 and then subtract a value whenever we
+interpret the value of the exponent.  For 11 bits, this shift is
+typically 1023, so we take a value in the exponent and subtract 1023
+from it.  Thus the possible (integer) values stored in the exponent
+after subtracting the bias are -1022 to 1024.
+
+
+You may have noticed that there are couple of oddities in this
+description. First of all, we implicitly mentioned that the values for
+the exponent are between 1 and 2047 in terms of how they are stored
+(relative to the shift).  If there are 2048 possible values, we are
+omitting 2 possible values.  What happens to these? Well, 
+the simple answer is that we hold one for representing
+very, very small numbers that we cannot represent properly.
+And we hold another to indicate that the number really doesn't make
+sense, i.e. is the result of computing a value such as 1/0.
+value to indicate a special case such as underflow, overflow or "not a
+number" (<NaN/>).
+
+
+
+<section>
+<title>Examples</title> How do we represnt the number 0.4?  Since we
+are using base 2, how can we get 4 tenths (4/10)?  Can we represent it
+as a sum of powers of 2?  Clerly, 4/10 is 1/4 + <emphasis>the
+rest</emphasis>?  How do we represent the 15/100 in powers of 2?
+We can continue this for a while, but we will find that there is no
+finite answer. We have an infinite expansion. Since we only have 64
+bits, we will have to approximate this.
+</section>
+
+
+<s:code>
+<![CDATA[ 
+
+binaryToDecimal = 
+function(val, base = 2) {
+   # note using as.character uses scientific notation and messes
+   # things up if we are not expecting it.
+ els = strsplit(format(val), "")
+ sapply(els, function(x) sum(base^((length(x) -1) : 0) * as.integer(x)))
+}
+
+toBinary = 
+function(val, base = 2) 
+{
+ 
+}
+
+]]>>
+</s:code>
+
+
+
+ We start with the concept of significant digits.
+These are the digits trailing any initial 0s.
+
+
+<section>Machine Constants: Smallest Values</section>
+
+
+</section>
+
+
+
+<section>
+<title>
+Higher-level Languages
+</title>
+In reality, we don't have to worry about all of these things
+everyday. The high-level systems we use for working with data insulate
+us from the representations of different types of numbers and, with
+varying degrees of utility, from underflow and overflow errors.  And
+this is where we want to be - using commands that allow us to think in
+terms of the data and the statistical problem on which we are working,
+and leaving the mapping of this to the low-level, basic computer
+facilities.  And this is the general premise motivating programming
+languages such as Fortran, C, Java, and much higher-level languages
+such as S (R and S-Plus), Matlab, SAS, and other applications such as
+Excel.
+
+"One" step above assembler are the C and Fortran.  Fortran provides a
+higher-level mechanism to express computations involving formulae and
+the language translates these fromulae to machine instructions
+programming languages. This is where the name comes from: formula
+translator.  The Fortran language has evolved from Fortran 66 to
+Fortran 2000 now with increasingly modern programming facilities.
+Because of the simplicity of the language, it is quite fast and some
+argue that it is the most efficient language for scientific computing.
+This requires much greater specificity about what efficiency means and
+also how to measure performance appropriately.  It is useful, but it
+is clumsy and is less well suited to good software engineering than
+most other common languages.  It is very useful to be able to read and
+interact with Fortran code because so much of the existing numerical
+software was developed in Fortran.
+
+The C language has been a much richer language than Fortran and is
+used to implement operating systems such as Unix, Linux, and others.
+It has been the language of choice for many, many years and is used
+widely in numerical computing.  More recently C++ has become
+fashionable, and offers many benefits over its close ancestor, C.
+However, these benefits are not without complexity.
+
+Both Fortran and C are languages that are compiled.  In other words,
+programmers author code and then pass it to another application - the
+compiler - that turns this into very low-level machine code
+instructions.  The result is an executable that can be run to execute
+the instructions.  Such executables are invariably machine-dependent,
+containing machine-level operations that are specific to that machine
+targetted by the compiler.  The same source code can recompiled on
+other machines, but this compilation step is necessary.  And in many
+cases, one must either modify the code for the new machine or be
+concious of the portability constraints when authoring the code.
+
+Java and C# are very similar languages that one can categorize as
+being simplified variations of C++ that promote the object-oriented
+style of programming but without the complexity of C++.  They are also
+compiled languages, requiring a separate compilation step.  Unlike C
+and Fortran compilers, the Java and C# compilers transforms the
+programmer's code into higher-level instructions targetted at what is
+termed a Virtual Machine (VM).  The VM acts much like a computer,
+processing the instructions, providing registers, etc. and generally
+mimicing the actions of the low-level computer. This is done by
+creating a version of the virtual machine for each computer
+architecture (e.g. Powerbook, Intel *86, Sparc), but then allowing
+all code for that virtual machine to run independently of what
+machine it is running on. The virtual machine is a layer between the
+compiled code and the low-level computer. And this makes the 
+compiled code (byte code) independent of the particular architecture
+and so makes it portable without the need for recompiling.
+
+
+Compiled languages, i.e. those requiring a compiler, are very
+useful. Typically, the compilation step performs optimization
+procedures on the programmers code, making it faster by looking at the
+collection of computations and removing redundancies, etc.
+Additionally, because compiled languages typically require variable
+declarations in terms of scope and type information, they can often
+catch programming errors before the code is run. 
+There are disadvantages, however.  Using compiled
+languages, one typically has to write an entire program before
+compiling it.  This means that 
+<itemizedlist>
+<listitem>
+ exploration and rapid prototyping of individual chunks is more 
+ complex or impossible. Specifically, it is much more difficult
+ to incrementally create software by running individual commands.
+</listitem>
+<listitem>
+ one cannot typically alter the programming as it is running
+ to correct errors or add functionality.
+</listitem>
+<listitem>
+
+</listitem>
+</itemizedlist>
+
+Languages
+
+</section>
+
+<section>
+<title>Additional reading and resources</title>
+
+<itemizedlist>
+<listitem>
+BigNumber
+</listitem>
+<listitem>
+GNU MP multiple precision library.
+</listitem>
+</itemizedlist>
+
+</section>
+
+<section>
+<title>Statistical Data Types</title> Numbers are of course the basic
+building blocks for statistics.  While we can think about every
+measurement as being real valued, it is valuable to be able to provide
+more information in our computations to declare or indicate that
+certain values are integers. For example, if we count the number of
+times a coin is tossed and comes up heads, we have an integer.  If we
+record the number of failures of a machine experiences, we have
+integer values.  The Binomial and Poisson distributions are examples for
+integer valued random variables.  It is useful to 
+
+random variable that countmeasures the number of heads 
+
+And we use integer and real valued numbers
+for different purposes
+
+
+Dates and times. Reading, converting, working with.
+
+
+</section>
+
+<section>
+<title>The basics of reading data</title>
+</section>
+
+</chapter>

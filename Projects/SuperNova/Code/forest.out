@@ -1,0 +1,88 @@
+
+R version 2.4.0 (2006-10-03)
+Copyright (C) 2006 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> invisible(options(echo = TRUE))
+> nova <- read.table("scaled.csv", sep=",")
+> dim(nova)
+[1] 10000    20
+> nova$V1 <- as.factor(nova$V1)
+> levels(nova$V1) <- c("Other", "SN")
+> names(nova) <- c("class", "apsig", "perinc", "pcygsig", "mxy", "fwx", "fwy", "neighbordist", "new1sig", "new2sig", "sub1sig", "sub2sig", "sub2minsub1", "dsub1sub2", "holeinref", "bigapratio", "relfwx", "relfwy", "roundness", "wiggliness")
+> 
+> #Split into training and test sets
+> set.seed(19848492)
+> test.samp <- c(sample(5000, size = 500), 5000 + sample(5000, size = 500))
+> nova.train <- nova[-test.samp,]
+> nova.test <- nova[test.samp,]
+> 
+> library(randomForest)
+randomForest 4.5-16 
+Type rfNews() to see new features/changes/bug fixes.
+> rf <- randomForest(class ~ ., data = nova.train, importance = TRUE, proximity = TRUE, keep.forest = TRUE, ntree= 1000)
+> pred <- predict(rf, nova.test)
+> table(nova.test$class, pred)
+       pred
+        Other  SN
+  Other   483  17
+  SN       37 463
+> 
+> rf2 <- randomForest(class ~ ., data = nova.train, mtry = 2, ntree= 1000, importance = TRUE, proximity = TRUE, keep.forest = TRUE)
+> pred <- predict(rf2, nova.test)
+> table(nova.test$class, pred)
+       pred
+        Other  SN
+  Other   484  16
+  SN       38 462
+> rf2
+
+Call:
+ randomForest(formula = class ~ ., data = nova.train, mtry = 2,      ntree = 1000, importance = TRUE, proximity = TRUE, keep.forest = TRUE) 
+               Type of random forest: classification
+                     Number of trees: 1000
+No. of variables tried at each split: 2
+
+        OOB estimate of  error rate: 4.16%
+Confusion matrix:
+      Other   SN class.error
+Other  4387  113  0.02511111
+SN      261 4239  0.05800000
+> 
+> rf3 <- randomForest(class ~ ., data = nova.train, mtry = 8, ntree= 1000, importance = TRUE, proximity = TRUE, keep.forest = TRUE)
+> pred <- predict(rf3, nova.test)
+> table(nova.test$class, pred)
+       pred
+        Other  SN
+  Other   480  20
+  SN       37 463
+> rf3
+
+Call:
+ randomForest(formula = class ~ ., data = nova.train, mtry = 8,      ntree = 1000, importance = TRUE, proximity = TRUE, keep.forest = TRUE) 
+               Type of random forest: classification
+                     Number of trees: 1000
+No. of variables tried at each split: 8
+
+        OOB estimate of  error rate: 4.2%
+Confusion matrix:
+      Other   SN class.error
+Other  4375  125  0.02777778
+SN      253 4247  0.05622222
+> proc.time()
+[1] 6263.727   14.568 6280.631    0.000    0.000
+> 

@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+
+<body>
+<h1></h1>
+
+
+<dl>
+  <dt> Literal expressions
+  <dd>
+
+  <dt> Meta-characters: ^, $, |, ()
+  <dd>
+      Need to escape meta-characters to be literals.
+
+  <dt> Character sets:  [ ]
+  <dd>
+      <ul>
+	<li> Complement of character set: start with ^.
+	<li> Ranges: 0-9, a-f, A-Z
+	<li> Named character sets.
+      </ul>
+
+  <dt>
+       Alternatives:  expr<sub>1</sub>|expr<sub>2</sub>
+  <dd>
+      <ul>
+	<li>
+           Use parentheses to group alternatives
+	<li>
+	    Can refer to group later in regular expression:  \\1, \\2,
+	    ..., \\9
+      </ul>
+
+
+  <dt> Match any character meta-character:  . 
+  <dd>      
+
+  <dt> Quantifiers: 
+  <dd>
+      apply to previous sub-expression.
+<table border="1">
+ <tr><th>*</th><th>0 or more occurrences</th></tr>
+ <tr><th>?</th><th>0 or 1 occurrence</th></tr>
+ <tr><th>+</th><th>one or more, i.e. at least one.</th></tr>
+ <tr><th>{m}</th><th>exactly m copies</th></tr>
+ <tr><th>{m,}</th><th>at least m (general version of +)</th></tr>
+ <tr><th>{m,n}</th><th>at least m, and no  more than n, where n &gt;= m</th></tr>
+</table>      
+
+<dt>
+      Substitution: 
+<dd>
+    <ul>
+      <li> Use <b>gsub</b> and <b>sub</b>.
+    </ul>
+
+      
+      
+</dl>
+
+
+
+
+<hr>
+<address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Mon Feb  9 14:16:10 PST 2004
+<!-- hhmts end -->
+</body> </html>

@@ -1,0 +1,47 @@
+<article>
+
+tcptrace
+
+Exploratory Data Analysis.  Use the database to query large amounts of
+information in smaller chunks.  Then examine outliers and anomalous
+
+
+Two tables:
+ connections, raw packets.
+
+Also compute HTTP information using the -xhttp option.
+
+User information from the network intrusion data.
+
+
+
+
+
+ns - network simulator.
+
+<section>
+<title>Questions</title>
+What types of connections are not completed
+with a SYN and a FIN?
+
+Plot connections over time?  Are there any periodic effects?
+Look at a plot over time. Think of interesting
+ways to represent this.
+
+How many connections are reset?  What types are reset?  And at what
+times of the day?  or how many other connections are active at the
+time?
+
+</section>
+
+
+snort (intrusion detection) application can log straight to a
+database.  See
+http://www.informit.com/isapi/product_id~%7B34FAA215-636F-4AE5-8FE0-3BA8C860EC9D%7D/element_id~%7BEC3101EE-44A0-4857-A0C3-9EBEECCA6630%7D/st~%7BEEA4B8BA-4464-4E41-BE37-B668A7ACCF61%7D/content/articlex.asp
+for schema.
+
+
+
+
+
+</article>

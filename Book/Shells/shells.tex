@@ -1,0 +1,2546 @@
+\def\shellArg#1{\texttt{#1}}
+\def\shellCmd#1{\texttt{#1}}
+\def\shellKey#1{\textbf{#1}}
+\def\Pattern#1{\textsl{#1}}
+\def\Directory#1{\textbf{#1/}}
+\def\Dir#1{\textbf{#1/}}
+\def\Value#1{\texttt{#1}}
+\def\envVar#1{\texttt{#1}}
+\def\shellVar#1{\texttt{#1}}
+\def\Shell#1{\exec{#1}}
+%\chapter{Shells}
+\chapter{Managing Data with Shell Tools}\label{chap:shells}
+
+The shell is the user's entry point to the command line interface to
+the operating system.  It is a command line interface that allows you
+to handle files, run programs and generally manage what you are doing.
+The shell is merely a regular program that sits and waits for commands
+to be typed interactively.  It executes those commands for you and is
+then ready and waiting for more instructions.  The shell can be used
+to move and delete files, start programs such as R or Matlab, stop
+long-running jobs, print files, and so on.  As a result, the shell is
+a very important part of your interface to a machine.  In many cases,
+you can do the same task using a graphical interface, and often, it
+will be easier to do so. With a graphical interface you don't have to
+remember the precise syntax and format of a command.  However, the
+shell can make certain tasks easier, and it can simplify and reduce
+the chance of errors when repeating a task over and over again.  The
+shell is an example of an interpreter and interactive language.  And
+importantly, when coupled with the various Unix tools that allow us to
+operate on lines of content, the shell provides a powerful environment
+for doing simple and basic exploratory programming and data analysis.
+
+
+
+\section{Shell Basics}
+
+
+\begin{table}
+\begin{center}
+\begin{tabular}{lcc}
+ & Graphical interface & Command interface \\ 
+\hline
+ Ease of use & $\surd$ & \\
+ Interactive exploration & $\surd$ & \\
+ Scalability & & $\surd$ \\
+ Complexity & & $\surd$ \\
+ Repetition & & $\surd$ \\
+\end{tabular}
+\caption{A comparison of graphical and command-line interfaces.} 
+\end{center}
+\end{table}
+
+
+A window-system/desktop with interactive file rollers and other graphical interfaces
+to the data stored on your computer can be very handy and easy to use.
+But sometimes the scale or complexity of the problem makes these
+easy-to-use interfaces cumbersome and time consuming as they involve
+many repetitive mouse and button clicks. Other times, the problem needs
+to be performed automatically, i.e. without manual intervention.
+%These are the times when shell tools can be real time savers by automating a tedious procedure.  
+An example of the power of executing
+commands at the prompt in the shell, consider the problem of finding all Tex files in a
+directory and its subdirectories that have not changed in the past 21 days.
+With an interactive file roller, it is easy to sort files by
+particular characteristics such as the file-type extension and the
+last-modified date.  But often this sorting does not apply to files
+within subdirectories of the current directory, and it can be
+difficult to apply more than one search criteria at a time.
+A single Unix command allows us to construct a more complex search.
+With the shell, we find the files we are after by executing the command, 
+\begin{verbatim}
+find /home/nolan/ -mtime +21 -name "*.tex"
+\end{verbatim}
+
+
+The shell provides a command-line interface to manage files and
+processes.  The commands follow a very simple syntax: the command is
+followed by options and arguments which are separated by one or more
+blanks.  Options begin with a dash, and can be thought of as named
+arguments to the command.  The shell displays what is called a prompt,
+such as the \%, and waits for a command to be typed interactively. Once
+the command is typed, and you hit enter, the shell takes the line of
+input, breaks it up into words using blanks as delimiters, and evaluates the
+command.  As a simple example, to make a copy of the file called
+\shellArg{first.pdf} that is in the current working directory and place
+the copy in a new file called \shellArg{second.pdf} also located in the working
+directory, we use the \shellCmd{cp} command as follows: 
+\begin{verbatim}
+% cp first.pdf second.pdf
+% 
+\end{verbatim}
+%Alternatively, if \shellArg{first.pdf} were in the directory
+%\shellArg{/home/nolan/junk/}, then to copy it into the current working
+%directory, keeping the same file name, we type \shellCmd{cp
+%  /home/nolan/junk/first.pdf .} at the prompt.  Here the period stands
+%for the current working directory.
+
+
+Table~\ref{table:UnixCommands} provides a summary of some of the
+basic commands.  Note that a single line of input may have several commands,
+  each separated by a semicolon ```;''.  Also, a command may be split across
+  multiple lines of input and the shell will understand this and
+  change the prompt on the subsequent lines to indicate that it is
+  waiting and expecting more input for that command. When the command
+is complete, the shell displays the prompt again and waits for more
+commands.
+
+
+Unix-based operating systems and their tools are available on a variety of platforms,
+including Mac OS X, Linux, and Solaris. In addition, Windows operating
+systems offer Cygwin, software that provides tools that act somewhat like command-line Unix tools.
+
+
+
+\begin{center}
+\begin{table}
+\begin{tabular}{lp{3.5in}}
+\hline
+Information on a file &\\ 
+\shellCmd{cat} \shellArg{filename} &Write contents of
+\shellArg{filename} to the screen. \\
+\shellCmd{tail} \shellArg{filename} &Write the last ten lines of
+\shellArg{filename} to the screen. \\
+\shellCmd{more} \shellArg{filename} &Write contents of
+\shellArg{filename} to the screen with page breaks. \\
+\shellCmd{wc} \shellArg{filename} & Print the number of lines, words, and
+characters in \shellArg{filename}. \\
+& \shellKey{-l} Print the number of lines only.\\
+\shellCmd{ls} \shellKey{-l} \shellArg{filename} & List the permissions,
+ownership, and last modified date of \shellArg{filename}.\\
+\hline
+Navigating a file system & \\
+\shellCmd{cd} \shellArg{directoryname} &change current directory to \shellArg{directoryname}.\\ 
+\shellCmd{pwd}  &Print working directory, i.e. provide the full path
+name of the current directory.\\ 
+\shellCmd{ls} &List files in current directory (not including files
+that start with a period.\\ 
+ &  \shellArg{directoryname} List files in \shellArg{directoryname}.\\
+ & \shellKey{-a} List all files, including those with names that begin
+ with a period. \\
+ & \shellKey{-R} List contents recursively, that is , list contents of
+ subdirectories. \\
+& \\
+\hline
+File Management & \\
+\shellCmd{mkdir} \shellArg{directoryname} & Make a directory called
+\shellArg{directoryname}. \\
+\shellCmd{touch} \shellArg{filename} & Make a file called
+\shellArg{filename}, or if it exists then update the last
+modified date. \\
+\shellCmd{mv} \shellArg{filename} \shellArg{filename2}& Move (or rename)
+\shellArg{filename} to  \shellArg{filename2}. \\
+\shellCmd{cp} \shellArg{filename} \shellArg{filename2}& Copy the
+contents \shellArg{filename} to \shellArg{filename2}. \\
+\shellCmd{rm} \shellArg{filename} & Remove (delete) \shellArg{filename}. \\
+ & \shellKey{-r} Recursively remove (delete) \shellArg{directoryname}
+ and its contents. \\
+\shellCmd{rmdir} \shellArg{directoryname} & Remove directory
+\shellArg{directoryname}. Note, directory must be empty. \\
+ & \shellKey{-f}  Force the removal of a nonempty directory. \\
+ & \\
+\hline
+Utilities & \\
+\shellCmd{lpr} \shellArg{filename} & Print the \shellArg{filename}.\\
+ & \shellKey{-P} \shellArg{printername} prints to the printer \shellArg{printername}. \\
+
+\shellCmd{lpq} &Check the printer queue.\\
+\shellCmd{lprm} \shellArg{jobnumber}&Remove print job
+\shellArg{jobnumber} from the printer queue.\\
+
+\shellCmd{ssh} \shellArg{hostname} & Connect to the machine
+\shellArg{hostname}. \\
+
+ & \\
+\hline
+ & \\
+Getting Help & \\
+\shellCmd{command} $--$\shellKey{help} & This option on most
+commands will provide an abbreviated help. \\
+\shellCmd{man} \shellArg{command} & Show the online documentation or
+help about \shellArg{command}. \\
+
+ & \shellKey{-k} \shellArg{keyword} shows commands related to
+ \shellArg{keyword}. \\
+\end{tabular}
+\caption{Summary of some basic Unix commands.}\label{table:UnixCommands}
+\end{table}
+\end{center}
+
+
+\section{Example: Setting up a project with shell tools}
+The National Aeronautics and Space Administration (NASA)
+\\
+\url{http://mynasadata.larc.nasa.gov/} made a subset
+of their data available for the American Statistical Association (ASA)
+Data Exposition in 2006
+\\
+\url{http://www.amstat-online.org/sections/graphics/dataexpo/2006}.   
+We use it as an example of how you might embark on a data analysis
+project.  In this scenario, the first steps facing you in the project
+are to:
+\begin{itemize}
+\item Acquire the data from the Web
+\item Figure out the organization and structure of the raw data
+\item Manipulate the raw data into a form suitable for further data analysis
+\end{itemize}
+We demonstrate the usefulness of shell tools to accomplish these
+preliminary tasks.
+
+
+The data for the Expo are available on the Web as a zip file from
+\begin{verbatim}
+  http://www.amstat-online.org/sections/graphics/dataexpo/
+                              nasadata.zip
+\end{verbatim}
+and as a gzipped tar file from
+\begin{verbatim}
+  http://www.amstat-online.org/sections/graphics/dataexpo/
+                       nasadata.tar.gz
+\end{verbatim}
+
+
+\subsection{Getting Help}
+Once we have downloaded the file, we need to figure out what to do
+with it.  As a starting point notice that this file has a ``tar.z''
+extension.  Learning more about these types of files may help us
+figure out what to do next.  One approach is to use Web resources, such as a search engine
+or Internet tutorial. If you get
+on the internet and use a search engine, such as Google
+(\url{www.google.com}), to search for information about tar and gz
+files, the search keywords \Pattern{tar gz tutorial} yield fruitful
+results.  Google directs us to ``UNIX Tutorial Seven'' at
+\\
+\url{www.ee.surrey.ac.uk/Teaching/Unix/unix7.html}\\
+ where we find an
+example that shows how to \shellCmd{gunzip} and extract the files:
+\begin{verbatim}
+First unzip the file using the gunzip command. 
+This will create a .tar file. 
+% gunzip units-1.74.tar.gz
+
+Then extract the contents of the tar file.  
+% tar -xvf units-1.74.tar
+\end{verbatim}
+There are many excellent on-line Unix tutorials, such as
+\\
+\url{unixhelp.ed.ac.uk/} \url{www.ee.surrey.ac.uk/Teaching/Unix/} and
+\url{www.grymoire.com/Unix/}.
+
+
+From the Internet we also find out that when data come in many files and they need to be transferred over the
+Internet, it can be far more efficient to do this if the files are
+wrapped up into a single file and compressed to take up less
+space. The ``tar'' file-type extension indicates that multiple files 
+have been wrapped up, or tarred up, into a so-called ``tape archive''.
+The  ``gz'' file-type extension indicates the file has been compressed
+or ``GNU zipped'' if you will to take up less space.  
+
+
+Another approach to take is to search the manual pages on your computer for
+help on the topic.  The \shellCmd{apropos} command searches through the
+headers of the manual pages for the keyword you provide. 
+{\footnotesize{
+\begin{verbatim}
+% apropos gz
+MIME::Decoder::Gzip64(3pm) - decode a "base64" gzip stream
+gzexe(1)            - compress executable files in place
+gzip(1), gunzip(1), zcat(1) - compress or expand files
+zforce(1)          - force a '.gz' extension on all gzip files
+znew(1)            - recompress .Z files to .gz files
+\end{verbatim}
+}}
+It confirms that \shellCmd{gunzip} may be the command that we are
+after.  To learn more about \shellCmd{gunzip}, we can use \shellCmd{man}
+to get the full documentation available in the manual pages, including
+a synopsis of the various options and parameters of the command, a
+full description of the options, examples, and a list of related
+commands. The manual pages are quite verbose, and we provided a brief
+excerpt here.
+{\footnotesize{
+\begin{verbatim}
+% man gzip
+
+GZIP(1)                                                                GZIP(1)
+
+NAME
+       gzip, gunzip, zcat - compress or expand files
+
+SYNOPSIS
+       gzip [ -acdfhlLnNrtvV19 ] [-S suffix] [ name ...  ]
+       gunzip [ -acfhlLnNrtvV ] [-S suffix] [ name ...  ]
+       zcat [ -fhLV ] [ name ...  ]
+
+DESCRIPTION
+       Gzip  reduces  the  size  of  the  named  files using Lempel-Ziv coding
+       (LZ77).  Whenever possible, each file  is  replaced  by  one  with  the
+       extension .gz, while keeping the same ownership modes, access and modi-
+       fication times.  (The default extension is -gz for VMS,  z  for  MSDOS,
+       OS/2  FAT, Windows NT FAT and Atari.)  If no files are specified, or if
+       a file name is "-", the standard input is compressed  to  the  standard
+       output.  Gzip will only attempt to compress regular files.  In particu-
+       lar, it will ignore symbolic links.
+...
+\end{verbatim} 
+}}
+
+A brief set of instructions on how to use the command is typically
+available by executing the command itself with the \shellArg{--help}
+option.  This often can provide enough information for you to
+proceed. Below we see that a simple call \shellCmd{gunzip file} should
+get us what we want.
+{\footnotesize{
+\begin{verbatim}
+gzip --help
+gzip 1.3.5
+(2002-09-30)
+usage: gzip [-cdfhlLnNrtvV19] [-S suffix] [file ...]
+ -c --stdout      write on standard output, keep original files unchanged
+ -d --decompress  decompress
+ -f --force       force overwrite of output file and compress links
+ -h --help        give this help
+ -l --list        list compressed file contents
+ -L --license     display software license
+ -n --no-name     do not save or restore the original name and time stamp
+ -N --name        save or restore the original name and time stamp
+ -q --quiet       suppress all warnings
+ -r --recursive   operate recursively on directories
+ -S .suf  --suffix .suf     use suffix .suf on compressed files
+ -t --test        test compressed file integrity
+ -v --verbose     verbose mode
+ -V --version     display version number
+ -1 --fast        compress faster
+ -9 --best        compress better
+ file...          files to (de)compress. If none given, use standard input.
+Report bugs to <bug-gzip@gnu.org>.
+\end{verbatim}
+}}
+
+\subsection{Managing and navigating a directory structure}
+We could unzip our file, and then
+proceed to extract the files from the resulting tar file with the
+command
+\begin{verbatim}
+gunzip nasadata.tar.gz
+tar -xf nasadata.tar
+\end{verbatim} 
+However, we will want to be a
+little more organized with our project and take care of where the
+extracted files will be placed.  (Note that the files can also be
+extracted using the GNU tar program via
+\begin{verbatim}
+  tar zxf nasadata.tar.gz
+\end{verbatim}
+Take some time to understand the difference the single call to
+\shellCmd{tar} and the two calls, first to \shellCmd{gunzip} and then
+\shellCmd{tar}, and why they are equivalent.)
+
+
+To get off on the right foot with an organized project, we create a
+separate work area for the data files.  The tar zipped file was
+automatically downloaded to the \Directory{Downloads} subdirectory in our
+home directory.  We make a new subdirectory in our home directory
+called \Directory{NASA} into which we unzip and extract the files. See
+Figure~\ref{fig:manageFiles} for the commands used to do this.  These
+commands start from the point that the file has been downloaded from
+the Web.
+
+\begin{figure}[htp]
+\begin{tabular}{p{2.75in}p{3.5in}}
+\verb+% cd+ &
+Change directories to the home directory so we know where we are when
+referring to files and directories in subsequent commands.\\
+ & \\  
+\verb+% gunzip Downloads/nasadata.tar.gz+ &
+Unzip the file. The unzipped file \file{nasadata.tar} is placed in
+\Directory{Downloads}\\
+ & \\
+\verb+% mkdir NASA+ & 
+Make a new subdirectory called \Directory{NASA} within the home
+directory. This is where we will keep the extracted files. \\
+ & \\
+\verb+% cd NASA/+ &
+Change to the \Directory{NASA} directory. \\
+ & \\
+\verb+% pwd+ &
+Print the full path name of the current working directory. In this
+example, \verb+/home/nolan/NASA+ is printed. \\
+ & \\
+\verb+% tar -xf ~/Downloads/nasadata.tar+ &
+Extract the files from the tar ball. Note that we use the tilde to
+refer to the path relative to the home directory.\\
+ & \\  
+\verb+% ls+ & 
+List the files in \Directory{NASA}.  This command returns \verb+Files+.\\
+ & \\
+\verb+% ls -l+ & 
+The long option gives us the information that \Directory{Files} is a directory.\\
+ & \\
+\verb+% ls Files+ &
+A list of many files goes whizzing by on the terminal screen.\\
+ & \\
+\verb+% ls Files | more+ &  
+To look over the files more carefully, we send the output from \shellCmd{ls}
+to \shellCmd{more}, which formats it to provide
+one screen-full of information at a time.
+To proceed to the next page of output hit the space bar.
+To stop displaying the output hit \shellCmd{q} at any time.\\
+ & \\
+\verb+% ls Files/ | tail+ &
+Prints the last ten lines from standard out, which in this case is the
+last ten files names in \Directory{Files} 
+\file{temperature66.txt, temperature67.txt, ... , temperature9.txt}\\
+\end{tabular}
+\caption{Set up directories tar and extract files into the directory.}\label{fig:manageFiles}
+\end{figure}
+
+
+\subsection{Redirection}
+In Figure~\ref{fig:manageFiles} we saw that when too much information
+is printed to the screen we can redirect the output to the command \shellCmd{more}
+for special formatting.  The symbol $|$ is used to ``pipe'' the
+standard output from \shellCmd{ls} to the input to \shellCmd{more}.
+The standard input to a command is from the keyboard and the standard
+output for a command is the terminal screen. However, as just
+seen in this example, it is possible to redirect the standard output to
+another process. The input to a command may come
+from a file or from the output of another process, and the output from
+a command may be redirected to a file or another process. 
+
+
+As an example, to determine how many files are in \Directory{Files} we pipe the
+output from \shellCmd{ls} to \shellCmd{wc -l}, the word count
+process with the option \shellArg{l} indicating that it is the number
+of lines that are desired, not the number of words that are in the
+standard output from \shellCmd{ls}.
+\begin{verbatim}
+% ls Files/ | wc -l
+     506
+\end{verbatim}
+Alternatively, we can redirect the output from \shellCmd{ls} to a new
+file called \file{file\_list} which
+will contain the names of all the files in the directory
+\Directory{Files}.  The symbol $>$ in the command below redirects the
+output from \shellCmd{ls} to this new file. 
+Then a word count with the \shellArg{-l} argument on \file{file\_list},
+gives the same result as the above command.
+The main difference between these two approaches is that the pipe does
+not create an extra file.
+\begin{verbatim}
+% ls Files/ > file_list
+% wc -l fileList.txt 
+     506 file_list
+\end{verbatim}
+
+
+The output from a command can also be appended to an existing file by
+using $>$$>$ rather than $>$.  To designate that the input to a process
+comes from a file, use the less than sign.
+There is also the standard error, where a process writes its error
+messages. This typically is the terminal screen as well.
+
+
+\begin{center}
+\begin{table}
+\begin{tabular}{lp{3.5in}}
+\hline
+Redirection & \\
+\shellCmd{command} $>$ \shellArg{filename} & Redirect the
+result of \shellCmd{command} from standard output to a new file.
+called \shellArg{filename}. \\ 
+\shellCmd{command} $>>$ \shellArg{filename} & Add the
+result of \shellCmd{command} to an existing file.
+called \shellArg{filename}. \\
+\shellCmd{command} $<$ \shellArg{filename} & Redirect the
+input to \shellCmd{command} to come from from \shellArg{filename}
+rather than standard input. \\  
+\shellCmd{command} $|$ \shellCmd{command2} & Pipe the
+standard output from \shellCmd{command} as standard input to \shellCmd{command2}. \\
+\end{tabular}
+\caption{Summary of how to redirect standard input and output for a command.}\label{table:Redirect}
+\end{table}
+\end{center}
+
+
+The \shellCmd{find} command may be better suited to the task of
+determining how many files are in \Directory{Files} because
+it recursively descends a given directory tree searching for
+files.  This means that if \Directory{Files} contains subdirectories,
+which in turn contain files and subdirectories, \shellCmd{find}
+will print all of these files and \textit{not} the subdirectories.
+\begin{verbatim}
+% find Files -type f | wc -l
+     506
+\end{verbatim}
+The \shellArg{type} parameter is called a ``primary''.  You can think of it as a
+named parameter that can take on different values.  In this case, the
+value for \shellArg{type} is \Value{f} which tells \shellCmd{file}
+to print only regular files, i.e. not directories.
+
+
+\subsection{Globbing and File name expansion}
+The \shellCmd{find} command also allows us to search
+for files that match a provided expression.  In our example so far, we see
+that there are 506 files in the \Directory{Files}.  According to the
+website there should be $72$ files, one for each month, for each
+variable, e.g. $72$ temperature files, $72$ ozone, and so on.  But
+$506$ is not an even multiple of $72$.  We can use the wildcard ``*''
+to confirm that there are indeed $72$ files for the ozone data.
+\begin{verbatim}
+% ls Files/ozone* | wc -l
+      72
+\end{verbatim}
+The wildcard ``*'' asks the shell to expand the standard input to
+include any files that begin with ``ozone'' and end with any arbitrary
+characters.  This file name expansion is also known as globbing.  Globbing
+enables us to match file names more easily.  A wildcard pattern is
+either a ``?'' or  ``*'' or ``[''.  The question mark matches any
+single character, the asterisk matches any string, which includes the
+empty string but not the ``/''.  The square brackets
+enable us to provide a set of equivalent characters for matching.  For
+example, [A-Za-z] matches any upper or lower case letter.
+
+Globbing is applied on each of the components of a pathname
+separately. In other words, a forward slash in a pathname cannot be
+matched by a wildcard. 
+That is why we get no matches when we search for files from within the
+\Directory{NASA} directory using the pattern
+*ozone* but we do get $72$ matches for */*ozone*,
+\begin{verbatim}
+% ls *ozone*
+No match.
+% ls */*ozone* | wc -l
+      72
+\end{verbatim} 
+
+
+If a filename starts with a period then this character must be matched
+explicitly.  For example \shellCmd{rm *} removes all of the files in the current
+working directory except those that begin with ``.''.
+Note that wildcard patterns are not regular expressions.  They match
+filenames, not text, and the conventions are not the same.  For
+example, in a regular expression the asterisk means zero or more
+copies of the preceding pattern, whereas the wildcard ``*'' means any
+number of characters including the empty string and excluding the
+forward slash.
+
+
+We can further use the observation that these files have names with a
+file-type extension of ``txt'' to determine via shell commands that
+there are $504$ files with an extension of ``txt'' and two additional files,
+``elevation.dat'' and ``intlvtn.dat''.  All of these files are at the
+top level within \Directory{Files}, i.e. there is not sub-directory system.
+\begin{verbatim}
+% find Files/ -name "*txt"| wc -l
+     504
+% find Files/ -type f -not -name "*.txt"
+Files//elevation.dat
+Files//intlvtn.dat
+\end{verbatim}
+In our first call to \shellCmd{find}, the ``*.txt'' says to look for
+all files with names that start with any set of characters and end
+``.txt''.  The second call to \shellCmd{find} looks for those file
+with names that are not matches (because of the \shellArg{not}
+parameter).  Note that we did not need the \shellArg{type} parameter
+in the first call to \shellCmd{find} because we know that the
+directories do not end in ``txt'' so we won't count any directories by
+mistake.  Note also that we must put our filename expansion in
+quotes because it is an expression that we want \shellCmd{find} to expand
+as it seraches recursively through the subdirectories.  That is, we do
+not want it expanded by the shell.
+
+
+\subsection{Information on a file }
+We are now ready to examine the internals of the files to determine
+their structure and to see if they need to be cleaned or reformated for
+our data analysis step.  When we look inside one of the ozone files (Figure~\ref{fig:ozon1}) we
+see that the first five lines contain informaion about the file in a
+key:value format.  This information tells us the variables measured, the
+original file name, etc. The sixth line of the file shows the
+latitudes, and the seventh line shows what looks to be a column
+number.  We also see taht each subsequent line begins with the
+latitude, a blank, slash, blank, and what looks to be a row number
+followed by a colon.   It appears that the ozone measurements are laid
+out in a $24$ by $24$ array of blank-separated values.
+
+\begin{figure}
+{\footnotesize{
+\begin{verbatim}
+% less ozone1.txt
+             VARIABLE : Mean Ozone abundance (dobson)
+             FILENAME : ISCCPMonthly_avg.nc
+             FILEPATH : /usr/local/fer_data/data/
+             SUBSET   : 24 by 24 points (LONGITUDE-LATITUDE)
+             TIME     : 16-JAN-1995 00:00
+              113.8W 111.2W 108.8W 106.2W 103.8W 101.2W 98.8W  96.2W  93.8W  ...
+               27     28     29     30     31     32     33     34     35    ...
+ 36.2N / 51:  304.0  306.0  306.0  294.0  308.0  310.0  310.0  310.0  310.0  ...
+ 33.8N / 50:  304.0  304.0  296.0  294.0  302.0  300.0  298.0  298.0  296.0  ...
+\end{verbatim}
+
+\begin{verbatim}
+% tail ozone1.txt
+ 1.2N  / 37:  248.0  246.0  246.0  248.0  246.0  246.0  246.0  248.0  244.0  ...
+ 1.2S  / 36:  248.0  248.0  246.0  248.0  246.0  248.0  244.0  246.0  246.0  ...
+ 3.8S  / 35:  248.0  246.0  246.0  246.0  246.0  246.0  244.0  246.0  246.0  ...
+ 6.2S  / 34:  250.0  250.0  246.0  248.0  246.0  246.0  246.0  246.0  248.0  ...
+ 8.8S  / 33:  252.0  250.0  248.0  248.0  246.0  248.0  248.0  248.0  250.0  ...
+ 11.2S / 32:  252.0  252.0  250.0  250.0  252.0  250.0  250.0  250.0  250.0  ...
+ 13.8S / 31:  254.0  256.0  254.0  250.0  250.0  250.0  250.0  252.0  250.0  ...
+ 16.2S / 30:  258.0  254.0  254.0  252.0  252.0  252.0  252.0  252.0  250.0  ...
+ 18.8S / 29:  258.0  258.0  258.0  254.0  252.0  254.0  256.0  254.0  252.0  ...
+ 21.2S / 28:  260.0  260.0  260.0  258.0  258.0  258.0  256.0  258.0  256.0  ...
+\end{verbatim}
+}}
+\caption{Each of the files has the same format: five lines of
+  information about the meaurements in a key:value format; the
+  longitudes where the measruements were taken; column number;
+  followed by 24 lines (one for each latitude) of 24 measurements (one
+  for each longitude).}\label{fig:ozone1}
+\end{figure}
+
+
+With \shellCmd{tail} we can check that the last lines of the file
+follow this same pattern.  Also, a \shellCmd{wc} tells us that there
+are indeed $31$ lines ($24 + 7$) in the file.  We can proceed to look
+in a few other files to confirm that they all appear to have a similar
+structure.  With the wildcard, we find that indeed all of the ``.txt''
+files are 31 lines long.  See Figure~\ref{fig:shellFile} for the
+details of how to do this.
+
+
+\begin{figure}[htp]
+\begin{tabular}{p{2.75in}p{3.5in}}
+\shellCmd{head -10 ozone1.txt} &
+Display the first ten lines of \file{ozone1.txt}.\\
+ & \\  
+\shellCmd{tail -5 ozone1.txt} &
+Display the last five lines of \file{ozone1.txt}.\\
+ & \\
+\shellCmd{wc -l *.txt} &
+Prints the number of lines and file name for each of the files with a ``txt''
+file-type extension.\\
+ & \\
+\shellCmd{wc -l *.txt | cut -f 7 -d ' ' > temp1} &
+Cuts out the seventh column from the standard output of \shellCmd{wc},
+which is the number of lines only. These numbers are placed in a
+temporary file \file{temp1}\\
+ & \\
+\shellCmd{temp1 | sort | uniq } &
+Prints the unique values in \file{temp1}, which is $31$.  Note that we sorted the
+file first, and also note that we could have piped the standard output
+from \shellCmd{cut} to sort rather than create the intermediate file.\\
+ & \\
+\end{tabular}
+\caption{Check the contents of the NASA files.}\label{fig:shellFile}
+\end{figure}
+
+\subsection{grep and sed}
+Our next step is to determine if the current file format is suitable
+for our data analysis, if we want to reformat the data then there are options
+of doing this through the shell at the command line, through a shell
+script, i.e. program, or through more powerful regular expression and
+input/output handling software such as that available in Perl, Python,
+and R.  We limit ourselves here to the first option; that is, in
+keeping with the goal of introducing the basic shell commands, 
+we massage the data a bit more and then pass it off to R.  Shell
+scripts are demonstrated in detail in the next two examples of the
+chapter, and in the following subsection of this example, we show how
+R can be used to clean and reformat the data more completely.
+
+Our simple appraoch will be to combine all of the 72 ozone files into
+one large file with the seven header lines stripped from each file
+along with the latitude information, i.e. the final file will contain
+$24$ columns, one for each longitude, and $72 \times 24$ rows, one for
+each month-latitude combination.
+
+The \shellCmd{head} and \shellCmd{tail} are very useful here for
+pulling out the lines that we wish to keep.  
+\begin{verbatim}
+tail -24 ozone*.txt > ozoneAll.dat
+\end{verbatim}
+The call to \shellCmd{tail} gives us the lines of data that we want
+but it also inserts blank lines and lines that indicate the original
+file name that we do not want in our output file:
+\begin{verbatim}
+
+==> ozone10.txt <==
+\end{verbatim}
+The \shellCmd{grep} command searches for patterns in files and prints
+the lines in the file where the pattern is found.  The \shellArg{v}
+parameter to \shellCmd{grep} returns the lines where the pattern is
+not found so a search through the file for blank lines will return all
+non-blank lines if we use this option.  We can search again for lines
+with two equal signs to eliminate them as well.  Two calls to grep
+give us the file that we are after.  We try them out one at a time.
+\begin{verbatim}
+tail -24 ozone*.txt | grep -v '^$' | more
+\end{verbatim}
+The pattern provided to grep is in quotes.  It uses two special
+characters, the caret and dollar sign.  The \verb+^+ denotes the
+beginning of a line and the \verb+$+ denotes the end of a line, so the
+pattern searches for empty lines and returns those lines which are not
+empty. Next, we search for lines that begin with two equal signs:
+\begin{verbatim}
+tail -24 ozone*.txt | grep -v '^$' | grep -v '==.*' | more
+\end{verbatim}
+In this pattern, the \verb+.+ is a special character that matches any
+character and the \verb+*+ is a special character that matches the
+previous character any number of times.  So essentially, the pattern
+we are after is a line that begins with \verb+==+ followed by any
+characters.  We get in return those lines which do not start with
+\verb+==+ which is the desried result.  Patterns or regular
+expressions are covered in greater deatils in
+Chapter~\ref{chap:RegExpr}.  For now we content ourselves with these
+few examples.  Of course there are usually many ways to approach a
+problem, and the solution presented here represents only one approach.  
+
+
+Our next task is to remove the information found at the beginning of
+each of the 24 data lines.  It appears to follow a specific format
+\verb+ 36.2N / 51:+ beginning with a blank, then the latitude with one
+decimal and either N or S, another blank, a row number, and ``:''.  We
+use the fact that this pattern ends in a colon and no other colons
+appear in the file to search for and eliminate the pattern.  We use
+\shellCmd{sed} to do this.  It is a stream editor that performs basic text
+translation on an input stream from a file or from a pipeline.  Like
+\shellCmd{grep} it can be used to search for particular patterns, but
+it can also replace the found patterns with particular character
+strings.  See Table~\ref{table:grepsed} for more information on the
+  syntax and parameters for \shellCmd{sed}.
+\begin{verbatim}
+cat ozone*.txt | sed -e 's/^.*://' | more
+\end{verbatim}
+Notice here that the imput is comming from the output of
+\shellCmd{cat}, which will be the lines from the 72 ozone files. We
+would actually either pipe the output from the previous two calls to
+\shellCmd{grep} to the call to \shellCmd{sed}.  Alternatively, we
+could give \shellCmd{sed} the \file{ozoneAll.dat} file from above, in
+which case we would send the output from \shellCmd{sed} to another
+file such as \file{ozoneAll2.dat} because otherwise the output would
+wipe out the input and we would be left with nothing.  Rather than
+make several intermediate files, we create a composite shell command.
+We provide the composite command after we have constructed and tested
+all of the pieces.  At this point, we read \file{ozoneAll.dat} into R
+and begin exploring the data.  When we do this we find that there are
+\verb+....+ in the file where there should be measurements.  We return
+to the shell and replace these with ``NA'' as follows,
+\begin{verbatim}
+cat ozone*.txt | sed -e 's/\.\.\.\./  NA/g' | more
+\end{verbatim}
+Here we are searching for \verb+.+s, but because these are special
+characters in search patterns, we use the backslash \verb+\+ to
+indicate that the periods are not to be interpreted as such.  The
+\verb+g+ that follows the replacement string indicates that the
+replacement should occur for every instance of \verb+....+ found in a
+line, not just the first instance.  At last, the composite command:
+\begin{verbatim}
+tail -24 ozone*.txt | grep -v '^$' | grep -v '==.*' |
+  sed -e 's/^.*://' |
+  sed -e 's/\.\.\.\./  NA/g' > ozoneAll.dat
+\end{verbatim}
+Note that this command would appear on one command line (with
+wrapping) but to fit in the format of this page it is broken up over
+three lines.
+  
+\begin{center}
+\begin{table}
+\begin{tabular}{lp{3.5in}}
+\hline
+Searching for regular expressions - grep & \\
+\shellCmd{grep} \shellArg{phrase} &Read from the standard input, and
+print lines matching \shellArg{phrase}. \\ 
+\shellCmd{grep} \shellArg{phrase} \shellArg{filename} &Search \shellArg{filename}
+for \shellArg{phrase} and print lines matching. \\ 
+
+& \shellKey{-v} Print all line not matching \shellArg{phrase}.\\
+& \shellKey{-l} Print all file names containing lines matching
+\shellArg{phrase}.\\
+& \shellKey{-h} Do not print the name of the file the match was found.\\
+& \\
+\hline
+Stream Editor - sed & \\
+\verb+sed -e 's/pattern/replace/key'+ & The \shellArg{e} parameter
+%\shellCmd{sed} -e 's/pattern/replace/key' & The \shellArg{e} parameter
+is for edit mode.  Within the quotes, the \shellArg{s} stands for
+substitute, the \shellArg{pattern} is a regular expression to be
+replaced by \shellArg{replace} and when the \shellArg{key} is
+\shellArg{g} the raplacement is global, i.e. all instances of the pattern found in
+the line rather than the first instance.\\
+\shellCmd{sed} -e '1,7d' &  Drop lines 1 through 7 of the input.\\
+\shellCmd{sed} -d 's/$\backslash$.$\backslash$.$\backslash$.$\backslash$./NA/g' & Replace every instance of the
+  pattern ``....'' with ``NA''.  Note that to avoid the interpretation
+  of \verb+.+ as a special character it is preceeded by a blackslash
+  \verb+\+. \\
+\shellCmd{sed} -e 's/$\wedge$.*://' & Eliminate (because the replacement
+  characters are not provided) from the beginning of each line (the
+  \verb+^+ denotes the beginning ofthe line) up to and
+  including the \verb+:+. \\ 
+\end{tabular}
+\caption{}\label{table:grepsed}
+\end{table}
+\end{center}
+
+As a final example of \shellCmd{grep} and \shellCmd{sed}, we grab the date from
+each of the 72 ozone files and create a new file with $72$ lines, one
+for each of the $72$ dates.
+\begin{verbatim}
+grep -h 'TIME' ozone*.txt | 
+  sed -e 's/^.*: //' | 
+  sed -e 's/ 00:00.*//' > dates.txt
+\end{verbatim}
+The call to grep pulls out all of the lines from the $72$ files that
+contain the workd ``TIME''.  The \shellArg{h} argument indicates that
+we do not want the file name included in the output. The two
+sequential calls to \shellCmd{sed} eliminate the characters before and
+after the date. The date lines look as follows,\\
+\verb+            TIME     : 16-SEP-1996 00:00+ 
+\\
+and so we eliminate
+all characters from the beginning of the line \verb+^+ up to the
+\verb+: +.  The end of the line contains \verb+00:00+ which we don't
+want to keep either.  Each of these patterns are substitute with
+nothing, i.e. they are removed from the line leaving only the date in
+the format DD-MMM-YYYY.
+
+
+
+\section{Example: Web logs}\label{sec:weblog}
+The Unix shell can be used to compute simple summary statistics and
+derived data-sets from the original, raw data.  Although, the shell
+offers a very primitive language, the Unix tools are quite useful when
+transforming inputs to create derived data or simple summary
+statistics.  The context in which we will explore the data
+analysis capabilities of the shell and Unix tools is Web site log
+files.
+
+When you visits a Web site, your browser sends a request for the
+specified page.  The Web server processes the request, verifying that
+the requester has the right to access its contents, and sends it back
+to the client.  All this is done using HTTP - the HyperText Transfer
+Protocol.  While processing the request, the server also writes a
+record of the transaction to a ``log'' file.  Our data are these
+raw log files.  There are two basic formats for a log file.
+The files we will see are in the ``long'' format which means they
+have two extra fields - the referral URI (Universal Resource I) telling us from which page
+the request was made,  and information about the 
+client software, e.g. browser and operating system details.
+The referral URI can tell us about how the client got to the requested
+page and can provide us with important information about 
+how people navigate through a Web site.
+
+
+The log files are available as a compressed tar file, i.e. with 
+extension .tar.gz. via \\
+\url{http://eeyore.ucdavis.edu/stat141/data/OmegahatWebLogs.tar.gz}
+Each line in the log file looks something like the following:
+{\footnotesize{
+\begin{verbatim}
+82.232.52.22 - - [09/Jan/2005:04:13:59 -0800] "GET /RSPython/html.css HTTP/1.1" 
+404 1327  "http://www.omegahat.org/RSPython/"
+"Mozilla/5.0 (Windows; U; Windows NT 5.1; fr-FR; rv:1.7.5) Gecko/20041108 Firefox/1.0"
+\end{verbatim}
+}}
+Note that this information is all on one line in the log file but is displayed as
+  several lines here for formatting on the page.
+The fields of this input line are described in
+Table~\ref{table:weblogVars}. 
+A single request may generate multiple lines in the log
+file because when you request a page that contains images, for 
+example, the request also generates separate requests for those images.
+
+
+\begin{table}
+\begin{tabular}{ll}
+Position & Description \\
+1. & The IP address of the client machine making the request. \\
+2. & Reserved. \\
+3. & Reserved. \\
+4. & The time and date (with offset from GMT) all enclosed in square
+  brackets ([]).\\
+5. & The HTTP command request, in quotes. \\
+6. & The return status. \\
+7. & The number of bytes returned in the response from the server. \\
+8. & The referring page which might be the page from which the user
+  clicked\\
+   &  on a link to this page being requested, or a the container\\
+   & page if the request is for an image, etc. inside that page. \\
+9. & A description of the client software (e.g. the browser).\\
+\end{tabular}
+\end{table}
+
+
+Robots, spider or crawlers are are programs that crawl the Web and
+build catalogs of Web sites. They are also often called simply `bots'.
+The search engines such as Google has one to build its collection of 8
+billion Web documents.  Sometimes these are of interest, other times
+we want to filter these records out before looking at ``regular'' or
+human traffic.
+
+Below are some questions that will give us a preliminary exploratory
+analysis of the Weblog data.
+\begin{enumerate}
+\item How many requests were there across all of the log files?
+% wc -l is fine, but to get just the number.
+% wc -l | tail -n 1 | sed -e 's/total//'
+
+\item Get the starting and ending dates for each log file?
+% head and tail. Perhaps need to ensure there are no comments
+% grep -v '^#' omegahat.log | head -1 | cut -d ' ' -f 4 | sed -e 's/\[//'
+%% Play with the order in which you filter.
+
+
+\item  How many non-robot queries are there in the log file omegahat.log.1?
+How many robots accessed the site?  %Of course, you have to
+%  specify a criterion for identifying robots.  What are the IP
+%  addresses of the robots? Are some of them related? % e.g. same subnet
+                                % but different machine.
+
+% This is tricky when done entirely correctly.
+% If we define a robot entry as one looking for robots.txt, then we
+% just search for that and do a wc.
+% 
+%
+%
+
+\item How many different  IP addresses accessed the Web site?
+% cut  -d ' ' -f 1 omegahat.log | sort | uniq | wc -l
+Create a table listing the 5 IP addresses that had
+the greatest number of queries and the actual number of queries
+they generated.
+%cat omegahat.log | cut -d ' ' -f 1 | sort | uniq -c | sort | tail -n
+%5
+
+
+\item What are the popular (i.e. most visited) pages? 
+This can be done as a single,  long  command.
+To make it easier to call, write it as a script
+that is invokable as, say, popularPages.
+In what ways can it be made  more flexible?
+
+
+\item Identify the top $n$  most active IP addresses across all the
+  log files.   For each of these, create a file whose name is the IP address
+  and whose contents are the files requested by that IP address.
+  Write a shell script to do this as a single call. 
+  You can use $n  = 30$, but the script should allow the user to
+  specify $n$ as a command line argument. 
+
+
+
+\end{enumerate}
+
+
+\begin{enumerate}
+\item 
+To get the number of requests, we just want the number of lines in the
+files. We do want to ensure that we don't include comment lines.
+These are lines that start with a \# character.
+So before we start looking at records, we should check whether there
+are any comment lines. If there are, we should filter them out from
+the original files or we will have to filter them out for each command.
+We can check for comment lines  using 
+\executable{grep} and a suitable pattern. 
+I mentioned in class that the $\hat.$ symbol in a ``regular expression''
+(which what \executable{grep} uses for specifying patterns)
+means ``the beginning of the line''. (The ``\$'' character means the
+end of the line.)
+So to express the text pattern ``the start of the line followed
+immediately by the \# character'', we can use
+\begin{verbatim}
+  grep '^#' *log*
+\end{verbatim}
+Note that the shell expands the file names for the shell glob
+pattern \verb+*log*+
+We can use any pattern here that matches the files we want:
+\verb+*.log*+,  \verb+*log*+.
+We just want to make certain we catch all the ones we want and
+no more. So we can always test this with
+\begin{verbatim}
+ echo *log*
+\end{verbatim}
+and we will see what the shell passed to \executable{echo}
+as the sequence of arguments it expanded.
+
+Since I have files named omegahat.log and omegahat\_error.log
+in my directory, I use
+\begin{verbatim}
+  omegahat.log*
+\end{verbatim}
+to match all files starting with the literal string
+\verb+omegahat.log+ and followed by any characters, including
+no characters (i.e. omegahat.log).
+This avoids the error log files which \verb+*.log*+
+would include.
+
+The command
+\begin{verbatim}
+  grep '^#' *log*
+\end{verbatim}
+produces no output and so we have no comment lines. This means
+we can work on these raw logs for all our questions related to
+real records without having to filter them.
+
+So, now we can count the number of records by just
+counting the number of lines in all the files.
+We use \executable{wc} and ask only for the lines
+and we get results 
+\begin{verbatim}
+% wc -l omegahat.log*
+    1004 omegahat.log
+   28022 omegahat.log.1
+   21609 omegahat.log.2
+   25963 omegahat.log.3
+   28885 omegahat.log.4
+  105483 total
+\end{verbatim}
+For interactive, exploratory data analysis, this is great.
+We  have now got an idea about how many records there are;
+i.e. how many observations we have.
+
+If we had a lot of files or if were writing a report and wanted 
+to put the value into a file directly (e.g. to use it in a loop)
+we would want only the total and not the lines for each of the
+individual  files.
+We can do this by grabbing just the last line:
+\begin{verbatim}
+ wc -l omegahat.log* | tail -1
+\end{verbatim}
+And now we technically want just the number and not the word
+``total'', so we can filter this out also.
+We can use \executable{cut} for this, but it 
+is a little tricky. It depends on knowing how many spaces
+there are preceding the count.
+The command
+\begin{verbatim}
+ wc -l omegahat.log* | tail -1 | cut -f3 -d ' '
+\end{verbatim}
+words, but  when we look at just the files
+omegahat.log.1, omegahat.log.2 and omegahat.log.3,
+we get no answer:
+\begin{verbatim}
+ wc -l omegahat.log.[1-3] | tail -1 | cut -f3 -d ' '
+\end{verbatim}
+So we need something more robust, i.e. not dependent
+on the format of the actual result.
+What is going on here?  The 3 in \verb+cut -f3+
+means the third field so we are looking for 2 spaces
+followed by the field we want - the count of the lines.
+But when the count is less than $100,000$, 
+\executable{wc} is preceding the total with more
+spaces and so it is no longer the third field we want
+
+We can use \executable{sed} which is often
+used for doing substitutions of text patterns 
+in lines.
+We give sed an expression to run on each line
+via the -e flag.
+In this case, we want to substitute or replace the
+literal string  `` total'' with the empty string.
+The command
+\begin{verbatim}
+sed -e 's/ total//'
+\end{verbatim}
+works for this.  The substitution command in \executable{sed}
+is the character `s' and we tell it what to look for and
+what to replace it with by separating these two inputs
+with the `/' character. (In fact, we can use any character
+that is not in either of the two inputs.  So 
+\verb+ s| total||+ would work also.)
+
+And now we have our command
+\begin{verbatim}
+ wc -l omegahat.log* | tail -1  | sed -e 's/ total//'
+\end{verbatim}
+We can check that this gives the correct result for
+the subset of the files as well to ensure that this
+is reasonably general.
+
+We might also want to remove the leading spaces,
+for example, to use in calculations (via \executable{bc}
+or using the shell's own simple arithmetic).
+To do this, we could use either
+\executable{tr} for translating sets of characters to different
+characters, or we could use \executable{sed} to replace the
+space characters with nothing.
+\begin{verbatim}
+ wc -l omegahat.log* | tail -1  | 
+   sed -e 's/ total//'  | tr -d " "
+\end{verbatim}
+or
+\begin{verbatim}
+ wc -l omegahat.log* | tail -1  | 
+   sed -e 's/ total//'  | sed -e 's/ //g'
+\end{verbatim}
+Note the `g' at the end of the \executable{sed} expression.
+This says make the substitutions ``global'' and don't just stop
+at the first one.
+
+We have now pretty much exhausted that question but hopefully 
+illustrated lots of other aspects of the shell tools.
+
+
+\item The start and end date for each log file can be obtained using
+head and tail. 
+The earliest record is the first one in the file.
+The latest is the last record in the file.
+This is because the log files are written sequentially.
+So we can get the first and last record for each log file
+via two commands
+\begin{verbatim}
+ head -n 1 omegahat.log.1
+ tail -n 1 omegahat.log.1
+\end{verbatim}
+Now, we want these for all the files.
+Fortunately, \executable{head} and \executable{tail}
+accept multiple files as inputs.
+So we can get all the initial records
+{\footnotesize{
+\begin{verbatim}
+head -n 1 omegahat.log*
+==> omegahat.log <==
+133.51.21.64 - - [09/Jan/2005:04:06:37 -0800] "GET /robots.txt HTTP/1.1" 
+    404 1070 "-" "wish-la"
+
+==> omegahat.log.1 <==
+81.155.137.144 - - [02/Jan/2005:04:03:13 -0800] 
+   "GET /RSJava/man/Java/html/file.choose.html HTTP/1.1" 
+   200 1757 
+"http://www.google.co.uk/search?q=file+dialog+file+filter+java&hl=en
+    &lr=&start=30&sa=N" 
+    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; 
+    .NET CLR 1.1.4322; .NET CLR 1.0.3705; FDM)"
+
+==> omegahat.log.2 <==
+195.208.220.215 - - [26/Dec/2004:04:02:08 -0800] "GET /robots.txt HTTP/1.0" 
+    404 1070 "-" "-"
+
+==> omegahat.log.3 <==
+207.46.98.30 - - [19/Dec/2004:04:02:07 -0800] "GET /RSXML/WritingXML.html HTTP/1.0"
+    200 15554 "-" "msnbot/0.3 (+http://search.msn.com/msnbot.htm)"
+
+==> omegahat.log.4 <==
+66.151.181.4 - - [12/Dec/2004:04:02:41 -0800] 
+  "GET /RSPerl/man/RSPerl/html/PerlExpr.html HTTP/1.0"
+   200 1687 "-" 
+   "FAST-WebCrawler/3.8/Scirus (scirus-crawler@fast.no; 
+    http://www.scirus.com/srsapp/contactus/)"
+\end{verbatim}
+}}
+Now, we don't want to have to deal with these extraneous lines in the
+output that identify each file.
+So we want to filter these out.
+We can do this by matching lines that starts with \verb+==>+
+and excluding these. The -v flag for \executable{grep} 
+allows exclusion of matching lines, or inverse matching.
+\begin{verbatim}
+head -n 1 omegahat.log* | grep -v '==>'
+\end{verbatim}
+We are still left with the blank lines which would be nice to
+eradicate also.
+A blank line can be identified with the pattern
+expressed in English as 
+``a line that starts with a beginning of line and is followed
+immediately by an end of line''.
+Using regular expressions, we can say this as
+\verb+^$+ since
+$\hat.$ means ``beginning of line'' and '\$' means ``end of line''.
+Again, we want to exclude such lines
+\begin{verbatim}
+head -n 1 omegahat.log* | grep -v '==>' | grep -v '^$'
+\end{verbatim}
+And now we have exactly the starting records we want. 
+
+All we need to do is fetch the date field.
+We can use cut for this.
+To get the entire string (with time zone), we can use 
+\begin{verbatim}
+cut -f4-5 -d' '
+\end{verbatim}
+Note that we want to do this after we have filtered the records of
+interest (e.g. after the call to \executable{head}).  We could do it
+first, but then we will be operating on all the lines and then
+subsetting the ones we want. So doing the \executable{cut} at the end
+means we don't do extra work.
+
+We can do the same thing for the records at the end
+of the files using \executable{tail}.
+\begin{verbatim}
+tail -n 1 omegahat.log* | grep -v '==>' | grep -v '^$' | cut -f4-5 -d' '
+\end{verbatim}
+
+Now it is convenient to arrange the start and end dates
+in two columns for each file.
+We can do this using \executable{paste}.
+We want to combine the two computations via paste.
+To do this, we could store the output from each
+in a file and then \executable{paste} these
+two files together.
+\begin{verbatim}
+head -n 1 omegahat.log* | grep -v '==>' | grep -v '^$' | 
+                 cut -f4-5 -d' ' > Start
+tail -n 1 omegahat.log* | grep -v '==>' | grep -v '^$' |
+                 cut -f4-5 -d' ' > End
+paste Start End
+\end{verbatim}
+We then have to clean up these temporary files.
+\begin{verbatim}
+rm Start End
+\end{verbatim}
+
+Typically, when we have intermediate files (like Start and End),
+we can avoid them by using in-lined computations via 
+the pipe (|) or execute-and-replace (\textit{`cmd`}).
+This is a little hard for these computations above
+and is not worth the hassle.
+
+We can get rid of the brackets around the date if we want,
+although it is not essential.
+We can do this via \executable{tr}:
+\begin{verbatim}
+head -n 1 omegahat.log* | grep -v '==>' | grep -v '^$' |
+     cut -f4-5 -d' ' | tr -d ']['
+\end{verbatim}
+
+
+\item
+Identifying the robot records is an iterative task.
+First, we want to identify the records that are ``obviously''
+robots.  These are the ones that request the file
+\textsl{robots.txt}.
+Additionally,  we can use a list of well known robot
+user agent identifiers (e.g. Googlebot, Yahoo Slurp)
+to identify the same and additional  records.
+The additional records are the requests that these robots
+submitted for files other than \textsl{robots.txt}.
+To find these records, we use \executable{grep}
+as we are looking for lines that contain particular strings.
+To find those that request \textsl{robots.txt}, we might use
+\begin{verbatim}
+grep robots.txt omegahat.log*
+\end{verbatim}
+This might include requests that just mention robots.txt in the line
+but that are not requests for that file.
+To test this, we might look at all the lines that do not have
+the request field \texttt{GET /robots.txt}.
+\begin{verbatim}
+grep robots.txt omegahat.log*  | grep -v 'GET /robots.txt'
+\end{verbatim}
+The result is 6 lines of
+the form
+\begin{verbatim}
+omegahat.log.1:61.135.131.209 - - [04/Jan/2005:15:37:54 -0800] 
+          "GET //robots.txt HTTP/1.1" 404 1070 "-" "sohu-search"
+\end{verbatim}
+So the only difference is that there are two / in the request!
+So we use these.
+
+We can now look at both the IP and User Agent fields in these collection of robot records.
+Let's compute the IP address for each of these records and then search the 
+full collection of records again to match for any of these.
+The result will be that we get
+not only the original records we matched (when looking for robots.txt),
+but also any other requests from any of those machines.  Since Web crawlers
+probably don't  have dynamic IP addresses (i.e. assigned to them each time they connect to the
+internet), any requests from an IP address identified as Web  crawler once, are likely
+to also be from a Web crawler.
+In other words, 
+if we identify 61.135.131.209 as a robot, then 
+any other requests from that machine are likely to be robot requests.
+
+To get the IP addresses of the robots, we use \executable{cut}
+to get just the IP addresses and then we make them into a set
+of unique elements, i.e. removing any duplicated entries.
+\begin{verbatim}
+grep robots.txt omegahat.log* | cut -f1 -d' ' | sort | uniq > RobotIP
+\end{verbatim}
+It is a good idea to look through this file, or at least compute the number of
+lines within it to verify it is what you expect:
+\begin{verbatim}
+wc -l RobotIP 
+     422 RobotIP
+\end{verbatim}
+So it has a reasonable number of lines, but we can look at the contents
+using \executable{head} or \executable{more}.
+The first $3$ lines look like:
+\begin{verbatim}
+omegahat.log.1:12.175.0.44
+omegahat.log.1:139.18.2.68
+omegahat.log.1:194.150.123.1
+\end{verbatim}
+The omegahat.log.1 is the name of the file in which the match occurred.
+We don't want this as we want just the IP addresses.
+We can get what we want in at least two different ways.
+The first way might be to take this file and use
+\executable{cut} to get the second field where the delimiter or separator
+is the : character.
+\begin{verbatim}
+ cut -f2 -d: RobotIP  
+\end{verbatim}
+We can do this as the last element of the pipe in the original command before redirecting
+to RobotIP,  or after we have created RobotIP. If we operate on RobotIP as above, 
+we cannot immediately redirect to RobotIP.
+In other words,
+\begin{verbatim}
+ cut -f2 -d: RobotIP  > RobotIP
+\end{verbatim}
+will not  work.   Think about why? When does the file into which the output is redirected
+get created?
+
+The other and simpler approach to eradicating the names of the log file identifying the matches
+is to avoid them in the first place.
+They arise because we gave \executable{grep} a list of files  to work on.
+If we just gave it a stream of lines to process, then it would not know the name
+of the files and wouldn't  attempt to distinguish them. 
+So rather than listing the file names in the \executable{grep} command, we can
+\executable{cat} the contents of the files to 
+\begin{verbatim}
+cat omegahat.log* | grep robots.txt | cut -f1 -d' ' | 
+       sort | uniq > RobotIP
+\end{verbatim}
+This now gives us the file in the form we want.
+
+
+Now, we want to ask \executable{grep} to find all the records that match these
+IP addresses.
+Fortunately, \executable{grep} can read the patterns to match 
+from a file rather than the command line and it can be used
+for just the circumstances we have.
+We specify the file containing the patterns we want to match
+via the \textbf{-f} argument.
+\begin{verbatim}
+grep -f RobotIP omegahat.log*
+\end{verbatim}
+If we hadn't checked the contents of the RobotIP file and found the file prefix on each line (i.e.
+the \texttt{omegahat.log.1:}), we would end up with no matches at all. And this would have prompted
+us to find out what \executable{grep} was looking for as we know we should have at least matched all
+the same lines as the original search for \textsl{robots.txt}.
+
+We can now find out how many requests were made by robots in addition
+to 
+or different from the
+ones for \textsl{robots.txt}.
+\begin{verbatim}
+grep -f RobotIP omegahat.log* | grep -v 'robots.txt'
+\end{verbatim}
+Running this through \executable{wc -l} indicates that there are $34,210$
+records that match.
+Is that all the robot requests?
+
+We can also look at the IP addresses of the robots and look for
+related IP addresses.  Specifically, we could look for machines on the
+same domain. The domain is identified by the the first 3 components of
+the IP address.  For example, for the IP address 66.194.55.242, the
+domain is 66.194.55. The machine identifier within this is 242.  And
+robots often work as a team and make requests from the same domain.
+So one, e.g. 66.194.55.242, might ask for the robots.txt and another
+related machine, e.g. 66.194.55.12, might ask for some other file as
+part of the crawling.  So, we can filter on just the domain part of
+the IP addresses.  To do this, we find the IP addresses of the
+``known'' robots.  Then, we strip off the last component, e.g. the
+.242 and then pass these patterns to \executable{grep}.  We can work
+from the RobotIP file and just remove the machine name.
+\begin{verbatim}
+sed -e 's/\(.*\)\..*/\1/g' RobotIP  > RobotDomains
+\end{verbatim}
+Then we can use grep to filter these records.
+\begin{verbatim}
+cat omegahat.log* | grep -f RobotDomains 
+\end{verbatim}
+This might be too aggressive and find non-robots 
+on the same domain.
+
+We can do even more. We can look at all of these records and build up a collection of user-agent
+identifiers.  And we can combine them with the ones we already know such as Googlebot, msnbot, Yahoo
+Slurp, etc.  So we use the initial filtering to identify robots and then use the User Agent fields
+from these to find more.
+We get the user-agent from fields 12 and beyond (via \verb+-f 12-+).
+\begin{verbatim}
+cat omegahat.log* | grep -f RobotDomains  
+     | cut -d ' ' -f 12- | sort | uniq | tr -d '"'  > RobotAgents
+\end{verbatim}
+Now we could add these to the filtering for non-robots:
+\begin{verbatim}
+cat omegahat.log* | grep  -v -f RobotDomains | 
+   grep -v -f RobotAgents
+\end{verbatim}
+or alternatively, we can concatenate the two files
+RobotDomains and RobotAgents into a single larger file
+and pass that to grep.
+And we can also check whether \executable{grep}
+accepts multiple -f arguments.
+Unfortunately, when we do any of these, we end up with no
+non-robot records. So we have to figure out why.
+We used the domains to search  for the user agent fields.
+And this ended up including regular browsers such as  Mozilla, Sherlock (on the Mac), 
+and so on. So it may be more sensible to go back to using the 
+full IP address of the machines, or
+taking only the user agents that we know to be robots, or excluding
+the ones in our robot filter  that we know to be non-robots.
+In fact, it is most likely that we have to be more intelligent
+about how we use the user agent field and we have to
+examine entries such as 
+\begin{verbatim}
+Mozilla/5.0 (compatible; Yahoo! Slurp; 
+    http://help.yahoo.com/help/us/ysearch/slurp)
+\end{verbatim}
+to identify the compatible and Yahoo ! Slurp.
+Using the list of robot names 
+whose URI  was posted on the 
+newsgroup is a good idea, and can be done
+using \verb+grep -f+
+
+
+
+
+Ideally, we would want to do the second, third, etc. searches only on the subset 
+that didn't match earlier searches. We have done this above
+via sequential filtering:
+\begin{verbatim}
+cat omegahat.log* | grep -v -f RobotDomains | 
+   grep -v -f RobotAgents
+\end{verbatim}
+and then we can look at the results to count the number of requests from each category of robots.
+In R, we can work with the indices of the matching records, compute the sets of
+unique indices, their lengths, their unions and intersections, etc.  And importantly, we can also
+find the times of these requests and look at requests in short intervals around these, look for
+requests from machines on the same sub-network within a fixed period of the initial request from the
+robot (e.g. the robots.txt request).
+
+
+\item %4
+We can compute the list of all the unique IP addresses that accessed the site
+by filtering out the first field in all the files via \executable{cut}.
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' '
+\end{verbatim}
+This gives the entire list, including
+duplicates, etc.
+So we need to simplify this to the unique set of IP addresses.
+We can use the \verb+sort | uniq+ idiom in the shell to 
+first arrange the lines and then compute the unique set.
+(Note that if we don't use \executable{sort} first, we get the wrong
+answer as \executable{uniq} works on adjacent lines and does not sort
+over them first.)
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq 
+\end{verbatim}
+This gives us the list of unique IP addresses.
+We can run this through \executable{wc} to get a count
+of the total number of IP addresses.
+And the result is $9,426$.
+
+The next part of the question asks about the most active IP addresses.
+For this, we need to get counts of the number of requests for each IP address.
+So this is count-within-IP  address, and not the overall count.
+Fortunately,  we can use \executable{uniq} to do this directly
+as the \textbf{-c} flag will give us not only the 
+unique lines of input, but also the count of how often each occurred.
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c
+\end{verbatim}
+
+This command produces output organized by the order in which 
+\executable{uniq} sees the different IP addresses.
+So there is no particular structure to it for our purposes.
+Instead, we need to arrange it by the number of requests
+and then extract the top 5.
+To do this, we have to sort the counts in the first field of the output.
+We have to do this respecting the fact that they are numbers and not simple
+strings.
+\executable{sort} has a command line flag for this which is -g.
+We also
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c | 
+   sort -g | tail -n 5
+\end{verbatim}
+The results are
+\begin{verbatim}
+3002 66.194.55.242
+3277 66.151.181.4
+3827 207.46.98.33
+4626 63.238.163.75
+4790 207.46.98.32
+\end{verbatim}
+
+What happens if you reverse the sort so that the biggest are first and
+then use \executable{head} to pull out the top 5? Can you explain this?
+
+\subsubsection{for and while loops.}
+To get the names of machines for the different IP addresses, we might
+try to find a program that takes a collection of IP addresses
+and looks each one up and returns the name for each one in turn.
+The program \executable{host} unfortunately works on only
+one IP per call. To use it, we have to loop over the top 5 IP addresses.
+We can do this using a for loop :
+\begin{verbatim}
+for i in 66.194.55.242    66.51.181.4  ; do
+  echo $i `host $i`
+done
+\end{verbatim}
+But of course, we don't type the IP addresses directly.
+Instead, we have to calculate them.
+Suppose we saved the output of the original command above
+to compute the frequency table to a file, say TopIPs:
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c 
+       | sort -g | tail -n 5  > TopIPs
+\end{verbatim}
+Then, we could get a list of the IP addresses using
+the \executable{cut} command and put this as the list
+of ``words'' to iterate over in the for-loop.
+\begin{verbatim}
+for i in `cut -f2 -d' ' TopIPs` ; do
+  echo `host $i`
+done
+\end{verbatim}
+
+How can we get rid of the extraneous output from \executable{host}.
+The output from a call to host is
+\begin{verbatim}
+% host 66.194.55.242
+242.55.194.66.in-addr.arpa domain name pointer 
+  66-194-55-242.gen.twtelecom.net.
+\end{verbatim}
+The first bit tells us about our query.
+The bit after the string ``pointer''  gives us our answer.
+So we can strip away the first bit.
+We could do this with cut and access the 5th field using space
+delimiters.
+Alternatively, we can just discard any characters to the end of 
+the string ``pointer '' (including the trailing space).
+We can do this with \executable{sed}
+and a simple regular expression:
+\begin{verbatim}
+host 66.194.55.242 | sed -e 's/.*pointer //'
+\end{verbatim}
+
+
+We can do this filtering within each iteration of the
+loop or in one step at the end.
+\begin{verbatim}
+for i in `cut -f2 -d' ' TopIPs` ; do
+  echo `host $i`
+done      | sed -e 's/.*pointer //' 
+\end{verbatim}
+
+We can then paste the result with the columns in
+TopIPs giving a frequency table with IP addresses
+and resolved names.
+\begin{verbatim}
+for i in `cut -f2 -d' ' TopIPs` ; do
+  echo `host $i`
+done      | sed -e 's/.*pointer //'  > Resolved
+
+paste TopIPs Resolved
+\end{verbatim}
+
+
+\item  % 5 Popular pages.
+To find the most popular pages, we can use the same technique as in
+the previous question for ranking IP addresses.
+We extract the requested document field (number 7)
+and then sort and count them.
+\begin{verbatim}
+cat omegahat.log* | cut -f7 -d' ' | sort | uniq -c | 
+    sort -gr | head -n 10
+\end{verbatim}
+
+Note that it might be more instructive to do this for 
+the robots and the non-robots separately.
+To do this, we can use our robot filter from question 3.
+
+To find the pages selected by robots, we use the following command.
+\begin{verbatim}
+cat omegahat.log* | grep  -f RobotDomains | grep -f RobotAgents |  
+       cut -f7 -d' ' | sort | uniq -c | sort -gr | head -n 10
+\end{verbatim}
+And we get the following output 
+\begin{verbatim}
+2571 /robots.txt
+ 268 /
+ 259 /omegahat-bugs
+ 257 /bugs
+ 245 /philosophy.html
+ 245 /SASXML
+ 237 /SJava
+ 222 /cvsweb
+ 213 /Java
+ 200 /bugs.html
+\end{verbatim}
+
+For non-robots, we use 
+\begin{verbatim}
+cat omegahat.log* | grep -v -f RobotDomains | 
+       grep -v -f RobotAgents | cut -f7 -d' ' | sort | 
+       uniq -c | sort -gr | head -n 10
+\end{verbatim}
+Note the -v flags to negate or reverse the filtering.
+XXX
+
+
+\subsubsection{Shell Scripts}
+
+
+\subsubsection{Debugging Shell Scripts}
+
+\subsubsection{Error Handling in Shell Scripts}
+
+\item
+Here we need to use a loop.
+We can find the most active $n$ IP addresses in the logs using
+the code in question 4.
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c | sort -rg | 
+         head -n 5 | cut -f2 -d' '
+\end{verbatim}
+We need to be able to allow the user to easily specify the value for
+$n$
+in this command, i.e. where we have 5. So we put this in a script
+by creating a new file, say getTopIPRequests.
+The first line of the file must be
+\begin{verbatim}
+#!/bin/sh
+\end{verbatim}
+so that the operating system knows to pass the contents of the file
+to the shell interpreter to execute the code within the file.
+
+The main command so far in the script is
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c | sort -rg |
+           head -n $n | cut -f2 -d' '
+\end{verbatim}
+where we have replaced 5 with the value of the variable $n$,
+i.e. \verb+$n+.
+For this to be of any use, we must define $n$ earlier in the script.
+We can do this by giving it a default value, say 5.
+\begin{verbatim}
+#!/bin/sh
+
+n=5
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c | sort -rg | 
+        head -n $n | cut -f2 -d' '
+\end{verbatim}
+
+We make the script executable or callable to tell the operating system
+that it is a regular command that we can invoke in the shell.
+We use 
+\begin{verbatim}
+ chmod +x getTopIPRequests
+\end{verbatim}
+
+Now, we can go ahead and call this command from the shell prompt:
+\begin{verbatim}
+./getTopIPRequests
+\end{verbatim}
+(Note that we explicitly specify the script file and don't let the
+shell find it by searching the path. If . - the current working
+directory - is in your path, then getTopIPRequests will work also.)
+
+Of course, the value of 5 for $n$ is fixed in the script.
+We want to allow the caller to specify it as the single argument
+to this script, e.g.
+\begin{verbatim}
+getTOPIPRequests 20
+\end{verbatim}
+The first argument to a script is in \verb+$1+x,
+so we can use the command
+\begin{verbatim}
+n=$1
+\end{verbatim}
+But we need to do this only when the user has specified an actual
+value.
+Otherwise, we want to stick with our default of 5.
+We can check whether the value in the argument is 
+non-empty using
+\begin{verbatim}
+test -n "$1"
+\end{verbatim}
+since the -n flag for test means non-zero or non-empty.
+We can then use an if statement to conditionally assign
+the value to $n$. So our updated script looks like
+\begin{verbatim}
+#!/bin/sh
+
+n=5
+
+if test -n "$1" ; then
+ n=$1
+fi
+
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c | sort -rg | 
+       head -n $n | cut -f2 -d' '
+\end{verbatim}
+
+Go ahead and invoke this with different values for $n$ and with no
+argument at all to verify it works.
+Do we get $n$  lines back.
+
+Before we leave this topic, we should note that we can use a
+convenient shortcut to assign a default value to a variable.
+Instead of assigning a value and then testing for an argument,
+we can use the simpler, single command
+\begin{verbatim}
+n=${varName-default}
+\end{verbatim}
+In other words, we say assign to a variable $n$ the current value
+in varName or, if that is not defined, the value default.
+So we can simplify our script to 
+\begin{verbatim}
+#!/bin/sh
+
+n=${1-5}
+
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c | sort -rg | 
+         head -n $n | cut -f2 -d' '
+\end{verbatim}
+
+We should also note that we get ``weird'' results back for $n > 7$.
+\begin{verbatim}
+./getTopIPRequests 10
+207.46.98.32
+63.238.163.75
+207.46.98.33
+66.151.181.4
+66.194.55.242
+207.46.98.30
+65.54.188.109
+896
+820
+654
+\end{verbatim}
+What are the last 3 lines about?
+The answer is that the table produced by the
+\begin{verbatim}
+sort | uniq -c | sort -rg
+\end{verbatim}
+sequence is formatted to align the counts in the first column.
+Since these values have a different number of digits,
+the smaller numbers are padded with spaces.
+But of course, we are using spaces as the delimiter
+to pull out the second field which we expect to be
+the IP address.
+So we need to be more intelligent about this to handle
+cases where the counts have a different number of digits!
+The simplest thing to do is to strip all the characters
+away until the last space on each line, and this leaves just the 
+IP address.
+Our useful tool \executable{sed} can do this.
+\begin{verbatim}
+sed -e 's/.* //'
+\end{verbatim}
+The pattern means any character any number of times (\verb+.*+)
+followed by a space. And the replacement is the empty string
+(\verb+//+) and so we get what we want.
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' |
+         sort | uniq -c | sort -rg |head -n $n | sed -e 's/.* //'
+\end{verbatim}
+
+Now, we have to loop over the the resulting IP addresses and
+get all the documents each requested.
+To do this, we can store the output from the command to get IP
+addresses either in a file or in a variable.
+We'll do the latter so we don't have to clean up after them.
+\begin{verbatim}
+IP=`cat omegahat.log* | cut -f 1 -d ' ' 
+      | sort | uniq -c | sort -rg |  head -n $n | sed -e 's/.* //'`
+\end{verbatim}
+Here we just execute the command and replace it with its output via
+the and assign this to the variable named $IP$.
+
+Next, we can use the separate words (IP addresses) in our loop.
+\begin{verbatim}
+for ip in $IP ; do 
+
+done
+\end{verbatim}
+And all we have to do is figure out what to do in the loop.
+We want to use \executable{grep}  to find all
+requests for that IP address in \verb+$ip+ and store
+the 7th field in the file named \verb+$ip+.
+\begin{verbatim}
+for ip in $IP ; do 
+  grep $ip | cut -f7 -d' ' > $ip
+done
+\end{verbatim}
+\end{enumerate}
+
+
+\section{Example: Spam}
+In the spam data \cite{lingspam} from Chapter~\ref{chap:spam}, the
+messages are divided (arbitrarily) into $10$ directories named
+\dir{part1}, \dir{part2}, $\ldots$, \dir{part10}.
+In each directory, there are numerous messages divided into two
+categories - ham and spam.  Each message is in its own file and the
+names of the spam messages all start with 'spmsga'.  The regular or
+ham messages all end with msg\textit{digits}.txt where digits is a set
+of literal digits, i.e. 1, 2, $\ldots$, 9.
+The contents of each file is just the message (having been
+stemmed\footnote{Stemming involves mapping words with the same basic
+  root the same, e.g. stop, stopped and stopping map to stop.}
+
+As in Example~\ref{sec:exNASA}, we begin with the questions: how many
+messages are there altogether?  how many are spam? and how many are ham?
+Let's think about how to do this using the shell.
+That is, we want to find all \textit{files}, not directories, with
+names that do and do not start with "spmsg".  As before, the
+\exec{find} command is useful here.  It can tell the difference between various types of files, e.g.
+directories, symbolic links, empty files, and so on.  It can also
+match patterns in names.
+Since we know that all regular files are messages, we could use
+\begin{verbatim}
+find . -type f | wc -l
+\end{verbatim}
+to get $2893$, the total number of messages.  
+\begin{verbatim}
+find  . -type f -name 'spmsg*' | wc -l
+find  . -type f -not -name 'spmsg*' | wc -l
+\end{verbatim}
+These commands return $481$ and $2412$, respectively.
+
+\begin{comment}
+To compute the number of SPAM messages, we can subtract these two
+numbers in our head, or pull up a calculator on our computer to do it.
+But what if we wanted to do it programmatically - can we use the
+shell?  It turns out that it is
+quite awkward. The basic shell has no concept of numbers.  It looks
+like a programming language, but it really only deals with text and
+words.  Again, we would have to delegate the subtraction to a command
+or tool called by the shell.  The program \exec{bc} is calculator.
+You can use it interactively, e.g.
+\begin{verbatim}
+% bc
+1+2
+3
+\end{verbatim}
+And we can set up a call to \exec{bc} with the values
+computed from other commands.
+\begin{verbatim}
+echo "`find . -type f | wc -l` - `find . -type f -name 'spmsg*' | 
+   wc -l`" | bc
+\end{verbatim}
+Running this, we get 2412!  But it is unsightly.
+And we cannot easily use it to loop from 1 to 2412 as the
+shell provides looping over words, not numbers.
+
+Bash and some other shells do provide some basic arithmetic.
+To add 1 and 2, we can use the command
+\begin{verbatim}
+ $((1 + 2))
+\end{verbatim}
+(You can use \exec{echo} to print the result.)
+So the syntax is
+math command inside two sets of parentheses
+and a dollar sign to dereference the value in the result.
+But note that this arithmetic is highly focused on integers
+and not real numbers!
+
+Our example above can be written  as
+\begin{verbatim}
+echo $((`find . -type f | wc -l` 
+   - `find . -type f -name 'spmsg*' | wc -l`))
+\end{verbatim}
+but this is only marginally better, if at all.
+
+
+A reasonable strategy to use is that if you are doing
+more than the most elementary amount of arithmetic
+in the shell for processing data, 
+use R or some other language instead and call the shell
+from these systems. 
+
+
+By the way, we can also do basic counting loops using \shellKey{while} and 
+\shellKey{until} and the \exec{test} operator to
+evaluate the condition of interest.
+\end{comment}
+
+\subsection{Cross-validation sample sizes}
+The lingspam data is organized into 10 parts for the purpose of
+cross-validation.  A question we might ask is whether there is an
+equal number of messages in each part. So we would like a count of the
+number of messages in each of the \dir{part} directories,
+and then we might like to look at the two-way table of
+SPAM and HAM messages by sub-directory.
+
+\begin{comment}
+\begin{verbatim}
+for i in part* ; do cd $i; echo "$i `ls -1 spmsg* | wc -l`  `find . -not -name 'spmsg*' | wc -l`" ; cd .. ; done
+\end{verbatim}
+\end{comment}
+
+To do this, we can use the following sequence of 3 commands
+to create the table.
+These are run from the top-level directory containing the
+different \dir{part} sub-directories.
+\begin{verbatim}
+find . -type f -name 'spmsg*' -printf "%h\n" | sort | uniq -c > spam
+find . -type f -not -name 'spmsg*' -printf "%h\n" | sort | uniq -c > ham
+join -1 2 -2 2 spam ham
+\end{verbatim}
+The idea is quite simple. We want to get a list of
+all the SPAM messages in each sub-directory
+and get the count.
+Similarly, we want to get a count for each of the HAM
+messages in those same sub-directories and then
+combine these two columns of numbers.
+
+The first two lines are quite similar in spirit.
+The first line searches for all the files with  spmsg
+as a prefix.  For each matching file, it prints only the directory name
+of each of those files. (See the man page for \exec{find} and its
+printf argument.)
+We only need the directory name, and not the file name,
+because we are not interested in the individual
+messages, but merely a count of the SPAM files in the different
+sub-directories. So we end up with a line for each SPAM message in
+each of the sub-directories and each line is merely the name of the
+directory. So we can now use \exec{sort} and \exec{uniq -c}
+to get a frequency table.
+This does the SPAM. To identify the HAM messages, we merely negate the
+criterion for the \exec{find} command, i.e. \verb+-not -name 'spmsg*'+.
+Again, we count the number in each sub-directory.
+
+The hard part comes in merging these two outputs together into
+the format we want.  We have put the results into temporary
+files (spam and ham) via the $\>$ operator.
+Each of these looks something like
+\begin{verbatim}
+     48 ./part1
+     49 ./part10
+     48 ./part2
+     48 ./part3
+     48 ./part4
+     48 ./part5
+     48 ./part6
+     48 ./part7
+     48 ./part8
+     48 ./part9
+\end{verbatim}
+But, we want to end up with something like
+\begin{verbatim}
+./part1 48 241
+./part10 49 242
+./part2 48 241
+./part3 48 241
+./part4 48 241
+./part5 48 242
+./part6 48 241
+./part7 48 241
+./part8 48 241
+./part9 48 241
+\end{verbatim}
+which combines each line in spam with the corresponding line in ham
+based on the directory name. 
+The \exec{join} command does precisely this 
+and we tell it to use the second field in each file
+as the column to use for matching lines. This is the
+directory name.  And the result is exactly as above.
+
+
+
+
+
+A different approach to doing this is to use 
+a shell loop to iterate over the different directories
+and create each line of ``directory spam ham count''.
+We can do this as 
+\begin{verbatim}
+for d `find . -name 'part*' -type d` ; do
+ echo "$d `find $d -name 'spmsg*' | wc -l` 
+          `find $d -not -name 'spmsg*' | wc -l`"
+done
+\end{verbatim}
+
+This is a lot to type. We can make this into a script
+that can be called using a simple name, e.g. \exec{messageTable}.
+We do this by putting the code into the file, e.g. messageTable.
+\begin{verbatim}
+#!/bin/sh
+
+for d in part* ; do 
+ echo "$d       `find $d -name 'spmsg*' | wc -l` \
+       `find $d -not -name 'spmsg*' | wc -l`"
+done
+\end{verbatim}
+The first line tells the operating system to use 
+the interpreter
+\exec{/bin/sh} to evaluate the code in the file.
+The remaining lines are exactly as we might use them
+interactively on the command line.
+Note that we have used tabs between the fields
+in the \exec{echo} command to help align the numbers in
+the column.
+
+The simplest way to use this is
+to treat it as a regular command that
+the shell will invoke, i.e.
+\begin{comment}
+  messageTable
+\end{comment}
+as a command to the shell.
+To do this, we need to tell the shell that it is 
+an executable command rather than a regular file.
+We do this by changing its \textit{permissions}.
+A file has 3 sets of 3 permission settings.
+The 3 groups are for the user, the group and
+everyone else (other).
+A file is created and owned at any moment in time
+by a user logged into the system. 
+That user may want to specify that the file is
+readable, writable or both and that it is executable,
+i.e. can be treated as a regular command by the shell.
+These are three permission settings within each category
+of permissions.
+We can control the settings using the command
+\exec{chmod}.
+To make a file executable for the user, we give the command
+\begin{comment}
+  chmod +x messageTable
+\end{comment}
+The \verb|+x| indicates that we want to add the executable
+permission. 
+We could remove it using \verb|-x|.
+Similarly, we can make the file non-writeable to ensure
+that we don't unintentionally modify its contents
+via
+\begin{comment}
+  chmod -w messageTable.
+\end{comment}
+
+We might also have confidential information
+in a file that we don't want others to read.
+We can make the file accessible to ourself
+(i.e. the author) but prohibit others on
+the system from reading it by changing the permissions
+for the ``other'' category.
+To do this, we would use a command such
+\begin{verbatim}
+ chmod o-rw privateFile
+\end{verbatim}
+This makes it neither readable or writable by others.
+
+There are occasions where we want a file to be
+accessible to a few people, but not everyone else on the system.
+In other words, we want to set permissions for a select
+\textit{group}.
+UNIX allows for collections of users to be described by a
+group.  You can see what groups you are in using
+the \exec{groups} command.   Suppose, for 
+example, there was a group named 
+\textbf{stat141} and I wanted only the students in
+that group to be able to access the OmegahatWebLogs.tar.gz
+file in my account. Then, I could specify this as
+\begin{verbatim}
+ chgrp stat141 OmegahatWebLogs.tar.gz
+ chmod g+r OmegahatWebLogs.tar.gz
+\end{verbatim}
+This says that the file is now owned by the group stat141
+and that is readable by that group.
+
+For what we want, we need only set the executable permission
+for ourselves on messageTable:
+\begin{verbatim}
+ chmod +x messageTable
+\end{verbatim}
+but  it is useful to be able to understand and use groups
+effectively. It tends to make somethings easier
+to understand and fix, and groups and permissions can be used
+to increase security appropriately.
+
+
+
+Of course, this script is very specialized.
+It makes specific assumptions about the name of the directories,
+that we want to process all of them,  
+and the names of the HAM and SPAM files.
+Suppose we want the caller to be able to specify
+the directories of interest.
+We can do this using a while loop over the number of
+arguments.
+Alternatively,  in Bash, we can use
+the variable \verb+$@+ which gives us
+all the command line arguments as separate words
+in a single string.
+So, changing our script
+\begin{verbatim}
+#!/bin/bash
+
+for d in $@ ; do 
+ echo "$d       `find $d -name 'spmsg*' | wc -l` \
+         `find $d -not -name 'spmsg*' | wc -l`"
+done
+\end{verbatim}
+now allows one to call it as
+\begin{verbatim}
+count part*
+\end{verbatim}
+
+Notice that we also don't use knowledge of the working directory
+to change between the different sub-directories of interest.
+We could have written the code as
+\begin{verbatim}
+for d in $@ ; do
+  cd $d
+  echo "$d       `find . -name 'spmsg*' | wc -l` \
+       `find . -not -name 'spmsg*' | wc -l`"
+  cd ..
+done
+\end{verbatim}
+We would therefore be assuming that the original directory is
+the one just above  the sub-directories.
+But if we wanted to call this from within another directory,
+then we would be in trouble.
+Rather than using \dir{..}, we could also compute the current
+working directory and change back to it at the very end.
+It is not a big deal but we should think about these
+things when writing scripts.
+
+
+If we want to make our lives easier,
+we can use shell-specific constructs
+like the ``\$@'' in Bash.
+This makes the code less portable to other systems.
+Generally, there are ways to avoid shell-specific
+features, but they require more verbose code.
+The decision to use a general approach or a less-portable
+one depends on the expected use of the script.
+But beware, software often lives on much longer than
+we think and our environment changes.
+
+To work portably, we could write this loop as
+\begin{verbatim}
+while test -n "$1" ; do
+  echo "$1       `find $1 -name 'spmsg*' | wc -l` \
+       `find $1 -not -name 'spmsg*' | wc -l`" 
+  shift
+done
+\end{verbatim}
+Here we just keep removing elements from the array of command line
+arguments and eventually we will consume them all
+and \verb+$1+ will become the empty string.
+\shellKey{shift} is the thing operation that pops the current
+argument from the top of the array of arguments.
+
+Also note the use of \shellKey{test} in the condition.
+Read the man page for \shellKey{test} and the documentation
+for it in the shell.
+
+
+\subsection{Word frequency tables.}
+Break a file into list of words,
+then sort and then  uniq -c
+First part is the only part that is in any way hard.
+
+\begin{verbatim}
+cat spmsg*.txt | tr -s ' ' '\n' | sort | uniq -c | 
+    sort -dr | tail -n 10
+\end{verbatim}
+
+What if we use head so we get the first 10 lines of the output?  Does
+this save us time since we terminate the command before it is all
+complete.  Actually, I get a write error: Broken pipe message.  But
+the use of tail avoids this as the sort completes!  Explain.
+
+\subsection{Distribution of the number of words in each Subject line}
+Let's try to compute the number of words in each subject line (which
+is the first line of each message file) and look at the distribution
+for SPAM and HAM messages.
+We'll do this in 
+
+%%% wc -w spmsga1*.txt  | sed -e 's/[0-9]+/XX/'
+
+
+There are various ways to think about this.
+\begin{verbatim}
+for i in `ls *.txt` ; do  \
+ grep 'Subject:' $i | wc -w | grep -v total \
+        | sed -re 's/^ +([0-9]+).*$/\1/g' ;\
+done \
+  | sort | uniq -c
+\end{verbatim}
+(All this can be put on one line or separated onto multiple lines via
+the
+\\ at the end).
+The output is
+\begin{verbatim}
+      8 1
+      7 10
+     13 11
+      5 12
+      8 13
+      7 14
+      5 15
+      2 17
+     14 2
+      1 20
+     35 3
+      1 31
+     28 4
+     29 5
+     35 6
+     41 7
+     33 8
+     17 9
+\end{verbatim}
+which gives us the counts (first column) of the different values
+of number of words in the Subject line (second column).
+
+This gives us what we want, but it would be nicer
+to sort this by the second field as these are the number
+of words.
+Suppose we had the two columns above in the file
+named \texttt{cc}.
+Then we could sort by the second column
+using the command
+\begin{verbatim}
+sort -bg --key=2 cc
+\end{verbatim}
+The b flag means to ignore blank spaces before
+columns.  The g flag means to treat the contents of the column
+on which we are sorting as numbers rather than simple strings.
+This means we get the correct sorting for our purposes.
+And finally, the key argument specifies the column by which
+we want to sort the lines.
+This sorts from smallest to largest.
+We could use the r flag to reverse this.
+
+
+
+Note also that on Mac OS X,  the version of \exec{sed} does not 
+support the -r argument and has a slightly different version of
+regular expressions.  This is an example of non-portability.
+
+There are 8 messages that have only one word. Since we
+are looking for lines with Subject:, that means they have
+no other words and so have an empty subject.
+Which files are they?  Are the more likely to be SPAM than HAM or
+vice versa?
+We can identify the names of these messages using
+\begin{verbatim}
+grep -n 'Subject: $' *.txt
+\end{verbatim}
+The -n argument says to print the name of the file in which a line is
+matched.
+The pattern we are looking for is the literal string ``Subject:''
+followed by a space and then the end of the line.
+This amounts to no additional words on the line other than ``Subject:''.
+We may want to look for an arbitrary number of spaces before the end
+of the line, but this works in our case, given the structure of the messages.
+The result in the \dir{part1} sub-directory is
+\begin{verbatim}
+3-380msg2.txt:1:Subject: 
+5-1263msg1.txt:1:Subject: 
+5-1274msg1.txt:1:Subject: 
+5-1275msg1.txt:1:Subject: 
+spmsga107.txt:1:Subject: 
+spmsga118.txt:1:Subject: 
+spmsga125.txt:1:Subject: 
+spmsga132.txt:1:Subject: 
+\end{verbatim}
+and this shows as many SPAM messages as HAM. So it doesn't seem to be
+a good predictor.
+
+
+
+
+\begin{comment}
+Another approach to the whole problem is to iterate over all the
+messages
+and append the name of the message file to a ``list'' containing other
+messages with that number of words in the subject line.
+\begin{verbatim}
+for i in `ls *.txt` ; do 
+  grep 'Subject:' $i | wc -w | grep -v total | sed -re 's/^ +([0-9]+).*$/\1/g' ; done | sort | uniq -c
+\end{verbatim}
+\end{comment}
+
+
+How would we find the messages which had 2 additional words?
+This is a subsetting problem and is not necessarily done easily or
+well in the shell. 
+To do this, we would need a richer pattern to match.
+We will cover this when discussing the regular expression
+language.
+For the moment, we will just explain how to do it, 
+and not worry about why or how to think about this.
+The following works:
+\begin{verbatim}
+grep  -E 'Subject:\W+\w+[ \t]+\w+$'  *.txt 
+\end{verbatim}
+
+
+\section{Environment Variables}
+Environment variables provide a way of passing information from the
+shell to programs when you run them. Programs look in the environment
+for particular variables, and if they are found the program will use
+the values of these variables. Some are set by the system, the user,
+the shell, or any program that loads another program.
+
+Standard UNIX variables are split into two categories, environment
+variables and shell variables. In broad terms, shell variables apply
+only to the current instance of the shell and are used to set
+short-term working conditions.  Whereas environment variables have are
+set at login and are valid for the duration of the session. By
+convention, environment variables have UPPER CASE and shell variables
+have lower case names.
+
+One example of an environment variable is \envVar{PATH}, which specifies the
+directories the shell should search to find a command. The
+\shellCmd{echo} command displays the value of an environment
+variable. For example, the query
+\begin{verbatim}
+% echo $HOME
+/Users/deborahnolan
+\end{verbatim}
+tells gives the path name for my home directory.
+The \shellCmd{printenv} and \shellCmd{env} commands display the values of
+all the variables, and \shellCmd{setenv} and \shellCmd{unsetenv} set
+and unset, respectively, the value of an environment variable.  
+
+An example of a shell variable is the \shellVar{prompt} variable which specifies
+the text string to display at the command line.  These variables can
+be set and unset by using the \shellCmd{set} and \shellCmd{unset}
+commands. The \shellCmd{set} command also displays the values of the
+shell variables.  Note that when the shell variables \shellVar{path},
+\shellVar{home}, and \shellVar{user} are changed then the
+corresponding environment variables are also changed.  However, the
+reverse is not the case.  That is, when the environment variables
+\envVar{HOME} and \envVar{USER} are changed they do not effect the
+shell variables.  The exception is with \envVar{PATH}, both
+\envVar{PATH} and \shellVar{path} always represent the same path and
+any change to one variable is automatically reflected in the other.
+
+\begin{table}
+\begin{tabular}{ll}
+\hline
+Environment Variables & \\
+USER & user's login name\\
+HOME & path name of user's home directory\\
+HOST & name of computer being used \\
+PATH & the directories the shell searches in for commands\\
+\hline
+Shell Variables & \\
+cwd & user's current working directory\\
+home & path name of user's home directory \\
+prompt & text string to display at the prompt in the shell\\
+\end{tabular}
+\end{table}
+
+Other environment variables may be defined by particular programs, and
+these programs will check their value to find out where to look for
+files. For example, if the \envVar{R$\_$LIBS} variable is set to a
+particular path then R will search for packages in this path before
+looking in the default path.  These and other variables are typically
+set via initialization files so that when the user logs in to the
+system, these variables are set up in the users working
+environment. Different shells look for these initializations in different
+files. The TC shell (tcsh) uses the .cshrc file, whereas the
+Bourne-Again Shell (bash) picks up the environment variables from
+\shellVar{.bash$\_$profile} and \shellVar{.bashrc}.  
+
+\section{The executable Path}
+  
+
+\section{Processes}
+hierarchies
+top, ps, kill
+
+\subsection{Long-Running Jobs}
+nice, nohup, \&, redirection.
+
+
+
+\section{Exercises}
+\begin{enumerate}
+\item Return to the NASA example and use shell commands to determine
+  the unique names for the files in the Files subdirectory and the
+  counts of how many files there are of each type.  That is, your
+  output should be 72 cloudhigh, cloudmid, .. and one each of
+  intlvtn.data and elevation.dat  Hint use sort and pay attention to
+  the options....  \shellCmd{sort} -- sort lines of text files
+ \shellCmd{uniq} -- remove duplicate lines from a sorted file
+ \shellCmd{cat} -- concatenate files and print on the standard output
+
+\item Organize your assignments for the course, music into libraries.
+
+\item Determine the tree of directories and files for a particular set
+  of data.
+
+\item Ask duncan about his old photo problem.
+
+\item Use shell to do some minimal data analysis. Possible pull out
+  some from the weblog and put into the hw.
+
+\item Investigate how to unwrap the rar file
+
+\item Create a file and directory structure in the top-level
+directory of your SCF account that matches the diagram shown here,
+where the squares represent directories and the circles files.
+For the file marked ? you are to find and copy a specific file
+in the \Dir{s133/data/} area. Use two different approaches to
+find your personal file:
+\begin{itemize}
+\item Look for a file name that contains your SCF login, e.g. s133aw.
+\item Look for a file whose contents contain your actual name,
+e.g. Deborah Nolan. This would be the name that you typed in
+when you signed up for your SCF account.
+\end{itemize}
+
+%\begin{figure}
+%\epsfig{figure=dia3.png,width=5in}
+%\end{figure}
+
+\item It's often a  good idea to make back ups of your data,
+and sometimes it is necessary for these copies to preserve symbolic
+links,  devices, attributes, permissions, ownerships etc.
+For example, if you have a big project that you want to be able to work on
+on your laptop and on the computer in your office, then it would
+be important to synchronize these files and directories on a
+regular basis in order to keep your two work environments identical.
+
+Search the web using Google (\texttt{www.google.com}) to find
+how to use a synchronization program called rsync.
+Read their examples, and then recursively transfer
+all the files in \Dir{A} to another directory called
+\Dir{Archive} in your s133xx home directory.
+Be sure to preserve all of the permissions, attributes, etc
+in your file transfer.
+
+\item At other times, we need to ship many files over the internet,
+and it can be far more efficient to do this if we first wrap them up
+into a single file.
+One such file, called a \textit{tar ball}, is made using the \textit{tar}
+program.  Read the documentation and create a tar ball of all the
+files in the directory \Dir{A}.  Be sure to give the file a name
+with a \texttt{.tar} file type extension.
+
+\item In the directory \Dir{/class/u/s133/s133aw}
+you will find a directory called \Dir{bare}. This directory contains
+another 10 subdirectories named \Dir{part1} through \Dir{part10}.
+In each of these there are many files of email messages,
+i.e. one file for each email message.
+There are two kinds of files in these directories, representing
+two kinds of email, spam and regular email, and these files are
+named differently if they are spam or regular mail.
+
+\begin{itemize}
+\item Return to the NASA example and use shell commands to determine
+  the unique names for the files in the Files subdirectory and the
+  counts of how many files there are of each type.  That is, your
+  output should be 72 cloudhigh, cloudmid, .. and one each of
+  intlvtn.data and elevation.dat  Hint use sort and pay attention to
+  the options.... \item \shellCmd{sort} -- sort lines of text files
+\item \shellCmd{uniq} -- remove duplicate lines from a sorted file
+\item \shellCmd{cat} -- concatenate files and print on the standard output
+
+\item Find the total number of spam message files in the \Dir{bare}
+directory.
+Use two different approaches to do this.
+The commands \Shell{ls}, \Shell{find}, \Shell{grep}
+
+and \Shell{wc} may prove useful. Be sure not to include
+the directories in your count.
+It is often a good idea to do something two different ways
+in order to check that you have done it correctly.
+If the two answers do not match then one (or both) of the
+approaches is incorrect.
+
+\item Now determine how many spam files there are in
+each \Dir{part1}-\Dir{part10} directory.  Do this with one compound
+command.  For example, you could create a list, one line
+for each spam file, where you only print the directory
+that the file is in.  Then the \shellCmd{sort} and \shellCmd{uniq}
+commands can help you determine how many duplicates that
+you have.
+\end{itemize}
+
+\item
+In the Weblogs example of Section~\ref{sec:weblog} there are no files that are served up by the Web server
+whose names contain spaces.  This makes matters easier and can be used.
+Use shell tools to verify this.
+\begin{comment}
+There are of course numerous different ways to go about this.
+The following is one quite kludgy approach using the tools
+we have learned to this point.
+We know that the 7th field contains the name of the document
+being requested. The 8th field, if there are no spaces
+should be the HTTP/1.0.
+So we can extract the 8th field and see if it starts
+with HTTP.
+\begin{verbatim}
+cat omegahat.log* | cut -f8 -d' ' | grep -v 'HTTP/1'
+\end{verbatim}
+This does indeed return the 31 lines that have a space within them,
+each being 
+\verb+onmousedown="return+.
+
+To extract the full document being requested with the spaces,
+we can use regular expressions as we will discuss in class.
+
+If we wanted to find out the IP addresses of these requests, we could
+use a command such as
+\begin{verbatim}
+cat omegahat.log* | cut -n -f1,8 -d' ' | grep -v 'HTTP/1' | 
+     cut -f1 -d' '|sort | uniq
+\end{verbatim}
+which extracts both the first and eighth field, using the 8th field to
+identify  which are not HTTP and then giving a list of just the IP addresses.
+\end{comment}
+
+
+\item In the Weblogs example in Section~\ref{sec:weblog} we found the
+  top 5 referral pages, i.e. field 8 (including the two fields of '-').
+ What ``browsers'' were used to access these sites?
+Order them by number of requests.
+
+\item For the Weblogs example in Section~\ref{sec:weblog}, create a
+ frequency table of the different operating systems used by the clients.
+
+\item For the Weblogs example in Section~\ref{sec:weblog}, determine
+what other sort of HTML pages will give rise to multiple requests.
+
+\begin{comment}
+\textit{ What other sort of HTML page will give rise to multiple
+  requests?} Firstly, each request will result in sub-requests for
+documents referenced within it such as images, JavaScript files, etc.
+Another type of page that will produce (multiple) sub-requests is an
+HTML document made up of ``frames'', i.e.  separate documents in the
+same browser page.  Each sub-document within the screen will be
+requested separately.  Similarly, when one visits a site, an icon for
+the site is often displayed in the URI field of the browser to provide
+a quick visual reference of the identity of the page's host site.
+\end{comment}
+
+ 
+
+
+\end{enumerate}
+
+
+You can use nslookup (or dig) to find the name associated with these IP
+addresses, e.g. 
+\begin{verbatim}
+nslookup 65.54.188.109
+\end{verbatim}

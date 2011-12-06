@@ -1,0 +1,2817 @@
+<?xml version="1.0"?>
+<article xmlns:s="http://cm.bell-labs.com/stat/S4" 
+         xmlns:r="http://www.r-project.org"
+         xmlns:c="http://www.C.org">
+<title id="Rlang">The R Programming Language</title><para>
+In this chapter, we will discuss some of the ideas 
+in the R programming language and environment and how
+to use it. 
+When learning a programming language, one
+typically  needs detailed, specific information
+about particular syntactic structures
+such as how to write a conditional statement
+or a loop or what are the inputs for a  particular function,
+but it is also important to have a broad ``bigger picture''
+understanding of the language.
+Like with a human language, 
+one needs to become familiar with the rules of
+the language, but also the vocabulary and the 
+style and idioms that other use.
+And for a computer language, it helps and is important
+to understand the rationale and logic that
+underlies how the language is understood by the computer.
+This helps you express computations properly
+and understand why the computer may interpret
+the commands differently from your expectations.
+</para><para>
+
+There are several sources of information about the
+R and S programming languages
+that work at these different levels of specific information,
+reference manuals and broad overviews.
+In this chapter, we don't attempt to provide all of these.
+Rather, here we focus on trying to understand the rationale
+of the language. We expect the reader to explore the ideas
+interactively using the R environment as they read this and
+do some experiments to see how the language
+works.  We have a terrific, interactive medium with which 
+we can hypothesize  and test characteristics.  
+</para><para>
+
+Finding out how R works and learning to think about how to
+express computations in R will greatly simplify your work
+when using R. It is good to take the time early on to
+learn a language and not simply use it in a utilitarian,
+ad hoc manner.  And while R is a specific language
+that you may or may not use extensively in the future,
+it is important to realize that what you will learn
+when exploring R will be generally applicable to many
+different programming languages that you might use.
+R is very similar to Matlab, and shares many of the
+same concepts as Perl, Python, Java, C, and FORTRAN.
+They are all quite different, but they also share important
+commonalities that are important when communicating computations
+to others and to the computer.
+</para><section><para>
+We first start R by invoking the command R. On my machine, I have
+invoked a particular version since I can and do have different versions
+installed.
+<literallayout>
+(pts/10)duncan[~-52]&gt;/usr/duncan/R/bin/R
+
+R : Copyright 2003, The R Foundation for Statistical Computing
+Version 1.9.0 Under development (unstable) (2003-12-28), ISBN 3-900051-00-3
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for a HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+&gt; 
+</literallayout>
+
+Note that the line that says 
+<literallayout>[Previously saved workspace restored]</literallayout>
+This means that R is loading up the 
+data that we had saved from the last session.
+</para><para>
+
+R is both an interactive and interpreted language.  By interpreted, we
+mean that we can give an instruction and immediately have it
+evaluated.  Then, we can give another command.  In other,
+non-interpreted languages, we must write an entire program made up of
+a sequence of commands that are specified before we run the program.
+We have to order the instructions and take account of different
+possibilities.  Once the program is running, we cannot change the
+commands.  All we can do is either wait for it to complete or
+terminate it and re-run it with the commands altered or different
+inputs.
+</para><para>
+The interactivity is very important for
+us in statistics.  We need to be able to visualize data, look at
+numerical summaries and the output from fitting a model, or subsetting
+the data based on previous observations and then decide what to do
+next.  This is Exploratory Data Analysis (EDA).  It is a highly
+iterative process where we attempt to let the data direct us as to
+what to do next.  We try different things as we go along different
+branches or paths, sometimes leading to useful insights that we want
+to report and, at other times, verifying that certain assumptions are
+justified, or trying different methods to understand the data better.
+The ability to be able to dynamically specify what we want to do next
+is important.  S then allows to combine the commands into a script or
+"program" that we can then re-run on new or different data to recreate
+our analyses.  This is often termed BATCH programming since we are
+doing several commands in a single run. This gives us the best of both
+worlds: interactive facilities during exploration, programming
+facilities when the exploration is more "complete".
+</para><para>
+Systems or environments like SAS provide either a BATCH or interactive
+interface. The interactive view is a point-and-click interface as in
+SAS' JMP product.  While this supports exploratory, interactive data
+analysis, it does not allow us to readily manage the intermediate
+results from each step and put them into the next steps and generally
+branch in different directions.  And the BATCH system only allows us
+to do interactive work in very coarse-grained increments; run these
+sequence of commands on this data and produce this output. Then, look
+at the output and write some more code. While superficially this is
+the same sequence of steps in EDA that we might do in R, the interface
+is much less convenient.
+</para><para> The point-and-click, drag-and-drop interfaces like the one
+provided by Excel are very useful for specific tasks such as editing
+values in cells, quickly creating plots, etc.  Managing results and
+output from different tasks (e.g. regression, ANOVA, summary
+statistics) across sheets can be hard work.  The visual interface
+which is the thing that makes Excel, and GUIs in general, convenient
+is a hindrance here. We must put these values somewhere. Instead, we
+might like to give them a name and be able to refer to them later. In
+other words, we would like to assign them to a
+<emphasis>variable</emphasis>.  While we can put different results in
+their own worksheets, this soon gets cluttered and we sped time
+navigating the tabs in the workbook.  Another complexity in this world
+of point-and-click for EDA is that specifying precisely what we mean
+can be difficult.  In some cases, we might want to customize a
+particular methodology when applying it to data, or we might want to
+draw a plot slightly differently, or use a dataset that we derive in a
+complex way from the original source.  For these common but
+non-standard situations, a sequence of dialogs provided by a "wizard"
+can be frustrating.  It is tediously long, especially if we are doing
+it several times with different subsets of the data or different
+datasets that we wish to compare.  And in addition to the unnecessary
+repetitiveness, we also cannot specify everything we may want to. The
+dialogs provide access only to the common options. In the interest of
+keeping them simple, the designers have identified what they believe
+are the important elements one specify and change in the task.  It is
+not possible for us to create our own modifications of these tasks, or
+at least it is a major project.
+</para><para> 
+
+The purpose of the rest of this document is to give you an
+understanding of how R works. R has lots of functions (over 1500
+immediately available to you and thousands more in add on packages).
+It is impossible to remember all of these and their details (e.g. what
+arguments they take, what they do in all situations and what they
+return) and to make effective use of R, you need to get into the habit
+of using the help system.  (Just type
+<s:expression>help("<emphasis>topic</emphasis>")</s:expression> to get
+help on the specified topic.)  What we want to do in this document is
+to get you to think about what R is doing and why it does it and to
+understand the basic building blocks that you have available to you.
+They are similar to those of other languages such as Matlab and
+packages like Stata, SPSS, Excel.  R is more a programming language
+than these environments and is much more statistically focused than
+Matlab. It is a good tool to know for doing any kind of data analysis.
+To use it effectively, you will need to understand these basics and to
+sit down and gain experience with the engine and the numerous
+functions.
+</para></section><section><title>Using R</title><para>We can use R as a heavyweight calculator
+<s:code><![CDATA[
+> 1+2
+[1] 3
+]]></s:code>
+
+We can use built-in values, such as <s:var>pi</s:var>.
+<s:code><![CDATA[
+> 1+pi
+[1] 4.141593
+]]></s:code>
+</para><para>
+
+What is the "thing" <s:var>pi</s:var> in this computation?
+It is a variable. By this we mean it is a name by which we refer to a
+value.  We can associate new values
+with this name by <emphasis>assigning</emphasis>
+a value to it.
+For example, we can give <s:var>pi</s:var>
+the value 1 and then use that.
+<s:code><![CDATA[
+> pi = 1
+> 1+pi
+[1] 2
+]]></s:code>
+
+So <s:var>pi</s:var> is not a constant in this world.
+Mathematically, it is.  But in the programming world, it is merely a
+variable to which we can bind or assign new values.  Of course, this
+is not necessarily a good idea.  If we use this new value, we will get
+strange results!
+
+</para><para>
+
+There are several ways to assign a value to a variable in
+S. They differ only in syntax.
+<s:code><![CDATA[
+> x = 1+2
+> x <- 1+2
+> 1+2 ->x
+> x
+[1] 3
+]]></s:code>
+These three forms (=, &lt;-, and -&gt;) can all be used, however the
+last is very rarely seen.  It arose when one was typing a long command
+and realized that we had forgotten to assign the result.  At one time,
+we couldn't go back to the beginning of the line without deleting all
+the intervening text and so removing the command. Nowadays, we can
+jump to the beginning of the line, and add the assignment and continue on.
+</para><para>
+
+In reasonably recent versions of R, one could also use
+the underscore (_) as the assignment operator.
+This is no longer possible and soon we will be able to use
+it as a character in a variable name.
+So the following error occurs when we try to assign using  _ now:
+<s:code><![CDATA[
+> x_ 1
+Error: syntax error
+No suitable frames for recover()
+]]></s:code>
+</para><para> Now that we can create variables, we can do some useful
+things.  And we may want to ensure that we don't lose anything we do.
+So it is a good time to think about how we might save our data.  Each
+time we run R, we create a new R session.  Then we can do some work,
+create new variables and potentially want to save some or all of them.
+</para><para>
+We can save our entire workspace, i.e. all the variables we have
+created calling the function the
+<s:func>save.image</s:func> at any time.  This puts all
+the objects in our session workspace into a file named .RData.  If we
+we start R again in that directory, the contents of that .RData are
+loaded into the new session and are immediately available to us again.
+If we start in a different directory, we can still load the values
+into the R session, but we must do this ourselves using the function
+<s:func>load</s:func> and giving it the fully qualified
+name of the file to load (i.e. full directory path and file name).
+</para><para> When we end the R session using the q() function, we will
+normally be asked whether we want to save the session or not. This
+calls <s:func>save.image</s:func> implicitly.
+</para><para> If we don't want to store all the variables, but only specific
+ones, we can explicitly <s:func>save</s:func> one or
+more objects to a file (or generally a connection).  This is convenient when we create a big dataset and
+then want to ensure that it gets saved before we do anything else.  Or
+if we want to make an object available to another R session, e.g. to
+somebody we are working with, without terminating ours, we can simply
+write the object to disk and then send it that person in an entirely
+portable format.
+</para><para>
+
+Note that S uses "copying" semantics.  When I assign the value of x to
+y, y gets the value of x.  It is not "linked" to x so that when x is
+changed, y would see that change. Instead, we copy the value of x in
+the assignment and the two variables are unrelated after that.
+
+<s:code><![CDATA[
+> x
+[1] 3
+> y = x
+> x = 10
+> x
+[1] 10
+> y
+[1] 3
+]]></s:code>
+</para><para>
+We have seen how we can store the results of computations or simple
+values in variables.  We can think of these as being stored in our
+workspace.  This is like our desk with pieces of paper storing
+different information. We would put different pieces of paper in
+different places so that we can easily find them again when we need
+them.  The place we put them allows us to quickly find them
+and is analogous to the variable name which allows us to easily
+refer to the values.
+</para><para>
+In the same way that we might overload our desk with pieces of paper
+as we move from task to task, or just have too much information,
+we need to manage the variables we have in our work area or desktop.
+S provides functions which we can use to dynamically manage the 
+variables and the contents of our workspace.
+
+The function <s:func>objects</s:func> gives us the names
+of the variables we have in our workspace. 
+<s:code><![CDATA[
+> objects()
+[1] "x"  "y"  "pi"
+]]></s:code>
+
+We can remove values using
+<s:func>remove</s:func> by passing the name to the function
+of the variable we want to remove.
+
+<s:code><![CDATA[
+> remove("x")  
+]]></s:code>
+and we can verify that the variable has been removed
+using <s:func>objects</s:func> again.
+<s:code><![CDATA[
+> objects()
+[1] "y"  "pi"
+]]></s:code>
+
+We can give more than one name.  So we can remove both
+<s:var>y</s:var> and <s:var>pi</s:var>, the last
+two remaining variables in our session's workspace.
+<s:code><![CDATA[
+> remove("y", "pi")
+]]></s:code>
+
+Before we leave this topic, we should ask what happened to the
+original version of pi?  We assigned a new value to it - 1 - and used
+that in our computations?  Now that we removed it, is
+<s:var>pi</s:var> defined at all ? is the old value put
+back?  The answer is that the old value is now in effect again, but it
+wasn't "put back". R did not remember the old value and restore it
+when we removed our version of <s:var>pi</s:var>.  The
+explanation is a little more complicated, and a lot richer.  It
+relates to where we were finding the variable named
+<s:var>pi</s:var>.
+
+<para/>
+When we issued the command
+<s:code><![CDATA[
+> pi = 1
+]]></s:code>
+we were telling R to associated the value 1 with the variable name
+<s:var>pi</s:var>.  This puts it in our workspace.  But
+before we did this, we managed to find <s:var>pi</s:var>
+also, and then it had the usual value of 3.141.
+So where did it come from? It wasn't in our workspace, yet it was
+still available.
+</para><para> The answer involves understanding how R finds variables when
+we refer to them.  R actually keeps a collection of places in which to
+search for variables. This is called the search path.  This is an
+ordered collection of workspaces containing variables and their
+associated values.  At any point during an R session, we can ask R
+what this collection of workspaces is.  We do this using the function
+<s:func>search</s:func>.
+In my session, I get 
+<s:code><![CDATA[
+> search()
+[1] ".GlobalEnv"       "package:Rbits"    "package:methods"  "package:stats"   
+[5] "package:graphics" "package:utils"    "Autoloads"        "package:base"    
+]]></s:code>
+The first entry is our own personal workspace.  When we quit, this
+disappears.  The other entries are packages or libraries of functions
+and data that are available to us.
+</para><para> Now, when we implicitly cause R to look for a variable, it
+walks along this collection and asks each entry whether it has the
+relevant variable.  After we defined our own version of
+<s:var>pi</s:var>, when we used <s:var>pi</s:var>
+in a computation such as <s:expression>1 + pi</s:expression>, R
+started its search for <s:var>pi</s:var>.  It started in the
+first element of the search path, and found it there. That is our
+workspace where put <s:var>pi</s:var>.
+
+</para><para> When the session started and we did not yet have our own
+version of <s:var>pi</s:var>, the search for
+<s:var>pi</s:var> was rather different.  R looked through
+each element of the search path and found <s:var>pi</s:var>
+only in the last entry "package:base".  This contains the built-in
+variable provided by the R system itself (rather than add-ons).
+
+</para><para> How could we know where R would find a variable?  We can use
+the function <s:func>find</s:func>.
+So in the following, we define <s:var>pi</s:var>,
+and ask R where we can find it.
+<s:code><![CDATA[
+> pi = 1
+> find("pi")
+[1] ".GlobalEnv"   "package:base"
+]]></s:code>
+Now, we remove our version of <s:var>pi</s:var> and then R
+can only find the one in "package:base".
+<s:code><![CDATA[
+> remove("pi")
+> find("pi")
+[1] "package:base"
+]]></s:code>
+
+All the functions we have seen so far, and in general, are simply
+values assigned to variables.  R finds them in the same way when we refer
+to them in a computation.  It looks through the search path until it
+finds the variable.  It is slightly smarter for functions.  If it
+knows we are calling the value of the variable as a function, it will
+only look for a function, skipping over other types of values.
+
+</para><para>
+
+What if we look for a variable that doesn't exist?  For example,
+suppose we use a variable named <s:var>duncan</s:var> in a
+computation
+<s:code><![CDATA[
+> duncan^2
+]]></s:code>
+What happens?
+R looks through each element of the search path and eventually 
+gives up, giving the error message:
+<s:output>
+Error: Object "duncan" not found
+</s:output>
+
+
+We can determine whether a variable is defined using
+<s:func>find</s:func>, or using a more convenient
+function in some cases named <s:func>exists</s:func>.
+For example,
+<s:code><![CDATA[
+> exists('duncan')
+[1] FALSE
+]]></s:code>
+
+(Note that I can use single or double quotes for a string,
+i.e. "duncan" or 'duncan'.)
+</para></section><section><title>The Basic Data Types</title><para>
+In S, everything is an object.  We have seen this already. We have
+variables that refer to values, and functions which do things are
+accessed as regular variables.  So we see that we have a commonality
+for data and functions.  This is different from many languages such as
+C/C++, Java, etc. For interpreted languages, it is quite common and it
+is very powerful.
+
+</para><para>
+
+The basic or primitive types of objects are vectors.  These are simply
+collections of values grouped together into a single container.  The
+basic types are integer, numeric, logical and character vectors.  And
+a very important characteristic of these vector types is that they can
+only store values of the same type. In other words, a vector has
+homogeneous data types.  We cannot use a vector to store both an
+integer and a string in their basic forms. (We'll see that we can put
+them into a vector and the integer will become a string. And we can
+use what is called a "list" to store them both in their original
+form.)
+
+</para><para> As we just said, there are 4 basic types of vectors: integer,
+character, numeric and logical.  Integer vectors store integer values,
+numeric vectors store real numbers, logical vectors store values that
+are either TRUE or FALSE and character vectors store strings.  In C
+and Java, we can work on characters individually. However, in S there
+is no way to store a single character except as a simple string with
+only one character. This is very rarely a problem.
+
+</para><para>
+
+ Essentially, vectors are like arrays in C and Java.  And in those
+languages, we have a large difference between a scalar or basic
+built-in value and arrays of such values.  In S, there are no scalars.
+By this, we mean that there are no individual number objects, or
+logical values, or strings.  Instead, such individual values are
+actually vectors of length 1.  So they are special cases of general
+vectors with multiple elements. And this makes lots of computations
+convenient.
+
+</para><para>
+
+An important function for creating vectors is the
+<s:func>c</s:func> function.
+The 'c' stands for concatenate, and all it does
+is take one or more values and put them into
+a new vector.
+For example, 
+<s:code><![CDATA[
+> c(1.2, 4.5, 3.2)
+[1] 1.2 4.5 3.2
+> c(TRUE, FALSE, FALSE, TRUE)
+[1]  TRUE FALSE FALSE  TRUE
+> c("Abc", 'def', "ghikllm", "z")
+[1] "Abc"     "def"     "ghikllm" "z"      
+]]></s:code>
+What about the integer vector?
+Well, in R, all numbers that we type are made into
+real numbers.
+So when we type 
+<s:code><![CDATA[
+> c(1, 2, 3)
+]]></s:code>
+we get a numeric vector as the individual values
+are actually numeric.
+(This is different in S-Plus, version 5 and higher.)
+
+</para><para>
+There are many cases in which we want integers and they arise
+naturally. One of them, as we shall see in the subsetting
+section, is a sequence of integers.
+The built-in syntax for creating the integer sequence
+a, a+1, a+2, ..., b is
+<s:expression>a:b</s:expression>.
+For example,
+<s:code><![CDATA[
+> 1:10
+ [1]  1  2  3  4  5  6  7  8  9 10
+> 4 : 5
+[1] 4 5
+> 10:3
+[1] 10  9  8  7  6  5  4  3
+> 3:3
+[1] 3
+]]></s:code>
+
+This is a very specific version of the more general
+<s:func>seq</s:func> function.  This allows us to create
+sequences with different strides (differences between successive
+elements), of specific length, and so on. See the help pages.
+
+<s:code><![CDATA[
+> seq
+function (...) 
+UseMethod("seq")
+<environment: namespace:base>
+> seq(1, length = 10, by = 2)
+ [1]  1  3  5  7  9 11 13 15 17 19
+]]></s:code>
+
+</para><para>
+
+An important characteristic of any vector is its length. We can always
+find out how many elements a vector contains using the function
+<s:func>length</s:func>.
+<s:code>
+&gt; x = 1:10
+&gt; length(x)
+[1] 10
+&gt; letters
+ [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
+[20] "t" "u" "v" "w" "x" "y" "z"
+&gt; length(letters)
+[1] 26
+</s:code>
+
+Note that the return value from calling
+<s:func>length</s:func> is itself a vector. It is an
+integer vector of length 1.  The system uses its own built-in types to
+provide functionality.
+
+</para><para>
+
+Often we want to combine two vectors.  We can also do this using the
+<s:func>c</s:func>.
+<s:code><![CDATA[
+> x = c(1, 2, 3)
+> y = c(4, 5, 6)
+> c(x, y)
+[1] 1 2 3 4 5 6
+]]></s:code>
+
+We can also use the function <s:func>append</s:func>.
+Look at the help for <s:func>c</s:func> and
+<s:func>append</s:func> and try to discover the
+difference.
+
+</para><para> 
+
+In many situations, it is convenient to associate names with elements
+in a vector.  For example, suppose we have IP addresses of machines
+stored as strings.  We might also want to associate the human-readable
+name along with it.
+For example,
+<s:output>
+          wald          anson         fisher 
+"169.237.46.2" "169.237.46.9" "169.237.46.3" 
+</s:output>
+Here, we have associated the names 
+wald, anson and fisher with the elements
+of the character vector
+
+</para><para> For any vector, we can ask for the names of the elements.
+Suppose the vector of IP addresses above was assigned to the variable
+<s:var>ip</s:var>, then we could get the character vector of
+names using the function <s:func>names</s:func>.
+<s:code><![CDATA[
+> names(ip)
+[1] "wald"   "anson"  "fisher"
+]]></s:code>
+
+If the vector has no names, we get back <s:null/>.  This is a special
+symbol in R, and has length 0.  We can check if a value is <s:null/>
+using <s:func>is.null</s:func>:
+<s:code><![CDATA[
+ is.null(names(ip))
+]]></s:code>
+
+</para><para>
+There are several ways to specify the names for a vector
+(of any type, i.e. integer, numeric, logical or character).
+If we are explicitly creating the vector (using
+<s:func>c</s:func>), then we can put the names in
+the expression, as in
+<s:expression>c("169.237.46.2", "169.237.46.9", "169.237.46.3")</s:expression>.
+<s:code><![CDATA[
+> c(wald="169.237.46.2", anson = "169.237.46.9", fisher = "169.237.46.3")
+]]></s:code>
+
+
+If we already have a vector, then we can assign names to the elements
+using the <s:func>names</s:func> function (or
+technically the <s:func>names&lt;-</s:func> function).
+<s:code><![CDATA[
+> x = 1:26
+> names(x) <- letters
+ a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z 
+ 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 
+> y = c(0, 0, 256)
+> names(y) = c("R", "G", "B")
+> y
+  R   G   B 
+  0   0 256 
+]]></s:code>
+
+
+Useful general facilities for operating on vectors are
+<s:func>rep</s:func>,
+<s:func>rev</s:func>,
+<s:func>sort</s:func>.
+The function <s:func>rep</s:func> allows us to replicate
+a vector in convenient ways.
+<s:code><![CDATA[
+> rep(c(1, 2, 3))
+]]></s:code>
+
+For character vectors, <s:func>paste</s:func> is convenient for
+combining strings together.  <s:func>strsplit</s:func>
+can be used for splitting strings by user-specified delimiters.
+<s:func>substring</s:func> can be used to extract a
+sub-part of a string.  And we can match and substitute text using
+regular expressions with the functions
+<s:func>grep</s:func> and
+<s:func>gsub</s:func>.
+</para></section><section><title>Vectorized Operations</title><para>
+In lower-level languages like C/C++ and Java, we operate on entire
+arrays by iterating over each element.
+We have code something like:
+<c:code><![CDATA[
+ for(i = 0; i < n; i++) {
+   f(x[i])
+ }
+]]></c:code>
+where f is some function to do something on the individual element
+of the array.
+</para><para> 
+
+In S, since vectors are the basic types, and because in statistics we
+typically want to work on groups of observations or experimental
+units, the philosophy is that operations work on an entire vector.
+This means users don't have to write loops for many operations.
+A simple example is the + function.
+We can add two vectors together element-wise using the +
+operation:
+<s:code><![CDATA[
+> c(1, 2, 3) + c(4, 5, 6)
+[1] 5 7 9
+]]></s:code>
+The first element of each vector are added together to get 5.
+Similarly, we get 7 and 9 by adding the second elements,
+and the third elements.
+
+</para><para> 
+
+This is very powerful and convenient. It allows us to express
+computations at a high-level, indicating what we mean rather than
+hiding it in a loop.  Many functions in S are vectorized, meaning that
+if you give them a vector of length n, they will operate on all n
+elements rather than just the first one.
+<s:func>strsplit</s:func> is an example.
+If we give it the vector of IP addresses and ask it to
+break the strings into sub-parts separated by .,
+then we get
+
+<s:code><![CDATA[
+> strsplit(ip, "\\\.")
+$wald
+[1] "169" "237" "46"  "2"  
+
+$anson
+[1] "169" "237" "46"  "9"  
+
+$fisher
+[1] "169" "237" "46"  "3"  
+]]></s:code>
+Here, we get back a collection of character vectors.
+The collection has the same names as the original input vector
+(wald, anson, fisher) and each element is a string with the
+particular part of the IP address.
+
+The actual data type of the result is a list
+which we shall see shortly.
+
+
+</para><para>
+
+When you right your own functions, you should try to make them
+vectorized so that they take in a vector and give back a value for
+each element.  Of course, if these are aggregator functions (e.g. sum,
+prod, lm), then they should work on all of the elements and combine
+them into a single result.
+</para></section><section><title>The Recycling Rule</title><para>
+What if we add two vectors with different lengths.
+For example,
+what happens to <s:expression> c(1, 2) + 2</s:expression>?
+We would like S to be smart enough to add 2 to each element.
+And that is what happens
+<s:code><![CDATA[
+> c(1, 2) + 2
+[1] 3 4
+]]></s:code>
+What about
+<s:expression>c(1, 10) + c(100, 200, 300, 400)</s:expression>
+where the second vector has two more elements
+than the first.
+<s:code><![CDATA[
+> c(1, 10) + c(100, 200, 300, 400)
+[1] 101 210 301 410
+]]></s:code>
+
+R does the right thing, depending on what you think the right thing
+is!  But what did it do?  It appears to have created the vector
+<s:expression>c(1 + 100, 10 + 200 , 1 + 300, 10 + 400)</s:expression>
+and indeed that is what it did.  This is a general concept in S; it
+recycles or replicates the smaller vector to have the same length as
+the larger one. So, in this case, we recycle 
+<s:expression>c(1, 10)</s:expression> to have length 4.  We do this as the function
+<s:func>rep</s:func> would, basically by concatenating
+several copies of the original vector to get the right length.  So we
+get <s:expression>c( 1, 10, 1, 10)</s:expression> to have length 4,
+the same as the larger vector and then we can do the basic arithmetic
+as before.
+
+</para><para>
+We can now understand how <s:expression>c(1, 2) + 2</s:expression>
+works.
+
+</para><para>
+What about the following expression
+<s:expression>c(1, 2) + c(10, 11, 12)</s:expression>,
+i.e. using vectors of length 2 and length 3.
+<s:code><![CDATA[
+> c(1, 2) + c(10, 11, 12)
+[1] 11 13 13
+Warning message: 
+longer object length
+	is not a multiple of shorter object length in: c(1, 2) + c(10, 11, 12) 
+]]></s:code>
+First thing to note is that R generates a warning telling you that you
+may want to check whether the result is as you expected.  The problem
+is that recycling the smaller vector did not naturally yield a vector
+of the same length as the larger one.  That is why R gave a warning.
+But it went ahead and did the addition using 
+<s:expression>c(1, 2, 1) + c(10, 11, 12)</s:expression> 
+as it recycled the smaller vector to
+have the same length as the larger one and threw away any left over
+elements.
+
+</para></section><section><title>Subsets</title><para>
+A lot of what we do in statistics and exploratory data analysis is to
+look at subgroups of a sample or population.  We determine
+characteristics about that subset and compare them to other groups or
+the same characteristic of the overall group.  We might look at how
+height and weight are related for both men and women separately.  We
+might look at milk yield for cows of different breeds.  We might look
+at stock prices within a particular week and so look at that
+particular subset of time.  We might also look at stock prices every
+Friday rather than consecutive days.  For Web page "hits" on a server,
+we might look at the other requests from the site of the requester.
+These are all examples of how we look at different parts of our data
+using categorical or continuous variables to "zoom in" on a subgroup.
+The criteria we use might be known ahead of time (type of cow,
+male/female) or might depend on the data itself (e.g. other web hits
+from the most frequent downloading site).
+
+</para><para> Being able to compute subgroups easily within our data is one
+of the things that is most powerful in S, but also one that takes some
+time to get used to.  The flexibility comes from the fact that there
+are many ways to specify the subset of interest and this can be
+confusing.  You should sit down and work with R to try to understand
+what is happening and master the concepts. They are very useful.
+There are essentially 5 different ways to subset a vector
+in R.
+They all use the [ function or operator and the only differences
+are what you specify as the value to use to identify the
+particular subset of interest.
+We'll use the built-in vector of lower case letters
+of the alphabet as our simple vector to illustrate the ideas.
+<s:code><![CDATA[
+> letters
+ [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
+[20] "t" "u" "v" "w" "x" "y" "z"
+]]></s:code>
+
+</para><para> Let's start with the most obvious and simple one.  Suppose we
+have a vector with n entries.  A common thing to ask is for one or
+more elements identified by position.  For example, I can ask for the
+2nd, 5th and 10th elements.
+We do this by passing the positions of the elements we want.
+<s:code><![CDATA[
+> letters[c(2, 5, 10)]
+[1] "b" "e" "j"
+]]></s:code>
+As we might have expected, we get back the specified elements of our
+original vector.  Note that what we get back is also a vector of the
+same type as our original one, in this case a character vector.  The
+result has as many elements as we asked for in our specification of
+the subset.
+
+</para><para>
+This is very simple: we ask for the values we want by identifying
+their position.
+What if we give a position that makes no sense, e.g. 
+that is larger than the length of the starting vector.
+For example, let's ask for the 30th element of the
+<s:var>letters</s:var> object.
+<s:code><![CDATA[
+> letters[30]
+[1] NA
+]]></s:code>
+The result is a missing value, NA.  This makes sense
+in many contexts.  It is something we should
+be aware of so that we can understand how NAs might 
+be introduced into our computations.
+
+
+</para><para>
+There are two other values that might be considered meaningless.
+What if we ask for the 0-th element?
+<s:code><![CDATA[
+> letters[0]
+character(0)
+> letters[c(0, 1)]
+[1] "a"
+]]></s:code>
+Essentially, S ignores a request for the 0-th element and doesn't
+include a value in the result for that element.
+This means that the result may not have as many elements as 
+we asked for.
+
+</para><para>
+And what if I ask for a negative index?
+For example, 
+<s:code><![CDATA[
+> letters[-c(1, 3)]
+]]></s:code>
+is outside the range of the indices of the elements of 
+<s:var>letters</s:var>.
+What does S do with such a request?
+(Try it and see what happens.)
+
+</para><para> Negative numbers for subsetting mean to drop those elements.
+What happens in the above example is that we get a new vector derived
+from <s:var>letters</s:var> with the first and third
+elements dropped or removed.
+<s:code><![CDATA[
+> letters[-c(1, 3)]
+ [1] "b" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u"
+[20] "v" "w" "x" "y" "z"
+]]></s:code>
+
+There are some restrictions on this.  We cannot mix positive indices
+and negative indices in a single subsetting call.  In other words, we
+cannot include some and omit others in one action.
+So
+<s:code><![CDATA[
+> letters[c(-1, -3, 5, 6, 7)]
+]]></s:code>
+might seem reasonable to drop the first and third elements
+and include the fifth, sixth and seventh.
+But if we give such a command, we get an error
+<s:code><![CDATA[
+> letters[c(-1, -3, 5, 6, 7)]
+Error: only 0's may mix with negative subscripts
+]]></s:code>
+and it makes sense. 
+We are saying "I want you to only include these, but also
+exclude those". That is not a good way to give an instruction.
+
+
+</para><para>
+
+So we have seen two ways to get subsets so far.  Both involve
+identifying the elements of interest by position or index in the
+original vector and either including them in the result or excluding
+them.  One of the problems is that we have to know the indices of the
+desired elements.  And this brings us to the next two subsetting
+approaches.
+
+</para><para>
+We have seen that vectors can have names. If we are subsetting
+a vector with names, we can refer to the elements we want in the
+subset using these names.
+Let's suppose we have our vector of IP addresses
+<s:code><![CDATA[
+> ip = c(wald="169.237.46.2", anson = "169.237.46.9", fisher = "169.237.46.3")
+]]></s:code>
+To get only wald and fisher, we pass a vector giving these names.
+<s:code><![CDATA[
+> ip[c("wald", "fisher")]
+          wald         fisher 
+"169.237.46.2" "169.237.46.3" 
+]]></s:code>
+So far so good.
+Note that we are passing a vector to 
+the <s:operator>[</s:operator>.
+We can't just put in names like
+<s:code><![CDATA[
+> ip["wald", "fisher"]
+]]></s:code>
+This would be two arguments to 
+<s:operator>[</s:operator>
+and this confuses it for a simple, linear, one dimensional vector.
+<s:code><![CDATA[
+> ip["wald", "fisher"]
+Error in ip["wald", "fisher"] : incorrect number of dimensions
+]]></s:code>
+The error gives a hint that we might be able to do two dimensional
+subsetting on other types of objects.
+See matrices and data frames below.
+
+</para><para>
+Again, if we ask for a non-existent element, we will
+get an <s:NA/> in the result.
+<s:code><![CDATA[
+ip[c("wald", "fishesr")]
+          wald           <NA> 
+"169.237.46.2"             NA 
+]]></s:code>
+And we cannot use this style of subsetting to 
+exclude elements.
+Think about what
+<s:code><![CDATA[
+ip[-c("wald", "fisher")]
+]]></s:code>
+means when R interprets the command.
+While we can understand that we mean
+to drop the wald and fisher elements, 
+R first evaluates 
+<s:code><![CDATA[
+-c("wald", "fisher")
+]]></s:code>
+This is meaningless as the negative of a string doesn't make sense.
+So the error comes from this part of the computation.
+<s:code><![CDATA[
+> ip[-c("wald", "fisher")]
+Error in -c("wald", "fisher") : Invalid argument to unary operator
+]]></s:code>
+What's the unary operator? It is the <s:operator>-</s:operator>
+operator.
+
+
+</para><para>
+
+ So now we have covered three types of subsetting: indexing by
+position, exclusion by position, indexing by name.  The next one is to
+use a logical vector to index the elements we want.  Like names, this
+is used when we don't know the position of an argument but know what
+we are looking for.  We give the <s:operator>[</s:operator> a logical
+vector and R returns the subset of the original vector containing the
+elements corresponding to <s:true/> values in our logical "indexer".
+Basically, this is like super-imposing our logical vector over the
+vector being subset, and dropping all the values under the <s:false/>
+elements, and keeping all the elements under the <s:true/> values. In
+this way, it works like a "mask".
+A couple of examples may make this clearer.
+The simplest and least interesting is
+the following:
+<s:code><![CDATA[
+> x = c("a", "b", "c", "b")
+> x[c(TRUE, FALSE, TRUE, FALSE)]
+[1] "a" "c"
+]]></s:code>
+Here, we just extract
+the first and third elements.
+
+</para><para>
+Suppose we wanted to get all the elements that
+were equal to "b".
+Remember, that S is a vectorized language with
+the recycling rule.
+The command
+<s:code><![CDATA[
+ x == "b"
+]]></s:code>
+returns a logical vector with as many values
+as there are in <s:var>x</s:var>
+and the result contains <s:true/>s
+and <s:false/>s according to the condition.
+<s:code><![CDATA[
+> x == "b"
+[1] FALSE  TRUE FALSE  TRUE
+]]></s:code>
+Now we can use this to subset <s:var>x</s:var>
+to get all the "b" elements:
+<s:code><![CDATA[
+> x[x == "b"]
+]]></s:code>
+This reads as 
+"get all the elements of x such that x is equal to 'b'".
+
+</para><para>
+There are several other ways to do this subsetting.
+We could find the positions of all the "b" elements
+and then use the positions as our subsetting vector.
+This can be done  in one command as
+<s:code><![CDATA[
+> x[(1:length(x))[x == "b"]]
+]]></s:code>
+Think about what this is doing to make certain you understand it.
+We can do the computations separately and look at the intermediate
+results to see what is happening.
+<s:code><![CDATA[
+> x == "b"
+[1] FALSE  TRUE FALSE  TRUE
+> 1:length(x)
+[1] 1 2 3 4
+> c(1, 2, 3, 4)[c(FALSE, TRUE, FALSE,  TRUE)]
+[1] 2 4
+]]> x[c(2,4)]
+[1] "b" "b"
+</s:code>
+So we see that it does give us the same result.
+But compare the two commands
+<s:code><![CDATA[
+> x[x == "b"]
+> x[(1:length(x))[x == "b"]]
+]]></s:code>
+
+By the way, why do we put the parentheses around
+<s:expression>(1:length(x))</s:expression>?  Try it with and without
+and see what you get. 
+
+
+</para><para> Let's look at another example.  R has many functions to
+generate random values from different probability distributions.  One
+of the distributions it doesn't support is what is called the
+"truncated normal". This is a regular Normal distribution that is
+limited to values between a and b, where these are parameters
+specifying the distribution.  Suppose we want to generate values from
+such a distribution, how would we do it?  One approach is to sample
+from the associated Normal distribution using the
+<s:func>rnorm</s:func> function and then discard any
+values that are less than a and greater than b.  In other words, we
+keep only the values in the interval [a, b].
+We can do this by simple subsetting using a logical  vector.
+Let's suppose we use a standard normal, N(0, 1), 
+and a and b are -.1 and .3 respectively.
+<s:code><![CDATA[
+> x = rnorm(100, mean = 0, sd = 1)
+> x[x < .3 & x > -.1] 
+]]></s:code>
+
+Make certain you use the element-wise operator &amp;
+and not the other form - &amp;&amp;. 
+
+
+</para><para>
+
+Note that we can readily use logical vectors to
+exclude certain elements rather than include them.
+Just like we negate the indices giving positions to exclude
+values when subsetting, we can negate the 
+<s:true/>s and <s:false/>s easily.
+The <s:operator>!</s:operator> does exactly this.
+So if we want to drop elements specified by
+a logical vector <s:var>i</s:var>,
+we need do only the following:
+<s:code><![CDATA[
+> x[ !i ]
+]]></s:code>
+Again, go through the intermediate computations, looking at
+<s:var>i</s:var> and <s:expression>!i</s:expression> to see
+what is actually happening.
+
+</para><para> 
+
+So now we have seen 4 ways to subset: inclusion and exclusion by
+position, names and logical "masks".  We said at the outset there were
+5, so we only have one remaining and this is a special, degenerate
+one. What if I pass no value for the indexing vector, i.e.
+<s:code><![CDATA[
+> x[ ]
+]]></s:code>
+The result is <s:var>x</s:var> itself, i.e
+the original vector.
+This is not the same as passing in a vector with
+length 0
+<s:code><![CDATA[
+> x[integer()]
+]]></s:code>
+That gives back a subset of <s:var>x</s:var> with the same length 
+as the indexing vector and so is
+<s:code><![CDATA[
+> x[ integer() ]
+numeric(0)
+]]></s:code>
+
+
+</para><para>
+
+Why is the empty subsetting (<s:expression>x[]</s:expression>) useful
+and why are we making a big deal of it?  There are several reasons.
+One of the things we haven't mentioned about subsetting until now is
+that not only can we access sub-vectors using these 5 techniques, but
+we can also modify the elements in the original vector by simply
+assigning elements to the specified subset.
+We use the same subsetting on the left hand-side
+of an assignment as we did earlier but specify an object
+on the right side and good things happen.
+<s:code><![CDATA[
+> x = c(1, 2, 3)
+> x[c(1, 3)] <- 10
+> x
+[1] 10  2 10
+]]></s:code>
+Similarly, if we want to replace all the occurrences of "G" in 
+a character vector with the string "GG",
+we can do this simply
+<s:code><![CDATA[
+> x = c("A", "G", "C", "C", "G", "G", "A")
+> x[x == "G"] <- "GG"
+]]></s:code>
+And if we realized that we had made a mistake
+and erroneously switched the IP addresses of anson and wald,
+we could switch them back via
+<s:code><![CDATA[
+> ip = c(wald="169.237.46.2", anson = "169.237.46.9", fisher = "169.237.46.3")
+> ip[c("wald", "anson") ] <- ip[c("anson", "wald")]
+> ip
+          wald          anson         fisher 
+"169.237.46.9" "169.237.46.2" "169.237.46.3" 
+]]></s:code>
+
+Note that the recycling rule is in effect in all of these cases.  The
+number of values on the right must match the number of values expected
+on the left hand side and the recycling rule works to do this.
+
+</para><para>
+So what does this have to do with the empty subsetting capabilities?
+Well, what's the difference between 
+<s:code><![CDATA[
+> x <- 0
+> y[] <- 0
+]]></s:code>
+In the first case, we are assigning the value 0 to the name "x".
+In the second case, we are assigning 0 to each element of the
+vector <s:var>y</s:var>.
+
+</para><para>
+Another reason why the empty subsetting is useful is when
+we deal with multi-dimensional vectors, i.e. matrices and arrays.
+For these, we can say "give me all the columns for the first four rows"
+as 
+<s:code><![CDATA[
+> m[1:4, ]
+]]></s:code>
+The same subsetting rules apply for each dimension
+and so we need a convenient  way to say "everything" in this
+dimension. And that is the empty subsetting operation.
+</para></section><section><title>Matrices</title><para>
+In this class, we won't look very much at matrices.  Instead, we will
+focus on data frames which are a richer, more appropriate way to think
+about observed data.  However, since matrices arise within
+computational statistics a lot, it is good to understand the basics.
+We can create a matrix in S using the
+<s:func>matrix</s:func> function.  We give this values
+for the elements, the number of rows and the number of columns.
+<s:code><![CDATA[
+> matrix(1:6, 2, 3)
+     [,1] [,2] [,3]
+[1,]    1    3    5
+[2,]    2    4    6
+]]></s:code>
+Note that the values (1, 2, 3, 4, 5, 6) are arranged column-wise.
+If we wanted to arrange them row-wise, we could use
+the byRow argument.
+<s:code><![CDATA[
+> x = matrix(1:6, 2, 3, byrow = TRUE)
+]]></s:code>
+Because of the recycling rule for vectors,
+we can give fewer values than are needed.
+<s:func>matrix</s:func>
+uses the number of rows and columns
+to determine how many values it needs and recycles
+appropriately.
+For example,
+<s:code><![CDATA[
+> matrix(NA, 2, 3)
+]]></s:code>
+creates a matrix of NAs, i.e.  missing values.
+
+</para><para>
+We can even omit either dimension if we specify the correct
+number of values.
+For example,
+<s:code><![CDATA[
+> matrix(1:6, , 3)
+]]></s:code>
+omits the number of rows, and S infers that it is 2.
+
+
+</para><para>
+
+Now that we know one way to create a matrix, let's think about what it
+is in S.  Essentially, it is a vector with additional information
+about the dimensions of the matrix.  The dimensions are stored as an
+integer vector of length 2.  This additional information is stored in
+a general "attributes" field that we can associate with any S object.
+We can query this value
+using the <s:func>dim</s:func> function.
+<s:code><![CDATA[
+> dim(matrix(1:6, , 3))
+[1] 2 3
+]]></s:code>
+We can even assign a value to the dimension to change the 
+"shape" of the matrix.
+
+<s:code><![CDATA[
+> x = matrix(1:6, , 3)
+   [,1] [,2] [,3]
+[1,]    1    3    5
+[2,]    2    4    6
+> x
+> dim(x) <- c(3, 2)
+x
+     [,1] [,2]
+[1,]    1    4
+[2,]    2    5
+[3,]    3    6
+]]></s:code>
+This is another way to create matrices.
+
+
+
+</para><para> From the perspective of a matrix, the fact that it is a vector
+has a very strong implication.  Being a vector, a matrix in S can only
+contain values or elements of the same type.  This is like its
+mathematical counterpart, and it means that we cannot mix character
+elements with numbers or logicals.  As we saw for vectors, if we
+combine elements of different basic types, they get coerced into the
+common form that doesn't lose information.  This is rarely desirable
+and this is where data frames are more appropriate and useful
+as we shall see.
+
+</para><para> 
+
+We do get nice things from a matrix being a vector with dimensions.
+We can perform arithmetic, etc. simply on two matrices of the right
+dimensions using the basic vector operations.
+<s:code><![CDATA[
+> matrix(1:4, 2, 2) + matrix(101:104, 2, 2)
+     [,1] [,2]
+[1,]  102  106
+[2,]  104  108
+> matrix(1:4, 2, 2)^3
+     [,1] [,2]
+[1,]    1   27
+[2,]    8   64
+]]></s:code>
+
+
+</para><para>
+
+As with vectors, it is often convenient to supply names to label the
+elements. In the case of matrices, we have two dimensions and so two
+sets of names, one for the rows and one for the columns.  We can
+access the names using <s:func>rownames</s:func> and
+<s:func>colnames</s:func>.  These are actually stored
+together as a list containing two character vectors of the appropriate
+lengths.  They are again stored in the attributes part of the object.
+We can access them together using the
+<s:func>dimnames</s:func> function meaning, of course,
+the dimension names.
+
+</para><para>
+
+One of the things we sometimes want to do on a matrix is to apply a
+function to each of the rows or each of the columns.  This is like a
+vectorized operation that operates on the entire collection of
+elements, but for a matrix there are times we want to respect the two
+dimensional structure and apply the function to the different
+collection of elements given by the rows or the columns.  The function
+<s:func>apply</s:func> does this for us.  We give it the
+matrix of interest, the dimension we want to sweep over (i.e. the rows
+or the columns) and a function that takes in a vector and returns a
+value.
+Let's take the simple matrix we have above
+<s:code><![CDATA[
+> x = matrix(1:6, 2, 3)
+]]></s:code>
+Now, we can sum the elements in each row
+using <s:func>apply</s:func>
+in the following way:
+<s:code><![CDATA[
+> apply(x, 1, sum)
+[1]  9 12
+]]></s:code>
+One way to remember which dimension to specify is
+to think about which one we want left with us.
+And 1 refers to rows and 2 refers to columns.
+We can use other functions, and indeed these functions
+can return complicated objects, not just simple vectors
+of length 1.
+
+</para><para>
+
+The apply functions are very powerful.  They work on matrices, and we
+can use them on simple vectors also.  They remove the need for verbose
+looping constructs such as
+<s:code><![CDATA[
+ans <- numeric(nrow(x))
+for(i in 1:nrow(x)) {
+ ans[i] <- sum(x[i,])
+}
+]]></s:code>
+which is the equivalent to the <s:func>apply</s:func>
+command in the previous paragraph.  And we shall see that the
+different forms of the <s:func>apply</s:func> functions
+are very important for operating on lists.
+
+</para><para>
+
+A little thought about the fact that matrices are simply vectors with
+an associated dimension vector might lead to thinking about
+multi-dimensional matrices or <emphasis>arrays</emphasis>.  We can use
+the same structure and provide a dimension vector of length k to
+specify a k dimensional array.
+<s:code><![CDATA[
+> array(1:60, c(3, 4, 5))
+]]></s:code>
+This creates a collection of five 3 by 4 matrices.
+Of course, we can look at this along any dimension and 
+see it also as a collection of three 4 x 5 matrices,
+or four 3 x 5 matrices.
+</para><para>
+And we can use the <s:func>apply</s:func>
+function, this time with multiple dimensions.
+Again, using the rule that we specify what dimensions
+we want to be left with, we perform an operation
+along the other dimensions 
+such as
+<s:code><![CDATA[
+> apply(array(1:60, c(3, 4, 5)), c(1, 3), sum)
+     [,1] [,2] [,3] [,4] [,5]
+[1,]   22   70  118  166  214
+[2,]   26   74  122  170  218
+[3,]   30   78  126  174  222
+]]></s:code>
+to end up with a 3 x 5 matrix collapse across the 
+middle dimension of 4 matrices.
+
+</para><para>
+Similarly, we collapse the second and third dimension
+in the following command.
+<s:code><![CDATA[
+> apply(array(1:60, c(3, 4, 5)), c(1), sum)
+[1] 590 610 630
+]]></s:code>
+
+</para><para>
+Some functions to look at for operating on matrices in S
+are:
+<s:func>dimnames</s:func>,
+<s:func>t</s:func>,
+<s:func>eigen</s:func>,
+<s:func>diag</s:func>,
+<s:func>solve</s:func>
+</para></section><section><title>Lists</title><para>
+So far we have looked at vectors and we have emphasized that they must
+have the same type of elements.  If we try to combine different types
+of elements, S coerces them to an appropriate common type.
+For example
+<s:code><![CDATA[
+> c(1, 1.2, TRUE, "abc")
+[1] "1"    "1.2"  "TRUE" "abc" 
+]]></s:code>
+results in a character vector.
+You can try combining different elements
+and see what you get,
+e.g.
+<s:code><![CDATA[
+> c(as.integer(1), 1.2)
+]]></s:code>
+
+</para><para> 
+
+There are so many situations that we want to be able to group values
+with different types.  An observation may be made up of an identifier
+such as a name or social security number; age; day, month and year of
+birth; gender; height; 3 measures of blood pressure; etc.  We most
+definitely don't want to put these into a vector as then everything
+will have to be a string.  We will throw away good information about
+the fact that some are numbers, some are integers, etc.  Instead, we
+want to be able to group them together but keep their different types.
+Otherwise, if we want to take the mean of the blood pressure
+measurements for each person, or find the average height, we would
+have to convert the strings to numbers, handle errors in the data that
+had snuck in because we were treating numbers as strings and hadn't
+verified that they were numbers, and so on.  Generally, giving up
+information about the type of a value is a bad idea. This
+<emphasis>meta-information</emphasis> can be important, and is
+becoming much more commonly available in data analysis and good
+programming these days.
+
+</para><para> 
+
+So what we need is a container to group things together that supports
+elements with different types.  This is exactly what a list does in S.
+A list is essentially a vector but can support elements with different
+types.  We put things into a list
+using the list function:
+<s:code><![CDATA[
+> x = list(1:10, "B", list(name = "Duncan Temple Lang", ssn = "999-99-9999"), rnorm(20))
+]]></s:code>
+This shows that we can use any S object as an element in a list,
+including lists themselves.  We can use names for elements of lists as
+we did for vectors.
+
+</para><para>
+We can use the same style of subsetting as we did for vectors also.
+For example, we can get the first two elements of our 
+list above as
+<s:code><![CDATA[
+> x[1:2]
+]]></s:code>
+And we can drop elements using negative indices:
+<s:code><![CDATA[
+> x[-1]
+]]></s:code>
+Similarly, names and logical vectors will work the same way as they
+did for vectors.  What is important to note is that, just as for
+vectors, the <s:operator>[</s:operator> returns an object of the same
+type as the one being subsetted.  So using the
+<s:operator>[</s:operator> on a list means that we will get back a
+list.  This is true even if the subset only has one element.  So if we
+want to get an element itself, rather than a list containing that one
+element, we are going to need some other mechanism.
+For example, consider the simple list
+<s:code><![CDATA[
+> x = list(1, "a")
+]]></s:code>
+containing just two elements.
+If we get the subset containing the first element
+<s:code><![CDATA[
+> x[1]
+[[1]]
+[1] 1
+]]></s:code>
+it is a list of length 1.
+And 
+<s:code><![CDATA[
+> x[1][1]
+]]></s:code>
+is the same thing!  
+
+</para><para> 
+
+So we need another operator to extract an individual element.  We use
+<s:operator>[[</s:operator> for this.
+<s:code><![CDATA[
+> x[[1]]
+]]></s:code>
+
+Other than this and the fact that we can hold arbitrary types in a
+list, they are like vectors. The same subsetting works.  Elements can
+have names.  One thing we can do is use the <s:operator>$</s:operator>
+to access elements by name.
+If we have a list
+<s:code><![CDATA[
+> x = list(sample1 = rnorm(10), sample2 = rnorm(1000))
+]]></s:code>
+we can access the elements as
+<s:code><![CDATA[
+> x$sample1
+> x$sample2
+]]></s:code>
+
+
+We can apply a function to each element of a list using the function
+<s:func>lapply</s:func>, for "list apply".  This works
+very much the same way as <s:func>apply</s:func> does
+for vectors/matrices.  We give it the list or vector and the function
+to apply to each element.  The result is itself a list where each
+element is the result of applying the function to the corresponding
+element in the original list.  For example, with our list above
+containing two samples of observations from a random normal
+distribution, we can calculate the sum and mean of the values as
+<s:code><![CDATA[
+> lapply(x, sum)
+$sample1
+[1] -6.707135
+
+$sample2
+[1] 0.0317475
+> lapply(x, mean)
+$sample1
+[1] -0.6707135
+
+$sample2
+[1] 0.00317475
+]]></s:code>
+Note that the names of the new list are the same
+as that of the original list.
+
+</para><para>
+If we want to save looping over the list
+twice, we could compute both the sum and the mean
+in a single call.
+<s:code><![CDATA[
+> lapply(x, function(x) c(sum = sum(x), mean = mean(x)))
+$sample1
+       sum       mean 
+-6.7071349 -0.6707135 
+
+$sample2
+       sum       mean 
+0.03174750 0.00317475 
+]]></s:code>
+
+This shows that we can specify a function either by name or by
+defining one in our call.  These are often called "anonymous
+functions" since they have no name.  But in either case, the argument
+is a function object and that is important.  In some cases, we
+naturally define a new function so that we can customize a particular.
+For example, suppose I want to loop over a list in which each element
+is a collection of lines. These might be mail messages, directory
+listings, etc.  And suppose I want to paste the elements of each
+character vector together.  If I had just one character vector, I
+would use the <s:func>paste</s:func> function
+with the <s:arg>collapse</s:arg> argument.
+For example,
+<s:code><![CDATA[
+ paste(x, collapse = "\n")
+]]></s:code>
+If we want to specify this in a call to 
+<s:func>lapply</s:func>, we cannot simply 
+use the <s:func>paste</s:func>
+function. Instead, we need to also have it use the 
+<s:arg>collapse</s:arg> argument.
+We can do this in two ways.
+A natural way is to define a new function
+that simply calls <s:func>paste</s:func>.
+<s:code><![CDATA[
+ lapply(l, function(x) paste(x, collapse="\n"))
+]]></s:code>
+We can do better however.  <s:func>lapply</s:func> takes
+arbitrary additional arguments via its <s:dots/> argument.  These
+arguments are passed directly to the function calls for each element.
+So this allows us to pass in additional arguments like
+<s:arg>collapse</s:arg>.  So we can write this expression now
+as
+<s:code><![CDATA[
+ lapply(l, paste, collapse="\n")
+]]></s:code>
+So the <s:arg>collapse</s:arg> argument is given to
+<s:func>lapply</s:func>, but is then passed on to each
+call to <s:func>paste</s:func>.  This is likely to be
+marginally faster than the earlier version because there is one less
+function call per element.  We call
+<s:func>paste</s:func> directly rather than a function
+that calls <s:func>paste</s:func>.  But this is a second
+order consideration at this stage.
+
+
+</para><para>
+
+Lists are very useful when we want to do a number of iterations and
+store the results from each.  The bootstrap or any form of simulation
+is a good example.  The example above suggests that if we wanted to
+loop over different sample sizes - say 10, 100, 1000, 10000 -
+and compute samples of that size, we might do this and store the
+results in a list.  Many people are included to try to save the
+results of each iteration to a variable with a name made up by pasting
+a name and the sample size together.
+This can be done, but it is not a very good way.
+<s:code><![CDATA[
+for(i in c(10, 100, 1000, 10000)) {
+  x = rnorm(i)
+  assign(paste("sample", i, sep="."))
+}
+]]></s:code>
+And then we end up with the results in the variables
+<s:var>sample.10</s:var>,
+<s:var>sample.100</s:var>,
+<s:var>sample.1000</s:var> and
+<s:var>sample.10000</s:var>.  This will overwrite any
+existing variables having these names.  It is also hard to deal with
+the collection of results as a collection. Instead, they are distinct
+variables.
+
+</para><para>
+A better way  to do this is
+<s:code><![CDATA[
+ans <- list()
+for(i in c(10, 100, 1000, 10000)) {
+ ans[[paste("sample", i, sep=".")]] <- rnorm(i)
+}
+]]></s:code>
+Now we end up with a list containing the 4 sample vectors.
+And one of the nice things we can do is then
+use <s:func>lapply</s:func> to compute on
+the elements as a collection: e.g.
+<s:code><![CDATA[
+> lapply(ans, mean)
+]]></s:code>
+as before.
+
+</para><para>
+Perhaps the nicest way to do these iterative computations is 
+to use <s:func>lapply</s:func>
+on the vector of sample sizes.
+<s:code><![CDATA[
+> ans = lapply(c(10, 100, 1000, 10000), rnorm)
+]]></s:code>
+We lose the names, but we can put them on ourselves after the
+computation.  We do avoid having to declare a global variable
+(<s:var>ans</s:var>) and then add to it within each
+iteration.  And the names are very important in some contexts.
+
+</para><para>
+Just to show what we might do in a
+call to <s:func>apply</s:func>,
+let's create a histogram of each of the 4 samples.
+<s:code><![CDATA[
+> par(mfrow=c(2,2))
+> lapply(ans, hist)
+]]></s:code>
+Here we split the graphics screen (which will be created automatically
+if necessary) into 2 rows and 2 columns and then use the
+<s:func>hist</s:func> to create the individual
+histograms.  We would probably want to ensure that they had the same
+scale and the right title and axis labels.
+<s:code><![CDATA[
+> lapply(ans, function(x) hist(x, xlab="", main=paste("Sample size", length(x))))
+]]></s:code>
+
+</para><para>
+
+ There is one other detail in using
+<s:func>lapply</s:func>.  We mentioned that it returns a
+list containing the new elements.  If all the elements have the same
+type, it is often much more convenient to have them as a vector and
+not a list.  Our example of when we computed the mean of the samples
+is illustrative.  Suppose we had 1000 samples in our list, each of
+sample size 200.  Then we might want to compute different statistics
+on these samples and look at their distributions.
+Let's do this by looking at the scatter-plot of
+means and medians.
+First we generate our 1000 samples
+<s:code><![CDATA[
+> samples = lapply(1:1000, function(x) rnorm(200))
+]]></s:code>
+Now, if we use <s:func>lapply</s:func> to compute the
+medians and the means, we will end up with two lists of length 1000.
+But to display a scatterplot of these, we need vectors, not
+lists. (See the help page for <s:func>plot</s:func>.)
+So what can we do?
+
+</para><para>
+
+One thing to do is call <s:func>unlist</s:func>.
+This will unravel the elements in the list and try to
+remove their structure and create a vector.
+In this case, this will work nicely.
+<s:code><![CDATA[
+> unlist(lapply(samples, mean))
+]]></s:code>
+In other cases, we have to be careful only to unlist at the top-level.
+For example, if we have a list of lists, then we may not want to
+unravel the entire two levels, but just the first.  (See the
+<s:arg>recursive</s:arg> argument for
+<s:func>unlist</s:func>.)
+
+</para><para> But better than <s:func>unlist</s:func> in many
+cases is the function <s:func>sapply</s:func>.  This is
+the same as <s:func>lapply</s:func> but it attempts to
+coerce the result into a vector. If it can't, it simply returns the
+result as a list, as would <s:func>lapply</s:func>.
+So <s:func>sapply</s:func> is exactly what we want here.
+So our plot is easily created as 
+<s:code><![CDATA[
+> plot(sapply(samples, mean), sapply(samples, median))
+]]></s:code>
+and this gives us a sense of the relationship between the mean and the
+median for standard normal distributions with samples of size 200.
+(Again, fix the axes labels!)
+</para></section><section><title>Programming Language Facilities</title><para>
+We have looked at the basic data types and the facilities in the S
+language for manipulating them.  In addition to these data structures,
+there are also the standard control flow operations that are in other
+languages.  These allow us to branch our computations based on
+conditions (i.e. the if--else clause) and perform iterations in loops
+(using for, while and/or do-while constructs).
+
+</para><para>
+
+The <s:operator>if</s:operator> in R is for the most part the
+usual one.  We use it as 
+<s:code><![CDATA[
+if(condition) {
+  do something
+} else {
+  do something else
+}
+]]></s:code>
+Note that we don't have to have the 
+<s:keyword>else</s:keyword> part.
+A simple 
+<s:code><![CDATA[
+if(condition) {
+  expressions
+}
+]]></s:code>
+is fine.
+Also, we can combine multiple conditions
+as 
+<s:code><![CDATA[
+if(condition1) {
+
+} else if(condition2) {
+
+} else if(condition3) {
+
+} else {
+
+}
+]]></s:code>
+
+
+In all cases, the condition in the <s:operator>if</s:operator> should
+evaluate to a value that will be coerced to a logical value (i.e. a
+logical vector of length 1).  If, this is <s:true/>, then the
+expressions in the <emphasis>do something</emphasis> clause are
+evaluated.  If the value is <s:false/>, then the expressions in the
+<emphasis>do something else</emphasis> clause are evaluated.
+
+
+
+</para><para> Since the condition should be a single logical value, we often
+have to map a logical vector of length n to one of length 1 to express
+our condition.  The functions <s:func>all</s:func> and
+<s:func>any</s:func> are often used for this.
+For example, let's suppose our test is that any of the values
+are missing in the vector <s:var>x</s:var>.
+We can write this as 
+<s:code><![CDATA[
+if(any(is.na(x))) {
+ stop("Missing values present")
+}
+]]></s:code>
+
+Similarly, if we wanted to test that all the values are greater than
+10, we might do something like
+<s:code><![CDATA[
+if(all(x > 10)) {
+  # do something
+}
+]]></s:code>
+
+</para><para> There are two other forms of branching that are convenient.
+They are the two functions <s:func>switch</s:func> and
+<s:func>ifelse</s:func>.
+
+</para><para><s:func>switch</s:func> lets you use the value of a
+variable to identify which one of many different alternative
+expressions to evaluate.  It is more convenient than multiple if-else
+statements and is used when we have a finite number of possible
+branches that we can identify by the value of the condition itself.
+Consider the following example.  We want to let the user specify the
+name of a probability distribution, and from that we will generate a
+sample of size 1 from the default distribution of that type.  For
+instance, if they specify the value "Normal", we will create a sample
+from a standard Normal distribution (N(0, 1)).  If they specify
+"Exponential", we will generate a value from an Exponential(1)
+distribution.  And similarly, for a Poisson, we will generate a
+Poisson(1); for a Bernoulli/Binomial, Bernoulli(.5), and so on.  We
+can implement this in a variety of different ways.  But a simple way
+to do this is to use the <s:func>switch</s:func>
+function.
+Let's suppose the name of the distribution the user specifies
+is given in the variable <s:var>distName</s:var>.
+Then, we would write the expression
+<s:code><![CDATA[
+switch(distName, Normal = rnorm(1),
+                 Exponential = rexp(1),
+                 Poisson = rpois(1),
+                 Bernoulli =, Binomial = rbinom(1, p = .5),
+                 Gamma = rgamma(1, 1),
+                 stop("Unhandled distribution name"))
+]]></s:code>
+Now, when we evaluate this expression
+with <s:var>distName</s:var>
+as "Normal", we get a value from an N(0, 1).
+<s:code><![CDATA[
+> distName = "Normal"
+> switch(distName, Normal = rnorm(1),
+                 Exponential = rexp(1),
+                 Poisson = rpois(1),
+                 Bernoulli =, Binomial = rbinom(1, 1, p = .5),
+                 Gamma = rgamma(1, 1),
+                 stop("Unhandled distribution name"))
+ [1] -0.5397505
+]]></s:code>
+Of course, we would put this into a function and
+<s:var>distName</s:var> would be an input. Say, we define
+the function <s:func>Sample</s:func> to simply invoke
+this expression with <s:var>distName</s:var> given as the
+only argument.
+Then, 
+<s:code><![CDATA[
+> Sample("Normal")
+[1] -0.05923842[1
+> Sample("Gamma")
+[1] 1.561399
+> Sample("Binomial")
+[1] 1
+> Sample("made up")
+Error in switch(distName, Normal = rnorm(1), Exponential = rexp(1), Poisson = rpois(1),  : 
+	Unhandled distribution name
+]]></s:code>
+</para><para> Now that we have seen the code "in action", let's try to
+understand it.  It is relatively straightforward. The value of the
+first argument, the expression <s:var>distName</s:var> in
+this case, identifies which of the different alternatives given next
+is evaluated and returned.  In our case, the value is a string, the
+name of the distribution.  So switch then looks for a named argument
+that matches that value.  In the case of "Normal", it of course finds
+the second argument and evaluates the expression for that argument:
+<s:expression>rnorm(1)</s:expression>.  If we pass "Gamma" as our
+distribution name, the <s:func>switch</s:func> function
+matches the argument named Gamma and evaluates 
+<s:expression>rgamma(1, 1)</s:expression>.
+If the distribution name doesn't match any of the named arguments,
+<s:func>switch</s:func> matches the default
+argument which is the last one.  In this case, it is a call
+to <s:func>stop</s:func> which raises an error.
+
+</para><para>
+There is one additional curiosity. If we call 
+<s:func>Sample</s:func> with
+the either of the values
+"Bernoulli" or "Binomial", we get a random
+value from a Bernoulli(.5) distribution.
+That is because of the arguments
+<s:code><![CDATA[
+    Bernoulli =, Binomial = rbinom(1, 1, p = .5),
+]]></s:code>
+in the <s:func>switch</s:func> statement.  The
+<s:expression>Bernoulli=, </s:expression> term looks weird. What it
+means is "use the expression in the next argument", in this case the
+argument named "Binomial".  So if <s:var>distName</s:var> is
+"Bernoulli", <s:func>switch</s:func> matches the
+Bernoulli argument and then looks to the next one with an actual
+expression and so uses <s:expression>rbinom(1, 1, p = .5)</s:expression>.
+
+</para><para><s:func>switch</s:func> also works when the
+first argument is a number.  If this value is an integer (between 1
+and the the number of additional arguments), the corresponding
+alternative is evaluated by matching positions of all the alternative
+expressions.  So <s:expression>Sample(2)</s:expression> is equivalent
+to <s:expression>Sample("Exponential")</s:expression>.
+
+
+Note that you might think we could use a named vector to hold the
+values and just subset this using a distribution name.
+<s:code><![CDATA[
+> v = c(Normal = rnorm(1),
+        Exponential = rexp(1),
+        Poisson = rpois(1),
+        Binomial = rbinom(1, 1, p = .5),
+        Gamma = rgamma(1, 1),
+       )
+> v["Normal"]
+> v["Normal"]
+]]></s:code>
+The problem with this is that we don't get to reevaluate 
+the expressions each time.
+We will get the same value each time for the particular
+distribution name.
+That is because we have evaluated the expressions to generate
+the sample value for each distribution when creating the
+vector that we assign to <s:var>v</s:var>.
+<s:func>switch</s:func>
+allows us to evaluate expressions and return the resulting
+value. So it is much more flexible,
+and much simpler than multiple if-else statements.
+
+</para><para>
+
+The <s:func>ifelse</s:func> is essentially an
+element-wise or vectorized version of the <s:keyword>if</s:keyword>
+statement.  Remember that the condition in an
+<s:keyword>if</s:keyword> statement must be a single logical value.
+If we want to iterate over several elements in a logical vector and do
+something for each depending on whether it is <s:true/> or <s:false/>,
+we would have to explicitly loop 
+(using <s:expression>for(i in x)</s:expression> or <s:func>sapply</s:func>.
+The <s:func>ifelse</s:func> is a further convenience
+than <s:func>sapply</s:func> here. 
+
+</para><para>
+Let's start with a simple example.
+Suppose we want to compute the square root of a vector
+of numbers, say 
+<s:code><![CDATA[
+> x = rnorm(10)
+]]></s:code>
+We have to be careful to skip over any negative values
+since we will get NaNs and warnings.
+<s:code><![CDATA[
+> sqrt(x)
+ [1] 0.8101283       NaN       NaN 0.8841332 1.1162295 1.0555023       NaN
+ [8]       NaN 1.0695558 0.4869805
+Warning message: 
+NaNs produced in: sqrt(rnorm(10)) 
+]]></s:code>
+What we might want to do is return
+<s:na/> for these negative values and
+avoid the warning.
+<s:func>ifelse</s:func> will assist us here.
+<s:code><![CDATA[
+> sqrt(ifelse(x > 0,  x, NA))
+]]></s:code>
+What is going on here?  <s:func>ifelse</s:func> works in
+the following way.  The first argument should be a logical vector.
+The other two values should be vectors of the same length as this
+logical vector of conditions.  So we have three parallel vectors,
+i.e. of the same length.  If the i-th element in this condition vector
+is <s:true/>, the i-th element of the result is taken from the i-th
+element of the second vector, the <s:arg>yes</s:arg> argument.
+Otherwise, the i-th element of the result is taken as the i-th element
+of the <s:arg>no</s:arg> argument.
+It is the same as the following in subsetting terms:
+<s:code><![CDATA[
+ ans = numeric(length(test))
+ ans[test] = yes[test]
+ ans[!test] = no[test]
+]]></s:code>
+So basically, the result is a vector as long as <s:arg>test</s:arg>,
+the condition, with elements taken from <s:arg>yes</s:arg> or
+<s:arg>no</s:arg> depending on whether the condition is <s:true/> or
+<s:false/>.  Having evaluated the condition, R creates a vector
+corresponding to the result of evaluating the condition.  It then
+fills in each corresponding element in the result that is <s:true/> in
+the condition with the value from <s:arg>yes</s:arg>, and similarly
+with the result from the corresponding <s:arg>no</s:arg> value for
+<s:false/> values.
+
+The result can actually be a matrix or array also, but of course that
+is still a vector. (Remember how arrays are represented!)
+Basically, it is the same type as the <s:arg>test</s:arg>
+object.
+</para></section><section><title>Functions</title><para>
+We have talked about and used functions a lot in this exposition of
+how R works.  It is now time to consider them in a little more depth.
+There are two aspects to functions: calling them and creating them.
+
+</para><para>
+
+
+There are many functions already built-in to R and its packages.  For
+example, plot, length, sum, apply, matrix, as.integer, etc. are all
+functions.  A function is essentially a localized action that
+typically takes inputs, performs some computations, and returns its
+output value.  Ideally, the actions in the function have no side
+effects.  In other words, it doesn't change the state of things
+outside of the function.  Each function has parameters or formal
+arguments.  These define the different inputs the function can accept.
+When we actually call or invoke a function, the arguments we provide
+are mapped to these formal arguments in a particular way that we will
+discuss shortly.  Regardless of how the arguments are mapped to the
+parameters, the result is that each function call effectively creates
+a local workspace much like our top-level/session workspace with the
+formal arguments containing the input values or actual arguments.
+An example will make this more concrete.
+Consider the function
+<s:func>substring</s:func>
+<s:code><![CDATA[
+function (text, first, last = 1e+06) 
+{
+    storage.mode(text) <- "character"
+    n <- max(lt <- length(text), length(first), length(last))
+    if (lt && lt < n) 
+        text <- rep(text, length = n)
+    substr(text, first, last)
+}
+]]></s:code>
+This has 3 parameters: text, first and last.
+If we make the call
+<s:expression>substring("This is a value", 3, 5)</s:expression>
+R will create a call frame in which to evaluate
+the call and associate the input values/arguments
+with the parameters as we might expect:
+<itemizedlist><listitem>
+text = "This is a value",
+</listitem><listitem>
+first = 3,
+</listitem><listitem>
+last = 5
+</listitem></itemizedlist>
+
+It now evaluates the expressions in the <emphasis>body</emphasis> of
+the function, i.e.  
+<s:expression>storage.mode(text) = "character"</s:expression>, 
+etc.  When it looks for variables - both
+functions and data - such as
+<s:func>storage.mode</s:func> and
+<s:var>text</s:var>, R looks in the local call frame first.
+If it finds the variable there, it uses the value stored with the
+variable.  Otherwise, the basic idea is that R continues looking for
+the variable along the search path.  This is the same thing we
+discussed about looking for variables for commands issued at the
+prompt.  So, it looks in the workspace, then the next element
+of the search path, and so on.
+
+</para><para>
+
+In this example, it will find <s:var>text</s:var> locally in
+the call frame as a formal parameter.  R will not find
+<s:func>storage.mode</s:func> locally, but instead it will
+look through the search path and find it in the
+<r:package>base</r:package>
+package.
+
+</para><para>
+When assignments are made in these expressions 
+such as
+<![CDATA[
+    n <- max(lt <- length(text), length(first), length(last))
+]]>
+these are generally made locally within the call frame.
+So <s:var>n</s:var> and <s:var>lt</s:var>
+become new variables in the function call.
+
+
+</para><para>
+
+When the function returns, the call frame disappears and all the
+variables are discarded.  We don't have to manage these and remove
+them ourselves.  (If some of the values are no longer needed within a
+function and they are very big, it can be useful to explicitly discard
+the values to save memory. The easiest way to do this is to assign a
+new small value to the variable, such as <s:null/>.)
+
+
+</para><para> 
+
+So we have now described how a call to a function is evaluated except
+for two things: the way the arguments are mapped to the formal
+arguments in the call frame and how we exit from a function and return
+control to the caller.  We'll deal with exiting first.  The simplest
+way a function can exit and hand control back to the caller is with an
+explicit <s:keyword>return</s:keyword> expression.  This can be called
+with no arguments or with a single value which can be any S object.
+If we want to return two or more values, we put them in a list
+and return that single list object.
+For example, suppose we wanted to return both the
+text of a mail message and the header information,
+we might create a named list with these two elements
+and then return that:
+<s:code><![CDATA[
+  return(list(text = messageLines, header = header))
+]]></s:code>
+This is a list with two named elements, but we are returning a single
+S object, the list.  If we don't want to return anything, we can call
+<s:keyword>return</s:keyword> with no argument, but that actually
+returns <s:null/>.
+
+</para><para>
+
+Explicitly calling <s:keyword>return</s:keyword> allows us to 
+exit from a function within loops, if-else statements, and so
+on. In many functions, we often want to do some computations
+and return the last computed value.
+R helps us do this by making the value returned
+by a function the result of evaluating the last expression.
+So in the absence of an explicit <s:keyword>return</s:keyword>
+being evaluated, R returns the last result evaluated.
+This means you will often see something like
+<s:code><![CDATA[
+ function(x) {
+   x = x[!is.na(x)]
+   x = x[x > 0]
+   sum(x)/length(x)
+ }
+]]></s:code>
+and the result is the last expression
+<s:expression>sum(x)/length(x)</s:expression>.
+
+</para><para>
+When we call a function, either from the prompt or in other functions,
+we can assign the result to a variable in the standard way:
+<s:code><![CDATA[
+ x = sum(1:10)
+]]></s:code>
+
+
+</para><para>
+
+The last remaining thing to understand about calling functions is how
+the inputs we give it are mapped to the formal arguments and how we
+can use this conveniently.  We have seen that formal arguments in a
+function definition have names, and some may have default values.
+When we call a function, R maps these inputs to the formal argument
+names and puts them into a call frame with variables corresponding to
+these formal argument names.  One can think of this step in the
+following way.  R first creates a list (or table) of variables with
+one variable named for each of the formal arguments.
+Next, it assigns the default value for each formal argument that has
+one to the corresponding variable.
+So in our substring example above, 
+<s:code><![CDATA[
+function (text, first, last = 1e+06) {
+
+}
+]]></s:code>
+R would create a call frame with variables
+named <s:var>text</s:var>, <s:var>first</s:var> and <s:var>last</s:var>.
+It would then assign the value 1e+06 to <s:var>last</s:var>.
+</para><para>
+
+It is at this point that R starts to try to map the inputs to these
+variables.
+Suppose we have a call of the form
+<s:code><![CDATA[
+ substring("This is a value", 3, last = 5)
+]]></s:code>
+as before.
+R starts first by matching named arguments.
+So in this case it looks at 'last' and recognizes
+that that matches the name of a formal argument.
+So it assigns the value 5 to <s:var>last</s:var>
+in the call frame table.
+Now, there are no other named arguments, so it
+starts matching by position.
+"This is a value" is assigned to the first formal
+argument, <s:var>text</s:var>.
+The next step is to match 3 to 
+the next formal argument which is 
+<s:var>first</s:var>.
+And now we are ready to go.
+
+</para><para>
+
+We have seen calls like the following
+<s:code><![CDATA[
+ matrix(, 3, 4)
+]]></s:code>
+which creates a 3 by 4 matrix with an <s:na/>
+value in each element.
+How does this work with matching the arguments
+to the formal arguments of the function matrix:
+<s:code><![CDATA[
+function (data = NA, nrow = 1, ncol = 1, byrow = FALSE, dimnames = NULL) 
+{
+    data <- as.vector(data)
+    if (missing(nrow)) 
+        nrow <- ceiling(length(data)/ncol)
+    else if (missing(ncol)) 
+        ncol <- ceiling(length(data)/nrow)
+    x <- .Internal(matrix(data, nrow, ncol, byrow))
+    dimnames(x) <- dimnames
+    x
+}
+]]></s:code>
+
+
+</para><para> The rule is that we first handle all the named arguments.  In
+this case, there are no named arguments. So we skip to the next stage
+of the matching.  This involves matching by position.  The first
+argument is intentionally missing (i.e.  the lack of argument before
+the first comma in <s:expression>matrix( , 3, 4)</s:expression>).  So
+we count that as the first formal argument (<s:arg>data</s:arg>) but
+leave its default value as the actual value in the call.  Then we
+process the value 3. This is assigned to the next formal argument
+which is first actual argument is 3 and that gets matched to the
+second formal argument, <s:arg>nrow</s:arg>.  And lastly, we match 5
+to the next formal argument which is <s:arg>ncol</s:arg>.
+
+
+</para><para> R does have a mechanism that allows us to abbreviate argument
+names when they unambiguously identify the particular argument.  For
+example, rather than using the command 
+<s:expression>matrix(1:10, ncol = 5)</s:expression>, we could abbreviate the "ncol" to
+<s:expression>matrix(1:10, nc = 5)</s:expression> as that matches only
+the <s:arg>ncol</s:arg>.  This style of abbreviated argument names is
+called partial matching and can make code much harder to read and
+confusing.  It can also lead to some very subtle and frustrating bugs
+so you should avoid using it, and if you do chose to use it, do so
+only in interactive use!
+
+</para><para> There is one additional style of formal argument in R
+functions.  This is the <s:dots/> mechanism.  When R cannot match an
+argument by name or by position, and there is a formal argument
+<s:dots/> in the signature of the function, the argument is added to
+this list.  This is a mechanism by which we can have an arbitrary
+number of arguments for the list.  While it does allow us to have any
+number of arguments in functions like
+<s:func>c</s:func>, <s:func>list</s:func>,
+<s:func>sum</s:func> and so on, it also has another
+purpose.  It allows us to write top-level functions
+that use <s:dots/> to take any arguments
+which it then passes on to lower-level functions.
+<!-- Example. -->
+</para><section><title>Writing Functions</title><para>
+We can add our own functions to the R
+system and use them just as we do regular, "built-in" functions.  A
+very common style of writing and managing functions is to create them
+in a regular ASCII/text file somewhere in your account.  Then, when
+you want to try them in R, use the function
+<s:func>source</s:func> to read and evaluate the
+commands in that file.  And this will define the functions you have
+created in the file as regular variables in your workspace, ready for
+you to use and check.  Then, if you need to modify the function to fix
+a bug or make it more general, then change it in the file again, and
+re-<s:func>source</s:func> the file into R.
+
+</para><para>
+
+Let's suppose we wanted to take lines of the form
+<emphasis>name=value</emphasis> and turn them into a vector of
+<emphasis>value</emphasis> elements with names given by the vector of
+<emphasis>name</emphasis> elements.
+For example, we might have a file something like
+<literallayout>
+font=Times
+color=red
+font-size=12
+</literallayout>
+to specify appearance of text.
+The result of our function should return
+the named character vector
+<s:code><![CDATA[
+  c(font = "Times", color = "red", "font-size" = "12")
+]]></s:code>
+
+How do we go about writing a function to transform general lines like
+this into the corresponding vector?  When programming a task, we break
+it into its smaller units or steps. First, we need to read in the
+lines.  Next, we need to break the lines into the name and value
+pieces.  Then we need to create the vector.  And then, we need to put
+the names on the resulting vector.  We start by writing a function
+that takes the name of the file as its input.
+
+
+We do this by using the function.  We define a function using the
+<s:keyword>function</s:keyword> and supplying the list of formal
+arguments.
+<s:code><![CDATA[
+function(filename)
+{
+
+}
+]]></s:code>
+This just defines the function as an S object, but does not
+assign it to an S variable.
+This means that it will just disappear. It is what
+we call an anonymous function.  We will see that this is
+very useful, but more often we want to assign the function to a variable.
+And we do this just like we do for any assignment
+<s:code><![CDATA[
+readProperties =
+function(filename) 
+{
+
+}
+]]></s:code>
+
+</para><para>
+So  far, so good. We have created a function that takes one
+argument and assigned it to the variable 
+<s:var>readProperties</s:var>.
+Unfortunately, it doesn't do much.
+We have to supply S expressions that perform the actions
+of the function and put them in the body.
+We do this by putting these expressions between the
+{...}
+
+</para><para>
+Let's start by trying to map the steps we outlined
+for the function into actual code.
+The first step is to read in each line from the
+file. We do this with the
+<s:func>readLines</s:func> function.
+So we call this and store the results in a 
+local variable, say <s:var>txt</s:var>.
+<s:code><![CDATA[
+readProperties =
+function(filename) 
+{
+  txt = readLines(filename)
+}
+]]></s:code>
+Now we want to split each line into the bit before the first = sign
+and the rest to the left.  Before we head off to write a function to
+do this, we should look through R's collection of functions to see if
+such a function already exists.
+And fortunately it does, in the form of  the
+<s:func>strsplit</s:func> function.
+
+<s:code><![CDATA[
+readProperties =
+function(filename) 
+{
+  txt = readLines(filename)
+
+  splits = strsplit(txt, "=")
+}
+]]></s:code>
+And now we have
+a list with character vector entries of 
+the form
+c("font", "Times"),
+c("color", "red")
+and 
+c("font-size", "12").
+So our task is to extract  the second
+element as our values and the first
+elements as names.
+<s:code><![CDATA[
+readProperties =
+function(filename) 
+{
+  txt = readLines(filename)
+  splits = strsplit(txt, "=")
+
+  values = sapply(splits, function(x) x[2])
+  names(values) = sapply(splits, function(x) x[1])
+
+  values
+}
+]]></s:code>
+The calls to <s:func>sapply</s:func> do just these two
+steps and we assign the names to the vector of values.  And finally,
+we return the result with the line <s:expression>values</s:expression>
+at the end of the function.  And we have written a new function in R.
+
+</para><para> 
+
+We now <s:func>source</s:func> this into R by
+<s:func>source</s:func>'ing the file in which we created
+this file.  And the next step is to test the function.  To do this, we
+need to prepare a test file to use as the input.  We can take the
+three example lines above as a start.  Of course, we need to test on
+more interesting and complex data if we want to have any confidence
+our function will work in general situations.  But let's start with
+these three lines and put them in a file, say
+<filename>props.txt</filename>.  Then we can invoke this function as
+<s:code><![CDATA[
+ readProperties("props.txt")
+]]></s:code>
+And, sure enough, we get the correct result.
+<literallayout>
+     font     color font-size      &lt;NA&gt; 
+  "Times"     "red"      "12"        NA 
+</literallayout>
+
+</para><para>
+Note, however, that some people may have obtained
+a different result.
+For example, with a slight change to the 
+<filename>props.txt</filename>
+file, I get
+<literallayout>
+     font     color font-size       &lt;NA&gt; 
+  "Times"     "red"      "12"        NA 
+</literallayout>
+Where did this NA come from?  Think about it.  Being able to diagnose
+problems from the output or other symptoms is one of the important
+skills in being able to write functions.
+Since it worked on the original file, lets look to see what is
+different about this file and the previous version.
+There are utilities to find differences between files which might
+help. In this case, we can see that there is an extra blank line
+at the end of the new version of the file. So somehow, the
+NA is coming from the blank line. 
+Our job is to understand how and then to try to fix it.
+
+</para><para>
+What does <s:func>strsplit</s:func> do with
+a blank line.  It returns an empty character vector,
+i.e. of length 0.
+So <s:func>strsplit</s:func> is not the problem.
+But where do the NAs come from?
+Since there are few other expressions in our function,
+let's look at the next few commands.
+What happens in the <s:func>sapply</s:func>
+commands? The functions that extract the first and second
+elements may be causing problems.
+What is the first element of a character vector of 0 length?
+We can try this in R to see the result:
+<s:code><![CDATA[
+> character(0)[1]
+[1] NA
+]]></s:code>
+So that seems to be our problem, especially since we are getting
+<s:NA/>s  in the values and the names.
+
+</para><para> So now that we know what the problem is, how do we fix it?  We
+could adapt the functions in the <s:func>sapply</s:func>
+calls to not return <s:NA/> when the vector has length 0, but that
+will unnecessarily complicate them and also misses the real point.
+Instead, we just want to drop entirely blank lines in our input before
+call <s:func>strsplit</s:func>.
+So we just need to add a line something like
+<s:expression>  txt = txt[txt != ""]</s:expression>
+and our function will be better behaved.
+<s:code><![CDATA[
+readProperties =
+function(filename) 
+{
+  txt = readLines(filename)
+  txt = txt[txt != ""]
+
+  splits = strsplit(txt, "=")
+
+  values = sapply(splits, function(x) x[2])
+  names(values) = sapply(splits, function(x) x[1])
+
+  values
+}
+]]></s:code>
+And now we retest after re-<s:func>source</s:func>'ing
+this into R.
+<s:code><![CDATA[
+> readProperties("props.txt")
+     font     color font-size 
+  "Times"     "red"      "12" 
+]]></s:code>
+And we get the correct answer.
+
+</para><para>
+So we see we are now making our function more robust and general
+and iteratively refining it by prototyping and testing and recoding,
+and doing this over and over again until we are happy with the function.
+And this is a good style. First, break the function into small steps
+and write down code to do each one. Then test, fix, test, ...
+And then test on different inputs.
+
+
+</para><para>
+These properties files can be written in different formats,
+specifically using : instead of the = sign to separate 
+the name and value on a line. It would be silly to write another
+function to handle files in that form. Instead, we can add
+an additional formal argument to the function to allow the user
+specify the particular separator that is used in the file.
+Let's call this argument <s:arg>sep</s:arg>.
+And now we have to replace the hard-coded value of 
+"=" with the value that is specified via this formal
+argument.  Fortunately, there is only one
+case,  in <s:func>strsplit</s:func>.
+<s:code><![CDATA[
+readProperties =
+function(filename, sep) 
+{
+  txt = readLines(filename)
+  txt = txt[txt != ""]
+
+  splits = strsplit(txt, sep)
+
+  values = sapply(splits, function(x) x[2])
+  names(values) = sapply(splits, function(x) x[1])
+
+  values
+}
+]]></s:code>
+It is good to avoid hard coded constants for this reason and to make
+them variables either within the function or formal arguments so that
+the caller can specify them.  But now our function can handle two
+types of separators.
+
+</para><para> It is slightly frustrating for the caller to always have to
+specify a value for the <s:arg>sep</s:arg> argument when it is
+typically =, say.  We would like a way to allow a caller to specify
+this, but not insist on it.  Default values will come to our
+assistance here.  We can supply a default value for the
+<s:arg>sep</s:arg> argument:
+<s:code>
+readProperties =
+function(filename, sep = "=") 
+{
+  txt = readLines(filename)
+  txt = txt[txt != ""]
+
+  splits = strsplit(txt, sep)
+
+  values = sapply(splits, function(x) x[2])
+  names(values) = sapply(splits, function(x) x[1])
+
+  values
+}
+</s:code>
+
+Now we can call this as
+<s:expression>readProperties("props.txt")</s:expression>,
+<s:expression>readProperties("props.txt", "=")</s:expression>, for
+clarity, or 
+<s:expression>readProperties("otherprops.txt", ":")</s:expression>.  And this way, we get the best of all worlds:
+convenience but still adaptable and parameterizable.
+
+
+</para><para>
+
+There are additional ways we may want to make this function
+more general.
+Firstly, it is possible that the right hand side of a
+name-value property contains the separator string.
+For example, the label on a radio button
+in a GUI may read
+<literallayout>
+label=  intercept = 0?
+</literallayout>
+When we apply <s:func>strsplit</s:func>
+to this line, we will get  a character vector with
+3 entries -
+c("label", "intercept ", " 0?").
+This is just the left and right hand side.
+So when we get the value, we need to put the second and third
+elements back together again into a single string.
+We would do this with the command
+<s:code><![CDATA[
+  values = sapply(splits, function(x) paste(x[-1], collapse = sep)
+]]></s:code>
+
+</para><para>
+We also need to handle the case where a value is
+continued across multiple lines.
+For example, we may have a property file of the form
+<literallayout>
+label=This is a multi line
+    value
+</literallayout>
+What we know about such files is that the continuation lines
+start with white space.
+<exercise><question>
+Extend this function to handle these continuation lines.
+</question></exercise>
+
+
+
+</para><para> There are some important aspects of style you should think
+about when writing functions.  Firstly, indent your code so that it is
+easier to read.  By this we mean align commands that are at the same
+level and put additional white space in front of commands within
+loops, if-else statements, etc. to indicate their relationship
+to that collection of expression.
+Compare the two functions
+<s:code><![CDATA[
+function(x) {
+if(any(x)<=0)
+x[x<=0]=epsilon
+for(i in x) {
+g(x)
+}
+}
+]]></s:code>
+and
+<s:code><![CDATA[
+function(x) {
+
+  if(any(x) <= 0)
+     x[x<=0] = epsilon
+
+  for(i in x) {
+     g(x)
+  }
+}
+]]></s:code>
+
+</para><para> The next thing to do is put comments in your code.  A comment
+is introduced by the # character.  All text after this to the end of
+the line is ignored by S. So you can put in informative remarks to
+remind yourself or the reader what the purpose of command(s) is.
+<s:code><![CDATA[
+readProperties =
+function(filename, sep) 
+{
+   # Read the lines into a character vector with
+   # one element per line.
+  txt = readLines(filename)
+
+   # Discard the empty lines.
+  txt = txt[txt != ""]
+
+
+    # Break the string by the value of sep
+  splits = strsplit(txt, sep)
+
+    # Get the right hand side of each line, putting the elements
+    # back together if they were split by sep.
+  values = sapply(splits, function(x) paste(x[-1], collapse = sep)
+    # Get the left hand side of the line which is the name
+    # put this on the values vector.
+  names(values) = sapply(splits, function(x) x[1])
+
+  values
+}
+]]></s:code>
+
+</para><para> It is also useful to give meaningful names to the variables
+and formal arguments to make the code easier to read.  The names
+should be suggestive of the purpose or nature of the values being
+stored in the variable.
+</para></section><section><title>Debugging Functions</title><para>
+One of the nice things about writing code in an interpreted language
+like S or Matlab is that there is no compilation step.  We just source
+our function into S and we can use it.  Compilation does provide an
+opportunity to check certain things about the code however that we
+don't have when we source into S.  The only thing that is checked when
+we read the code into S is the syntax. It is common to have forgotten
+to close a " or a parenthesis, or to have omitted a , between
+arguments in a call, or whatever. The result is a syntax error and R
+will announce where it thinks it is by giving a line number.  Often,
+this identifies the problem precisely.  At other times, it may be the
+expression before that line that hasn't been terminated properly.
+
+</para><para>
+
+But after that, the interpreter does not examine the code in the
+function to try to detect any errors.  Rather, it waits until the
+function is called and then only finds errors that affect that actual
+run-time behavior of the actions of the code.  However, it is quite
+common to introduce problems when we build up functions incrementally
+by interactively issuing commands at the R prompt and then
+cut-and-paste them into a file.  Often, we make use of variables that
+are in the session when we evaluate the command interactively, but
+which aren't present when we run the function, e.g. when we return to
+a new R session and source our functions.  In these circumstances,
+when we call the function, it will complain about a variable not being
+found.  There are functions available for R in the
+<r:package>codetools</r:package> that will identify these "free"
+variables.
+
+</para><para>
+The more interesting case of an error is when something in
+the computations actually go wrong for more subtle reasons.
+There are two basic situations that we need to be worried
+about. Firstly, there is an error and R terminates the call
+to the function with an error message.
+This is actually the best type of error. We see the
+message and can try to make sense of it, and as we shall
+see, we can go in and investigate what the states of 
+the different variables were at the time of the error.
+
+</para><para>
+The more insidious problem arises when one's code returns an incorrect
+value, e.g.  returning a negative value or an <s:na/> when it is not
+supposed to. It is hard to detect these situations because there is no
+abnormal termination of a function call, no error message. In fact,
+there is no sign that anything has gone wrong because the system does
+not know that anything has indeed gone wrong.  Unfortunately, it is a
+problem-specific issue.  The author of the function needs to identify
+that there is an error.  A strongly-typed language
+which allows/requires the author of the function
+to specify the return value might help in catching such "errors",
+but there are trade-offs.
+
+</para><para>
+So how do we go about finding the cause of an error, be it explicit or
+implicit?  Most people quickly gravitate to the idea of adding
+expressions to the computations at "appropriate" places that print the
+results of intermediate computations.  One can use
+<s:func>print</s:func> and <s:func>cat</s:func> to
+output information on the R console.  One of the problems with this is
+that it tends to generate a large amount of output and some of the
+important details that would identify an error get lost in the
+multitude of text that scrolls by.  So one has to be judicious in
+adding these output statements.
+Additionally, the process of adding the <s:func>print</s:func>
+statements, running the commands, analyzing the output and
+then adding more specific <s:func>print</s:func>
+statements tends to be quite time consuming.
+And this is especially true if the computations
+take a long time before getting to these
+<s:func>print</s:func>
+statements.
+The reason things take a long time,
+or more precisely numerous cycles, is 
+that we tend to initially print general information
+such as the length or type of a variable.
+Then we make "guesses" or formulate hypothesis about
+what might be wrong and arrange to print out
+diagnostic information to explore that.
+And then we rerun the computations and repeat the process.
+Sometimes we make things slower by having errors in our
+debugging print commands!
+But even if we don't, often our guesses are not quite
+correct and we go down the wrong path.
+And often the problem lies not with a single
+variable but the other variables that were used
+in computing its value.
+So we need to go back and explore different hypothesis
+for what might be wrong and use more information.
+This is a very tedious process when done
+in the edit-print-debug cycle.
+
+</para><para>
+A much more sensible approach that an overwhelming number of people do
+NOT use is to take advantage of explicit tools for debugging.  So many
+people think that their particular problem will reveal itself in the
+first iteration of the edit-print-debug cycle and so there is no need
+to take the time to take a detour and learn about the debugging tools
+in R (or another language they are using).  This is, at best,
+optimistic as statisticians, it is a foolish lack of learning from
+data and experience.  So often I have sat down with users and tried to
+help them solve a problem. I often watch them use their approaches for
+twenty minutes or so and try to help them along. Then I "take over"
+and illustrate how to use the more structured debugging tools and
+identify the problem within a minute. This is not unusual. The tools
+combined with experience are remarkably more effective than seemingly
+"simpler" methods.
+So use them and you will save time!
+
+</para><para>
+
+Let's consider the case where you get an error and you don't
+understand it.  The first thing you want to do is actually read the
+error message and break into its components.  What is the nature or
+type of the error?  Is there any information about what variables are
+involved?  Where did the error occur? Of course, it occurred as a
+result of your command, but as that command was being evaluated, it
+called other functions, which called other functions and so on.  This
+is the (function) call stack, a hierarchy of function calls and
+associated evaluation frames for local variables, etc.  It is very
+helpful to know where in this call stack the error occurred.  It gives
+us much more information about the nature and origins of the error.
+So we'd like to be able to see the call stack and find out in which
+function the error occurred and which function called that one, and
+which called that one, and so on.  And rather than just finding out
+this "static" information, we would like to be able to jump into any
+of those function calls and look around, issuing R commands to explore
+and examine the values of the variables.
+
+</para><para>
+When the R interpreter encounters an error,
+by default it emits an error message and jumps back
+to the top-level prompt and waits for a new command.
+However, we can instruct the interpreter to handle
+the error in our own user-definable way. 
+We can specify a function or command to run 
+when any error occurs by specifying
+the function or expression of interest 
+as the value for the <s:arg>error</s:arg>
+option in the <s:func>options</s:func>
+function.
+In order to get interactive debugging that
+gives us the properties we discussed in the previous
+paragraph, the most common value to specify for this option is
+the <s:func>recover</s:func> function.
+We can specify this at any time during
+the R session as
+<s:code>
+options(error = recover) 
+</s:code>
+It is a good idea to put this
+in your <file>.Rprofile</file> file
+in your home directory so that it is
+automatically set at the beginning of each R session.
+Use the code
+<s:code>
+library(utils)
+options(error = utils::recover) 
+</s:code>
+to ensure that the relevant package is loaded.
+</para><invisible><para>
+We'll create a very function
+that when called with generate an error
+to illustrate how the <s:func>recover</s:func>
+works.
+This function is a (slightly awkward) 
+way of generating <s:arg>B</s:arg> samples
+from an exponential random variable
+with parameter <s:arg>rate</s:arg>
+and returning  the reciprocal of the
+median for each sample.
+<s:code>
+f = 
+function(n, rate, B = 999) {
+ sapply(1:B, function(x) 1.0/median(rexp(n, rate)))
+}
+</s:code>
+A simple call
+<r:expression>f(10, 1)</r:expression>
+works just fine.
+But
+<r:expression>f(10, -1, 0)</r:expression>
+</para></invisible><section id="Post Mortem Debugging"><title>Post-mortem Debugging</title><para>
+</para></section><para>
+Now that we have seen the mechanics of debugging,
+it is helpful to think about how we approach
+debugging more generally.
+The first thing to be said is that
+you want to be approach debugging
+as a detective looking for the actual
+cause of the problem, keeping your mind open
+to different possible conclusions, but prioritizing
+different hunches or intuitive educated "guesses"
+as to what is happening.
+As you get more information, reevaluate the different
+hypotheses or possible conclusions and 
+eliminate those that no longer make sense
+and be keen to reprioritize these possibilities.
+Usually, there are several possible explanations
+and you want to 
+rational and logical when debugging
+and 
+</para></section></section></article>

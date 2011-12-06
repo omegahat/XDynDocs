@@ -1,0 +1,599 @@
+<?xml version="1.0" ?>
+
+<article xmlns:s="http://cm.bell-labs.com/stat/S4"
+         xmlns:r="http://www.r-project.org"
+         xmlns:perl="http://www.perl.org">
+
+<title>Web logs</title>
+
+<section>
+<title>Reading the log files</title>
+
+We are all familiar with the Web and viewing pages on different web
+sites.  Each time a person visits a site, the browser sends a request
+to the particular Web server for a given page and its contents.  (It
+typically uses HTTP to carry on the conversation requesting the page
+and relies on the lower-level TCP/IP mechanism to transport the
+messages to and from the server.)  When a document is request, the Web
+server records the request in a log along with information about the
+request.  These logs can therefore provide information about how many
+users have navigated the site, what documents were popular, which had
+dead links, what were the busy periods, etc.  This information can
+help us improve the layout and the design of a web site, better
+allocate computational resources for serving pages, etc.  To do so, we
+must first digest the log files into a suitable form for exploring
+them statistically.
+
+<para/>
+
+The basic format of a Web server log is the following.  Each line
+relates to a particular request.  It contains the name of the machine
+or its IP address of the requestor.  The next two fields are - - in
+our example data, so we can ignore these.  They can contain
+information about the user requesting the page.  The next fields are
+the date, the request made up of the operation (typically "GET"), the
+name of the file and the protocol and version being used in the
+request.  The remaining two fields give the status of the request and
+the number of bytes transferred in response to the request.
+
+<figure label="web log data example">
+<literal>
+na508.online-age.net - - [30/Dec/2003:13:50:02 -0600] "GET / HTTP/1.0" 200 718
+na505.online-age.net - - [30/Dec/2003:13:50:02 -0600] "GET /R.css HTTP/1.0" 200 658
+na505.online-age.net - - [30/Dec/2003:13:50:02 -0600] "GET /navbar.html HTTP/1.0" 200 1418
+na508.online-age.net - - [30/Dec/2003:13:50:02 -0600] "GET /banner.shtml HTTP/1.0" 200 3173
+na507.online-age.net - - [30/Dec/2003:13:50:02 -0600] "GET /logo.html HTTP/1.0" 200 244
+na507.online-age.net - - [30/Dec/2003:13:50:03 -0600] "GET /Rlogo.jpg HTTP/1.0" 200 8793
+</literal>
+</figure>
+
+<s:code>
+fileNames = list.files(pattern="access*[^~]$")
+requests = list()
+for(i in fileNames) {
+  requests[[i]] = strsplit(readLines(file(i)), " ")
+}
+
+# This doesn't work on my locale. The month is causing problems.
+# Works on other machines (franz).
+DateFormat = "%d/%b/%Y:%H:%M:%S"
+
+
+toWebRequest = 
+function(x, DateFormat = "%d/%b/%Y:%H:%M:%S") {
+ # x = x[-c(2,3)]
+
+ ans = list()
+
+ ans$visitor = x[1]
+ ans$date = strptime(gsub("^\\\[", "", x[4]), DateFormat)
+ ans$status = as.integer(x[9])
+ ans$bytes = as.integer(x[10])
+ ans$file = x[7]
+ ans$operation = gsub('^"', "", x[6])
+ ans$protocol = strsplit(gsub('"$', "", x[8]), "/")
+
+ ans
+}
+
+lapply(unlist(requests, recursive = FALSE), toWebRequest)
+
+</s:code>
+
+Let's think about what can go wrong with this simple scheme?  The most
+obvious problem is that we are using <s:functionRef>strpslit</s:functionRef>
+to identify the different elements. We immediately see that this is a
+problem even in the way we deal with the data; the request is in
+quotes and we split that into different elements and have to clean up
+the leading and trailing quotes.  Let's take a more dire possibility.
+What if file names that are being request have spaces in them?  Will
+the log file escape them with a special character?  will
+<s:functionRef>strsplit</s:functionRef> recognize this?  or will we just get
+more terms that we expected?  If the last of these happens, then the
+status and number of bytes will be meaningless.  As a result, we
+should probably be a little more careful if we are trying to do this
+in a general and robust way that will not require us to have to
+revisit the code if somebody ever posts a file with a space in the
+name.
+
+It turns out that most web browsers and servers will substitute a %20
+in place of a space in the request. As a result, our approach will
+not be troubled by that particular problem.
+
+
+<para/> 
+
+We have a very definite input format and we want to identify the same
+fields as before.  But we will use a very different approach, namely
+regular expressions.  We will take advantage of know certain aspects
+of the format rather than being unnecessarily general.  So, for
+example, we know that the first collection of characters up to white
+space is the name of the machine or its IP address.  We could put a
+regular expression to handle the dotted quad of the IP address or a
+machine name. But we know that machine names will not have a space in
+them (right?).
+
+The function to process an entire line of the log file is
+then something like the following.
+<s:code>
+toWebRequest =
+function(x, DateFormat = "%d/%b/%Y:%H:%M:%S") 
+{
+  tmp = gsub('(.*) - - \\[(.*) -[0-9]*\\] "(.*) (/.*) (HTTP|FTP)/(1\\.[01])" (-|[0-9]+) (-|[0-9]+)',
+             "\\1, \\2, \\3, \\4, \\5, \\6, \\7, \\8", 
+             x)
+  els = as.list(strsplit(tmp, ", ")[[1]])
+  
+  if(length(els) == 1)
+    return("")
+
+  names(els) = c("visitor", "date", "operation", 
+                 "file", "protocol",
+                  "version", "status", "bytes")
+
+  els$date =  strptime(els$date, DateFormat)
+  if(els$status == "-")
+   els$status = 0
+  els$status = as.integer(els$status)
+  if(els$bytes == "-")
+   els$bytes = 0
+  els$bytes = as.integer(els$bytes)
+
+  els
+}
+</s:code>
+
+It is relatively straightforward in what it does, except perhaps the
+regular expression.  We take the entire line as input,
+<s:arg>x</s:arg> and use the regular expression
+replacement/substitution function <s:functionRef>gsub</s:functionRef> to
+subset and transform the entire string into a more accessible form for
+us to use.  This merely involves identifying the elements we want and
+putting them into a comma-separated list which we can easily pull
+apart in R using <s:functionRef>strsplit</s:functionRef>.  The difference in
+the use of <s:functionRef>strsplit</s:functionRef> here is that we have
+created the separating character (a "," but anything will do).  Having
+separate the transformed string into individual string elements, we
+can give them names and also transform these entries into full S
+objects, i.e. away from their string representation.  We might want to
+organize the protocol further into a name, major and minor version
+list to make computations easier.
+
+<para/>
+<sidebar purpose="perl">
+In Perl, the regular expression matching and substitution is slightly
+cleaner to use for the purpose we are exploiting here.  We can check
+whether a particular collection of patterns match a string and if so,
+the variables <perl:variable>$1</perl:variable>,
+<perl:variable>$2</perl:variable>, ...  are available to us until we
+perform another match or substitution.  This would mean that we don't
+have to construct another string with the elements separated by commas
+and then split that again with a second regular expression operation
+in S.  Instead, we would just access the elements immediately after
+the match.
+So the Perl code might look something like
+(using the same regular expression)
+<perl:code>
+ if(m/(.*) - - \\[(.*) -[0-9]*\\] "(.*) (/.*) (HTTP|FTP)/(1\\.[01])" ([0-9]*) ([0-9]*)/) {
+  $obj->{'visitor'} = $1;
+  $obj->{'date'} = $2;
+  $obj->{'operation'} = $3;
+  $obj->{'file'} = $4;
+    .....
+ }
+</perl:code>
+
+</sidebar>
+
+
+We need to be able to handle cases like the following:
+<literallayout>
+host51-103.pool80116.interbusiness.it - - [27/Dec/2003:11:48:10 -0600] \"GET http://cran.us.r-project.org/src/contrib/PACKAGES.htm HTTP/1.1\" 404 308
+</literallayout>
+This has the URL in the filename itself.
+
+<para/>
+
+So now we can loop over the lines in the files and apply this function
+to each line.  We have two simple choices here.  We can give read all
+the lines and then use <s:functionRef>lapply</s:functionRef> on the
+resulting character vector:
+<s:code>
+ textLines = readLines("access.log")
+ hits = lapply(textLines, toWebRequest)
+</s:code>
+
+A disadvantage of this is that we have both the text and the processed
+entries in memory at all time.  If we were to apply the function to
+each line as we read it and discard the text then, holding on to only
+the hit information, we would save memory. This might be important if
+the log files were very large, e.g. New York Times, Google web sites.
+We can do this in S-Plus by registering a <emphasis>reader</emphasis>
+for the connection. This will cause the reader to be invoked
+asynchronously whenever there is new data on the connection.  This is
+overkill here, but is the foundation of how we can handle asynchronous
+streaming data.  Unfortunately, this is not built into R yet.  The
+<r:package>REventLoop</r:package> provides a mechanism for doing this,
+but we won't cover that here.
+The simpler way to do this with non-asynchronous data is to loop
+over the lines, getting 1 at a time.
+<s:code>
+ f = file("access.log")
+ hits = list()
+ ctr = 1
+ open(f)
+ while(TRUE) {
+   l = readLines(f, n = 1)
+   if(length(l) == 0)
+    break
+   hits[[ctr]] = toWebRequest(l)
+   ctr = ctr + 1
+ } 
+ close(f)
+</s:code>
+
+Note that this might get progressively slower as we expand the length
+of <s:variable>hits</s:variable> each time we append an element to the
+list.  We can avoid this if we do two passes. We first count the
+number of lines in the file(s) and then allocate a list of that
+length, and then in the second pass assign to the existing, empty
+elements of the list.  
+
+<para/> This won't work for streaming data that we only get to read
+once.  In this case, we can guess how many elements we will need and
+grow it when we fill it up. In other words, we can start with a list
+of length say 101. When we encounter the 100th element in the file, we
+can expand the list to 200 and then starting filling from 101 to 200.
+And then when we encounter the 201st element, we can grow to 400 or
+300, or use any enlarging strategy.  This is an example where we could
+use statistical prediction to determine a good number, and understand
+the variability associated with that estimate.
+
+<para/>
+
+In this case, we have multiple log files because periodically, we swap
+out the current that is getting "full" or large and name it
+<filename>access.log.1</filename> or whatever.  There is no particular reason
+to treat these files separately for the analysis, but it is
+inconvenient for our code as we have to loop over the files. It would
+be more convenient if we could persuade R to treat a collection of
+connections as a single connection and to move to the next when the
+contents of one have been fully read.
+
+<invisible>
+<s:code>
+hybridConnection(sapply(list.files(pattern = "access\\.log[^~]"), file))
+</s:code>
+</invisible>
+
+
+</section>
+
+<section>
+<title>Identifying Atomic User Requests</title> 
+
+Now that we have this information in R, we can start looking at it.
+We might note that there are a lot of requests coming at the same time
+and from the same machine.  Of course, there might well be many users
+on a machine each requesting the same page such as at a news site or
+stock quote site.  However, the explanation is more mundane and
+technical.  When a request arrives at a Web server for a page, the
+server returns it. The Web browser making the request will immediately
+process it and realize that it refers to other pages by direct
+inclusion, not just links. To display the page properly, it must
+download the images, applet code, etc. that are inserted into the
+rendered display.  So it then fires off a sequence of requests for
+these additional pages, and some of these will often refer to the same
+Web server.  The log entries in figure <link linkend="web log data
+example"/> illustrate this.  The request was for the top page in the
+site (which is index.html).  In this case, it refers to
+<filename>R.css</filename>, <filename>navbar.html</filename>,
+<filename>banner.shtml</filename>, <filename>logo.html</filename> and
+<filename>Rlogo.jpg</filename>.  So as a result, the one user request
+led to 5 additional "hits" in the web log.
+
+<para/> If we are to make sense of the log data from the perspective
+of user actions, we will want to handle these additional requests
+associated with a single user download.  If we take a look at the date
+for these in our example, we will notice that they were all received
+at essentially the same time (within one second of 13:50:02).  But, of
+course, if the Web server or the client was heavily loaded or there
+were other network delays, this might not be the case.  We can use
+statistics to make inferences about whether a request is part of
+another request.  We can do this by looking at other requests for the
+same page and seeing if the same download pattern was observed and
+had the same basic pattern.  While there are problems with this, it
+would basically work.
+
+<para/>
+
+Rather than relying on inference and some heuristics about network
+delay times, etc. we do have a more direct approach.  We can read the
+page and find the URLs that are directly included in the page.  We
+will then know what pages would have been downloaded in response to
+the intial download of that page.  Essentially, we try to look at what
+the browser sees and work from there.  Of course, if the pages are
+dynamically generated, they may not exist on the server when we
+analyze the logs or they may have different content.  Another problem
+is that the page may contain dynamic content that must be interpreted
+by the browser. In this case, we might not be able mimic the
+computations that the browser would do.  However, many pages will be
+static with static content and be amenable to this analysis.  And for
+those that are not, we can use the inference about other downloads of
+the same page and time information that we mentioned above.
+
+<para/> So how do we find which other pages will be downloaded when we
+request a page?  The answer is that we need to fetch the HTML file,
+read it and find the references to directly loaded files.
+We can look at the top-level file that was downloaded in the first
+entry in the log file segment in figure <link linkend="web log data example"/>.
+<figure label="R index.html">
+<literal>
+<![CDATA[
+<title>The Comprehensive R Archive Network</title>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head>
+
+<FRAMESET cols="1*, 4*" border=0>
+<FRAMESET rows="120, 1*">
+<FRAME src="logo.html" name="logo" frameborder=0>
+<FRAME src="navbar.html" name="contents" frameborder=0>
+</FRAMESET>
+<FRAME src="banner.shtml" name="banner" frameborder=0>
+<noframes>
+<h1>The Comprehensive R Archive Network</h1>
+
+Your browser seems not to support frames,
+here is the <A href="navbar.html">contents page</A> of CRAN.
+</noframes>
+</FRAMESET>
+]]>
+</literal>
+We see the reference to 
+<filename>R.css</filename>
+in the line
+<literal>
+<![CDATA[
+ <link rel="stylesheet" type="text/css" href="R.css">
+]]>
+</literal>
+</figure>
+Similarly, we see references to 
+<filename>logo.html</filename>,
+<filename>navbar.html</filename>,
+in the <xml:tag>FRAME</xml:tag> elements.
+Notice that the other reference to
+<filename>navbar.html</filename> in
+the <xml:tag>noframes</xml:tag> tag is not
+part of this download.  That is because either
+the browser supported frames or didn't, so only one
+of these groups was downloaded.
+
+<para/>
+
+Note that in the presence of frames, we must recursively process the
+file each frame includes as this is what the browser will download.
+<filename>logo.html</filename> includes both
+<filename>R.css</filename> and also the image
+<filename>Rlogo.jpg</filename>.  And that accounts for all the
+downloads we see resulting from downloading the top-level file.
+
+<para/> 
+
+We can do this manually by downloading the files and looking
+at them.  But of course we need a more automated way to do this.  What
+we can do is download the files automatically (using wget or R) and
+then look for the "links". We might use regular expressions to find
+these links.  For example, we might use Perl or R to look for
+<literal>
+<![CDATA[
+ <img .*src="(.*)">
+]]>
+</literal>
+or
+<literal>
+<![CDATA[
+ <link .*href="(.*)">
+]]>
+</literal>
+This will catch most of what we want.  But, as with all regular
+expressions, it might catch more than we want.  For example, this file
+is written in XML and we have included the literal
+string that would match the regular expression. But of course, that is
+not a real link, just a reference to one.
+<para/>
+
+A more precise way to find the links (and do the downloading in one
+step) is to explicitly parse the HTML files.  We can do this in R
+using the <s:package>XML</s:package> package and its
+<s:function>htmlTreeParse</s:function> function.
+We give it the URL and it downloads the file and parses it.
+We can then traverse the resulting parse tree and nodes.
+Alternatively, we can collect the information about
+related files as we parse by supplying functions to the parser
+which are called when it encounters certain HTML elements.
+<s:code>
+<![CDATA[
+parseURL = 
+function(u) 
+{
+  if(inherits(u, "URL"))
+    return(u)
+
+  m = gsub("(ftp|http)://(.*)(/.*)", "\\1,\\2,\\3", u, perl = TRUE)
+  els = rev(strsplit(m, ",")[[1]])
+
+  names(els) <- c("file", "domain", "protocol")[1:length(els)]
+
+  class(els) <- "URL"
+
+  els
+}
+
+basename.URL =
+function(u)
+{
+ u[["file"]] = basename(u[["file"]])
+ u
+}
+
+dirname.URL =
+function(u)
+{
+ u[["file"]] = dirname(u[["file"]])
+ u
+}
+
+URL = 
+function(u, file, protocol = "http")
+{
+  u = parseURL(u)
+  if("file" %in% names(u) && !missing(file)) {
+     u = dirname.URL(u)
+     u[["file"]] = paste(u[["file"]], file, sep = "") # , sep="/")
+  }
+
+  u
+}
+
+as.character.URL = 
+function(x) { 
+ paste(x[["protocol"]], "://", x[["domain"]], x[["file"]], sep="")
+}
+
+getLinks = 
+function(baseURL) {
+ 
+ if(is.character(baseURL))
+  baseURL = list(parseURL(baseURL))
+
+ links = character()
+
+ .add = function(l) {
+   if(!is.null(l))
+     links <<- append(links, l)   
+  }
+
+ link = function(node) {
+   .add(xmlGetAttr(node, "href"))
+ }
+
+ img = function(node) {
+   .add(xmlGetAttr(node, "src"))
+ }
+
+  # Here we must recursively process any files 
+  # referenced in the <FRAME> tag.
+  # Needs fixing of URLs here.
+ frame = function(node) {
+   src = xmlGetAttr(node, "src")
+
+   .add(src)
+
+   if(length(grep("^/", src)) == 0) 
+       src = URL(baseURL[[length(baseURL)]], file = src)
+
+   baseURL[[length(baseURL)+1]] <<- src
+   htmlTreeParse(as.character(src), handlers = handlers)
+   baseURL <<- baseURL[-length(baseURL)]
+ }
+
+ handlers = list(link = link, img = img, frame = frame, links = function() links)
+
+ handlers
+} 
+]]>
+</s:code>
+
+Then we can run this
+<s:commands>
+p = getLinks("http://cran.r-project.org/")
+htmlTreeParse("http://cran.r-project.org", handlers = p)
+unique(p$links())
+</s:commands>
+
+Note that we have collapsed all the URLs associated with a given page
+into a vector.  It might be useful to associate which page is included
+in which document at each levl of resolution,
+e.g. <filename>Rlogo.jpg</filename> in <filename>logo.html</filename>.
+How can we addapt the <s:functionRef>getLinks</s:functionRef> to do this?
+
+<para/>
+
+The next step is to use this data to collapse the Web log entries into
+user-level hits or requests, discarding the induced downloads caused
+by direct inclusion of pages.
+
+</section>
+
+<section>
+<title>Things to Explore</title>
+
+<itemizedlist>
+<listitem>
+Look at the distribution of the number of downloads
+made by a person, by a person in a single session.
+By session, we mean a period of time that they were
+looking at the site and did not leave.
+While we cannot tell from these logs whether they left 
+or not, we can separate downloads into different sessions
+based on elapsed time between consecutive downloads.
+Explore different cut-off times such as 10 minutes
+for marking session ends. 
+Note also that there may be more than one person
+on a given IP address/machine so one cannot
+easily tell whether the downloads are part of the
+same "session" or two or more different sessions by different
+users.  What are ways to infer this?
+</listitem>
+<listitem>
+Which pages are most popular?
+Are popular pages linked? Is there are common
+path that is used to jump between groups of pages?
+</listitem>
+<listitem>
+What are the busiest times for the Web site?
+days? hours of the day? Is there an time-zone effect?
+(This is a site that can be accessed internationally,
+although it is a mirror of a European site.)
+</listitem>
+<listitem>
+What proportion of downloads (by count, bytes, time?)
+are for images, HTML files, archive (tar, tar.gz, zip, bzip) files?
+</listitem>
+</itemizedlist>
+
+To investigate these questions, you may have to transform the data
+into different groups by thinking about what are the logical entities
+being explored. You should also think how to present information
+graphically to make it clear.
+
+</section>
+
+
+
+<s:code>
+<![CDATA[
+xx = unlist(sapply(list.files("~/WebLogs/cran", pattern="access.log*", full.names=TRUE), readLines), recursive = FALSE)
+b = regexpr(pat, xx, numElements = 12, asText = TRUE)
+
+b = b[sapply(b, length) > 0]
+
+dd = data.frame(ip = sapply(b, function(x) x[1]),  file = sapply(b, function(x) x[4]), 
+                date = sapply(b, function(x) format(x[2], "%Y%m%d%H%M%S")),
+                 bytes = as.integer(sapply(b, function(x) x[8])))
+
+write.table(dd, "wlog.txt", quote=FALSE, row.names = FALSE, col.names = FALSE, sep=",")
+]]>
+</s:code>
+
+
+<sql:command>
+ create table log (ip varchar(200), file varchar(255), date DATETIME, bytes int(6));
+
+ load data INFILE '/home/duncan/wlog.txt' INTO TABLE log FIELDS TERMINATED BY ',';
+</sql:command>
+
+</article>

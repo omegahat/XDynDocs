@@ -1,0 +1,2701 @@
+<?xml version="1.0"?>
+<chapter xmlns:r="http://www.r-project.org">
+\chapter{The eXtensible Markup Language}\label{chap:XML}
+
+
+In this chapter we explore a variety of different ways in which
+we as scientists can deploy XML, the eXtensible Markup Language.  We
+start by considering its use as a way to store structured
+information and exchange it between different applications, either
+on the same machine or over the network.  We introduce facilities
+in the S language for reading and writing XML quite easily and
+allowing people to create their own languages or dialects for
+storing and exchanging information. 
+We also consider serialization of objects within different systems, 
+e.g. S, SAS, Omegahat, Matlab in a common format which allows them to be
+easily shared by others.
+And finally, we look at how we can use the XML facilities
+in R to implement SOAP (Simple Object Access Protocol) clients and
+servers.
+
+Statisticians often need to use different software tools in their data analysis,
+and by far and away the most common solution to sharing data between
+applications has been to exchange data via ASCII or text files.  One application
+will write out its view of some data; the other application will then
+read this file and construct its internal version of this dataset and
+go about its business. If we want to make the results of computations
+in this application available to the original application or any
+other, we write the results to another ASCII file and they are there to be
+picked up by any other application.
+We don't reserve this style of communication for dynamic interaction
+between two applications running simultaneously.  We exchange datasets
+in the same way, using agreed upon formats such as white-space
+delimited or comma-separated data files.  Since most of the datasets
+over the years are rectangular tables or arrays, the ASCII format is
+relatively natural.  Each line corresponds to a record, and each
+element within a line corresponds to a variable and is the value for
+that variable. 
+
+The benefits of using tabular ASCII files are easy to see. 
+\begin{itemize}
+\item We can edit them in simple text editors.  
+\item There is a natural connection between the visual layout in the 
+  file and the way we think about the dataset when computing on it.  
+\item It is quite simple to both write and read data in this format.  
+\end{itemize}
+
+But what happens as data become more complex? 
+How do we represent \textit{missing values} in our data?  A common
+approach is to choose a number that is not in any of our datasets and
+to have our software treat such a value in a special way. And so we
+see datasets with numbers like `999'.  Of course, the software cannot
+be used to read datasets that actually have `999' as an actual value
+since it will mark these as missing.  
+
+Another problem arises if we have \textit{repeated measurements} within
+records and there are a different number of measurements for each
+record.  The data are no longer rectangular and we will have to modify
+our software to be able to read and write these files.  Not only that,
+how will we tell the software that there are 6 consecutive values for
+this record that are to be collected together into a single array, but
+for the next record there are only 3? In other words, how do we
+separate the different values within a record and associate them with
+a given variable.  In the simple table version, each variable in each
+record had only a single value. If we have an arbitrary number of
+values per variable, a simple way to indicate this in the file is to
+put in another variable that tells the software how many values to
+expect.  Suddenly, the simplicity of the tabular ASCII file is
+disappearing and the software in all the different applications has to
+be changed.
+
+Repeated measurements are a simple example of a general problem. Even
+within the context of a rectangular array, what if some of the
+\textit{entries are objects} rather than simple values?  The least we
+should be able to do with good data analysis software is to write out
+a dataset and read it back in without losing information. This is
+often called \textit{round-tripping}.  If we want to be able to read
+these objects, just as for the repeated measurements, we have to be
+able to identify that the next $k$ values go to make up the object.
+So, again, we are seeing that we have
+to add meta-information to the dataset so that our software
+can be certain to read it back unambiguously.
+
+
+In the past, people have distributed a dataset as a collection of
+files.  One file contains the actual values and the others contain
+information such as the variable names, descriptions of the variables,
+information about the origins of the data and how they were collected,
+and so on. These additional files are sometimes called the \textit{codebook}.
+XGobi, an interactive graphical visualization system, used
+a format that consisted of several files to represent the data
+(records and variables), variable names, the color of the records, the
+glyph for the record, and so on.  One of the major problems with these
+multiple file approaches is that it is very easy to edit one file and
+forget to update the others. For example, if we remove a record in
+the dataset and not in the color specification, the two files no longer
+match. At best, we would get an error message about this. Alternatively,
+we just get the wrong values for the different records.  Essentially,
+having the data in different files reduces the advantage of being able
+to edit it in a natural fashion. The visual similarity of the data and
+the conceptual model is no longer there.
+
+Not only does the multiple-file approach make editing harder, but it
+also makes it harder to distribute.  Nowadays we use HTTP or FTP from
+within applications to download files. There syntax for specifying a
+collection of files is less natural than giving a single URL.  And
+this becomes an issue as we combine datasets together. 
+
+We have focussed on rectangular data arrays since these are probably
+the most common form of data that statisticians experience.  Many of
+the same problems arise with other formats, and indeed can be worse.
+A popular format for name-value pairs is the properties file format 
+given either as
+\begin{verbatim}
+name: value
+\end{verbatim}
+or
+\begin{verbatim}
+name=value
+\end{verbatim}
+With this format, one has to be careful about how white space at the beginning and end
+of the value is handled.  And long values that extend onto second and
+third lines can be tricky.  Obviously this format is limited to
+specific types of data. Like many other formats, it is hard to extend
+it to include different types of information.  Again, if we want to do
+something as easy as combine multiple sets of name-value pairs, there
+is no easy way to separate the sets within the file.
+
+There is a theme inherent in this list of problems associated with
+representing ASCII data in simple files.  The basic impediment is that
+there is no way to add meta-information to the data.  Ideally, we
+would like to be able to include information such as what the missing
+value identifier is; identify objects as a collection of (potentially
+named) values; include multiple separate but related datasets in a
+single file.  We would like the software to be able to read the
+meta-information if it is there, and yet not require it to be there
+and ignore it if the software doesn't understand it.  The ability to
+add meta-information to representations of data would make us more
+expressive.  We could differentiate between a real number that has an
+integer value and an integer, i.e. the different between $1$ and $1.0$
+that often gets lost when software reads ASCII data.  We could refer
+to one piece of the data in another part of the data, i.e.
+cross-reference the elements, to indicate that if one piece is
+updated, the other pieces should reflect this.  Without
+meta-information or markup for ASCII data, we are quite limited in
+what we can express.
+
+The general markup language, XML -- the eXtensible Markup Language,
+allows us to mark up ASCII data with meta-information. 
+Just being able to add meta-information via markup allows us to solve
+several of the problems mentioned above. 
+But we have two other issues to face when looking for a
+markup mechanism. Firstly, if we are the only people using it, aren't
+we going to restrict our ability to exchange data with other
+communities? Since this exchange is becoming increasingly important,
+that would be a very bad thing. But again, we are fortunate because
+XML is quickly emerging as an extremely popular and widespread general
+data format. It is used to represent genetic information, geographical
+maps, output from databases, protocol for remote procedure calls
+(RPC), authoring technical articles and books, and so on.  Word
+processors, spreadsheets, and relational databases now provide options 
+to save their contents as XML.
+
+XML's popularity answers the second question that we should ask when
+considering using XML to represent data: What is the cost of switching
+to XML?  A new format requires us to
+rewrite software. This involves retesting our software, etc. which is
+a very time consuming task. So if we don't get any tools to help us
+write this new software, the cost of switching to XML may well be
+excessive. And again, the good news is that since all these other
+communities are actively using XML, they are also providing extensive
+collections of tools for working with XML. And we can incorporate
+those into our environments and get the benefits of XML relatively
+transparently.
+
+So what are the drawbacks to XML?
+It does solve all of the problems we have identified in the
+previous paragraphs. But, like all pieces of software, it is not a
+silver bullet that solves all problems and introduces no new ones.
+Rather it gives us more options (since we can always use non-marked up
+data, even as parts within XML documents), and is a step in our
+evolution.  It raises higher-level problems which we will then have to
+try to solve while people use XML.  One of the strengths of XML is
+that it is structured to make it easy for a computer to read.
+However, it leads to very verbose content and it is quite hard for us
+humans to read. And that means it is hard to edit
+directly. And so we lose the simplicity afforded by raw ASCII data,
+which means we need tools that allow us to visualize and manipulate XML content
+to create inputs. Or in other words, we need software that reads and
+writes the XML and insulates us from the details.  As we will see,
+this is not a simple problem in general because XML is itself
+extremely general. However, each community will gradually develop
+tools for viewing its own types of data and hopefully these will be
+shared when possible. Even now, some general tools for editing XML are
+emerging and can be customized to our needs.
+
+
+Now that we have motivated the value of XML, we will go into a little
+more detail. We will first give a more precise description of XML and
+its parts. Next, we will discuss the \SPackage{XML} package for R and
+S-Plus which allow us to both read and write XML directly from within
+the S language.  We will illustrate this package by looking at some
+real examples of XML for reading and writing data from other applications. 
+Finally we
+will also discuss some advanced uses of XML for communicating with
+other applications via SOAP (Simple Object Access Protocol).
+
+
+\section{What is XML?}
+The eXtensible Markup Language provides a standard for the semantic 
+management of data.  
+It is a formal meta-language facility for defining a markup language.
+The basic unit in an XML file is an entity
+or chunk that contains content and markup.
+The content is the actual information such as 6. 
+The markup describes the content, in this case the
+markup is the name \XMLTag{CYL} for the cylinders
+variable in the dataset
+(see the example in Section~\ref{sec:XMLSAS}).
+More generally, markup consists of tags, attributes, comments,
+and processing instructions for the content.
+The tag marks the beginning and end of a piece of content. 
+That is, content must be surrounded by a start tag 
+and a corresponding end tag.
+
+A tag has a name and possibly other pieces of information
+describing the element's content.
+In a start tag, the name and any additional information are surrounded 
+by the \lt and \gt characters. 
+Similarly, an end tag consists of the tag name (it must match
+the tag name in the start tag) surrounded by \lt/ and \gt. 
+For example, the following XML entity
+\begin{verbatim}<![CDATA[
+<CYL> 6 </CYL>
+]]>\end{verbatim}
+is a \XMLTag{CYL} element with content 6.
+It is possible to have empty tags, i.e. tags
+with no content,
+\begin{verbatim}<![CDATA[
+<CYL></CYL>
+]]>\end{verbatim}
+In this case the start and end tags can be combined 
+into one tag as follows, \verb+<![CDATA[<CYL/>]]>+.
+
+Attributes provide additional information about the content. 
+For example, the \XMLTag{dim} tag below has a \XMLAttribute{size} 
+attribute which has a value of 2. (See Section~\ref{sec:StatDataML}
+for the related example).
+\begin{verbatim}<![CDATA[
+<dim size="2">
+]]>\end{verbatim}
+Attributes are specified via name-value pairs.
+The syntax rules are provided below.
+
+
+\subsection{XML syntax}
+
+For XML to be \textit{well-formed} it must obey the
+following syntax rules.
+
+\begin{itemize}
+\item XML is case sensitive so start and end
+tag names must match exactly. For example, the following
+start and end tags have a mismatch in case and so are not well-formed,
+\begin{verbatim}
+<![CDATA[
+<CARS>
+</Cars>
+]]>
+\end{verbatim}
+The end-tag name needs to have all capital letters, i.e. \verb+<![CDATA[</CARS>]]>+, 
+in order for it to match the start tag.
+\item No spaces are allowed between the \lt and the tag name.
+\item Tag names must begin with an alpha character, and contain
+only alphanumeric characters.
+%DEB - what are other restrictions on tag names?
+\item  An element must have an open and closing tag unless it is empty.
+\item  An empty element that does not have a closing tag must be of the 
+form $&lt; \ldots /&gt;$. For example, \verb+<![CDATA[<nan/>]]>+.
+\item Tags must nest properly. That is, when one element contains 
+another element then the start and end tags of the inner element must 
+be between the start and end tags of the parent element.
+For example,
+\begin{verbatim}<![CDATA[
+<CARS>
+   <CYL> 6 </CYL>
+</CARS>
+]]>\end{verbatim}
+Here the \XMLTag{CYL} tag is nested within the \XMLTag{CARS} tag.
+Note the use of indentation makes it easier to see the nesting.
+
+\item All attribute values must appear in quotes in a \verb+name = "value"+
+format.
+\begin{verbatim}<![CDATA[
+<dim size="2"/>
+]]>\end{verbatim}
+This example shows an empty tag with a \XMLAttribute{size} attribute
+of ``2".
+\item Isolated markup characters are not allowed in text. 
+However, they may be specified via entity references. 
+For example, the \lt is specified by the entity reference 
+\verb+&lt;+
+and the \gt symbol is 
+\verb+&gt;+.
+\end{itemize}
+
+In addition to element tags, XML has markup for comments, which is
+information not shown to the user; processing instructions, which is
+similar to code meant for the processor; and character data that is
+not to be processed but simply passed straight through to the user.
+Comments must appear between \verb+<![CDATA[<!--]]>+ and
+\verb+<![CDATA[-->]]>+. For example, \begin{verbatim}<![CDATA[ <!--
+This is a comment which is so long that it apears on three lines of
+the document before it ends with two - followed by >. -->
+]]>\end{verbatim} It is possible to include in a document character
+data that is not processed and so the $>$ is ignored.  The character
+data must appear between \verb+<![CDATA[<![CDATA[]]>+ and
+\verb+<![CDATA[] ]>]]>+.  
+\begin{verbatim}<![CDATA[
+ <![CDATA[ 
+  This is character data that can have any special character 
+  in it such as < or > or & and not have to worry about it 
+  being interpreted as a special character by the processor.  
+]] > 
+]]>\end{verbatim}  % Fix the ]] > 
+Finally, processing instructions must appear between
+\verb+<![CDATA[<?]]>+ and \verb+<![CDATA[?>]]>+.  For example, an XML
+document must start with the processing instruction that identifies it
+as an xml document and provides the XML version number as an
+attribute, \begin{verbatim}<![CDATA[ <?xml version = "1.0" ?>
+]]>\end{verbatim}
+
+\subsection{Valid XML}
+The rules provided in the previous section are just syntax rules
+for insuring that an XML document is well-formed. But we typically want to
+have documents that are more than well-formed; we want to include application specific 
+structure in the markup. 
+For example, with geographic data we may want tags for locations, 
+$x$ and $y$ coordinates, city names, etc.  
+Tags for these entities are specified through
+a set of Document Type Definitions (DTD for short) or schema.
+With a DTD we can: provide the name of a valid element; limit the content
+of an element to character data, specific other elements, or to be empty;
+and specify the attributes that are required or allowed in the tag.
+
+Well-formed XML obeys XML syntax rules described in the previous section, 
+but \textit{valid} XML, in addition to being well-formed, 
+obeys a specified DTD.  The DTD may appear within the document
+itself or be provided via reference, 
+\begin{verbatim}<![CDATA[
+<!DOCTYPE dataset SYSTEM "../DataSetByRecord.dtd">
+]]>\end{verbatim}
+Here we specify a DTD to use via a document type declaration.
+The \XMLTag{dataset} gives the root element name that the DTD
+will be applied to in the verification process.
+
+Occassionally we will generate XML documents that mix content from two
+or or more DTDs.  This flexibility is one of the strengths of XML.
+However, it is possible of course that two DTDs will use the same
+element name to mean different things.  And certainly, it is probable
+that these two different versions of the apparently same element will
+not be valid in the same locations.  To avoid this conflict, we need a
+mechanism to be able to differentiate between the two elements and
+identify each occurrence with the associated DTD or usage.  XML
+namespaces provide the mechanism for this.
+
+To make things concrete, consider the case where we are including code
+in a document via a \XMLTag{code} element.  We may have code in
+different languages such as R and C.  We will want to differentiate
+between these two.  We do this by defining unique identifiers for each
+namespace in the form of a URI.  We also associate a shorter nickname
+with each namespace which we can use as a prefix to elements.  This
+prefix tells the XML parser which version of the element was intended
+and allows us to use elements in different contexts with full
+validation and meaning.
+
+We declare each namespace URI and prefix pair as attributes within an
+XML element.  This can be done anywhere in the document so that each
+sub-node that uses the namespace can inherit it from parent nodes.
+
+For example, the \XMLTag{object} element below lists three
+name space prefixes -- \XMLName{r}, \XMLName{c}, and \XMLName{bioc} -- and
+the URI's with which they are associated
+\begin{verbatim}<![CDATA[
+<object xmlns:r="http://www.r-project.org" 
+        xmlns:c="http://www.c.org" 
+        xmlns:bioc="http://www.bioconductor.org" 
+        type="R-pop-environment" hidden="true">
+]]>\end{verbatim}
+We specify which name space a tag uses within the \XMLTag{object}
+element
+using the form \verb+prefix:element+, e.g.
+\begin{verbatim}<![CDATA[
+<r:code> 
+x = rep(23, 2)
+</r:code>
+<c:code>
+for(i = 0; i < n; i++)
+  *p++ = *q++;
+</c:code>
+]]>\end{verbatim}
+
+A parser has the job of reading the XML, checking it for errors, and
+passing it on to the intended application.
+If no DTD or schema is provided, the parser simply checks that the
+XML is well-formed.
+If a DTD is provided then the parser also determines whether the
+XML is valid, i.e. that the tags, attributes, and content meet the
+specifications found in the DTD, before passing it on to the application.
+Models for parsing XML are described in greater detail in sections~\ref{}.
+
+\subsection{XHTML}
+Some readers will have thought of HTML when we mentioned markup
+and meta-information. 
+After all, what is the difference between HTML and XML?
+We can add meta information to HTML documents using the \HTMLTag{META} tag, 
+but this is not exactly what we mean by meta-information.  
+A little thought and familiarity with HTML will quickly bring us to problems. 
+HTML has a fixed set of markup elements, e.g. \HTMLTag{H1}, \HTMLTag{H2}, 
+\HTMLTag{a}, \HTMLTag{img}, \HTMLTag{B}, and so on.  It doesn't even have a
+\HTMLTag{NUMBER} or \HTMLTag{REAL} markup for representing real
+numbers. 
+
+Hopefully it is evident at this point that an important role of XML is to
+separate out information (content) from the structure and format.
+The markup provides the structure of the content, and the
+the format determines how the content is to be rendered for
+viewing by the user. 
+As a simple example, an array of numbers that corresponds to the
+miles per gallon of various makes of cars may be provided
+via XML as follows:
+\begin{verbatim}<![CDATA[
+<array name="MPG" size="7" type="numeric">
+  <e>21.0</e> <e>21.0</e> <e>22.8</e> <e>21.4</e>
+  <e>18.7</e> <e>18.1</e> <e>14.3</e>
+</array>
+]]>\end{verbatim}
+The content consists of the set of values 
+21.0, 21.0, 22.8, 21.4, 18.7, 18.1, and 14.3. 
+The structure provided via the markup tells us that the content 
+forms an array of numbers of length 7, and the array is named MPG.
+
+HTML does not make the same division between content, structure, and format. 
+Many tags describe how to format content, but provide no information about the
+type of content.
+For example, the HTML tags \HTMLTag{B} for bold face, \HTMLTag{br} 
+for line break, and \HTMLTag{hr} for horizontal rule are all
+instructions for the visual rendering of content.  
+
+HTML has been extended to XHTML by requiring all tags to be lower case, 
+all elements to be properly closed with end tags, and attribute values
+to appear between quotes. 
+Although these rules mean that we can require XHTML documents to be well-formed and 
+valid, XHTML is not up to the job of describing 
+complex structures such as factors, data frames, S objects, and so on.
+Clearly XHTML is lacking in this regard. 
+With XML we can define much richer application-specific markup. 
+
+To drive home the difference between format and content, consider the numbers in the 
+above example: 21.0, 21.0, 22.8, 21.4, 18.7, 18.1, and 14.3.  
+They can be represented as a text list,
+(21.0, 21.0, 22.8, 21.4, 18.7, 18.1, 14.3),
+as a summary statistic: 19.6,
+as a stem-and-leaf plot,
+\begin{verbatim}
+  14 | 3
+  16 |
+  18 | 17
+  20 | 004
+  22 | 8
+\end{verbatim}
+or in a graphic such as a histogram.
+The conversion of the content into one of these formats occurs when the 
+XML is processed for viewing. 
+The eXtensible Stylesheet Language (XSL) contains instructions for 
+formatting the XML. 
+(XSL is itself an XML document that provides a template describing
+how to view the document.) 
+The XML document together with the XSL stylesheet are processed by an XSLT processor
+to create the data display.
+The content remains the same as shown in the XML document, but with
+a processor the format is changed for the data view.
+For further references on XSLT processors XML display see  ...
+%Deb add references
+
+\section{XML examples}
+Data exchange between different software tools typically poses
+a problem because different applications use their own, 
+proprietary, undocumented formats for data storage. 
+The use of a well-defined, common exchange format can help solve 
+this problem.
+We explore here two proposals for XML-based data exchange formats.
+The first is supported by SAS, and the second by R, Matlab, and Octave.
+
+\subsection{SAS}\label{sec:XMLSAS}
+The SAS XML library allows you to export an XML document from a SAS 
+dataset and to import an XML document into a SAS dataset. 
+The XML document below gives an example of XML
+data that can be read into SAS.
+
+\begin{verbatim}<![CDATA[
+<?xml version="1.0"?>
+<LIBRARY>  
+   <CARS> 
+         <ID> Mazda RX4 </ID>
+         <MPG> 21.0 </MPG>
+         <CYL> 6 </CYL>
+         <HP> 110 </HP>
+         <AM> 1 </AM>
+   </CARS>
+   <CARS>  
+         <ID> Datsun 710 </ID>
+         <MPG> 22.8 </MPG>
+         <CYL> 4 </CYL>
+         <HP> 93 </HP>
+         <AM> 1 </AM>
+   </CARS>
+   <CARS> 
+         <ID> Valiant </ID>
+         <MPG> 18.1 </MPG>
+         <CYL> 6 </CYL>
+         <HP> 105 </HP>
+         <AM> 0 </AM>
+   </CARS>
+</LIBRARY>
+]]>\end{verbatim}
+
+The root element in the XML document is denoted by the \XMLTag{LIBRARY} tag.
+The tag name for the second-level element represents the
+SAS dataset name,
+in this case \SASName{CARS}.
+Each \XMLTag{CARS} element translates into a record in the SAS dataset.  
+We see from the figure that this dataset has 3 records,
+one for each of the 3 occurrences of the \XMLTag{CARS} elements.
+
+The variables in the dataset correspond to the 
+elements nested within the CARS element. 
+The tag names for these elements translate into the variable names. 
+That is, ID, MPG, HP, and AM, are the names for 
+the variables pertaining to the identification,
+miles per gallon, horse power, and automatic/manual transmission
+information for the cars.
+The content of these elements gives us the value for the
+variables in that record.
+The first record has the value ``Mazda RX4" for ID,
+21.0 for MPG, etc., 
+the second record has the value ``Datsun 710" for ID,
+22.8 for MPG, etc.
+
+Note that this input format handles only rectangular datasets
+and that type information, units, and missing values are not specified.
+The XML data are read in to SAS and shown below
+
+\begin{verbatim}<![CDATA[
+libname test xml 'C:\My Documents\test\cars.xml';
+proc print data = test.cars;
+run;
+
+ID              MPG             CYL             HP             AM
+
+Mazda RX4       21.0            6               110             1
+Datsun 710      22.8            4               93              1
+Valiant         18.1            6               105             0               
+]]>\end{verbatim}
+
+SAS 9.1.3 provides alternatives via XMLMap to include type information
+for variables, handle ragged arrays, and to specify a translation of other 
+XML formats into the one provided here (see 
+\URL{fttp://support.sas.com}).
+
+\subsection{StatDataML}\label{sec:StatDataML}
+Meyer, Leisch, Hothorn, and Hornik, propose a data exchange format 
+for statistical data, called StatDataML. 
+The R package \SPackage{StatDataML} provides
+an implementation of this data exchange format.
+
+An example of XML that obeys the StatDataML requirements for 
+importing data from XML into R, Matlab, Octave appears below. 
+The content is the same as that shown in the example in 
+Section~\ref{sec:XMLSAS}:
+
+\begin{tabular}{lrrrr}<![CDATA[
+ID &    MPG &    CYL &  HP &   AM \\
+\hline
+Mazda RX4  & 21.0 &     6 &     110 &   1\\
+Datsun 710 &  22.8 &    4 &     93 &    1\\
+Valiant    & 18.1 &     6 &     105 &   0
+]]>\end{tabular}
+
+However, the XML document is much more verbose as it includes more
+structure.  For example, the variables are typed.  We specify in the
+XML elements \XMLTag{type}, \XMLTag{categorical}, and \XMLTag{level}
+that the variable \SName{AM} is categorical with the level 0
+indicating automatic and level 1 manual transmission.  The StatDataML
+format is general enough to describe complex S objects such as lists
+of arbitrary content, which means that it must be more verbose than a
+data exchange format that assumes a rectangular array.  The data in
+this example have the simple rectangular shape, and so can be stored
+in a data frame in R.  The data frame is a special case of the list
+which forms a rectangular shape where the columns can be arbitrary
+types.  Here, our columns are a mixture of character, numeric and
+categorical data types.  If we had relied on the inherent structure of
+the data frame in describing the strucutre of the data then the XML
+would be made more compact by eliminating the \XMLTag{dimension} and
+\XMLTag{dim} tags within each \XMLTag{Array} tag would not be
+necessary.
+
+%Deb install the package and check to see if 
+% we can get along with out it.
+
+\small{
+\begin{verbatim}<![CDATA[
+<?xml version="1.0"?>
+<!DOCTYPE StatDataML PUBLIC "StatDataML.dtd">
+<StatDataML xmlns="http://www.ci.tuwein.ac.at/StatDataML">  
+  <description>
+    <title> Cars </title>
+    <comment> A subset of the mtcars data from R </comment>
+  </description>
+
+  <dataset>
+    <list>
+      <dimension>
+        <dim size = "5">
+          <e>ID</e> <e>MPG</e> <e>CYL</e> <e>HP</e> <e>AM</e>
+        </dim>
+      </dimension>
+      <listdata>
+        <array>
+          <dimension> <dim size="3"/> </dimension>
+          <type> <character/> </type>
+          <data>
+            <e> Mazda RX4 </e> <e> Datsun 710 </e> <e> Valiant </e>
+          </data>
+        </array>
+        <array>
+          <dimension> <dim size="3"/> </dimension>
+          <type> <numeric/> </type>
+          <data>
+            <e> 21.0 </e> <e> 22.8 </e> <e> 18.1 </e>
+          </data>
+        </array>
+        <array>
+          <dimension> <dim size="3"/> </dimension>
+          <type> <integer/> </type>
+          <data>
+            <e> 6 </e> <e> 4 </e> <e> 6 </e>
+          </data>
+        </array>
+        <array>
+          <dimension> <dim size="3"/> </dimension>
+          <type> <numeric/> </type>
+          <data>
+            <e> 110 </e> <e> 93 </e> <e> 105 </e>
+          </data>
+        </array>
+        <array>
+          <dimension> <dim size="3"/> </dimension>
+          <type> 
+            <categorical mode="unordered">
+              <label code="0">Automatic</label> 
+              <label code="1">Manual</label> 
+            </categorical> 
+          </type>
+          <data>
+            <e> 1 </e> <e> 1 </e> <e> 0 </e>
+          </data>
+        </array>
+      </listdata>
+    </list>
+  </dataset>
+
+</StatDataML>
+]]>\end{verbatim}
+}
+
+We provide a brief description of the elements of this StatDataML
+document.
+
+\begin{itemize}
+\item The name of the document containing the DTD is provided in
+the \XMLTag{DOCUMENTTYPE} element.
+\item The root element of the document is \XMLTag{StatDataML}.
+It contains two elements, the 
+\XMLTag{description} element and the \XMLTag{dataset} element.
+\item The \XMLTag{description} element contains information pertaining
+to the source of the data. 
+\item The \XMLTag{dataset} element contains the data along with
+all the markup describing it.
+\item The data may be a simple array or a list. In our case, we have
+a list object and so use the \XMLTag{list} element. Notice that
+it contains 5 \XMLTag{array} elements, one for each column of the 
+data frame.
+\item The first \XMLTag{dimension} tag provides information about
+the number and names of arrays in the dataframe. We see that there
+are 5 columns, and their names are provided via the \XMLTag{e} tag.
+\item The other \XMLTag{dimension} tags appear inside the 
+\XMLTag{array} elements and provide information about the length
+of the array. 
+\item Information about the data type is provided in the array
+element via the \XMLTag{type} entity.
+Notice that this tag has no content, i.e. it is empty in all cases
+because the data type is provided via a \XMLTag{numeric},
+\XMLTag{character}, or \XMLTag{categorical} tag.
+\item Finally, the \XMLTag{data} entity provides the values of the
+variables. Rather than prividing this information one record at a
+time, it is provided one variable at a time. This approach is 
+more condusive to the list data structure.
+\end{itemize}
+
+\section{The XML document as a tree}
+The indentation used in the examples in Sections~\ref{sec:XMLSAS} 
+and~\ref{sec:STatDataML} are suggestive of a tree structure.
+Each tag can be tought of as a node in the tree, and branches
+eminate from the node if the entity corresponding to the tag
+contains other tags or content.
+The conceptual model of the document as a tree can be very
+helpful when processing or navigating a document.
+In fact one of the two standards for parsing an XML document, 
+is the Document Object Model, or DOM for short, which
+reads the XML content and returns a data structure that
+represents the document as a tree. The DOM parser is described 
+in detail in Section~\ref{sec:DOMParser}. 
+
+\begin{figure}
+{\footnotesize{
+\begin{verbatim}
+LIBRARY   
+|
+|--CARS 
+|  |--ID
+|  |  |-- Text
+|  |      |--Mazda RX4 
+|  |--MPG
+|  |  |-- Text
+|  |      |--21.0
+|  |--CYL
+|  |  |-- Text
+|  |      |--6
+|  |--HP
+|  |  |-- Text
+|  |      |--110
+|  |--AM
+|     |-- Text
+|         |--1
+|
+|--CARS 
+|  |--ID
+|  |  |-- Text
+|  |      |--Datsun 710
+|  |--MPG
+|  |  |-- Text
+|  |      |--22.8
+|  |--CYL
+|  |  |-- Text
+|  |      |--4
+|  |--HP
+|  |  |-- Text
+|  |      |--93
+|  |--AM
+|     |-- Text
+|         |--1
+|
+|--CARS 
+   |--ID
+   |  |-- Text
+   |      |--Valiant 
+   |--MPG
+   |  |-- Text
+   |      |--18.1
+   |--CYL
+   |  |-- Text
+   |      |--6
+   |--HP
+   |  |-- Text
+   |      |--105
+   |--AM
+      |-- Text
+          |--0
+\end{verbatim}
+}}
+\caption{A tree depicting the SAS-XML document found in 
+Section~\ref{sec:XMLSAS}}
+\label{fig:SASXMLtree}
+\end{figure}
+
+Figure~\ref{fig:SASXMLtree}
+represents the XML document from the SAS example
+in Section~\ref{sec:XMLSAS} as a tree.
+The \textit{root} of the tree is the document node,
+which in this case is the LIBRARY node.
+There is only one root node per document, and 
+it is the top-most node, i.e. the \textit{parent} of all other nodes. 
+Notice that the LIBRARY node has four children,
+each one a CARS node, one for each record in the dataset.
+Also note that the character content of an entity is 
+always placed under a Text node. 
+The terminal branches of the tree are known as \textit{leaf nodes}.  
+By design, the character content of an entity will always fall in a leaf node,
+as the child of a Text node. 
+Each node in the tree has information associated with it:
+its name (i.e. the tag name or ``Text"), attributes if it has any, 
+and  a list of its children.
+In the following sections, we will see how this conceptual
+model will help us manipulate the contents of a document to
+create S objects, etc.
+
+
+\subsection{Reading XML as a tree}
+There are two styles of XML parsers: DOM and SAX parsers.  
+DOM stands for Document Object Model and DOM
+parsers read the XML content and return a data structure that
+represents an XML tree as shown above.  
+The parser sweeps over the entire document and returns an appropriate 
+representation of a tree in the programming language.
+The tree contains each of the XML elements and its attributes, and 
+clearly represents the relationships between them. 
+Essentially a DOM parser returns a copy of the XML document but
+in a form that makes is easier to operate on the document 
+and convert its contents as you wish. As a tree, you can perform multiple
+passes over the tree and perform arbitrary transformations.
+We give examples of this in the next section.
+
+SAX stands for Simple API for XML. It is qute
+different from DOM in that all it does is call different
+application-specific handlers as it encounters different parts of the
+XML content.  The SAX parser doesn't try to build the XML tree.
+Instead, it passes small pieces of information about the XML content
+to the event handlers and they are responsible for determining how to put
+these pieces together and convert the XML document into data that is
+meaningful to the application.  The SAX parser is very low-level.  It
+calls the handlers when a new XML element is opened and again when
+it is closed. It passes information to the handlers when it sees an
+XML comment or a processing instruction.  It is really quite basic and
+almost all of the hard work is done in the application-specific handlers.  
+However, where SAX parsers become important is when the XML tree 
+that a DOM parser would create is very large.  
+Rather than reading the entire XML document and processing it to create a 
+large ``tree" object, the SAX parser allows us to incrementally create the
+data object without holding the XML tree in memory.  Since we get to
+see very small parts of it in the handlers, they need only
+remember enough to make sense of subsequent pieces.  And typically
+these handlers work very locally and so keep a very small amount of
+information across calls.  So SAX parsers are more efficient when
+large XML documents are being read, but require more thought in
+programming and are more complex to use.
+
+The \SPackage{XML} package for the S language provides both a DOM and
+SAX parser via the \SFunction{xmlTreeParse} and
+\SFunction{xmlEventParse} functions respectively.  These have an
+S-style to them, but if you use them in the default manner, they are
+for the most part the same as the general DOM and SAX parsers.
+In addition to DOM and SAX based parsers, the \SPackage{XML} package
+provides a hybrid parsing model.  DOM reads the entire tree using the
+basic mapping for XML elements to S objects. SAX requires callbacks at
+a very detailed level, i.e. start and end of XML elements, rather than
+at the XML element or object level.  The hybrid style allows us to
+use the DOM style of parser but to have handlers or callbacks that work
+on entire XML elements.  This allows us not to store the entire tree,
+but to deal with it in chunks that are natural to process.  We don't
+have to deal with all ``events'' or chunks as we do in the SAX model.
+Instead, we can tell the parser the names of the XML chunks we want to
+deal with and it will use the default handlers to build the tree for
+the chunks we ``ignore''.  This combines efficiency with ease of
+programming and allows us also to employ either of the regular models
+
+
+\subsection{Input Sources}
+In most cases, the XML content that we want to parse will be in a
+local file.  In such cases, we just pass the name of this file to
+\SFunction{xmlTreeParse} or \SFunction{xmlEventParse} via the
+\SArg{file} argument.  In other contexts, we will have the XML
+document as an S string. This can occur when we either create the XML
+internally within S and keep it in memory rather than writing it to a
+file.  Also, we may read a file and extract only a portion of it to
+get the XML content of interest.  Rather than write this string to a
+temporary file and passing that to the XML parser, we can pass the
+string directly to the parser and have it work on that.
+
+Since we often use XML to exchange data with different, potentially
+remote, applications, it is convenient to be able to put the XML
+source on a Web site. Rather than having the user explicitly download
+the file, it is desirable to allow him to pass the URL to the parser and
+have it parse the content as it reads the file directly from the
+server. The libxml parser which we use in the \SPackage{XML} package
+does this for FTP and HTTP URIs.  It transparently recognizes URIs and
+talks to the server. Rather than using a two step approach of
+downloading the file and then parsing it, the XML parser streams the
+data incrementally from the server and processes it on the fly.
+
+We have seen that XML is very verbose. This means that it consumes a
+lot of disk space when stored or bandwith when sent across a nework.
+But if we look at an XML file, we will also see that there are a lot
+of repeated patterns.  This tends to make XML content highly
+responsive to compression.  Typically ratios of original to compressed
+form range between $10$ and $30$\% This wouldn't be exceedingly useful
+if we had to manually uncompress the file before handing it to the XML
+parser.  However, the libxml parser knows how to read compressed files
+and transparently parses the XML directly from that.  While this is
+slightly slower than reading the uncompressed file (since it has to
+also uncompress the data as it sees it as well as do the usual
+parsing), it again provides us with options that allow us to implement
+context-specific solutions.
+
+So the XML parser allows us to read from local files, XML strings,
+URIs and compressed files.  Unfortunately, it does not support reading
+from compressed remote URIs. In such cases, within R you can first
+download the URI to a local file using \SFunction{download.file} and
+then parse it as is.
+
+\section{The DOM Parser}
+The \SFunction{xmlTreeParse} function provides the DOM parsing
+functionality in the \SPackage{XML} package.  The basic way to use
+this function is to pass it the name of an XML file or URI, or simply a string
+containing the XML content.  This is the only required argument for
+the function. The others control how the parsing is done and the
+different elements handled. 
+Let's focus on a simple example. Suppose we have an XML representation of 
+a matrix given by the following:
+\begin{verbatim}<![CDATA[
+<matrix nrow="3" ncol="2">
+ <columnNames><string>X</string><string>Y</string></columnNames>
+ <row id="a"><real>1</real><real>2.0</real></row>
+ <row id="b"><real>10</real><real>1.2</real></row>
+ <row id="c"><real>20</real><NA/></row>
+</matrix>]]>
+\end{verbatim}\label{eg:XML:matrix}
+We can have this as a file, say \file{matrix.xml}
+or directly as a string (say, \SVariable{x}) in S.
+To parse this, we use 
+<r:code>
+xmlTreeParse("matrix.xml")
+</r:code>
+or
+<r:code>
+xmlTreeParse(x)
+</r:code>
+If you do this, you will see the output go by on the screen as even
+for this small piece of XML, there is a lot of information.  The
+result is a list containing these different pieces of information,
+including the XML content itself but represented as S objects in a
+tree.  The important bit for our purposes is given in
+the \SField{children} element of the resulting list returned from
+\SFunction{xmlTreeParse}.
+We can access it directly or using the \SFunction{xmlRoot} function.
+<r:code>
+ xtree = xmlRoot(xmlTreeParse("matrix.xml"))
+</r:code>
+
+Printing this XML tree should produce something very close to the
+original XML input, just printed in a slightly different and more
+verbose manner. For example, the \XMLTag{NA} is displayed with a
+start and end tag.  Eventhough the tree may look like a
+simple copy of the XML input, it is actually a collection of separate
+S objects that represent the different XML elements.  It is a tree
+made up of nodes (see Figure ...). Each node can potentially have children nodes, 
+with those nodes also having children, and so on.  In S, we represent this
+as a list of lists.  Each node is a list that has information about
+its XML tag name, e.g.  \XMLTag{matrix} or \XMLTag{real}, and a named
+character vector giving the XML attributes for the node.  And to
+represent the tree relationships, it uses the \SField{children} field
+to store a list of its children nodes.
+
+The basic XML node in S is an object of class \SClass{XMLNode}.  We
+can access its tag name using \SFunction{xmlName}.  Similarly, we use
+\SFunction{xmlAttrs} to get the attributes for the node.
+For example, working with the root of the XML tree, \SVariable{xtree},
+we get
+<r:code>
+xmlName(xtree)
+<r:output>
+[1] "matrix"
+</r:output>
+a = xmlAttrs(xtree)
+a
+<r:output>
+nrow ncol 
+ "3"  "2" 
+</r:output>
+a[["nrow"]]
+<r:output>
+[1] "3"
+</r:output>
+</r:code>
+
+We can get the list of children in an \SClass{XMLNode} using
+\SFunction{xmlChildren}.  This returns a named list of the children.
+The names are the XML tag names of the children and the elements are
+full \SClass{XMLNode} objects.  The number of children nodes can be
+computed using \SFunction{xmlSize}.
+We can treat the node as if it were an S list of the children and 
+use the familiar
+subsetting operations \SFunction{[} and \SFunction{[[} to access the
+children.  So, if we wanted to get the \SClass{XMLNode} for the first
+row of the matrix, we would ask for the second child using
+\SExpression{xtree[[2]]}.  We can also index the children by the XML
+tag name. So we can get that same row using
+\SExpression{xtree[["row"]]}.  Note that this returns the first
+element in the list that matches this name.  The node lists are
+slightly unusual in that they allow multiple elements to have the same
+name. 
+
+
+For simplicity, there are XML versions of the \SFunction{apply} and
+\SFunction{sapply} functions. These are \SFunction{xmlApply} and
+\SFunction{xmlSApply} and each takes an \SClass{XMLNode} as its
+primary argument.  They iterate over the node's children nodes,
+invoking the given function and returning the list of results.  We can
+use this to, for example, find the number of children each of the
+second-level nodes has:
+<r:code>
+xmlSApply(xtree, xmlSize)
+<r:output>
+columnNames         row         row         row 
+          2           2           2           2 
+</r:output>
+</r:code>
+We can supply an arbitrary function in the \SFunction{xmlApply} that
+takes a single argument which is the \SClass{XMLNode} and it can
+return any S value.  
+
+
+As we mentioned earlier, the XML parser by default maps XML elements
+within the document to \SClass{XMLNode} objects in S.  But there are
+different possible types of XML elements within a document. There are
+CDATA/literal text nodes, simple text nodes which have only text
+rather than sub-nodes, processing instruction nodes and comment nodes.
+As the XML parser encounters each node, it knows what type of node it
+is and it maps it to the corresponding S object.  
+For example, let's read the following XML file:
+\begin{verbatim}<![CDATA[
+<top>
+<![CDATA[
+ Literal text include & and <
+]]&gt;
+<?S print(1:10)?>
+<TextNode>This is a simple text node</TextNode>
+<!--This is an example of all the different type
+    of XML nodes that we support in the XML package. -->
+</top>
+]]>\end{verbatim}
+We read it using \SFunction{xmlTreeParse} and
+get the root node using \SFunction{xmlRoot}.
+<r:code>
+v = xmlRoot(xmlTreeParse("nodeTypes.xml"))
+xmlSApply(v, class)
+<r:output>
+$text
+[1] "XMLCDataNode" "XMLNode"     
+
+$R
+[1] "XMLProcessingInstruction" "XMLNode"                 
+
+$TextNode
+[1] "XMLNode"
+
+$text
+[1] "XMLComment" "XMLNode"   
+</r:output>
+</r:code>
+We can look at the individual nodes in the usual manner using
+\SFunction{[[} and see what they have in them.  Since these are
+extensions of the \SClass{XMLNode}, the usual methods apply to these
+also.  However, the content of each of these types of nodes is not in
+children but in the text they contain.  To access this content, we use
+the \SFunction{xmlValue} function.  In each case, this returns the
+node-specific content as a string.  For example, to get the content of
+the S processing instruction, we use the expression
+\SExpression{xmlValue(v[["S"]])} and get back \SOutput{"print(1:10)"}.
+
+Note that in our example, the \XMLTag{TextNode} element is mapped to a
+regular \SClass{XMLNode} in S. It is the first (and only) child that
+is the \SClass{XMLTextNode} object.  This makes sense since the
+\XMLTag{TextNode} element may have attributes, etc.  whereas the text
+node won't .
+Hopefully looking at the node and its children
+will help to emphasize this point.
+<r:code>
+v[["TextNode"]]
+<r:output><![CDATA[
+ <TextNode>
+ This is a simple text node
+ </TextNode>
+]]>
+</r:output>
+xmlSize(v[["TextNode"]])
+<r:output>
+[1] 1
+</r:output>
+class(v[["TextNode"]][[1]])
+<r:output>
+[1] "XMLTextNode" "XMLNode"    
+</r:output>
+</r:code>
+For more complex nodes, such as \SVariable{v} itself, it returns
+\SNull rather than raising an error.
+
+
+Along with the XML tree, \SFunction{xmlTreeParse} returns auxillary
+information about the parsed XML.  Essentially there are two parts to
+the result: the document and the DTD.  The document is accessed via
+the \SField{doc} element of the returned list and it has information
+about the source of the XML input and the version of XML.  The
+\SField{file} field in the \SField{doc} object gives the name of the
+file that was processed containing the XML (or simply
+\verb+"&lt;buffer&gt;"+ if the content was given directly as a string).
+The \SField{version} field tells us the version of XML used to author
+the document.  This is almost always the value $1.0$ and is the value
+you will often see at the top of each XML file to identify the file as
+being XML
+\begin{verbatim}<![CDATA[
+<?xml version="1.0"?>
+]]>\end{verbatim}
+
+Unless you ask it not to, \SFunction{xmlTreeParse} will try to read
+the DTD associated with the XML content.  And it returns this
+information as the second part of the result returned from
+\SFunction{xmlTreeParse} via the \SField{dtd} field.  This includes
+both the external and internal DTD, as each is available, and these
+can be accessed via the \SField{external} and \SField{internal}
+fields.  
+If you are not interested in the DTDs, you can avoid processing them
+using the \SArg{getDTD} argument.  Giving a value of \SFalse{} for
+this means that only the document part of the result is returned.
+
+At this point, we have covered the structure of XML nodes in S.  We
+can now turn our attention to processing the tree and customizing the
+XML parser.
+
+
+\section{Walking the DOM Object}
+One way to process XML content into data in S is to use
+\SFunction{xmlTreeParse} to read the XML into an S tree or DOM.  Then,
+we can extract the pieces of it that we want in any order and
+construct the appropriate S object.  Let's return to our matrix
+example above on page \ref{eg:XML:matrix} and see how we can create
+the appropriate S matrix.
+
+We start by generating the XML tree in S.
+<r:code>
+d = xmlRoot(xmlTreeParse("matrix.xml"))
+</r:code>
+There are several different ways we can proceed.  We can create an
+empty matrix with the appropriate dimensions and then fill in the
+values and the row and column names.  Alternatively, we can collect
+the values into a vector and the row and column names also, and then
+create the matrix in a single operation.  The code for either approach
+is quite similar and we can focus initially on the common aspects.  
+
+To get the row names, we want to extract the \XMLAttribute{id}
+attribute from each of the \XMLTag{row} elements.  We can exploit the
+fact that we know the \XMLTag{row} elements correspond to nodes $2$,
+$3$ and $4$, or more generally $2, \ldots, \hbox{nrow}$.
+Alternatively, we can process each node and check that it is
+a \XMLTag{row} element by examing its tag name.
+If it is, then we extract its \XMLAttribute{id} attribute.
+The following use of \SFunction{xmlApply} does the job of collecting
+the row identifiers. The first node (\XMLTag{columnNames}) returns
+\SNull, and so we need \SFunction{unlist} to get the individual
+names.
+<r:code>
+unlist(xmlApply(d, function(x) 
+                      if(xmlName(x) == "row") 
+                         xmlAttrs(x)[["id"]]))
+</r:code>
+Getting the column names is a little simpler.  We know there is only a
+single node named \XMLTag{columnNames} and we can access it directly
+as \SExpression{d[["columnNames"]]}.  To get the individual values in
+this tag, we need to process its children and use the
+\SFunction{xmlValue} function to get the actual string values.
+Again, using \SFunction{xmlSApply} does the job in the simple expression:
+<r:code>
+ xmlSApply(d[["columnNames"]], xmlValue)
+</r:code>
+
+We can get the dimensions of the matrix directly from the \XMLTag{matrix} element's
+attributes and converting them to integer values.  This is easily done
+as
+<r:code>
+ a = xmlAttrs(d)
+ r = as.integer(a[["nrow"]])
+ c = as.integer(a[["ncol"]])
+</r:code>
+We might be tempted to convert all the values in the attributes vector
+to integers since we know it only contains the \XMLAttribute{nrow} and
+\XMLAttribute{ncol} values.  However, if we were to use this code for
+processing a different file and there were other attributes such as
+the name of the matrix, or the name of the default type of its
+elements, converting these values to integers would be a problem.
+
+The last remaining part of the computation is to get the values for
+matrix entries.  Again, we can use \SFunction{apply} or
+\SFunction{xmlApply} to loop over the \XMLTag{row} nodes.  Within each
+row, we mimic how we got the column name strings by using
+\SFunction{xmlSApply} and converting the individual \XMLTag{real} and
+\XMLTag{NA} nodes.  Rather than processing each node and checking
+whether it is a \XMLTag{row} element, we will simply work on the nodes
+$2, \ldots, r+1$ since we know these correspond to the rows.
+(If we really know that there are only \XMLTag{columnNames}
+and \XMLTag{row} nodes and all the \XMLTag{row} nodes are last,
+we could also use \SFunction{xmlSize} to determine the number
+of nodes and subtract $1$ to get the number of rows.)
+<r:code><![CDATA[
+ m <- sapply(d[2:(r+1)], 
+             function(x) 
+               xmlSApply(x, 
+                         function(x) 
+                           ifelse(xmlName(x) == "NA", 
+                                  NA, 
+                                  as.numeric(xmlValue(x[[1]])))))
+]]></r:code>
+We must use \SFunction{sapply} on the resulting list of nodes
+(\SExpression{d[2:(r+1)]}) since this, of course, is not an
+\SClass{XMLNode}.  The function works on the nodes within each row.
+Because of the way \SFunction{apply} (and hence \SFunction{xmlSApply})
+works, the result is actually a matrix whose columns correspond to the
+values in each of the \XMLTag{row} elements in the XML.
+So all we need to do is transpose this
+and set the row and columnames.
+
+We can put all the steps together and create
+a function that does this, given the root XML node.
+<r:code><![CDATA[
+xmlMatrix =
+function(node)
+{
+ a <- xmlAttrs(node)
+ r <- as.integer(a[["nrow"]])
+ m <- sapply(node[2:(r+1)], 
+              function(x) 
+                xmlSApply(x, function(x) 
+                              ifelse(xmlName(x) == "NA", 
+                                      NA, 
+                                      as.numeric(xmlValue(x[[1]])))))
+ m <- t(m)
+ dimnames(m) <- list(unlist(xmlApply(node, function(x) 
+                                           if(xmlName(x) == "row") xmlAttrs(x)[["id"]])), 
+                     xmlSApply(node[["columnNames"]], xmlValue))
+ m
+}
+]]></r:code>
+And we can use this in calls
+such as 
+<r:code>
+ xmlMatrix(xmlRoot(xmlTreeParse("matrix.xml")))
+</r:code>
+
+You should verify that you know how to implement the other approach
+in whch we first create the empty matrix and fill in its values.
+
+
+\section{Customizing the DOM Parser}
+Getting the actual values from the \XMLTag{real} and \XMLTag{NA} nodes
+within the \XMLTag{row} nodes was a little cumbersome in the matrix
+example.  It would be more convenient if we could simply turn these
+into numbers as they were being added to the XML tree in S.  In the
+particular case of the matrix, it would be even more convenient to
+process each \XMLTag{row} element in the XML input and have it hold
+its values as a vector.  In other words, it would be useful to have a
+processing step that converted the default XML node created by the XML
+parser into an S object that is more suitable for the particular
+context.
+
+The \SFunction{xmlTreeParse} function allows us to specify
+pre-processing hooks via its \SArg{handlers} argument.  This is
+expected to be a named list of functions.  If the
+\SArg{handlers} argument is specified, the
+XML parser consults it each time it attempts to add an XML node to the
+S tree.  It looks at the name of the XML element and searches for an
+element in the \SArg{handlers} list with this name.  If it finds such
+an entry, it calls that function and passes it the S object
+representing the XML node.  It takes the return value from this call
+and, if it is non-\SNull, it adds that value to the tree.  If it is
+\SNull, it drops that node from the tree.  If there is no matching
+element in the \SArg{handlers} list, then the parser looks for a
+general function in that list for handling the particular type of XML
+node and uses that if it exists in the same way as a more specific
+function.  The association between node type and function name in the
+\SArg{handlers} list is given in table
+\ref{tbl:XML:GeneralDOMHandlerNames}.
+
+% Fix the ']] >' here.
+\begin{table}[htbp]
+  \begin{center}
+    \leavevmode
+    \begin{tabular}{lll}<![CDATA[
+Node Type  & Example & function name \\
+XML element & \verb+<node>...</node>+ & startElement \\
+Text node & Simple text inside node & text \\
+Comment node & \verb+<!-- a comment -->+ & comment \\
+CDATA node & \verb+<![CDATA[ literal ..]] >+ & cdata \\
+processing instruction &  \verb+<?S 1:10?>+ & processingInstruction \\
+XML namespace  & \verb+<a xmlns:name="http://www....">+ & namespace \\
+entity reference &  \verb+&gt;+ & entity  \\
+]]>    \end{tabular}
+    \caption{DOM handler names for XML node types}
+    \label{tab:GenrealDOMHandlerNames}
+  \end{center}
+\end{table}
+
+So how can we use this to simplify or matrix example?  The most
+elementary thing we can use the \SArg{handlers} list for is to convert
+the \XMLTag{real} and \XMLTag{NA} nodes into numbers.
+<r:code>
+ v = xmlRoot(xmlTreeParse("XML/matrix.xml", 
+                          handlers=list(real = function(x)
+                                                 as.numeric(xmlValue(x)),
+                                        "NA" = function(x) 
+                                                 NA
+                                       ), asTree=TRUE))
+</r:code>
+We specify the \SArg{asTree} argument as \STrue{} because want the DOM
+back from \SFunction{xmlTreeParse}.
+Other times we use the handlers to
+cumulate the results across calls for different nodes, and we want to
+return the handlers rather than the DOM in these cases. 
+In this example, we are just using the handlers to modify how the DOM 
+is constructed.
+Taking a look at the result, we see that each \XMLTag{row} node 
+prints quite differently than in the case of the regular DOM.
+<r:code>
+v[[4]]
+<r:output><![CDATA[
+ <row id="c">
+[1] 20
+[1] NA
+ </row>
+]]></r:output>
+</r:code>
+In fact, the children nodes of the row nodes are now simple numbers,
+not XML nodes.
+Given this structure, we can get the vector of matrix entries
+using 
+<r:code>
+ unlist(apply(v[2:4], function(x) xmlChildren(x)))
+</r:code>
+
+Having converted the individual values, we might want to collapse this
+further for each row and combine the entries into a vector rather than
+a list.  We could do both steps directly in a single handler for
+\XMLTag{row} nodes. However, since the XML parser processes the nodes
+from bottom up, when a \XMLTag{row} handler is called, the
+\XMLTag{real} and \XMLTag{NA} values will have already been processed
+and be sitting in the \XMLTag{row} node passed to the handler.  So we
+can chain the actions of the different nodes
+and in our case, the \XMLTag{row} handler is simply
+<r:code>
+ function(node) {
+    node$children = unlist(node$children)
+    node
+ }
+</r:code>\remind{Provide an xmlChildren gets function}
+All this does is convert the list of numbers into a vector of numbers
+and put it back into the node as the \SField{children} slot. Note that
+we return the modified node from this function so that it will be put
+into the tree that the parser creating.  A common mistake is to modify
+the node in the handler function and forget to put it back in the
+tree, assuming that the local changes will be seen globally.
+
+We use this function with the \SFunction{xmlTreeParse} function by
+adding it to the collection of handlers:
+<r:code><![CDATA[
+v = xmlRoot(xmlTreeParse("XML/matrix.xml", 
+                          handlers=list(real = function(x)
+                                                 as.numeric(xmlValue(x)),
+                                        "NA" = function(x) 
+                                                 NA,
+                                        row =  function(node) {
+                                                node$children <- unlist(node$children)
+                                                node
+                                               }
+                                       ), asTree=TRUE))
+]]></r:code>
+
+
+Having seen that we can process nodes before they are added to the
+DOM, one might naturally think that we can also move the creation of
+the data structures from these nodes rather than doing so after the
+DOM is created.  And of course this is the case. We can use or
+\SFunction{xmlMatrix} function in our earlier example as a handler
+that processes \XMLTag{matrix} nodes.
+This is as simple as 
+<r:code>
+xmlRoot(xmlTreeParse("XML/matrix.xml", asTree = TRUE,
+                       handlers=list(matrix=xmlMatrix)))
+</r:code>
+The result is the matrix of interest.
+
+
+If a handler returns \SNull{}, the original XML node is dropped from
+the resulting DOM built for S.  This can be used as a convenient data
+filter to eliminate XML nodes that are not of interest.  For example,
+suppose we have an XML document that contains processing instructions
+for several different languages such as S and its specific ones
+dialects R and S-Plus and Matlab.  If we are reading the document in
+S-Plus, say, it will be easier to work on the DOM if we have already
+eliminated the R and Matlab processing instructions. It will be just
+one less thing to deal with in the DOM processing code.  To do this,
+we can use the following general processing instruction handler to
+remove the non-S-Plus or S PIs.
+<r:code>
+pi = function(node)  {
+  if(match(xmlName(node), c("S-Plus", "S"))) 
+    return(node)
+
+  return(NULL)
+}
+</r:code>
+and we can include it in a call to \SFunction{xmlTreeParse} as
+<r:code>
+xmlTreeParse(fileName, handlers=list(processingInstruction=pi),
+               asTree=TRUE)
+</r:code>
+
+We can also use this approach to remove comment nodes.  Again, we
+simple create a trivial handler, this time one that unconditionally
+returns \SNull. And the resulting DOM will have no comment nodes.
+
+We have seen that we can use the handler mechanism to process nodes
+directly into data structures that are put in the DOM rather than have
+to wait until after the DOM is created and then traverse it with the
+same processing code. The \SFunction{xmlMatrix} is an example of how
+we do this at the top-level node -- \XMLTag{matrix} -- and within the
+handler process the sub-elements.  It should be relatively easy to see
+how we can also do this for other data structures such as data frames,
+time series, and so on. We can always write a handler function that
+operates on the top-most node that contains all the necessary XML
+elements to create the S object.  Of course, if the top-most node
+contains a large number of nodes, this \SClass{XMLNode} will consume a
+large quantity of memory. If we then have to create the S object from
+that, we will consume even more memory and at some point we may exceed
+the limits of S.  If we were using a language such as Python, Java or
+\Cplus, we might process the sub-nodes and incrementally create and
+update the target object without keeping any of these sub-nodes.  This
+would reduce the memory usage by avoiding the storage of the XML
+nodes.  So we can also do this in S.
+\remind{Need compelling example here of processing the sub-nodes
+first and putting them into a functions' environment. Perhaps there
+isn't one. -- can the Google example work here?}
+
+How can we ensure that the object we create and put into the DOM is
+compatible with accepting other objects?  or does the order in which
+we process nodes make this irrelevantly by going bottom first?  Take a
+look at glade with a recursive structure, i.e. widget tags within
+widget tags.
+
+\section{Examples}
+In this section we provide three examples, all using the DOM
+approach to XML parsing, to read, write, and process data
+formatted in XML.
+The first example parses an HTML page to pull data
+formatted in a table into a data frame for statistical analysis.
+It drives home the point that HTML, although simple and powerful
+for formatting information for display in a browser, 
+it can be quite cumbersome to extract data and it is a far 
+cry from XML in terms of providing useful structure to the data.
+The data we process are election results by county for the 2004
+US Presidential election; 
+they are used in Chapter~\ref{chap:electionMaps} to make 
+maps representing the election outcome.
+
+The second example, reverses the process.
+That is, we write an XML file, actually it is
+a GML (Geography Markup Language) file,
+from data stored in an R data frame.
+Here, we examine the schema for marking up geographic
+information, and use it to describe and build a DOM from 
+the data frame.
+
+Our final example recursively surfs the web, finding 
+and following links on webpages.
+We provide handlers for the \SFunction{xmlTreeParse}
+function to handle anchor tags.
+In this example, we are not interested in building a DOM
+but in creating a Web graph showing the connections between
+web pages.  This graph will be used further in 
+Chapter~\ref{chap:Google} in a link analysis of the Web. 
+
+
+\subsection{Election results from the web}
+This example demonstrates the limitations of HTML as a markup
+language for describing data. 
+The data of interest are presented via a 
+\HTMLTag{table} in a web page. 
+The \HTMLTag{table} tag names and attributes contain no useful 
+information about the data; they just get in the way of finding 
+the data.
+
+\begin{figure}
+%XX \includegraphics[height=.8\textheight,width=.6\textwidth]{AZScreenShot}
+\caption{A screen shot of the county election results for Arizona in
+the 2004 presidential election, as shown on the USA Today website,
+Note all of the advertizing and additional information that will need
+to be discarded in the extraction of the numbers of interest.
+}
+\label{fig:AZScreenShot}
+\end{figure}
+
+
+\begin{figure}
+%XX \includegraphics[height=8in,width=5in]{AZSourceScreenShot}
+\caption{A screen shot of a portion of the HTML source for the USA Today
+web page (shown in Figure xx that presents the
+county election results for Arizona in the 2004 presidential election.
+}
+\label{fig:AZSourceScreenShot}
+\end{figure}
+
+Figure~\ref{fig:PAelectionScreenShot} shows a portion of the web page
+that contains the table of election results.
+We see that the table of interest is embedded in a page with a lot
+of extraneous information which we must sort through to find the 
+numbers we wish to extract. 
+This page is from the USAToday website, where there
+is one page for each state; the figure shows us the election results 
+from Arizona which can be found at the following URL,
+\begin{verbatim}<![CDATA[
+www.usatoday.com/news/politicselections/vote2004/
+  PresidentialByCounty.aspx?oi=P&rti=G&tf=1&Sp=AZ
+]]>\end{verbatim}
+Notice that the question mark and ampersands in the URL indicate
+that the page is dynamically generated from the submission of 
+a form with particular parameter values.
+In fact, to obtain this page, we selected ``Arizona" from a 
+pull-down menu on a previous USAToday web page.
+The Sp argument has the value ``AZ" to denote that we are 
+requesting the data for Arizona.
+In Chapter~\ref{chap:electionMaps}, we extract data for all states, 
+but for this example we examine only the data for Arizona.  
+
+To get hold of the page, we use the \SFunction{getForm} function 
+in the \SPackage{RCurl} package.
+<r:code><![CDATA[
+library(RCurl)
+usaToday = "http://www.usatoday.com/news/politicselections/
+            vote2004/PresidentialByCounty.aspx"
+html = getForm(usaToday, oi = "P", rti = "G", tf = "l", sp = "AZ")
+]]></r:code>
+The format of the page is identical across states so we can
+directly pull the table of interest from the DOM tree and proceed to add
+the values of the \HTMLTag{td} tag in a table row (\HTMLTag{tr}) 
+to the row in data frame. 
+Alternatively, we could use a handler to find the \HTMLTag{table}
+nodes and extract data from the table of interest.
+To find the table, we run the HTML through the \SFunction{htmlTreeParse}
+function in the \RPackage{XML} package and start to walk the tree.
+The snippet of HTML source for the Arizona page (Figure~\ref{fig:SourceScreenShot})
+shows that we have our work cut out for us.
+<r:code>
+tree = htmlTreeParse(html, asTree = TRUEi, asText = TRUE)
+tree = tree[["children"]][["html"]][["body"]]
+tree = tree[[1]][[4]][[3]][[3]][[7]][[1]][[6]]
+                [[3]][[3]][[1]][[1]]
+</r:code>
+The table we are after is very deep in the tree.
+Rather than rely on the structure of the HTML page in this way,
+we can employ a handler function to pull out the correct table
+as the parser comes across \HTMLTag{table} tags.
+In this case, we do not need to keep the entire
+DOM, only the children of the correct \HTMLTag{table} tag interests us.
+The \SFunction{tableHandler} function below checks to see if
+the first row of a table has the character string,
+``Presidential Results - By County", for its value
+as that is the table we are after.
+The \SFunction{.value} function returns the table of interest.
+Notice that the \SFunction{tableHandler} function assigns
+the correct table into \SVariable{countyTable} in its parent environment 
+by using the $\lt\lt-$ double arrow assignment.
+The \SFunction{.value} function also has access to the
+\SVariable{countyTable} object in its parent namespace.
+A call to \SFunction{.value} returns the current value of
+\SVariable{countyTable}.
+\small{
+<r:code><![CDATA[
+tableHandlers =
+function()
+{
+  countyTable = character(0)
+  tableHandler = function(x){
+     if (!is.null(xmlValue(x[[1]]))) {
+      if (xmlValue(x[[1]]) == "Presidential Results - By County")
+             countyTable <<- x
+     }
+  }
+
+  list(table = tableHandler, .value = function() countyTable)
+}
+
+ tree = htmlTreeParse(html, asTree = FALSE, asText = TRUE,
+             handlers = tableHandlers())$.value()
+]]></r:code>
+}
+Once we have that table of interest, we examine the content of the rows.
+The first two rows and the last row can be discarded as they
+do not contain county information.
+The \SFunction{xmlValue} function is very handy in extracting the
+data we are after.
+
+<r:code>
+xmlName(tree)
+<r:output>
+[1] "table"
+</r:output>
+names(tree)
+<r:output>
+ [1] "tr" "tr" "tr" "tr" "tr" "tr" "tr" "tr" "tr" "tr" "tr" "tr" "tr" 
+[14] "tr" "tr" "tr" "tr" "tr"
+</r:output>
+tree[[4]]
+<r:output><![CDATA[
+ <tr>
+  <td class="notch_light" width="153">
+   <b>
+   Cochise
+   </b>
+  </td>
+  <td class="notch_light" align="Right" width="65">
+  64
+  </td>
+  <td class="notch_light" align="Right" width="70">
+  64
+  </td>
+  <td class="notch_light" align="Right" width="60">
+  24,828
+  </td>
+  <td class="notch_light" align="Right" width="60">
+  16,219
+  </td>
+  <td class="notch_light" align="Right" width="60">
+  0
+  </td>
+ </tr>
+]]></r:output>
+xmlValue(tree[[4]][[1]])
+<r:output>
+[1] "Cochise"
+</r:output>
+xmlValue(tree[[4]][[4]])
+<r:output>
+[1] "24,828"
+</r:output>
+</r:code>
+Notice that the attrivbutes on the \HTMLTag{td} tags
+contain information about how to render the information
+on the web page, e.g. right aligned, and there is no 
+information describing the content, i.e. the vote counts.
+Also note that the vote counts are character strings with 
+commas, and so will need to convert these to numeric values 
+for computational purposes.
+The following code picks up the values of the \HTMLTag{td} nodes
+and puts them in a matrix. 
+<r:code>
+n = length(tree)
+countynames = NULL
+statevotes = matrix(nrow = (n-3), ncol = 5)
+for (j in 3:(n - 1)) {
+      countynames = c(countynames, xmlValue(tree[[j]][[1]]) ) 
+       for (k in 1:5) {
+         statevotes[(j-2), k] =     
+           as.numeric(gsub(",", "", xmlValue(tree[[j]][[k+1]])) )
+       }
+    }
+rownames(statevotes) = countynames
+colnames(statevotes) = c("precincts","reporting",
+                         "Bush","Kerry","Nader")
+statevotes
+<r:output>
+           precincts reporting   Bush  Kerry Nader
+Apache            45        45   8068  15082     0
+Cochise           64        64  24828  16219     0
+Coconino          83        83  20619  26513     0
+Gila              40        40  10494   7107     0
+Graham            18        18   7302   3141     0
+Greenlee           8         8   1899   1146     0
+La Paz            12        12   3158   1849     0
+Maricopa        1058      1058 539776 403882     0
+Mohave            73        73  29608  16267     0
+Navajo            70        70  16474  14224     0
+Pima             401       401 138431 154291     0
+Pinal             67        67  34813  25652     0
+Santa Cruz        24        24   4668   6909     0
+Yavapai          103       103  49675  30377     0
+Yuma              42        42  18398  12668     0
+</r:output>
+</r:code>
+
+The rest of the states can be handled in a similar fashion,
+by taking each state abbreviation in turn to get the appropriate
+state web form.
+
+\subsection{Handling Google pages}
+
+In this example we consider the problem from Chapter~\ref{chap:google}
+where we want to build a graph such as the one shown in Figure~\ref{fig:ABClinks}
+to display connections between webpages.
+Simply, the idea is to take a webpage,
+determine the links on that page, follow each of these links 
+to their respective pages, find the links on those pages, 
+and continue following those links and so on.
+We may want to limit the search by following only links in a particular domain, 
+or we may want to limit the number of hops we take from the original site.
+We also may want to begin with a list of web pages, rather than just one, to
+follow the links on.
+For the purpose of this example, we ignore these extra complications, and 
+focus on the recursive processing of pages and links.
+
+To begin, we note that a link must appear in an anchor, or (\HTMLTag{a}), tag.
+We write a handler function to be called when an \HTMLTag{a} tag is parsed;
+the handler simply adds the value of the \HTMLAttr{href} attribute to a 
+list of links associated with the page being parsed.
+
+Figure~\ref{fig:ABClinks} shows a sample example containing four pages, 
+A.html, B.hmtl, C.html, and D.html. 
+We see from the figure that A.html links to B.html;
+B.html contains links to A.html, C.html, and itself; 
+C links to A and D; and D contains no links. 
+The contents of B.html is displayed below.
+
+\begin{figure}
+\begin{verbatim}
+      A
+
+B             C
+      D
+\end{verbatim}
+\caption{A small example of four interconnected html pages. 
+The A page links to B; B contains links back to A, as well as 
+links to C and itself; C links to A and D; and D contains no links. }
+\label{fig:ABClinks}
+\end{figure}
+
+\begin{verbatim}<![CDATA[
+<head>Example</head>
+<body>
+<h1>B </h1>
+<p>
+Some simple HTML that is not well-formed.
+But has a <a href="A.html">link to A</a>
+<i>and </i> a <a href="C.html">link to C</a>.
+<p/>
+It also has a <a href="B.html"> link to itself</a>.
+</body>
+]]>\end{verbatim}
+
+To pull the links from B.html, we write a handler
+function for the \HTMLTag{a} tag.
+When we parse the B tree, we do not need to keep 
+the DOM, but simply to call the link handler when
+an \HTMLTag{a} tag is encountered.
+Since the handler must accumulate \XMLAttr{href} values over 
+subsequent calls to it, so the function needs access to a variable 
+that does not disappear over repeated calls. 
+We create such an environment through the \SFunction{linkHandlers}
+function.
+It contains the \SFunction{aHandler} function and 
+the variable \SVariable{links}.
+The \SFunction{aHandler} function adds a newly found link
+to the collection in \SVariable{links} by making an
+assignment in its parent environment with the $\lt\lt-$
+double arrow assignment.
+
+The \SFunction{.value} function also has access to the 
+\SVariable{links} object in its parent namespace. 
+A call to \SFunction{.value} returns the current value of 
+\SVariable{links}.
+
+\small{
+<r:code><![CDATA[
+linkHandler =
+function()
+{
+  links = character(0)
+  aHandler = function(x){
+         href = xmlGetAttr(x, "href")
+         if(!is.null(href))
+             links <<- c(links, href)
+  }
+
+  list(a = aHandler, .value = function() links)
+}
+]]></r:code>
+}
+
+A call to \SFunction{htmlTreeParse} shows that the function
+\SFunction{aHandler} successfully found the three links to 
+A, B, and C.
+
+<r:code>
+htmlTreeParse( file = "Example/B.html", handlers = linkHanlder())$.value
+[1] "Example/A.html"  "Example/C.html"  "Example/B.html"  "
+</r:code>
+For the next step we need to continue calling 
+\SFunction{htmlTreeParse} with the latest urls.
+To do this we write a recursive function, i.e. one that calls itself.
+Our new function \SFunction{catalogLinks} builds a list
+with an entry for each page visited.
+When it visits a site it slurps up the urls
+there and adds them to the collection of urls to be processed.
+The \SFunction{catalogLinks} function calls itself recursively,
+each time taking the top url off the vector of urls to be processed
+and addig newly found links to the end of the vector.
+When does it stop?
+When it has been called with an empty vector.
+
+\small{
+<r:code>
+catalogLinks =
+function( toBeProcessed, allLinks = list())
+{
+
+    if ( length( toBeProcessed ) == 0 ) {
+           invisible(allLinks)
+    }
+
+    else {
+       u = toBeProcessed[1]
+       toBeProcessed = toBeProcessed[-1]
+
+       forwardLinks = htmlTreeParse(file = u, handlers = linkHandler(),
+                        asTree=FALSE )$.value()
+                                                                                     
+       allLinks[[u]] = forwardLinks
+
+       if( length( forwardLinks ) != 0 ) {
+
+         forwardLinks = unique( forwardLinks[ !( forwardLinks %in%
+                   c( toBeProcessed, names( allLinks ) ) ) ] )
+       }
+
+       catalogLinks( toBeProcessed, allLinks)
+    }
+}
+</r:code>
+}
+
+A small problem with our function is that each call to 
+\SFunction{htmlTreeParse} results in a new call to 
+\SFunction{linkHandler} which sers up is own environment
+with its own \SFunction{aHandler} function.
+One solution is to include the call to htmlTreeParse in the 
+same environment with the handlers.
+We do this by adding a the function \SFunction{getForwardLinks}
+to the list of functions returned by \Sfunction{linkHandler}.
+
+<r:code><![CDATA[
+  list(a = aHandler,
+       getForwardLinks = function(u) {
+          htmlTreeParse(file = u, handlers =list(a = aHandler),
+                   asTree=FALSE )
+          ans = links
+          links <<- character(0)
+          ans
+       }
+      )
+]]></r:code>
+
+Then we call the \SFunction{linkHandler} function
+to get the list of functions once, when the catalogLinks
+function is first invoked.
+To do this we adjust the signature of the function to include the 
+handlers:
+<r:code>
+catalogLinks =
+function( toBeProcessed, allLinks = list(), handlers = linkHandler() )
+</r:code>
+Now the same aHandler function is used for each subsequent call to
+\SFunction{catalogLinks} when we change the last line of \SFunction{catalogLinks}
+where it calls itself to:
+<r:code>
+catalogLinks( toBeProcessed, allLinks, handlers)
+</r:code>
+In addition, we simply replace the call to \SFunction{htmlTreeParse} in
+\SFunction{catalogLinks} with the follwoing call to \SFunction{getForwardLionks}:
+<r:code>
+forwardLinks = handlers$getForwardLinks(u)
+</r:code>
+This would cause a slight problem, if we did not reset
+the list of links after each call to \SFunction{getForwardLinks}
+because the newly found links would be added to the previous page's 
+set of links. 
+
+\small{
+<r:code>
+network = catalogLinks("Example/B.html")
+network
+<r:output>
+$"Example/B.html"
+[1] "Example/A.html"  "Example/C.html"  "Example/B.html"  "
+$"Example/A.html"
+[1] "Example/B.html"  
+$"Example/C.html"
+[1] "Example/A.html"  "Example/D.html"  "
+$"Example/D.html"
+character(0)
+</r:output>
+</r:code>
+}
+
+
+\subsection{Creating GML}
+In this example we consider the problem of converting an R 
+object into an XML file.
+Specifically, we have a data frame, \SVariable{countyCenters}, 
+with county name and latitude and longitude 
+for the center of the county for all counties in the United States.
+The goal is to convert the data frame into geography markup, i.e. GML. 
+GML stands for Geography Markup Language was developed by
+the Open Geospatial Consortium (\URL{http:www.opengeospatial.org})
+to characterize the geometry and properties of geographic information.
+
+We describe here a very small part of the OGC standards for conveying
+geographic information, and refer the reader to the full documention
+that can be found on the OGC website. 
+In particular, the Geographic Markup Language (GML)
+Implementation Specification (Cox, Daisey, Lake, Portele, and Whiteside)
+contains the normative GML schema for version.
+The notion of a county may be represented as a GML feature;  
+examples of features include, river, road, city, and college,
+i.e. physical, political, and administrative geographic regions.  
+Features may include properties such as \XMLTag{name},
+as well as basic geometric properties such as 
+\XMLTag{location}, \XMLTag{Point}, and \XMLTag{coordinates}.
+These tags are preceded by \XMLTag{gml:} to denote the GML
+namespace.
+The location may be given as a GML geometry in a particular
+spatial reference system.  The reference is typically given
+using the \GMLAttribute{srsName} attribute.
+Below is an example of how we might express a county center
+in GML:
+
+\begin{verbatim}<![CDATA[
+<county>
+  <gml:name>  Cochise County </gml:name>
+  <gml:location>
+    <gml:Point>
+      <gml:coordinates> -109488456 35383620</gml:coordinates>
+    </gml:Point>
+  </gml:location>
+</county>
+]]>\end{verbatim}
+
+In the \SPackage{XML} package the functions
+\SFunction{xmlOutputBuffer} and \SFunction{xmlOutputDOM} 
+provide two alternative ways to construct XML documents incrementally.  
+They have the same interface for opening and closing tags and 
+inserting nodes.  
+The buffer version stores the XML representation as a string,
+whereas the DOM version builds an XML tree.
+
+The return value of these functions is a list of 
+functions which operate on the XML data in a shared environment.
+<r:code>
+con = xmlOutputDOM()
+class(con)
+<r:output>
+[1] "XMLOutputDOM"    "XMLOutputStream"
+</r:output>
+names(con)
+<r:output>
+ [1] "value"      "addTag"     "addEndTag"  "closeTag"   "reset"
+ [6] "addNode"    "add"        "addComment" "addPI"      "addCData"
+ [11] "current"
+</r:output>
+args(con$addTag)
+<r:output>
+function (tag, ..., attrs = NULL, close = TRUE, namespace = NULL)
+NULL
+</r:output>
+args(con$closeTag)
+<r:output>
+function (name = "", namespace = NULL)
+</r:output>
+</r:code>
+
+The functions that interest us are: 
+\begin{itemize}
+\item \SFunction{addTag} to add a new element to the document.
+Note that when the argument \SArg{close} is FALSE, then the tag will remain
+open to allow elements to be nested as children of the open tag.
+\item \SFunction{closeTag} to close the currently open tag, which means
+that new elements will be added to the DOM as siblings to the tag just
+closed. 
+\item \SFunction{value} to retrieve the current contents of the XML document.
+\end{itemize}
+
+Before we write the function to build the GML file, 
+let's try making the following small GML file: 
+\begin{verbatim}<![CDATA[
+<doc>
+   <state>
+     <gml:name abbreviation="AK">
+        ALASKA
+     </gml:name>
+   </state>
+</doc>
+]]>\end{verbatim}
+We first point out that the return value of xmlOutputDOM contains a root-node 
+called \XMLTag{doc}. 
+<r:code>
+con$value()
+<r:output><![CDATA[
+ <doc>
+ </doc>
+]]></r:output>
+</r:code>
+So, we can begin by adding a \XMLTag{state} tag to the DOM.
+<r:code><![CDATA[
+con$addTag("state", close = FALSE)
+con$value()
+<r:output><![CDATA[
+ <doc>
+   <state>
+   </state>
+ </doc>
+]]></r:code>
+Although we specified that the tag should be kept open, 
+we see that the DOM already includes the closing tag.
+However, because the \XMLTag{state} tag is still open,
+when we issue the next call to \SFunction{addTag}, 
+the new tag will be added as a child to \XMLTag{state}.
+The mini-document that we are trying to create has
+the child node \XMLTag{name} with an attribute called
+\XMLAttribute{abbreviation} and contents ``ALASKA".
+The \SArg{attrs} argument to \SFunction{addTag} takes a
+named array to create the name=value pairs of attributes
+and their values, which in this example is just 
+\verb+abbreviation="AK"+.
+After adding the \XMLTag{name} element, we close the \XMLTag{state} 
+element to complete our document.
+<r:code>
+con$addTag("name", "ALASKA", 
+           attrs = c("abbreviation" = "AK"), namespace="gml")
+con$closeTag("state")
+con$value()
+<r:output><![CDATA[
+ <doc>
+  <state>
+   <gml:name abbreviation="AK">
+   ALASKA
+   </gml:name>
+  </state>
+ </doc>
+]]></r:output>
+</r:code>
+
+Notice that the document we just created was built from
+top to bottom.
+We are ready to generalize the code into a function 
+to create a \XMLTag{state} element with all of its
+\XMLTag{county} children. 
+This can be accomplished by a loop over the county records.
+Notice that we use indentation in the code below as a cosmetic
+aid to help keep track of the nesting of nodes. 
+The input to the \SFunction{statGML} shown below is the
+hame of the state, the two-letter state abbreviation, 
+a dataframe containing the county information, and the
+XML DOM (as an R object).
+
+%Deb - how do we add a text node? That is, a node can have
+%text in multiple places, before and after a child node. 
+
+\small{
+<r:code>
+stateGML =
+function(name, abb, counties, con) {
+  con$addTag("state", attrs = c("id" = abb), namespace = "gml", close = FALSE)
+    con$addTag("name", name, namespace = "gml")
+    for(i in 1:nrow(counties)) {
+      con$addTag("county", close = FALSE)
+        con$addTag("name", counties[i, 1], namespace = "gml")
+          con$addTag("location", close = FALSE, namespace = "gml")
+            con$addTag("Point", close = FALSE, namespace = "gml")
+              con$addTag("coordinates", 
+                        counties[i, c(4, 3) ], namespace = "gml")
+            con$closeTag() # Point
+        con$closeTag() # location
+      con$closeTag() # county
+    }
+  con$closeTag() # state
+  invisible(1)
+}
+</r:code>
+}
+
+To complete the task, we use the \SFunction{generateGML} function
+below to call \SFunction{stateGML} for each state, each time
+adding the corresponding state sub-tree to the DOM.
+The \SFunction{generateGML} function returns a DOM representing the
+dataframe. 
+The method \SFunction{saveXML} writes the GML DOM containing
+all of the county location data to a text file.
+
+\small{
+<r:code>
+generateGML = 
+function(StateAbbrev, StateName, ct = countyCenters, con = xmlOutputDOM())
+{
+  for(i in 1:length(StateName)) {
+     stateGML(StateName[i], StateAbbrev[i], 
+              ct[ct[, 2] == StateAbbrev[i], ], con = con)
+  }
+  con
+}
+
+countyDOM = generateGML(StateAbbrev, StateName)
+saveXML(countyDOM$value(), file="~/countyLocations.gml")
+</r:code>
+}
+
+
+\section{XPath}
+<!--
+Move me as you want. I am just putting this here	       
+because I haven't looked to see where else it would go.  
+-->
+The <r:func>xmlTreeParse</r:func> function reads the XML data into an
+internal tree structure in low-level C code.  We then convert this
+tree into R data objects so that we can work with it entirely within
+R.  This is convenient, but not necessarily very efficient.  We build
+the internal tree and then we have to traverse it to build up a second
+tree, this time in R.  Sometimes, we will use handlers to perform all
+the transformations into R objects during this traversal of the tree.
+However, in other cases, we will get the R-level tree back from a call
+to <r:func>xmlTreeParse</r:func> and then, in R, we will navigate
+throught the nodes and children recursively to pull out the different
+pieces we want.  In many circumstances, it would be helpful if we
+could avoid the expense of copying the nodes in the internal tree to R
+objects, but rather work with the internal tree and its nodes from
+within R as if they were regular R objects.  We can do this by
+instructing <r:func>xmlTreeParse</r:func> to return the internal tree
+or document directly without performing an conversion. This is
+specified by supplying <r:true/> for the
+<r:arg>useInternalNodes</r:arg> parameter.
+The function will then return an object of class
+<r:class>XMLInternalDocument</r:class> and from 
+this we can access the different parts of the DTD and tree of nodes
+using the same functions as we did when working the R level objects
+of class <r:class>XMLNode</r:class> and its subclasses.
+
+So if we can avoid copying the tree using
+<r:arg>useInternalNodes</r:arg>, why would we not always use the
+internal tree?  Well, when we get the internal tree back into R, we
+still have to process it.  This might involve multiple passes over the
+tree to extract the information of interest.  In contrast, if we use
+handler functions, we can process the information with a single pass
+that is done in fast C code within the call to
+<r:func>xmlTreeParse</r:func>. ( If we want, we might even avoid the
+cost of copying the nodes to R objects when we pass them to handler
+functions in the interest of efficiency and use the internal nodes
+both directly and transparently.)  Also, if we want to use the tree in
+a future R session, we need to serialize it to a file as a regular
+object. For this, we need to first convert it to R as we cannot
+readily serialize the internal C-level data structures so that they
+can be restored into another R session.  Of course, we can just
+reparse the XML document in the new R session, so the document is
+essentially the serialized version of the internal tree.  However, if
+the parsing was very expensive because the document was very large, we
+might think that it was useful to save it in R.  However,
+deserializing the R object will still be expensive and perhaps even
+more so than reading the XML document into an internal tree.  Also,
+for very large documents, <r:func>xmlTreeParse</r:func> may not be the
+appropriate parsing technique and a SAX-based approach to parsing
+described below may be more valuable.  So in short, using the internal
+tree and its nodes is typically a good approach.  It is not the
+default for reasons of legacy and backward compatability.
+<note>So we should provide a function with a new name that has the right
+defaults.</note>
+
+
+
+
+The default approach to using <r:func>xmlTreeParse</r:func> is a very
+natural way of thinking about the processing, dividing into steps
+involving reading the entire XML file into a tree and then accessing
+the bits we need from the tree.  Unfortunately, this post-processing
+of the tree typically involves several passes over the entire tree, in
+R.  This can be slow.  What we are doing is finding nodes with
+particular characteristics anywhere in the tree and then processing
+their information.  What we would like is a convenient, fast way to
+find these nodes. In some cases, the characteristic we use to identify
+the nodes of interest are very complex and require the power of a
+general purpose programming langauge like R.  However, often we will
+be looking at more stanard characteristics such as find all nodes
+named A, or all nodes named B which have an attribute named 'id', or
+all nodes named B that have an attribute named 'id' with the value
+'7'.  Or we might be interested in all nodes B which are children of a
+node named A, or all nodes B which are descendants (children,
+grand-children, grand-grand-children, ...) of nodes named A.  Or we
+might be interested in all nodes which have exactly 5 children.  Such
+criteria can be combined into complex, rich expressions that identify
+subsets of the nodes within the tree. 
+And in this multiple-pass approach to extracting information from the tree,
+this subsetting approach is usually exactly what we want.
+
+As we mentioned early in this chapter, XML is a widely used and
+supported format with a large collection of supporting technologies
+that make it viable to use.  And since so much of working with XML
+involves finding sets of nodes with a particular characteristic, it is
+likely that there exists some technology to specify such searches or
+characteristics.  The language is XPath and it is an important
+component of the XML suite used in many different places such as XSL
+for writing rules to transform an XML document, and XLink for
+specifying links from one part of an XML document to a node in
+another. So it is a valuable language to learn.
+
+There are numerous books that have sections on XPath.  Also there are
+several good, succinct tutorials on the Web that outline the essential
+aspects of XPath.  You can try these in R using an XML document
+returned via <r:func>xmlTreeParse</r:func> or <r:func>htmlTreeParse</r:func>
+with <r:arg>useInternalNodes</r:arg> as <r:true/>, and then performing the XPath
+query with <r:func>getNodeSet</r:func>.
+
+One common thing to do in XPath is to find all nodes with a particular
+(element) name. For example, suppose we want to find all links in an
+HTML document.  We would want to find all the nodes named
+<xml:tagName>a</xml:tagName>.  To specify this in XPath, we need to
+specify the name of the element of interest and also say where in the
+tree to search for these nodes. In our case, we want to find these 'a'
+nodes anywhere in the tree so we use the path '//' which means
+anywhere under the root of the tree.  So our simple XPath expression
+is "//a" meaning any node named a anywhere in the tree.
+
+In fact, this XPath expression will also find a nodes which are
+anchors, i.e. those with a name attribute.  So we want to restrict our
+search to those a elements which have an href attribute.  We want our
+XPath expression to say "all a nodes anywhere in the document such
+that the node has an href attribute".  We put this "such that"
+restriction inside [ ], much like we do subsetting in R.  And we refer
+to an attribute be preceding its name with an @ character.  So we can
+write our query as "//a[@href]".  By putting just the attribute
+identifier, we are asking just about the existence of the attribute in
+the node. The XPath search will find each 'a' node and then verify
+this condition, returning only the nodes for which it is true.
+
+Some of the links in the document are to other documents and some are
+to anchors within this document. The latter start with a #.  So we can
+try to find all of those internal links using XPath.  Of course, we
+could find all the 'a' nodes with an href using XPath as before and
+then look at the value of the href attribute for each of these within
+R. This is a perfectly reasonable approach and, in general, if it is
+easy to use both XPath and R in separate steps to produce the subset
+of nodes of interest, then this is a good thing to do.  However, if we
+can do it all in XPath, then this may be convenient and certainly
+educational while we are learning XPath.  What we want is to find all
+a nodes with an href whose first character is #.  In other words, find
+all a nodes (//a) and then check if the substring given by the first
+character equals #.  This can be expressed as
+<xpath:expr>"//a[substring(@href, 1, 1) = '#'"]</xpath:expr> Again,
+this use of [] indicates "such that".  Note that the use of href
+attribute is refering to the 'a' node currently being processed.
+Also, since XPath has no assignment of values to variables, the
+equality test is simply = and not == as in R and other languages.
+
+
+Note that if were concerned about the presence of links in the head of
+the HTML document confusing matters, we might specify that the nodes
+must be anywhere in the body.  We would indicate this as
+"//body//a". So the // can be used not just at the beginning of a
+query indicating the root node, but as an arbitrary path between one
+node and another within a branch of the tree. "//" is not the same as
+"/*/" as the latter means any node but exactly one, whereas // can
+involve zero or more nodes in between.
+
+Note also that we can use paths within the [] or "such that"
+predicate.  For example, we have one link within the a.html document
+which has markup within it.  This is <![CDATA[<a
+href="#Introduction"><i>some text</i></a>]]> To identify this, and
+only this, 'a' node with XPath, we can use the expression
+<xpath:expr>//a[./i]</xpath:expr>.  This says that the a node must
+have a child node named <xml:tagName>i</xml:tagName> and that we
+return the <xml:tagName>a</xml:tagName> node.  If we had use the
+expression "//a/i", this would return the <xml:tagName>i</xml:tagName>
+node. Putting the <xml:tagName>i</xml:tagName> withnn the [] serves to
+constrain the result set, but still returns the node being validated.
+The . means the "current node". We could omit it and use
+<xpath:expr>//a[i]</xpath:expr> as the current node is implicit.
+Whether we use the . or not, we are dealing with a path relative
+to the current node. Paths that start with / are 
+absolute paths and are taken relative to the root node.
+
+When we traverse a regular XML node tree in R, we can only reach down
+the tree and cannot access the parent or any ancestor node.  We cannot
+even access sibling nodes.  This is because R does have the notion of
+a reference (unless the tree uses an indirect representation using
+identifiers and an environment which is entirely feasible).  Using
+internal nodes, we can find a node's parent and then its parent node
+and so on for all ancestors.  Similarly, we can find the parent node
+and its children to access all the siblings.
+<r:func>xmlParent</r:func> gives us the parent node.
+
+When there are several nodes that satisfy  a particular
+criterion, we get back a  node set. This is a list in R
+and we can access the idnvidual nodes by index.
+In a different sense, we can also index nodes within the XPath query.
+Suppose that we are working with  our example document a.html.
+There are several paragraph nodes - <xml:tagName>p</xml:tagName> - 
+within the body. We can access the second of these
+with either of 
+<r:code>
+ getNodeSet(doc, "//body/p")[[2]]
+ getNodeSet(doc, "//body/p[2]")[[1]]
+</r:code>
+The first returns all the paragraph nodes to R and then we extract the second element of the R list.
+The second query returns just one node to R and we access it as the first element of the list.
+Technically, the second query may be more efficient as we spend less time converting the
+result set back to R, but this difference is typically negligible.
+It becomes imporant if there are lots of matching nodes, e.g. $100$ or more.
+
+In this example, there is little benefit to indexing in XPath. Where it is
+useful is when we want to refer to, e.g., the last element.
+Here we can say
+<r:code>
+ getNodeSet(doc, "//body/p[last()]")
+</r:code>
+
+
+If we want to obtain the values such as position, last, etc.  in the
+result rather than the node, then we should use XSL to write rules
+which identify the nodes and create information base on that
+contextual information.
+
+Let's suppose for some reason that we knew we only wanted the first
+three links found. (This can depend on the order in which the search
+is done, but let's ignore that now.)
+We can use the XPath function <xpath:func>position</xpath:func> to 
+determine the index of the matching node.
+So to find the first three links nodes, we could use
+"//a[@href and position() < 4]"
+</wrong>
+
+We can find all the anchors
+
+We often want to find a set of nodes and then apply a function to each
+of them. We can do this with a call to getNodeSet followed by a call
+to lapply or sapply.  For covenience and clarity, we have a function
+<r:func>xpathApply</r:func> that does both steps in one.
+
+
+
+XPath on nodes not the document.
+Memory issues.
+
+xmlValue versus saveXML
+
+
+
+
+
+It is important to note that when we use XPath queries, we are making
+a complete traversal of the entire tree.  This is done in C code so is
+quite fast. But for large trees, this can be very expensive. One may
+want to consider more context-specific approaches to getting the
+information of interest rather than doing a large number of XPath
+queries. And generally, one might want to use an XPath query to
+identify a large subset of nodes and process them conditionally rather
+than performing several more restrictive XPath queries and processing
+the nodes in each groups more homogeneously.
+
+
+
+
+
+
+\section{SAX}
+As we mentioned above, SAX is an alternative parsing model that
+differs from DOM parsing because it is based on events and callbacks.
+As the XML parser encounters different low-level parts or structures
+in the XML document, it generates events and allows callbacks to
+respond to these events.  Unlike DOM, the SAX parser never creates a
+tree or even XML nodes itself.  Instead, it works with events such as
+the opening of an XML element, the closing of an element, collecting
+segments of raw text, a comment, a processing instruction, etc.  The
+callbacks are given different information about the events and can
+manipulate these in whatever way they want.  They can create a tree or
+any data structure for that matter, but critically the parser does not
+create the tree.  SAX works in a linear manner on the XML stream,
+reading tokens from that stream until it finds enough to constitute an
+event.  This leads to one of the biggest differences between the DOM
+and SAX models which is that it works top-down.  In the DOM model, we
+process the children nodes first and when we get to process the parent
+node, it has access to all of the children.  This allows us to write
+handler functions that have access to all of the nodes that make up an
+object or self-contained unit.  In the SAX model, we get information
+about the parent node before we see anything about its sub-nodes.
+This means that we cannot transform the nodes into an S object in a
+single call since we don't have access to all the nodes.  Instead, we
+can often use the start of the parent node to create an empty or
+default object and then fill it in as we encounter the children nodes
+later in the XML stream. Only when we see the event that announces the
+closing of the parent node ca we can wrap up the construction of the
+object. So the SAX model encourages a very incremental construction
+approach and typically one that involves sharing state across the
+callbacks to remember what object is currently being constructed.
+
+The primary advantage of SAX is memory efficiency.  Because the nodes
+and the tree are not created but the same amount of information is
+communicated to the callbacks, the SAX parser doesn't incur the
+penalty of having both a tree and the target data structure in memory
+simultaneously.  This typically comes at the expense of more
+complexity in the callbacks that one would have in the DOM processing.
+Let's process the matrix input using SAX and contrast the different
+approaches.  We get SAX parsing in S via the \SFunction{xmlEventParse}
+function. This handles the XML input source in the same way that
+\SFunction{xmlTreeParse} does, by assuming it is either a file name, a
+remote URL or a string containing the XML .  As we might expect, the
+main difference between the functions is that, to be useful, we must
+supply callbacks to handle the different SAX events.  Again, we do
+this via the \SArg{handlers} argument and this is a named list
+of functions. 
+The names here correspond to the SAX event types
+and are listed in table \ref{tbl:XML:SAXEventNames}
+
+\begin{table}[htbp]
+  \begin{center}<![CDATA[
+    \leavevmode
+    \begin{tabular}{lll}
+& \verb+<node att1="value" att2="....>+ & startElement  \\
+& \verb+</node>+ & endElement  \\
+& \verb+some text+ & text \\
+& \verb+<!-- ... -->+ & comment \\
+& \verb+<?S ...?>+ & processingInstruction \\
+& \verb+\%lt;+ & externalEntity \\
+& \verb+<!ENTITY \% lt '<'+ & entityDeclaration \\
+    \end{tabular}
+    \caption{SAX Event and callback names}
+    \label{tab:XML:SAXEventNames}
+]]>\end{center}
+\end{table}
+
+To handle the matrix input, one possible strategy is to first create a
+matrix when we process the opening of the \XMLTag{matrix} element.
+Then, as we encounter the content in the sub-elements, we add these to
+the relevant part of the matrix.  Obviously we need a place to store
+the matrix and other information so that all of the different
+callbacks can see it and update it. We could assign the shared
+variable(s) to the global work space and communicate using that.  That
+is a bad idea. We would have to be very careful to choose variable
+names that we aren't already being used.  We could pick some very
+strange names, but this makes the code harder to read and doesn't
+guarantee that others won't use that name also. After all, they may be
+trying to pick an unusual name to be obscure also!  If you think this
+is unlikely to happen, consider who might use the name while you are
+using it.  More than likely, it will be you. If one of the values in
+our \XMLTag{matrix} element is a nested \XMLTag{matrix} element, then
+our callbacks will overwrite the first set of values and chaos will
+ensue!  So, global variables simply will not work in general.
+
+Essentially, we need to be able to mutate the S matrix across
+different calls.  In R, we can use lexical scoping to share a
+variables between different callback functions.  In S-Plus, we need
+another approach since it does not provide lexical scoping.  We will
+see that we can use the \SPackage{OOP} package for this purpose.  It
+allows us to create a special type of S object that can be modified in
+place and have these changes be seen across calls. It also provides an
+inheritance mechanism for methods and fields between classes.  But
+rather than use the full power of \SPackage{OOP}, we can use a more
+direct approach for SAX parsing. 
+
+Essentially, we need to be able to make a shared object available to
+the different callbacks and have any changes these callbacks make to
+the object be available to subsequent calls.  The simplest way to do
+this is to pass the current value of object to each callback and have
+it return an updated version of that object, or an entirely new
+object, which becomes the new value for that shared variable.  This is
+then passed to the next callback when it is invoked and we take its
+return value as the new value for the object.  And so on. This allows
+us to use regular S semantics (i.e. modifications are local) and still
+communicate state without using global variables.  Some readers will
+notice that this is quite similar to the use of user data in callbacks
+in the \SFunction{RGtk} callbacks.
+
+
+So now we have what we need to handle the \XMLTag{matrix} tag in the
+XML and create an S matrix from it.  We'll start by working on the
+\XMLTag{matrix} tag itself.  In the \SFunction{startElement} tag, we
+check the name of the tag and for the \XMLTag{matrix} element, we will
+create a matrix with the dimensions given by the attributes.  Both the
+name and the attributes vector are passed to the
+\SFunction{startElement} callback, so the code is reasonably easy to
+write.
+<r:code><![CDATA[
+startElement = function(name, atts, ..., .state = NULL) {
+ if(name == "matrix") {
+   r <- as.integer(atts[["nrow"]])
+   c <- as.integer(atts[["ncol"]])
+
+   .state$m <- matrix(0, r, c)
+   dimnames(.state$m) <- list(rep("", r), rep("", c))
+ }
+
+ .state
+}
+]]></r:code>
+Note that we return the updated value of the \SArg{.state} argument.
+This will become the value of the \SArg{.state} argument to the next
+callback, i.e. the start of the \XMLTag{columnNames} tag.
+
+There is no data to extract from the start of the \XMLTag{columnNames}
+tag. That comes from its \XMLTag{string} sub-elements. However, we do
+need to set a flag so that when we process these sub-elements that we
+know where to put their contents.  How we do this is up to us, so we
+will use the \SField{in} field within the \SArg{.state} object to
+denote what state we are currently working on.  To do this, we can set
+the value to the name of the \XMLTag{columnNames} tag.  For our simple
+example, this is not actually necessary since we know that
+\XMLTag{string} elements only occur within the \XMLTag{columnNames}
+nodes. However, this approach is necessary when tags can occur within
+a variety of other tags.  To be able to insert the individual column
+names in the appropriate position, we will need to know which element
+we are dealing with.  So we keep a counter for that and update it each
+time we finish adding a column name to the names of the matrix.
+<r:code>
+ if(name == "columnNames") 
+   .state$col = 1
+</r:code>
+
+Given that we know we are currently working on column names, we don't
+need to do anything with the start of the \XMLTag{string} tag.  We are
+only interested in its content and that will be given to us via the
+\SFunction{text} callback.  The \SFunction{text} callback can be a
+little more difficult than it should. The XML parser may not pass us
+the entire segment of text within an XML node in a single call to the
+\SFunction{text} callback. Instead, it is entitled to make multiple
+calls to the function handing it consecutive pieces.
+To deal with this, rather than immediately using this content as the name, we want
+to cumulate the content and wait until until a new XML element is
+opened before we know the full text has been handed to us.
+To do this, we just \SFunction{paste} any existing text
+in the \SArg{.state} object  with the content passed
+to us in this invocation of the callback
+and store this entire string in the \SArg{.state} object
+for the next callback.
+<r:code><![CDATA[
+text = function(content, ..., .state = NULL) {
+  .state$text <- paste(.state$text, content, sep="")
+
+   .state
+}
+]]></r:code>
+
+So now when we see the end of the \XMLTag{string} tag, we can put the
+value of the previously cumulate text into the appropriate position in
+the matrices column names vector.  We also reset the text and
+increment the index of the active column.
+<r:code><![CDATA[
+endElement = function(name, .state = NULL) {
+ if(name == "string") {
+   dimnames(.state$m)[[2]][.state$col] <- .state$text
+   .state$col <- .state$col + 1
+ }
+
+ .state$text <- ""
+ .state
+}
+]]></r:code>
+Again, we return the updated value of the \SArg{.state} object.
+
+We deal with the completion of the \XMLTag{real} tags in much the same
+way. We will have gathered the text within a \XMLTag{real} node via
+the \SFunction{text} callbacks and it will be in \SArg{.state\$text}.
+So we can convert this string to a number and then put it into the
+$(i, j)$ entry of the matrix.
+So we can add the following to the \SFunction{endElement} code.
+<r:code><![CDATA[
+ if(name == "real") {
+   .state$m[.state$row, .state$col] <- as.numeric(.state$text)
+   .state$col <- .state$col + 1   
+ }
+]]></r:code>
+Note that we are resetting the \SField{text} value unconditionally in
+the callback since we are assuming that when we see an end of tag that
+we are using the text immediately.
+
+The start or end of an \XMLTag{NA} node is all we need to process it.
+And what we do with it is almost identical to how we handle the
+\XMLTag{real} values.
+<r:code>
+ if(name == "NA") {
+   .state$m[.state$row, .state$col] = NA
+   .state$col = .state$col + 1   
+ }
+</r:code>
+
+The last remaining piece of the XML content that we have to handle is
+the \XMLTag{row} nodes.  Basically, when we start a \XMLTag{row} node,
+we have three things to do.  Firstly, we want to increment the active
+row index.  Secondly, we need to reset the column index to $1$. And
+thirdly, we want to get the \XMLAttribute{id} attribute and insert it
+into the row names of the matrix.  So we add the following code to the
+\SFunction{startElement} callback:
+<r:code><![CDATA[
+ if(name == "row") {
+   .state$row <- .state$row + 1
+   .state$col <- 1
+   dimnames(.state$m)[[1]][.state$row] <- atts[["id"]]
+ }
+e]]></r:code>
+
+
+As a matter of convenience, when we see the end tag of the
+\XMLTag{matrix} node, we can discard all the intermediate values in
+the \SArg{.state} object and return just the matrix itself.
+
+In order for the callbacks to behave properly, we have to create
+a suitable starting value of the \SArg{.state} object.
+We need to set the active row and column indices.
+We also need to set the current string to \texttt{""}.
+We do this when we call \SFunction{xmlEventParse} by
+passing it an initial value for \SArg{state}.
+<r:code>
+xmlEventParse("XML/matrix.xml",
+               state = list(in = "", col = 0, row = 0, text = "")
+               handlers=....)
+</r:code>
+
+Obviously we don't want to have to type the definitions for the
+different handlers each time we want to read a matrix from XML.
+Instead, we want to be able to refer to the collection of callback
+functions easily. So we create a function that returns them as a named
+list that we can pass directly to \SFunction{xmlEventParse}.  So now
+we can put all of this together and define the handlers in totality.
+\listinginput[100]{1}{XML/eventMatrix.S}
+
+This undoubtedly seems and is more complicated than the equivalent
+process for the DOM approach.  This is because when we use the DOM
+approach we have the entire node and its sub-nodes within each
+callback and we can process all the information together. The SAX
+model requires us to construct the necessary information ourselves and
+store it so that we can process it when we have enough to make sense
+if it. So not only are we responsible for making sense of the
+information, we have the additional task of building the information
+from the low-level pieces the XML parser hands us.  So we definitely
+have more work to do when using a SAX parser.  And what this gives us
+is the control over what intermediate information is created.  When we
+have to be concerned with the potential for a DOM parser creating an
+excessive amount of this information, we can assume control and use
+SAX. Of course, if we are reading small datasets, it is easier to
+program using the DOM approach. But if we ever need to read a very
+large dataset that will exceed the capacity of the DOM parser, we will
+need a SAX parser. So we have this difficult trade-off of whether we
+implement both approaches and use them on different inputs depending
+on their (expected) size, or do we just implement a single,
+complicated parser?  Unfortunately, there is no good, general answer
+to this problem.  It will depend on the circumstances you find
+yourself.  Issues such a the cost of developing the code compared with
+maintaining and (re)testing it will be important.  What we can say is
+that SAX parsing is very modular and is not in any way as complex as
+it appears.  There are several examples of SAX parsing available in
+different packages. The \SPackage{Rggobi} package allows has a SAX
+parser for reading GGobi (\url{http://www.ggobi.org}) input files.
+
+
+\section{Monitoring SAX}
+Sometimes, especially when learning how to use SAX, it is useful to be
+able to see the type and order of events that are generated by the SAX
+parser as it processes a document.  libxml provides a program,
+\executable{testSAX}, that prints information about the events its
+generates. One can pass an XML document to that to find out what
+events will be generated from the S SAX parser.  Alternatively, it is
+quite simple to implement a collection of SAX callbacks in S that also
+do this.  For example, the \SFunction{startElement} handler might look
+something like
+<r:code>
+function(name, atts) {
+cat("[startElement]")
+ print(name)
+ print(atts)
+}
+</r:code>
+And we would define the other callbacks in a similar manner.
+Note that we don't need a \SArg{.state} argument since we will call
+\SFunction{xmlEventParse} without giving a \SArg{state} object.
+
+Rather than simply printing the information to the terminal, we may
+want to collect it into an S object and look it after the parsing is
+complete.  It should be reasonably obvious that we can cumulate the
+information using the \SArg{state} argument.  All we need to do is
+have each of the callback functions add its arguments and an
+identifier for the event type to a list.  The \SArg{state} is the list
+and it expands to contain all the previously observed events.
+So our \SFunction{startElement} callback in this case would be
+<r:code><![CDATA[
+function(name, atts, .state) {
+ .state <- c(.state, list(event="startElement", name=name, attributes = atts)
+ .state
+}
+]]></r:code>
+Then we would use these handlers in the call
+<r:code>
+ events = xmlEventParse(file, state = list(), handlers = ....)
+</r:code>
+We can even cumulate events across different files by passing the
+\SVariable{events} object as the value of the \SArg{state} argument to
+another call to \SFunction{xmlEventParse}.  And if we were interested
+in specific event types, we would specify handlers only for those
+events.
+
+
+\section{SOAP}
+
+</chapter>
+

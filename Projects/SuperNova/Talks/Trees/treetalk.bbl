@@ -1,0 +1,28 @@
+\begin{thebibliography}{3}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Breiman et~al.(1984)Breiman, Friedman, Olshen, and Stone]{cart84}
+L.~Breiman, J.~Friedman, R.~Olshen, and C.~Stone.
+\newblock \emph{{Classification and Regression Trees}}.
+\newblock Wadsworth and Brooks, Monterey, CA, 1984.
+
+\bibitem[Ripley and Hjort(1995)]{546466}
+Brian~D. Ripley and N.~L. Hjort.
+\newblock \emph{Pattern Recognition and Neural Networks}.
+\newblock Cambridge University Press, New York, NY, USA, 1995.
+\newblock ISBN 0521460867.
+
+\bibitem[Therneau and port~by Brian
+  Ripley~<ripley@stats.ox.ac.uk>.(2006)]{rpart}
+Terry~M Therneau and Beth Atkinson.~R port~by Brian
+  Ripley~<ripley@stats.ox.ac.uk>.
+\newblock \emph{rpart: Recursive Partitioning}, 2006.
+\newblock URL
+  \url{http://mayoresearch.mayo.edu/mayo/research/biostat/splusfunctions.cfm}.
+\newblock R package version 3.1-32.
+
+\end{thebibliography}

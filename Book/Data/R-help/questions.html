@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:r="http://www.r-project.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" href="/Users/duncan/Classes/StatComputing/XDynDocs/inst/CSS/OmegaTech.css">
+<link rel="stylesheet" href="foo.css">
+<title>Questions</title>
+</head>
+<body><ol>
+<li>
+<div><p xmlns="http://www.w3.org/1999/xhtml">
+How many questions are there ? and how many replies are there?
+</p></div>
+<div class="answer"><tr xmlns="http://www.w3.org/1999/xhtml" class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>
+Starting with the messages in msgs  (i.e. the split header/body messages)
+</p><div xmlns=""><pre class="rcode">
+x = lapply(msgs, function(x) 
+                   sapply(x, function(x) "References" %in% names(x$header))
+                 )
+numReferences = sapply(x, sum)
+numQuestions = sapply(x, length) - numReferences
+tmp = data.frame( count = c(numReferences, numQuestions),
+                  type = rep(c("reply", "question"), each = length(x)),
+                  date = rep(sort(gz.dates), 2))
+xyplot( count ~ date, tmp, group = type, auto.key = list(columns = 2))
+</pre></div>
+<p>
+Does this mean there are more questions than answers up to a certain point in time?
+What other considerations do we have to take into account?
+Announcements R-pkgs, R releases, ...
+</p></td></tr></div>
+</li>
+<li>
+<div><p xmlns="http://www.w3.org/1999/xhtml">
+Can you identify threads, i.e. groups of messages
+that are in reply to each other. The subject line may provide a clue
+but not be good enough by itself. The Message-ID and the References fields
+should go a long way.
+</p></div>
+<div class="answer"></div>
+</li>
+<li>
+<div><p xmlns="http://www.w3.org/1999/xhtml">
+What is the distribution of initial response time to a question?
+For how long do discussions related to a particular question go on?
+You may want to ungroup the messages by month so that you can deal with
+transition across the file boundaries, i.e. messages posted
+on the last day of one month and answered on the next day, i.e.
+at the beginning of the next month.
+</p></div>
+<div class="answer"><tr xmlns="http://www.w3.org/1999/xhtml" class="answer"><td align="left" valign="top"></td><td align="left" valign="top"><p>
+This is a convenient approach and very fast.
+This doesn't guarantee the first match.
+</p><div xmlns=""><pre class="rcode">
+refs = references[!is.na(references)]
+reply = match(names(allMsgs)[is.question], refs)
+sum(is.na(reply))
+sum(is.na(reply))/sum(is.question)  # 57%
+replyTo = which(!is.na(references))[reply]
+</pre></div>
+<p>
+So over 50% of the questions didn't get a response.
+Does this mean we need to rethink what it means to be a question and a response,
+i.e. our computations?
+A major part of reading text data is trying to learn the format as we go,
+expanding or constraining our text patterns to build rules that capture more
+of the structure that we uncover empirically.
+</p><p>
+</p><div xmlns=""><pre class="rcode">
+allMsgs = structure(unlist(msgs, recursive = FALSE), 
+                     names = unlist(lapply(msgs, names)))
+
+references = sapply(allMsgs, function(x) x$header["References"])
+is.question = rep(FALSE, length(allMsgs))
+is.question[is.na(references)] = TRUE
+sum(is.question)
+</pre></div>
+<p>
+</p><div xmlns=""><pre class="rcode">
+idx = which(is.question)
+first.reply = sapply(idx, function(i) {
+                            id = names(allMsgs)[i]
+                              # Can be a lot smarter about this since we know it is likely to be within 
+                              # a few minutes, hours or days. Perhaps loop, starting at the index of the message
+                              # and breaking when we find the match.
+                            which.min(id == references)
+                          } )
+</pre></div>
+<p>
+</p><div xmlns=""><pre class="rcode">
+first.reply = sapply(idx, function(i) {
+                            id = names(allMsgs)[i]
+                            for(k in seq(i + 1, length(allMsgs)))
+                               if(references[k] == id)
+                                 return(k)
+
+                            NA
+                          } )
+</pre></div>
+<p>
+</p><p>
+Maybe not all messages that are really in reply to another have a References.
+So we have to look at the body as  well.
+When is the earliest message with a References field in the header.
+</p><div xmlns=""><pre class="rcode">
+min(which(!is.na(references)))
+</pre></div>
+<p>
+</p></td></tr></div>
+</li>
+<li>
+<div><p xmlns="http://www.w3.org/1999/xhtml">
+Does the group of people asking questions change over time?
+Similarly, does the group of people answering questions change over time?
+Do those asking questions later begin to answer questions?
+</p></div>
+<div class="answer"></div>
+</li>
+<li>
+<div><p xmlns="http://www.w3.org/1999/xhtml"> 
+Identify R functions being mentioned in a message.  Look for
+"foo()" and "foo(a, b, c....)"  Also compare the words (before
+stemming) in the body and subject to the variables in the R search
+path.  Can you identify package names in the text and add the
+variables from those packages?  
+</p></div>
+<div class="answer"></div>
+</li>
+<li>
+<div><p xmlns="http://www.w3.org/1999/xhtml">
+What can we tell from the subject lines?
+</p></div>
+<div class="answer"></div>
+</li>
+<li>
+<div><p xmlns="http://www.w3.org/1999/xhtml">
+Can we "cluster" the messages by topic?
+Do we want to do this by message or by thread?
+Does these change over time?
+To analyze the text of the message, you will
+want to remove common "stop" words
+and stem words so that, for example,
+stop, stopped and stopping all map to stop.
+</p></div>
+<div class="answer"></div>
+</li>
+<li>
+<div><p xmlns="http://www.w3.org/1999/xhtml">
+Can we identify the code elements within the body of a message.
+This is made more complicated because of the &lt;
+used to prefix lines from an included message as well
+as the prompt  for R.
+</p></div>
+<div class="answer"></div>
+</li>
+<li>
+<div><p xmlns="http://www.w3.org/1999/xhtml">
+We ask that people include a minimal example and
+also the output of <i xmlns:cpp="http://www.cplusplus.org" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns=""><a href="sessionInfo.html">sessionInfo()
+  </a></i>. How many questions (i.e. the start of a thread)
+do contain this information? Has it increased over time?
+</p></div>
+<div class="answer"></div>
+</li>
+</ol></body>
+</html>

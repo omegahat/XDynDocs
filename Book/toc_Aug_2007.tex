@@ -1,0 +1,296 @@
+\documentclass[11pt,timesroman]{article}
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{comment}
+
+\begin{document}
+\begin{comment}
+Other data possibilities -\\
+thousands of satellite images of the ocean around the Farallon islands - used
+in the search for Jim Gray's missing sailboat
+\\
+NASA registry of large pieces of junk in orbit around the earth - used
+to plan space shuttle and satellite routes
+\\
+netcdf file - simulated data from weather models
+\\
+\end{comment}
+\section*{Data}
+
+\begin{tabular}{l|l|l|l}
+Example & Introductory & Extended & Methods and Concepts\\
+\hline
+\hline
+Satellite Image & Intro & & \\
+Frontrange & Intro + Simple & & Missing data, Data in time \\
+Spam & Intro + Reg Expr & Stand alone &Naive Bayes \\
+Campaign donations & Digital & Digital &  \\
+MP3 & Digital & &  \\
+Aerial photo & Digital &  & \\
+Traffic & Simple & Simple & \\
+Super Nova & Simple & &SVM;  \\
+Web Graph & Viz + XML & &\\
+Geolocation & Viz & Viz & linear models and lattice \\
+Election Map & Viz + XML & Viz & maps and packages \\
+Dyanmic  & Viz & & \\
+Hospitalization & Shell & & \\
+NASA weather & Shell & Shell & \\
+Weblog & Shell + RegExpr & Shell & data analysis using shell tools \\
+Expt Design in profiling & Adv Pgm & & \\
+Repeated Measures & Adv Pgm & & \\
+State of Union & Reg Expr & Reg Expr & \\
+Baseball & DB & DB & many to many matches \\
+TCP & DB & & size \\
+Census & DB & & \\
+Google earth & XML & XML & \\
+\end{tabular}
+
+\section{Introduction}
+  \begin{itemize}
+  \item Philosophy - exploration; visualization is one of the most
+    important tools of a statistician;
+  \item Data are not just rectangular arrays of numbers - they need
+    not be rectangular and they need not be numbers - three examples:
+    rainfall, spam, traffic video
+  \item Statistical Thinking and the Data Analysis process; the closer
+    you are to orignial data the better job you will do at data
+    analysis;
+  \item The role of computing in statistics and data analysis.
+    Empower student to explore
+  \item Organization of rest of book
+  \end{itemize}
+
+
+\section{Digital data}
+        \begin{itemize}
+        \item Introductory examples
+          \begin{itemize}
+          \item Text numbers - Federal election campaign donations
+          \item Music - MP3 song as a time series
+          \item Image - Crowd in San Francisco demonstration
+          \end{itemize}
+        \item History of the PC
+        \item Parts of the computer
+        \item Taxonomy of languages and systems -- R, Matlab, Perl,
+          Python, Java, C/C++, SAS, Excel
+        \item Computation -- expressions, functions, variables 
+        \item Random number generation
+        \item Bits, numbers, and characters
+        \item Files and directories
+        \item Extended Example - federal election campaign donation
+        \end{itemize}
+
+\section{Exploring data in simple structures through R}
+        \begin{itemize}
+        \item Introductory Examples
+          \begin{itemize}
+            \item Traffic data
+            \item Colorado Front range data
+            \item Super nova data
+          \end{itemize}
+        \item Expressions - single, compound, ill-formed
+        \item Data types and structures, managing variables
+        \item Functions and packages - help, arguments, scope, search path
+        \item Operators - vectorized, recycling
+        \item Subsetting - position, logical, exclusion, name
+        \item Matrices and arrays
+        \item Lists and data frames
+        \item read.table, scan, readlines
+        \item Extended example - traffic data
+        \end{itemize}
+
+
+\section{An Introduction to Data Visualization}
+        \begin{itemize}
+          \item Introductory examples
+            \begin{itemize}
+              \item Lattice example - geolocation (repeat)?
+              \item Social network graph - website network (repeat)?
+              \item Dynamic graphic/video ?
+              \item Map ? (election - repeat)
+            \end{itemize}
+        \item Elements of a graph
+        \item eda
+        \item complex composite plots
+        \item Wilkinson's grammar of graphics
+        \item Examples of complex graphs
+        \item lattice.
+        \item Dynamic graphics, Ggobi
+        \item Extended example - lattice
+        \item Extended example - election map
+        \end{itemize}
+
+
+\section{Simulating data \& An introduction to programming concepts}
+        \begin{itemize}
+          \item Introductory Examples
+            \begin{itemize}
+              \item Wireless - geolocation (cross-validation)
+              \item Adhoc network
+              \item Traffic congestion
+            \end{itemize}
+        \item Loops, conditional statements, \texttt{ifelse}.
+          \\Acceptance rejection sampling
+        \item Writing functions - 
+                \begin{itemize}
+                \item How to approach problems,
+                \item General, Extensible
+                \item Comments
+                \item Inverse CDF
+                \end{itemize}
+        \item Recursion
+        \item Closure
+        \item Lazy evaluation.
+        \item Resampling - bootstrap, cross-validation
+        \item Monte Carlo Markov Chain
+        \item Extended example - geolocation
+        \item Extended example - Monte Carlo of adhoc network
+        \end{itemize}
+
+
+\section{Managing your data analysis with shell tools}
+        \begin{itemize}
+          \item Introductory examples
+            \begin{itemize}
+            \item Hospitalizations - johns hopkins data
+            \item NASA weather data from competition
+            \item Weblog - repeat
+            \end{itemize}
+          \item Command shell versus GUI
+          \item File Management
+          \item Pattern matching
+          \item Process management
+          \item Advanced shell tools - scripts, looping, sed,
+          \item Extended example - NASA weather data (may be covered
+            in previous sections already
+          \item Extended example - weblog (data analysis using shell tools)
+          \end{itemize}
+
+
+\section{Advanced programming - separate chapter?}
+        \begin{itemize}
+        \item Introductory Examples
+          \begin{itemize}
+          \item Duncan's example of design of experiment in profiling?
+          \item Duncan's example of repeated measures and errors?
+          \end{itemize}
+        \item Representing numbers, precision and comparison
+        \item Efficiency - memory, time, profiling
+        \item Batch jobs.
+        \item Debugging
+        \item Classes - S3 and S4.
+        \item Extended example - ?
+        \end{itemize}
+
+
+
+\section{Handling free-form text data with regular expressions.} 
+        \begin{itemize}
+        \item Introductory examples
+          \begin{itemize}
+            \item Weblogs
+            \item State of the union addresses
+            \item Spam
+          \end{itemize}
+        \item literal strings 
+        \item character classes 
+        \item meta characters
+        \item grouping and references 
+ 	\item alternation 
+ 	\item greedy matching
+        \item Extended example - State of the union addresses
+        \end{itemize}
+
+
+\section{Data in Relational Databases}
+        \begin{itemize}
+        \item Introductory examples
+          \begin{itemize}
+            \item Baseball
+            \item TCP intrusion detection
+            \item Census data - ?
+          \end{itemize}
+        \item The basic relational model - the table
+        \item Entity, meta information, missing values
+        \item Queries and the Select statement
+        \item Multiple tables and the relational model
+        \item Interfaces - Accessing a database from R 
+        \item SQL for statisticians - where to perform the statistics
+        \item Considerations for managing and designing your own database
+        \item Alternatives to databases
+        \item Extended example - baseball
+        \end{itemize}
+
+
+\section{Self describing data - XML}
+        \begin{itemize}
+        \item Introductory examples
+          \begin{itemize}
+            \item Google earth - seal migration
+            \item Something similar to Google's pagerank
+            \item Election maps
+          \end{itemize}
+        \item what is XML?
+        \item XML syntax
+        \item Valid XML 
+        \item XML examples - OIM (SAS/Oracle/Microsoft), StatDataML, 
+        \item The XML document as a tree
+        \item Reading XML as a tree
+        \item DOM Parser
+        \item Walking the DOM object
+        \item Customizing the DOM parser
+        \item Examples - HTML, GML, 
+        \item SAX
+        \item Monitoring SAX.
+        \item Hybrid parser model. 
+        \item Extended example - 
+        \end{itemize}
+
+
+\section{Inter-System Interfaces - ?}
+SJava, RSPerl, etc.
+\\
+KEGG, PubMed
+\\
+DCOM, GUIs, GIS, HTTP and Sockets
+
+
+\section{Data on the Internet ?}
+  \begin{itemize}
+  \item Introductory examples
+    \begin{itemize}
+      \item
+    \end{itemize}
+  \item HTTP requests and RCurl.
+  \item Web Services and SOAP.
+      GUIs 
+  \end{itemize}
+
+
+
+\section{Spam - Naive Bayes or Nearest neighbor}
+technology: regular expressions
+\\
+statistical methods: Naive Bayes; Cross-validation
+\\
+statistical methods: nearest neighbor, classification trees,
+cross-validation
+
+
+
+\appendix
+
+\section{Getting, Installing and Working with R}
+Installation.
+
+Editors.
+
+\section{setting up a relational database}
+SQL lite as an alternative
+
+\section{Tools for Windows}
+
+cygwin
+XEmacs.
+
+\end{document}

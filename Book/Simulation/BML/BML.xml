@@ -1,0 +1,1329 @@
+<article xmlns:r="http://www.r-project.org"
+         xmlns:c="http://www.C.org">
+  <!-- From Raissa's Web page http://research.microsoft.com/~raissa/bml.htm -->
+
+<para>
+This is code that was used to simulate the BML and explore performance
+of different approaches. I might do some aspects of this slightly differently
+now, but the basic ideas are sound.
+</para>
+
+<invisible>
+<r:load>
+xpathApply(doc, "//r:function", function(x) eval(parse(text = xmlValue(x)), globalenv()), 
+              namespaces = c(r = "http://www.r-project.org"))
+system("make dll")
+dyn.load("BML.so")
+</r:load>
+</invisible>
+
+<section>
+<title>The Problem and its Importance</title>
+<para>
+The following four paragraphs are taken from Raissa D'Souza's <ulink
+url="http://research.microsoft.com/~raissa/bml.htm">Web page</ulink>.
+</para>
+<para>
+The BML traffic model, introduced in 1992, is perhaps the simplest
+system exhibiting phase transitions and self-organization.  Moreover,
+it is an underpinning to extensive modern studies of traffic flow. The
+general belief is that the system exhibits a sharp phase transition
+from free flowing to fully jammed, as a function of initial density of
+cars.  The existence of this sharp transition has been cited in the
+scientific literature several hundreds of times.
+</para>
+<para>
+However, we discover intermediate stable phases, where jams and free
+flowing traffic coexist.  The geometric structure of such phases is
+highly regular, with bands of free flowing traffic intersecting at
+jammed wavefronts that propagate smoothly through the space.  These
+intermediate states have a crisp, well defined geometric structure,
+which is a consequence of the finite size and aspect ratio of the
+underlying lattice.  Aside from discovering these intermediate states,
+we derive a set of equations based on the underlying geometric
+constraints imposed by the lattice, and correctly predict the observed
+velocities.
+</para>
+
+<para>
+Two species of particles, "blue" and "red", are initialized at random
+sites of a 2-d square lattice with toriodal boundary conditions.  On
+even timesteps, all blue particles simultaneously attempt to move one
+site to the north.  They succeed unless the site they wish to occupy
+is non-empty, in which case they are "blocked" and stay stationary for
+that timestep.  On odd timesteps the red particles undergo an
+analogous process, only attempting to move towards the east.
+</para>
+<para>
+
+Particles are initialized at random locations, in accordance with some
+overall density, r.  After the random initialization step, the
+dynamics are fully deterministic.
+</para>
+</section>
+
+<section>
+<title>Our Approach</title> 
+
+<para>
+Before we start any programming, we want to think about the different
+ways we might implement this. Then we want to compare them and see if
+the comparisons suggest other things we should consider and also
+identify a "best" strategy or at least the pros and cons of the
+different ideas.  We also want to identify aspects of the problems
+that may appear fixed but that we might parameterize symbolically so
+we can explore them at a later date.
+</para>
+
+<para>
+We are dealing with a grid. Is it square? Let's assume it is r by c
+and use these are parameters to our function(s).  We will want to look
+at various different choices for (r, c) to see if our results hold for
+all configurations or differ based on the dimensions of the grid.  How
+many cars are there in total?  A fixed number?  a proportion of the
+number of cells in the grid, i.e. r x c?  Do we want to allow a
+different number of cars for each type or should they be "balanced"?
+We should separate the initialization of the grid and the car layout
+from the movement of the cars.  Will we ever want to extend this to
+deal with more than two types of cars?  And will we ever want to allow
+the cars to move at different relative speeds? or perhaps to assign
+different speeds to individual cars?
+</para>
+
+<para>
+How do we represent the grid?  A matrix would be a natural choice.  If
+there are very few cars in the system, however, most of the values
+will be 0.  Also, we will want to be able to quickly locate the cars
+of each color and move them.  One of the ways we might do this is to
+store the (x, y) coordinates for each car as a row in a data frame or
+matrix.  We could use two separate "tables", one for each type of car,
+or alternatively we could maintain all the car locations in a single
+table with a third column that identifies the type of car.
+</para>
+
+<r:code>
+n = 30
+r = 10
+c = 11
+</r:code>
+
+<para>
+If we were to use a matrix approach, we might use a character in each
+element to identify whether it was "red" or "blue" or empty (<r:na/>).
+Alternatively, we could use numbers such as 0, 1 and 2 to represent
+empty, red and blue cells.  There may be marginal benefits to using
+integers over reals or characters, but the basic idea is the same.
+Now, if we want to move all the blue cars, we have to first identify
+these and then move them to the row above.  And before we can actually
+perform the move, we have to ensure that the cell is empty.  Let's
+assume G is the R variable representing our grid with blue and red
+cars.  To move the red cars, we might have code something like
+<r:code eval="false">
+i = row(G)[G == 1]
+j = col(G)[G == 1]
+</r:code>
+</para>
+
+<para>
+For me, at least, it is easier to work with the locations of the car by storing them
+directly as points (x, y), along with the type of car.
+We sample from the r x c available  locations with 
+<r:code>
+locations = expand.grid(1:r, 1:c)
+locations = locations[sample(1:nrow(locations), n), ]
+locations$carType = factor(sample(c("red", "blue"), n, prob = c(.5, .5), 
+                                  replace = TRUE))
+</r:code>
+At the same time, it is useful to have 
+the grid as a matrix.
+<r:code>
+G = matrix(0, r, c)
+</r:code>
+And we want to insert the relevant values
+into the initial locations
+<r:code>
+G[ cbind(locations[, 1], locations[,2]) ] = as.integer(locations$carType)
+</r:code>
+</para>
+
+<para>
+Now, to move the blue cars, we can use a command such as
+<r:code>
+w = ( locations$carType == "blue" )
+</r:code>
+to determine which are blue cars in our <r:var>locations</r:var>
+data frame.
+Then, we can compute the potential new locations as
+<r:code>
+potential = locations[w, 1:2]
+potential[, 1] = potential[, 1] - 1
+potential[ potential == 0, 2] = r
+
+i = G[ cbind(potential[,1], potential[,2]) ] 
+ok = (i != 0)
+
+locations[ which(w)[i], 1:2]  = potential[i,]
+G[ cbind(potential[i != 0,1], potential[ i != 0,2]) ]  = 1
+</r:code>
+
+There are other approaches which we can explore.
+For example, we can index the rows and columns by position in a
+linear array.
+</para>
+
+<para>
+We want to be able to verify that this is doing what we want.
+Rather than updating the existing <r:var>G</r:var> and <r:var>locations</r:var> 
+variables, we want to have a sequence of these that we can examine 
+carefully and ensure that the correct results are being generated at each step.
+We will put the computations for the cars into a separate function that returns
+the updated <r:var>G</r:var> and <r:var>locations</r:var> objects.
+<r:function id="moveBlue1"><![CDATA[
+moveBlue = 
+function(grid, locations = grid$locations, G = grid$G, klass = class(grid))
+{
+  w = ( locations$carType == "blue" )
+
+  potential = locations[w, 1:2]
+  potential[, 1] = potential[, 1] - 1
+  potential[ potential[,1] == 0, 2] = r
+
+  i = G[ cbind(potential[,1], potential[,2]) ] 
+  ok = (i == 0)
+
+
+  locations[ which(w)[ok], 1:2]  = potential[ok,]
+  G[ cbind(locations[which(w)[ok], 1], locations[which(w)[ok], 2]) ] = 0
+  G[ cbind(potential[ok, 1], potential[ ok, 2]) ]  = 2 # blue
+  
+cat("Moved", sum(ok), "out of", sum(w), "\n")
+  structure(list(locations = locations, G = G), class = klass)
+}
+]]></r:function>
+</para>
+<para>
+We also provide a function to encapsulation the creation of the grid.
+<r:function id="createGrid"><![CDATA[
+createGrid =
+function(n = c(15, 15), r = 10, c = 11, prob = c(red = .5, blue = .5),
+          density = NA, exact = FALSE, colors = names(prob))
+{
+   # if we have only on n, and it is a proportion
+   # then turn it into a count as a proportion of 
+   # the grid size
+  if(length(n) == 1 && n < 1)
+     n = r * c * n
+
+  if(!missing(density)) 
+     n = r * c * density
+
+     # if we have only one count, then replicate it 
+     # that many times and allow the last grouping to pick up 
+     # any slack.    
+  if(length(n) == 1 && length(colors) > 1)  {
+       tmp = rep(floor(n/(length(colors)-1)), length(colors)-1)
+       n = c(tmp, n - as.integer(sum(tmp)))
+  }
+
+  locations = expand.grid(1:r, 1:c)
+  locations = locations[sample(1:nrow(locations), sum(n)), ]
+  
+  locations$carType = if(!exact) 
+                          factor(sample(names(prob), sum(n), prob = prob,
+                                           replace = TRUE), 
+                                 levels = names(prob))
+		      else 
+                          factor(rep(names(prob), n), 
+                                 levels = names(prob))
+
+
+  G = matrix(0L, r, c)
+  G[ cbind(locations[, 1], locations[,2]) ] = as.integer(locations$carType)
+  class(G) = "Grid"
+
+  structure(list(locations = locations, G = G), class = "BMLGrid")
+}
+]]></r:function>
+Note that we use 0L for the default value of the matrix making this an integer matrix.
+Add density argument for createGrid.
+</para>
+
+<para>
+Let's define a function so that we can visualize the current state of
+grid.  We'll make it convenient to use by providing a method for the
+<r:func>plot</r:func> using what are called S3 methods.  We define a
+function named plot.classname where classname is the string we used
+when attaching a class to the object. In our case, this is BMLGrid.
+In fact, we have a class for both the overall BMLGrid and the matrix
+that represents the current contents of the grid.  We could define a
+method for each of them, named plot.BMLGrid and plot.Grid
+respectively.  That is convenient for the users as they can now work
+with either object and not have to remember the name of the particular
+plot function or whether they are dealing with the top-level or inner
+grid.
+</para>
+
+<para>
+<!-- r:method ? -->
+<note>These are overridden below and so are not functional</note>
+We can make use of the <r:func>image</r:func> function to draw a matrix.
+<r:function id="xplot.Grid"><![CDATA[
+plot.Grid =
+function(x, y, ...)
+{
+#   image(z = t(x[nrow(x):1, ncol(x):1]),  col = c("transparent", "red", "blue"),
+#          axes = FALSE)
+   image(z = x,  col = c("transparent", "red", "blue"), axes = FALSE)
+   box()
+}
+]]></r:function>
+</para>
+
+<para>
+One thing to do is check that this gives us what we expect.
+Try a small simple matrix and make certain the display
+corresponds to what we see in the console, e.g
+<r:plot>
+M = matrix(rep(c(0, 1, 2), c(3, 5, 4)), 3, 4)
+<r:output>
+     [,1] [,2] [,3] [,4]
+[1,]    0    1    1    2
+[2,]    0    1    1    2
+[3,]    0    1    2    2
+</r:output>
+plot.Grid(M)
+</r:plot>
+</para>
+
+<para>
+We notice that the order of the columns is reversed, i.e.  the right
+most column on the plot is transparent/white and the blue values are
+in column 1. Similarly, the rows are reversed. Notice that we
+carefully selected this "sample" matrix so that we could see the
+different cases. Ones with each columns having elements of the same
+color would not have shown that the rows were mixed up.  We could have
+used a randomly generated grid, but we may have been "lucky" not to
+expose this problem with the particular configuration. So it helps to
+think about good test cases.
+</para>
+
+<para>
+Why does this inversion happen?  Well, when we print the matrix on the
+screen, we look at the rows and columns. The rows increase
+downwards and the columns increase to the right.  But on the plot,
+<r:func>image</r:func> treats the rows as the X variable and the
+columns as the y variable.
+<r:question>Verify this
+<r:answer>
+<r:code>
+image(1:3, 1:4, matrix(1:12, 3, 4), col = c("red", "green", "blue"))
+image(matrix(1:12, 3, 4), col = c("red", "green", "blue"))
+</r:code></r:answer>
+</r:question>
+</para>
+
+<para>
+How can we fix this?
+We can first transpose the matrix and the
+switch the order of the columns of the resulting matrix
+<r:code>
+image( t(M)[, nrow(M):1], col = c("transparent", "red", "blue"))
+</r:code>
+This gives us what we want so we can define our 
+plot.Grid function as 
+<r:function id="plot.Grid"><![CDATA[
+plot.Grid =
+function(x, y, ...)
+{
+   image(z = t(x)[ , nrow(x):1], col = c("transparent", "red", "blue"), 
+            axes = FALSE)
+   box()
+}
+]]></r:function>
+It would seem that we could specify x and y and then reverse
+the columns of the transposed matrix, e.g.
+<r:code eval="false">
+image(1:ncol(x), nrow(x):1, t(x))
+</r:code>
+but <r:func>image</r:func> expects the x and y arguments to be sorted
+in increasing order so raises an error when it encounters <r:expr
+eval="false">nrow(x):1</r:expr>.
+</para>
+
+<para>
+Now we provide our simple function for plotting the outer-level BMLGrid
+object with
+<r:function idx="plot.BMLGrid">
+plot.BMLGrid =
+function(x, y, ...)
+{
+  plot(x$G)
+}
+</r:function>
+This just passes the matrix Grid to a call to plot which finds the method
+we defined above, <r:s3method>plot.Grid</r:s3method>.
+</para>
+
+
+<para>
+Let's consider a different approach.  We will actually draw the grid
+and then fill in the rectangles for the red and blue cars.
+We can do this all within a method for BMLGrid.
+Alternatively we could split it into a method for BMLGrid to draw
+the blocks and another for Grid to draw the "background" lines.
+<r:function id="plot.BMLGrid">
+plot.BMLGrid =
+function(x, y, ..., addGrid = FALSE)
+{
+  plot(0, 0, type = "n", 
+       xlim = c(0, ncol(x$G)), ylim = c(0, nrow(x$G)), 
+       axes = FALSE, xlab = "columns", ylab = "rows", ...)
+
+  axis(1)
+  r = nrow(x$G)
+  tmp = pretty(1:r)
+  axis(2, at = tmp, labels = rev(tmp))
+  box()
+
+
+   # While we may want to loop, rect is vectorized
+   # and it is actually simpler to write in this form
+   # since we merely omit the for loop and indices
+  rect(x$locations[, 2] - 1, r - x$locations[, 1],  
+       x$locations[, 2], r - x$locations[, 1] + 1, 
+       border = NA,
+             # density = NA is very slow.
+       col = as.character(x$locations$carType))
+
+  if(addGrid) {
+      abline(v = 0:ncol(x$G))
+      abline(h = 0:nrow(x$G))
+  }
+}
+</r:function>
+</para>
+
+
+</section>
+
+
+<section>
+<title>The "Obvious" Approach</title>
+Let's try the obvious approach where we loop over all
+the cars of a particular type and try to move them by looking
+at what is next to them.
+We use a simple loop. How slow will this be? Will it be sufficient for our purposes?
+
+<r:function id="moveBlue">
+moveBlue = 
+function(grid, locations = grid$locations, G = grid$G, klass = class(grid))
+{
+   w = ( locations$carType == "blue" )
+
+   for(i in which(w)) {
+         r = locations[i, 1]
+         c = locations[i, 2]
+	 if(r == 1)
+            rprime = nrow(G)
+         else
+            rprime = r - 1
+
+         if( G[ rprime, c ] == 0 ) {
+             G[ r, c ] = 0
+             G[ rprime, c ] = 2
+   	     locations[i, 1:2] = c(rprime, c)
+         }
+   }
+
+   structure(list(locations = locations, G = G), class = klass)
+} 
+</r:function>
+
+<r:function id="moveRed">
+moveRed = 
+function(grid, locations = grid$locations, G = grid$G, klass = class(grid))
+{
+   w = ( locations$carType == "red" )
+
+   for(i in which(w)) {
+         r = locations[i, 1]
+         c = locations[i, 2]
+	 if(c == ncol(G))
+            cprime = 1
+         else
+            cprime = c + 1
+
+         if( G[ r, cprime ] == 0 ) {
+             G[ r, c ] = 0
+             G[ r, cprime ] = 1
+   	     locations[i, 1:2] = c(r, cprime)
+         }
+   }
+
+   structure(list(locations = locations, G = G), class = klass)
+} 
+</r:function>
+
+Now we can try this.
+<r:function id="run"><![CDATA[
+run = 
+function(g = createGrid(), steps = 100, ask = FALSE, ...)
+{
+  if(is.logical(ask))
+    ask = if(ask) 1 else NA
+
+    funs = list(moveRed, moveBlue)
+    if(!is.na(ask))
+       plot(g, ...)
+    for(t in 1:10) {
+       f = funs[[ t%%2 + 1]]
+       g = f(g)
+
+       if(!is.na(ask) && ask %% t == 0) {
+         plot(g, ...)
+         readLines(n = 1)
+       }
+    }
+
+    invisible(g)
+}
+]]></r:function>
+
+<para>
+First, the moveRed and moveBlue functions are very similar.
+We should attempt to consolidate the code into a single
+core function, perhaps with supporting functions or <r:keyword>if</r:keyword>
+statements to handle the different cases.
+</para>
+
+
+
+<para>
+Before we do any work on these functions, lets try to determine
+if they will be sufficiently fast for our needs.
+We want to see the time taken for different
+grid sizes and different numbers of cars.
+We should do an experiment where we time each run
+for various different inputs.
+We'll use grid sizes of 20, 50, 100, 200, 250
+with a density of cars ranging from 10% to 
+70% in increments of 20%, i.e. 
+10%, 30%, 50%, 70%.
+And we'll vary the number of iterations from 1000 to 11,000
+in increments of 2000
+<r:code id="timings">
+numIterations = seq(1000, 11000, by = 2000)
+dimensions = c(20, 50, 100, 200, 250)
+densities = seq(.1, .7, by = .2)
+timings = 
+lapply(numIterations,
+        function(numIterations) {
+	  lapply(dimensions,
+             function(dimension) {
+	        lapply(densities,
+		   function(density) {
+		      system.time(run(createGrid(density * dimension^2, 
+                                                 dimension, dimension + 1), 
+                                      numIterations, ask = FALSE))[1:3]
+                   })
+             })
+         })
+
+
+tt = expand.grid(style = c("user", "system", "elapsed"), 
+                 density = densities, 
+                 gridDimension = dimensions, 
+                 numSteps = numIterations)
+
+tt$timing = unlist(timings)
+</r:code>
+
+<r:plot>
+xyplot(timing ~ numSteps | density + gridDimension, tt,
+          subset = style == "elapsed")
+</r:plot>
+
+
+<r:code>
+Rprof("naieve.prof")
+z = run(createGrid(13000, 200, 200), 10000, addGrid = FALSE)
+Rprof(NULL)
+</r:code>
+
+<r:code>
+summaryRprof("naieve.prof")$by.self
+<r:output><![CDATA[
+                      self.time self.pct total.time total.pct
+"[<-.data.frame"           9.86     24.1      12.02      29.3
+"[.data.frame"             8.88     21.7      15.82      38.6
+"f"                        5.74     14.0      22.98      56.1
+"as.character.factor"      4.32     10.5       4.38      10.7
+"structure"                1.74      4.2       4.40      10.7
+"rect"                     1.40      3.4      17.98      43.9
+"match"                    1.32      3.2       2.58       6.3
+"inherits"                 1.06      2.6       1.08       2.6
+....
+]]></r:output>
+</r:code>
+This stells us that we are spending a great deal of time
+in subsetting our data frame, e.g. <r:var>locations</r:var>.
+Also, it might be useful to make our moveGreen and moveBlue faster
+as they are taking 14% of the time.
+</para>
+
+<para>
+One of the things we might be able to do easily  is to avoid the excessive number
+of calls to as.character.factor.
+When is this called?
+We can see using <r:func>trace</r:func>.
+<r:code>
+
+</r:code>
+</para>
+
+
+
+<para>
+The following is an attempt to vectorize the move function and also to
+combine the movement of the red and blue cars into a single function.
+We pass the type of car, i.e. "blue" or "red", and the corresponding
+value in the matrix G, i.e. 2 or 1.  After that, the arguments are the
+same, although we do add a speed argument which we ignore for the
+moment, but which we can use to allow the red and blue cars to move at
+different rates, i.e. number of cells within a single tick or iteration.
+The main difference between this function and the ones above
+(<r:func>moveBlue</r:func> and <r:func>moveRed</r:func>) is
+that this one does the moving for all the cars of the particular type
+in one operation within the function rather than requiring a for loop
+to process each car separately.
+<r:function id="vectorizedMove2-a">
+vectorizedMove = 
+function(type, val, grid, locations = grid$locations, G = grid$G,
+          klass = class(grid), speed = c(1, 1), ...)
+{
+   w = ( locations$carType == type )
+   loc = locations[w, ]
+  
+   r = loc[, 1]
+   c = loc[, 2]
+
+   if(type == "blue") {
+      c.next = c
+      r.next = r - 1
+      r.next[ r.next == 0] = nrow(G)
+   } else {
+      r.next = r
+      c.next = c + 1
+      c.next[c.next > ncol(G)] = 1
+   }
+
+   movers = G[ cbind(r.next, c.next) ] == 0
+   if(any(movers)) {
+       G[ cbind(r, c)[movers, drop = FALSE] ]  = 0
+       G[ cbind(r.next, c.next)[movers,  drop = FALSE] ] = val 
+       locations[which(w) [movers], 1:2 ] = 
+                  cbind(r.next, c.next)[movers, drop = FALSE]
+   }
+
+   structure(list(locations = locations, G = G), class = klass)
+} 
+</r:function>
+
+Next, we use this general move function with a slightly
+different version of our <r:func>run</r:func> function.
+This does the same iteration (and optional plotting of the grid),
+but passes the type and value and grid to <r:func>vectorizedMove</r:func>.
+<r:function id="vectorizedRun"><![CDATA[
+vectorizedRun = 
+function(g = createGrid(), steps = 100, ask = FALSE, ...)
+{
+  if(is.logical(ask))
+    ask = if(ask) 1 else NA
+
+    if(!is.na(ask))
+       plot(g, ...)
+
+    types = levels(g$locations$carType)
+    for(t in 1:steps) {
+       g = vectorizedMove(types[1], 1L, g)
+       g = vectorizedMove(types[2], 2L, g)
+       if(!is.na(ask) && ask %% t == 0) {
+         plot(g, ...)
+         readLines(n = 1)
+       }
+    }
+
+    invisible(g)
+}
+]]></r:function>
+
+</para>
+
+<para>
+Does this change improve the performance? 
+Before we time this, we should check it is correct.
+
+<r:code>
+z = createGrid(c(1, 1), 4, 5, exact = TRUE)
+testRun(z, runFunc = vectorizedRun)
+</r:code>
+And we note that it is not.  The issue is that we have prolems when we
+are moving a single car as the matrix indexing in the assignment goes
+awry.  This is stated in the documentation for
+<r:func><![CDATA[[<-]]]></r:func> but is not necessarily obvious.
+How do we find this?
+First, we look at the output from successive steps.
+<r:code>
+print(testRun(z, 1, runFunc = vectorizedRun))
+</r:code>
+We note that the locations are correct.  So it must be the setting of
+the values in <r:var>G</r:var> that are getting messed up.  So we can
+focus our attention there.  We add a call to print the value of
+<r:var>G</r:var> before we modify <r:var>G</r:var> and a call to
+browser after we update <r:var>G</r:var>.
+Then we can perform the commands by hand.
+</para>
+
+<para>
+How can we get around this problem.
+One approach is to make things into a matrix explicitly
+<r:function id="vectorizedMove2">
+vectorizedMove = 
+function(type, val, grid, locations = grid$locations, G = grid$G, 
+          klass = class(grid), speed = c(1, 1), ...)
+{
+   w = ( locations$carType == type )
+   loc = locations[w, ]
+  
+   r = loc[, 1]
+   c = loc[, 2]
+
+   if(type == "blue") {
+      c.next = c
+      r.next = r - 1
+      r.next[ r.next == 0] = nrow(G)
+   } else {
+      r.next = r
+      c.next = c + 1
+      c.next[c.next > ncol(G)] = 1
+   }
+
+   movers = G[ cbind(r.next, c.next) ] == 0
+   if(any(movers)) {
+       G[ cbind(r[movers], c[movers])] = 0
+       G[ cbind(r.next[movers], c.next[movers]) ] = val 
+       locations[which(w) [movers], 1:2 ] = 
+                  cbind(r.next, c.next)[movers, drop = FALSE]
+   }
+
+   structure(list(locations = locations, G = G), class = klass)
+} 
+</r:function>
+Here we cbind r[movers] and c[movers] rather than
+subsetting the cbind(r, c) by movers.
+This does give us the correct result
+which we can verify with
+<r:code>
+o = testRun(z, 6, runFunc = vectorizedRun)
+</r:code>
+</para>
+
+<para>
+Another approach is to update the locations correctly and then to
+entirely reset the entries in the grid <r:var>G</r:var> by zeroing
+them out and putting 1s and 2s in the cells for the red and blue cars.
+This is done by the function below.
+<r:function id="vectorizedMove3">
+vectorizedMove = 
+function(type, val, grid, locations = grid$locations, G = grid$G, 
+          klass = class(grid), speed = c(1, 1), ...)
+{
+   w = ( locations$carType == type )
+   loc = locations[w, ]
+  
+   r = loc[, 1]
+   c = loc[, 2]
+
+   if(type == "blue") {
+      c.next = c
+      r.next = r - 1
+      r.next[ r.next == 0] = nrow(G)
+   } else {
+      r.next = r
+      c.next = c + 1
+      c.next[c.next > ncol(G)] = 1
+   }
+
+   movers = G[ cbind(r.next, c.next) ] == 0
+   if(any(movers)) {
+       locations[which(w) [movers], 1:2 ] = 
+                cbind(r.next, c.next)[movers, drop = FALSE]
+       G[] = 0L
+       G[ cbind(locations[, 1], locations[,2]) ] = 
+                as.integer(locations$carType)
+   }
+
+   structure(list(locations = locations, G = G), class = klass)
+} 
+</r:function>
+We can time each of  these 
+<r:code>
+system.time(replicate(10, vectorizedRun(createGrid(.4, 60, 61), 30)))
+</r:code>
+We get a slight difference of 
+<programlisting>
+  5.020   0.000   5.028 
+  5.229   0.004   5.242 
+</programlisting>
+But when we move to a grid of size 120 x 121,
+we get 
+<r:code>
+system.time(replicate(10, vectorizedRun(createGrid(.4, 120, 121), 30)))
+</r:code>
+<programlisting>
+ 21.841   0.004  21.866 
+ 10.721   0.004  10.739 
+</programlisting>
+So the latter one seems reasonable.
+</para>
+
+
+<para>
+Let's time a run of
+30 iterations on  a 30 x 31 grid.
+<r:code>
+system.time(run(createGrid(.4, 30, 31), 30))
+<r:output>
+   user  system elapsed 
+  3.180   0.000   3.182 
+</r:output>
+system.time(vectorizedRun(createGrid(.4, 30, 31), 30))
+<r:output>
+   user  system elapsed 
+  0.036   0.000   0.0359
+</r:output>
+</r:code>
+That is pretty significant - a factor of 89.
+Moving to a 60x61, we get a ratio for elapsed time of 
+10.497/0.309 = 34.
+When using the "broken" version above, the speed up
+was more like a factor of 180.
+However, getting the wrong answer quickly is not relevant.
+</para>
+
+
+
+<para>
+One of the things we should add to our moveRed and moveBlue functions
+is how to handle the situation where a car cannot move because it is
+behind a car of the same type.  Whether the car can move in this case
+depends on the order in which we process them. For example, suppose we
+have two red cars, a and b, at positions (2, 3) and (2, 4)
+respectively.  If we move b first, then a is free to move as there is
+no car in spot (2, 4).  However, if we attempt to move a first, it
+cannot move and then we move b which can move.  How we handle these
+situations is part of the algorithm. It might affect the conclusions
+we come to. So we may want to implement different strategies.  In the
+case of red, we could order the cars by reverse sorted column number
+so that we move the ones to the right first.  Similarly, we would work
+on the blue cars in increasing row order, moving the ones higher up
+(with lower row indices) first.
+</para>
+
+
+
+</section>
+
+
+<section>
+<title>C code</title>
+<para>
+ We can use C code to make things faster. But we
+want to leverage R for doing all the things for which speed is not
+important.  So we use the profiling code to see where we should both
+speeding things up.  We might imagine, even without this information,
+that it is the moving of the cars that takes time.  We'll arrange for
+the C code to be given the entire grid made up of values 0, 1 and 2.
+We'll also give it the (row, column) positions for both the red and
+blue cars separately.
+</para>
+
+<para>
+We use 1-based counting in the R data structures, i.e. 
+the locations are from 1 to nrow(grid) and 1 to ncol(grid)
+and not 0 to nrow(grid) - 1.
+
+<c:code file="BML.h"><![CDATA[
+  /* These are symbolic constants for specifying the direction. */
+typedef enum {RED = 1, BLUE = 2} Direction;
+
+  /* This is the function that does the actual moving of the cars for a given
+     time step. */  
+unsigned int bml_move(int *grid, int *dims, int *locations, int *num, Direction dir, int speed);
+
+#include <stdio.h>
+]]></c:code>
+
+<c:code file="RBML.c"><![CDATA[
+#include "BML.h"
+
+/* This is the routine that is called from R and takes the same parameters
+   as the move() routine for the most part, but takes also does the looping for
+   numSteps of time and specifies the values in slightly different form.
+
+grid - an R _integer_ matrix which is of dimensions r x c (specified in the dims argument)
+       and whose values are either 0 for no car, 1 for blue and 2 for red. (Or the other way round for 1 and 2?)
+
+dims - an int array containing 2 elements and giving the number of rows and columns of grid.
+
+redLocations - an integer matrix with as many rows as there are red cars and with 2 columns.
+               Each row in the matrix gives the row and column of that red car
+
+numReds - a single integer giving the number of red cars.
+
+blueLocations -  same as redLocations, but for blue cars
+numBlues  -  same as numReds, but for blue.
+
+numSteps - an integer indicating how many time steps/iterations to  perform
+verbose - a logical value (TRUE or FALSE) indicating whether to print out the iteration 
+          number or not.
+
+ans - an integer vector or matrix with 2 * numSteps elements into which the number
+      of red and then blue cars are inserted.
+
+speeds - an integer vector of length 2 giving the number of cells a red car and a blue
+        car respectively moves in a single jump/time interval. This is c(1L, 1L) typically in R.
+*/
+void
+R_BML(int *grid, int *dims, int *redLocations, int *numReds, 
+      int *blueLocations, int *numBlues, int *numSteps,
+      int *verbose, int *ans, int *speeds)
+{
+  unsigned int t = 0;
+  for(t = 0 ; t < *numSteps ; t++) {
+    if( *verbose && (t % 100) == 0)
+        fprintf(stderr, "%d\n", (int) t);
+
+    ans[t] = bml_move(grid, dims, redLocations, numReds, RED, speeds[0]);
+    ans[t + *numSteps] = bml_move(grid, dims, blueLocations, numBlues, 
+                                    BLUE, speeds[1]);
+  }
+}
+]]></c:code>
+</para>
+<para>
+When speed is greater than 1, we have two possible regimes.
+One is that we jump to the spot if it is empty. The other
+would require that we can only move if all points in
+between are empty, i.e. so we can "drive" through them.
+We have implemented the checkers-like hopping here
+and do not worry about the cells in between.
+<c:code file="BML.c"><![CDATA[
+#include "BML.h"
+
+unsigned int
+bml_move(int *grid, int *dims, int *locations, int *num,
+          Direction dir, int speed)
+{
+   int i;
+   int r, c, rprime, cprime;
+   unsigned int numMoved = 0;
+
+   for(i = 0; i < *num; i++) {
+      r = locations[i] - 1;
+      c = locations[i + *num] - 1;
+    
+      if(dir == RED) {
+         rprime = r;
+         cprime = c + speed > dims[1] - 1 ?  c + speed - dims[1] : c + speed;
+      } else {
+         rprime =  r - speed < 0 ? dims[0] + r - speed : r - speed; 
+         cprime = c;
+      }
+      if(grid[rprime + dims[0] * cprime] == 0) {
+          grid[r + dims[0] * c] =  0;
+          grid[rprime + dims[0] * cprime] =  dir;
+          if(dir == RED)
+             locations[i + *num] = cprime + 1;
+          else
+             locations[i] = rprime + 1;
+          numMoved++;
+      }
+   }
+
+   return(numMoved);
+}
+]]></c:code>
+</para>
+<para>
+<r:function id="crun">
+crun =
+function(g, steps = 1000, verbose = FALSE, velocity = FALSE, speed = c(1, 1))
+{
+  red = as.matrix(g$locations[ g$locations$carType == "red", 1:2])
+  blue = as.matrix(g$locations[ g$locations$carType == "blue", 1:2])
+
+  movesPerStep = matrix(0L, steps, 2)
+  ans = .C("R_BML", G = g$G, dim(g$G), 
+                    red = red, nrow(red), 
+                    blue = blue, nrow(blue), as.integer(steps), 
+                    as.logical(verbose), movesPerStep = movesPerStep, 
+                    speed = as.integer(speed))
+
+  g$locations = as.data.frame(rbind(ans$red, ans$blue))
+  names(g$locations) = c("row", "column")
+  g$locations$carType = factor(c(rep("red", nrow(red)), 
+                                 rep("blue", nrow(blue))), 
+                               levels = c("red", "blue"))
+  g$G = ans$G
+  class(g$G) = "Grid"
+
+  if(velocity)
+     invisible(list(bml = g, movesPerStep = ans$movesPerStep))
+  else
+     invisible(g)
+}
+</r:function>
+</para>
+<para>
+<r:function id="testRun">
+testRun = 
+function(g = createGrid(), numSteps = 5, plot = TRUE, 
+         speed = c(1, 1), ..., runFunc = crun)
+{
+  if(plot)  {
+     par(mfrow = c(1, numSteps), ...)
+     on.exit(par(mfrow = c(1, 1)))
+     plot(g, ...)
+  }
+
+  ans = vector("list", numSteps)
+  ans[[1]] = g
+  for(i in 2:numSteps) { #XXX what if numSteps is 1
+     ans[[i]] = runFunc(ans[[i - 1]], 1, speed = speed)
+     if(plot)
+         plot(ans[[i]], ...)
+  }
+  invisible(ans)
+}
+</r:function>
+</para>
+
+<r:test>
+dyn.load("BML.so")
+z = createGrid(5, 4, 5)
+z$locations = data.frame( as.integer(c(2, 4, 3)), as.integer(c(1, 4, 2)), 
+                           carType = factor(c("red", "blue", "red"), 
+                           levels = c("red", "blue")))
+z$G = matrix(0L, 4, 5)
+z$G[ cbind(z$locations[,1], z$locations[, 2]) ] = 
+               as.integer(z$locations$carType)
+
+ans = testRun(z, 5)
+</r:test>
+
+<r:test>
+g = createGrid(1, 5, 7, prob = c(red = 1))
+testRun(g, addGrid = TRUE, speed = 2)
+</r:test>
+<r:test>
+g = createGrid(c(1, 1), 5, 7, exact = TRUE)
+testRun(g, addGrid = TRUE, speed = c(2, 3))
+</r:test>
+
+<para>
+Now that we have this code working, 
+we can evaluate its speed.
+<r:code>
+system.time(replicate(10, crun(createGrid(.4, 120, 121), 30)))
+<r:output>
+   user  system elapsed 
+  1.088   0.000   1.089 
+</r:output>
+</r:code>
+Recall that when using our vectorized version of this, this computation
+took 10.739 seconds. So there is a speedup of a factor of 10 over that.
+And relative to the original, non-vectorized implementation, what's the improvement?
+Well, we simply cannot run the original version on large grids in a reasonable amount of time.
+But we can compare the two on small grid sizes.
+<r:code>
+fast = system.time(crun(createGrid(.4, 30, 31), 100))
+slow = system.time(run(createGrid(.4, 30, 31), 100))
+slow/fast
+<r:output>
+    user   system  elapsed 
+215.5625      Inf 218.3125 
+</r:output>
+</r:code>
+This shows that there is a factor of approximately 200 in speedup
+for small problems and significantly more for larger grids.
+Our exploratory timings  to understand the characteristics of our original implementation
+yield
+<r:code>
+slow = system.time(run(createGrid(.4, 100, 101), 1))
+fast = system.time(crun(createGrid(.4, 100, 101), 1))
+<r:output>
+slow/fast
+    user   system  elapsed 
+593.9667      Inf 614.6897 
+</r:output>
+</r:code>
+giving even more impressive gains.
+
+Using 10 iterations, we get
+<r:code>
+slow = system.time(run(createGrid(.4, 100, 101), 10))
+fast = system.time(crun(createGrid(.4, 100, 101), 10))
+medium = system.time(vectorizedRun(createGrid(.4, 100, 101), 10))
+slow/fast
+<r:output>
+623.0333      Inf 613.5902 
+</r:output>
+slow/medium
+<r:output>
+    user   system  elapsed 
+69.74254      Inf 70.09176 
+</r:output>
+medium/fast
+<r:output>
+    user   system  elapsed 
+8.933333      NaN 8.754098 
+</r:output>
+</r:code>
+So we see that we are making successive gains.
+Let's compare the medium and the fast approaches on 
+a grid of size 769 x 256 as in Figure 9 of Raissa's paper,
+and we'll run just 10 iterations.
+Again, we see a speed up on the order of a factor of 7.5.
+However, if we change the number of iterations to 500, 
+then we see a significant improvement in speed from the C code,
+running approximately 70 times faster than the R code.
+<r:code>
+</r:code>
+</para>
+
+
+<para>
+<r:code>
+dyn.load("BML.so")
+z = createGrid(.36, 256, 257)
+g = crun(z, 10000)
+</r:code>
+
+We can use different speeds for the types of cars,
+with the red ones moving 2 cells in each time period
+(when possible) and the blue ones moving 3 cells.
+<r:code>
+g = crun(z, 10000, speed = c(2, 3))
+</r:code>
+</para>
+</section>
+
+<section>
+<title>Exploring the Model</title>
+
+Here we are going to loop over differen densities and
+look at the different steady-states
+<r:plot>
+density = seq(.2, .55, by = .01)
+par(mfrow = c(6,6))
+ans = lapply(density,
+       function(d) {
+         z = createGrid(d, 256, 257)
+	 g = crun(z, 1000)
+	 plot(g, main = paste("density =", d))
+	 g
+       })
+</r:plot>
+
+We up the number of steps to provide more time for convergence.
+<r:plot id='replicate'>
+par(mfrow = c(6,6))
+ans = lapply(1:18, 
+              function(i) {
+                 z = createGrid(density[6], 256, 257)
+                 plot(z)
+           	 g = crun(z, 5000);
+                 plot(g, main = paste(i, "density =", density[6]));
+              	 list(start = z, end = g)
+             })
+</r:plot>
+
+
+
+We loop over different density values and 
+see what the steady-state outcomes are.
+And we can find the distribution of car velocities
+at each of the different iterations.
+<r:code>
+density = c(.2, .25, .3, .35, .4)
+ans = lapply(density,
+       function(d) {
+         z = createGrid(d, 256, 257)
+	 g = crun(z, 1000, velocity = TRUE)
+	 g$movesPerStep/nrow(g$bml$locations)
+       })
+
+tt = data.frame( v = unlist(ans), 
+               type = rep(rep(c("red", "blue"), c(1000, 1000)), 5), 
+               density = rep(density, rep(2000, 5)),
+               step = rep(1:1000, 2*length(density)))
+
+
+xyplot(v ~ step | density, tt, group = type, type = "l")
+</r:code>
+
+
+
+
+<r:plot>
+density = seq(.2, .55, by = .01)
+par(mfrow = c(6,6))
+ans = lapply(density,
+       function(d) {
+         z = createGrid(d, 256, 257)
+	 g = crun(z, 1000)
+	 plot(g, main = paste("density =" d))
+	 g
+       })
+</r:plot>
+
+
+Let's see how big the jams are.
+We'll do a simulation over the different densities
+and then compute the distribution of stretches of
+non-movable objects in the results.
+<r:code>
+density = c(.2, .25, .3, .35, .4, .5)
+par(mfrow = c(1, length(density)))
+ans = lapply(density,
+       function(d) {
+         z = createGrid(d, 256, 257)
+	 g = crun(z, 1000)
+	 plot(g)
+	 g
+       })
+</r:code>
+
+<para>
+We modify our vectorizedMove function 
+to do essentially the same calculations except not to actually perform
+the moves of the cars, but just return the locations of the non-movers.
+<r:function id="cantMove">
+cantMove = 
+function(type, grid, locations = grid$locations, G = grid$G, 
+          speed = c(1, 1))
+{
+   w = ( locations$carType == type )
+   loc = locations[w, ]
+  
+   r = loc[, 1]
+   c = loc[, 2]
+
+   if(type == "blue") {
+      c.next = c
+      r.next = r - 1
+      r.next[ r.next == 0] = nrow(G)
+   } else {
+      r.next = r
+      c.next = c + 1
+      c.next[c.next > ncol(G)] = 1
+   }
+
+   movers = G[ cbind(r.next, c.next) ] == 0
+
+   if(!all(movers))
+      locations[ which(w)[ !movers ] , ] 
+   else
+      locations[ 0, ]
+}
+</r:function>
+</para>
+
+<para>
+<r:code>
+pts = rbind(cantMove("blue", ans[[1]]), cantMove("red", ans[[1]]))
+</r:code>
+What proportion are immobile?
+<r:code>
+nrow(pts)/nrow(ans[[1]]$locations)
+</r:code>
+So approximately 30%.
+</para>
+
+<para>
+<r:code>
+immobile = lapply(ans, function(x)  
+                          rbind(cantMove("blue", x), cantMove("red", x)))
+sapply(seq(along = immobile), 
+          function(i)  
+             nrow(immobile[[i]])/nrow(ans[[i]]$locations))
+<r:output>
+[1] 0.2910017 0.3547544 0.9889548 1.0000000 0.9971120
+</r:output>
+</r:code>
+</para>
+
+Now that we have the immobile points, how can find any spatial patterns
+or features of the jams?
+Let's find the length of the blue lines, i.e. contiguous collections of blue cars.
+We look along the columns.
+With
+
+<r:function id="findJamLengths">
+findJamLengths =
+function(col)
+{
+  i = which(col == 0) 
+  diff(i)
+}
+</r:function>
+
+We can look at the columns using
+<r:code>
+colJamLengths = lapply(ans, function(x) apply(x$G, 2, findJamLengths))
+rowJamLengths = lapply(ans, function(x) apply(x$G, 1, findJamLengths))
+</r:code>
+
+We can look at the distribution of these across columns (or rows)
+to see if there is any spatial pattern.
+<r:plot>
+par(mfrow = c(1, length(colJamLengths)))
+lapply(colJamLengths, boxplot)
+</r:plot>
+From these plots, the size of the extreme
+
+We can draw the smoothed densities of the distribution of jam length
+for each of these densities:
+<r:plot>
+v = lapply(ans, function(x) unlist(apply(x$G, 2, findJamLengths)))
+sapply(seq(along = v), function(i) { 
+                         d = density(v[[i]])
+                         if(i == 1) plot(d) else lines(d, col = i)
+                       })
+legend(4, 4, density, col = 1:length(v), lty = 1)
+</r:plot>
+
+<r:code><![CDATA[
+par(mfrow = c(1,3))
+sapply(c(.2, .3, .4),
+function(d) {
+g = createGrid(d, 256, 257)
+g = crun(g, 500, velocity = TRUE)
+
+ # Normalize the rates based on how many of each type of car there actually were.
+v = t(t(as.matrix(g$movesPerStep))/as.integer(table(g$bml$locations$carType)))
+matplot(1:nrow(v), v, type = "l", col  = c("red", "blue"), 
+          xlab = "iteration", ylab = "Proportion of cars moving")
+
+ i = which(rowSums(g$movesPerStep)/nrow(g$bml$locations) < .01)
+ if(!any(i))
+   integer()
+ else
+   i[1]
+})
+]]></r:code>
+
+</section>
+
+</article>

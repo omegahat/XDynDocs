@@ -1,0 +1,51 @@
+AC_INIT(R/ihtml.R.in)
+
+AC_ARG_ENABLE(wxwidgets, "activate the interactive documents using RwxWidgets", 
+                [echo "got it"; 
+		 if test "$enableval" = "yes" ; then
+                     HAVE_WXWIDGETS="TRUE"
+                 elif test "$enableval" = "no" ; then
+                     HAVE_WXWIDGETS="FALSE"
+   	         fi
+		],
+                [echo "Will check for RwxWidgets"])
+
+
+if test -z "$HAVE_WXWIDGETS" ; then
+echo "HAVE_WXWIDGETS = \"$HAVE_WXWIDGETS\""
+   echo 'library(RwxWidgets)' | R --vanilla
+   if test "$?" = 0 ; then
+     echo "Found RwxWidgets"
+     HAVE_WXWIDGETS="TRUE"
+   else
+     HAVE_WXWIDGETS="FALSE"
+   fi   
+fi
+
+
+
+if test "$HAVE_WXWIDGETS" = "yes" || test "$HAVE_WXWIDGETS" = "enable" ; then
+  HAVE_WXWIDGETS="TRUE"
+fi
+
+if ! test "$HAVE_WXWIDGETS" = "TRUE" ; then
+  HAVE_WXWIDGETS= "FALSE"
+fi
+
+echo "Have RwxWidgets? $HAVE_WXWIDGETS"
+
+AC_SUBST(HAVE_WXWIDGETS)
+
+if test -r NAMESPACE ; then
+ chmod +x NAMESPACE
+fi
+
+AC_OUTPUT(NAMESPACE R/ihtml.R)
+
+if test -r NAMESPACE ; then
+ chmod -x NAMESPACE
+fi
+
+
+
+

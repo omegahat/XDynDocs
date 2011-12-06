@@ -1,0 +1,125 @@
+\documentclass{book}
+\usepackage{comment}
+\usepackage{times}
+\usepackage{natbib}
+\usepackage{fullpage}
+
+\bibliographystyle{plain} % prsty, unsrt
+%\usepackage[gather]{chapterbib}
+\usepackage{bibunits}
+
+
+\begin{document}
+
+\begin{comment}
+This is the  basic and initial outline
+of topics we discussed on Saturday, 26th of June.
+It is not in any way fixed.
+\end{comment}
+
+\tableofcontents
+
+
+\include{preface}
+
+\part{Programming}
+
+\chapter{Introduction}
+What is Statistical Computing, technology and informatics.
+
+This is a reference \cite{GreenBook}.
+
+\chapter{Introduction to Computing}
+\section{Computation in General}
+  Limitations of computers.
+  Representing numbers,
+  precision and comparison
+  data types
+  algorithms
+
+  computing issues for statistics
+    pivoting
+
+   
+  Programming
+    control flow, data structures, etc.
+    R, Matlab, Perl, Python, Java, C/C++, SAS, Excel
+
+  Taxonomy of languages and systems.
+
+\chapter{Programming Philosophy}
+
+How to approach problems, writing functions, etc.  making code
+general, extensible, etc.  Why is it important.  Thinking about
+software as a library or inventory for use in future problems.
+
+Advanced R (and other languages)
+
+\include{Programming/thinking}
+
+\chapter{Tools}
+
+Analyzing particular problems and case studies and working out which
+tools to use and how to combine them.
+
+Think of an example of generating a report as an HTML page each night
+by accessing data and fitting a model, etc.
+shells, batch jobs, ssh, web servers, etc.
+
+\chapter{Data/Case Studies}
+Enumerate the different contexts
+for the data we will use throughout the book.
+This is a collection of unrelated sections
+that give a background to e.g. TCP, email.
+
+\include{Data/data}
+
+\part{Technologies}
+
+\chapter{RDBMS}
+stored procedure, RinPostgres
+\include{RDBMS/dbms}
+
+
+\chapter{DCOM}
+
+\chapter{Regular Expressions} 
+
+\chapter{XML}
+
+\chapter{GUIs}
+
+\chapter{Case Studies}
+extended/in depth
+
+\chapter{Visualization}
+
+\chapter{GIS}
+
+\chapter{Reporting}
+
+\chapter{HTTP and Sockets}
+
+\chapter{SOAP}
+
+
+\chapter{Inter-System Intefaces}
+SJava, RSPerl, etc.
+
+KEGG, PubMed
+
+
+%\cite*
+
+\cite{GreenBook}
+
+
+\chapter{Bibliography}
+\bibliographystyle{plain}
+\bibliography{statcomp}
+
+
+
+%%%\putbib[statcomp]
+
+\end{document}

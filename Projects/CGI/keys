@@ -1,0 +1,9 @@
+#!/bin/sh
+
+for u in `cut -f 2 -d ',' WebGroup.txt ` ; do
+      tsu $u
+      cd /class/u/s133/~${u} 
+      if ! test -f .ssh/id_rsa.pub ; then
+        ssh_keygen -t rsa
+      fi
+  done

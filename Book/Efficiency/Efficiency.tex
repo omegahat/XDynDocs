@@ -1,0 +1,61 @@
+\chapter{Efficient Code: Making code work faster}
+\begin{summary}
+In this chapter, we discuss how we go about improving code so that it
+runs faster and/or uses less memory.  We present the basic ideas of
+efficient code that are common to all languages, and also focus on
+R-specific aspects.  We also cover the tools in R for measuring
+performance. We go through the details of several real examples/case
+studies and illustrate the way we think about writing code.  As with
+the rest of the book, the goal here is not just to present the tools,
+but to try to explain the way users should think about them and
+comparing them to alternative approaches.
+\end{summary}
+
+\section{The basics of measuring code}
+\Rfunc{system.time}
+
+\subsection{Algorithmic Complexity: Theoretical and Empirical}
+The idea that there is a relationship between size of input and the
+number of computations and the time and memory the computations take. 
+We won't spend very much time talking about the theoretical/algebraic
+calculations one can perform for algorithmic analysis.
+Instead, we focus  on practical ways to empirically estimate 
+performance along with some of the difficulties or issues to 
+consider (e.g. garbage collection, other tasks running on the machine,
+comparing different hardware).
+
+
+\section{Basic Guidelines for Efficient Code}
+
+\begin{itemize}
+\item  Vectorize calculations
+\item  Pre-allocating the answer
+\end{itemize}
+
+\section{Profiling Code to find Bottlenecks}
+
+\section{Profiling in Action}
+Come up with an example similar in spirit to Ross'
+excellent 5 step Random Walk example.
+
+\section{Using C}
+Here we talk at a high-level of using C code to make computations
+faster. We don't show the C code, but more claim that we have it and
+show the performance gains. We discuss a little bit about how the come
+about because of compiled languages and the difference between
+resolving symbols and the need for unboxing in interpreted languages.
+
+\section{Introduction to High-level Distributed  Computing}
+\subsection{The basic computational model}
+Client-server, master-workers.
+Breaking tasks 
+
+\subsection{SNOW}
+
+\subsection{Different Communication Approaches}
+MPI/PVM
+
+\subsection{Managing Data}
+Here we talk about avoiding the transmission of data
+and maximizing the number of computations per
+byte transferred.

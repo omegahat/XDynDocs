@@ -1,0 +1,471 @@
+\documentclass[coloremph,lightbackground,landscape,17pt]{foils}
+\usepackage{times}
+\usepackage{color}
+\usepackage{fixseminar}
+\usepackage{graphics}
+\usepackage{hyperref}
+\usepackage[display]{texpower}
+\usepackage{stepitem}
+
+\def\SFunction#1{\textbf{#1()}}
+
+\setlength{\voffset}{-1cm}
+\addtolength{\textheight}{2cm}
+
+\addtolength{\hoffset}{-1cm}
+\addtolength{\textwidth}{2cm}
+
+\begin{document}
+\definecolor{gray}{rgb}{.6,.6,.6}
+\definecolor{darkblue}{rgb}{0,0,.5}
+\definecolor{darkgreen}{rgb}{0,.5,0}
+\definecolor{cornsilk}{rgb}{1,.97255,.862745}
+\definecolor{moccasin}{rgb}{1,.8941176,.70980392}
+\definecolor{khaki}{rgb}{0.941176,0.901961,0.549020}
+%\pagecolor{cornsilk}
+\pagecolor{khaki}
+
+
+We have seen vectors and seen a little bit of subsetting.  In this
+lecture, we will talk about
+\begin{itemize}
+\item vectorized computations
+\item the recyling rule
+\item the 5 forms of subsetting
+\item assigning to subsets
+\item lists
+\item data frames
+\item functions
+\end{itemize}
+
+% \setboolean{display}{false}
+% \let\hidestepcontents=\displaystepcontents
+
+\newcommand{\newslide}[1]{\newpage\begin{center}%
+\color{darkblue}{\large\bf #1}\end{center}}
+
+
+
+
+Here we show that S works on vectors element-wise in many cases. The
+idea is that if we operate on vectors of length 1, we get what we
+might expect.  However, if we operate on vectors of length n,
+S works on these element-wise.
+\newslide{Vectorized computations}
+\liststepwise*{
+  \begin{stepitemize}
+    \item 1 + 2
+    \item c(1, 2, 3) + c(4, 5, 6)
+    \item 1:10 + 11:20
+    \item paste("A", "B", sep = ", ")
+    \item paste(letters, letters, sep = ", ")
+
+    \item sapply() function for vectors\\
+          more later.
+  \end{stepitemize}
+}
+In the first case of paste, we have two vectors of length
+1 and we concatenate them. In the second case, we
+have two vectors with 26 entries so this adds
+a dimension. And paste puts the elements together
+and returns a vector of length 26.
+
+
+The recycling rule is important because it gives us a simple way to
+think about how element-wise operations will work when we operate on
+vectors with different lengths.  The basic rule is that we replicate
+the smaller vector to have the same length as the larger one.  This
+will generate a warning if the length of the smaller is not a divisor
+of the larger one as we will have to drop some elements when we
+replicate.
+
+\newslide{Recycling Rule}
+\liststepwise*{
+  \begin{stepitemize}
+    \item  c(1, 2) + 3
+    \item  c(1, 2) + c(4, 5)
+    \item  c(1, 2, 3) + c(4, 5)?
+    \item  paste("Sample", 1:10, sep=".")?
+   \end{stepitemize}
+}
+A simple way to think of this is \\
+ x + rep(y, length = length(x))
+where x is the longer vector.
+ 
+
+
+We saw subsetting before, but we will go over it again
+and show how the recyling rule works here too.
+\newslide{Subsetting}
+\liststepwise*{
+  \begin{stepitemize}
+    \item 5 types of subsetting
+    \item including by position \\
+      x[c(1, 2, 3)]
+    \item excluding by position \\
+      x[ - c(1, 2, 3)]
+    \item including by name \\
+       x[c("a", "b" , "c")]
+    \item including by logical vector
+     x[x $>$ 10] \\
+     x[!is.na(x)]
+    \item ?  \\ 
+     (left until later)
+  \end{stepitemize}
+}
+
+The subsetting allows us to easily and conveniently create new vectors
+from original ones by including or excluding elements.  We are
+guaranted that we will get a vector back of the same type as the
+original vector.  For example, a subset of a character vector is a
+character vector, a subset of a logical
+
+\newslide{Assigning to Subsets}{
+  \liststepwise*{
+    \begin{stepitemize}
+      \item x = 1:10
+      \item x[c(2, 3, 5)] =  100
+      \item x[c(2, 3, 5)] =  c(100, 200, 300)
+      \item x[c(2, 3, 5)] =  c(100, 200)
+
+      \item  All the other subsetting techniques work here too!
+    \end{stepitemize}
+}
+
+%\end{document}
+
+\newslide{Empty Subsetting}
+\liststepwise*{
+  \begin{stepitemize}
+    \item empty index (i.e. x[ ])
+    \item  y = 0
+    \item  x[ ] = 0
+    \item 2 dimensional vectors = arrays \\
+            x[1:10, ] \\
+            x[, c("Col 1", "Col 3")]
+  \end{stepitemize}
+}
+
+
+\newslide{Matrices and Arrays}
+\liststepwise*{
+  \begin{stepitemize}
+    \item matrix(values, nrow, ncol)
+    \item matrix( NA, 10, 3)
+    \item Stored as vector with dimensions \\
+       homogeneous types!
+    \item dim, ncol, nrow
+    \item rownames, colnames, dimnames
+    \item Subsetting \\
+           x[, ]
+    \item Generalize to k-dimensional arrays. 
+  \end{stepitemize}
+}
+
+\newslide{Lists}
+\liststepwise*{
+  \begin{stepitemize}
+    \item Container for different types of elements
+    \item list(1, rnorm(10), c("ab", "cd"), list(x = sum, y = mean(rnorm(10))))
+    \item recursive, i.e. lists within lists
+    \item Same as vector \\
+         but allows any S object as an entry
+    \item support names
+  \end{stepitemize}
+}
+
+\newslide{List Subsetting}
+\liststepwise*{
+  \begin{stepitemize}
+   \item 5 subsetting techniques work.\\
+          and for assignment
+   \item x[1:2]
+   \item Always returns a list
+   \item How do we get elements? \\
+          $[ [$ and $\$$
+   \item x\$name
+   \item x[ [1] ]       
+  \end{stepitemize}
+}
+
+
+\newslide{Data Frames}
+\liststepwise*{
+  \begin{stepitemize}
+    \item Can't use matrices for general data
+    \item Need list of variables, each with own types
+    \item Want to view as 2 dimensional \\
+       e.g. for subsetting observations
+    \item \textit{data frame}
+  \end{stepitemize}
+}
+
+
+\newslide{Vectorized Computations}
+\liststepwise*{
+  \begin{stepitemize}
+   \item Loop with apply functions
+
+   \item Calls given function for each 
+     "element".
+
+   \item lapply, sapply for lists \& vectors  
+   \item 
+ Xs =  lapply(1:100, function(x) rnorm(100)) \\
+ sapply(Xs, mean)
+    
+   \item apply for matrices \& arrays
+    
+  \end{stepitemize}
+}
+
+
+\newslide{Functions}
+\liststepwise*{
+  \begin{stepitemize}
+
+    \item Call a function as     \\
+      matrix(1:10, 5, 2) \\
+      matrix(, 5, 2) \\
+      matrix(1:10,  ncol = 2)
+
+    \item Match argument by name or position
+
+    \item First match exact names
+    \item partial matching of names \\
+        "s" matches "sd"
+    \item match by position
+    \item remainder in \texttt{$\ldots$}.
+
+  \end{stepitemize}
+}
+
+\newslide{How Functions Work}
+\liststepwise*{
+  \begin{stepitemize}
+
+    \item Create a special workspace for each call \\
+       call frame or environment
+    \item Assign the inputs (arguments) to the parameter names
+    \item Evaluate each expression in the \textit{body} of the
+      function.
+
+    \item Assignments in these expressions go into this
+      call frame.
+
+    \item Where to find variables \\
+        in this call frame
+
+    \item if not there, look in the \textit{parent}  environment \\
+       typically the session workspace
+
+    \item then walk along search path \\
+        in R, chain of environments.
+     
+
+    \item Remember each call (not function definition) gets its own
+     call frame.
+  \end{stepitemize}
+}
+
+\newslide{Lazy Evaluation}
+\liststepwise*{
+  \begin{stepitemize}
+    \item Lazy evaluation of arguments \\
+      evaluate argument expression only when value is needed.
+
+    \item Examples of lazy evaluation \\
+  ifelse(TRUE, 1, {cat("This isn't printed\\n"); 2})
+
+   \item substring = \\
+    function(x, start, last = nchar(x)) { \\
+      ...
+    }    
+  \end{stepitemize}
+}
+
+
+
+\newslide{Defining Functions}
+\liststepwise*{
+  \begin{stepitemize}
+    
+  \item Use \texttt{function} keyword
+  \item specify formal arguments 
+  \item body is collection of S commands \\
+    usually inside  { }
+  \item function(x, y) { \\
+    (x + y)/2
+  }
+
+  \item return value is either \\
+    from explicit \texttt{return(value)}, or \\
+    result of last expression evaluated
+  
+  \item Where's the name of the function?
+
+  \item Functions are objects \\
+     assign them to variables \\
+      f = function(x, y) (x+y)/2
+
+  \end{stepitemize}
+}
+
+\newslide{Formal Arguments}
+\liststepwise*{
+  \begin{stepitemize}
+   \item given by name \\
+      separate by commas (,) 
+
+   \item can have a default value \\
+     rnorm = function(n, mean = 0, sd = 1)
+
+   \item Can determine if an argument was supplied or not \\
+     if(missing(x))  x = 10 \\
+     same as default argument, but more flexible (and obscure).
+    
+  \end{stepitemize}
+}
+
+\newslide{Unnamed formal arguments}
+\liststepwise*{
+  \begin{stepitemize}
+    \item Some functions take unnamed arguments \\
+       list, sum \\
+       par, plot
+
+    \item identified by \texttt{$\ldots$} in the parameter list
+
+    \item 2 purposes \\
+        arbitrary number of arguments \\
+        pass to other functions
+    
+  \end{stepitemize}
+}
+
+\newslide{Managing Functions}
+\liststepwise*{
+  \begin{stepitemize}
+     \item Write in a separate file
+     \item Use \textbf{source()} to read file into S \\
+         evaluates expressions including assignments
+     \item check function 
+     \item edit file 
+     \item re-\textbf{source()}
+     \item Eventually document and put in package!
+  \end{stepitemize}
+}
+
+\newslide{Debugging Facilities}
+\liststepwise*{
+ \begin{stepitemize}
+  \item   when you get an error, find the call stack \\
+    \SFunction{traceback} 
+
+  \item \texttt{data(mtcars) \\
+         lm( mp ~ cyl, data = mtcars)}
+
+  \item traceback() \\
+7: eval(expr, envir, enclos) \\
+6: eval(predvars, data, env) \\
+5: model.frame.default(formula = mp ~ cyl, data = mtcars, drop.unused.levels = TRUE) \\
+4: model.frame(formula = mp ~ cyl, data = mtcars, drop.unused.levels = TRUE)\\
+3: eval(expr, envir, enclos)\\
+2: eval(mf, parent.frame())\\
+1: lm(mp ~ cyl, data = mtcars)\\
+ \end{stepitemize}
+}
+
+
+\newslide{Interactive Debugging}
+\liststepwise*{
+ \begin{stepitemize}
+
+  \item \SFunction{cat} and \SFunction{print}! \\
+    modifies the code \&  very blunt.
+
+  \item Stop the computation when there is an error
+   and allow the user to explore the call stack
+   and the local variables in each.
+
+  \item \texttt{options(error = recover)}
+  
+  \item recover provides facilities for examining \\
+     the local variables  - objects() \\
+     the call stack -  where \\
+     step through expressions - n
+     exiting - empty command or q
+
+ \end{stepitemize}
+}
+
+\newslide{Batch or Post-mortem debugging}
+\liststepwise*{
+ \begin{stepitemize}
+  \item For batch mode (i.e. non-interactive session) \\
+      Post-mortem debugging \\
+      \texttt{options(error = dump.frames)}
+
+  \item Follow error by \SFunction{debugger}
+\end{stepitemize}
+}
+
+
+\newslide{Monitoring Functions}
+\liststepwise*{
+ \begin{stepitemize}
+  \item \SFunction{browser}
+  \item f = function(x = 5)  {  \\
+          if(x == 1 || x == 0) \\
+          \ \   return(1) \\
+          browser()\\
+          x * f(x-1) \\
+        }
+ \end{stepitemize}
+}
+
+
+\newslide{trace}
+\liststepwise*{
+ \begin{stepitemize}
+  \item Rather than modifying the function \\
+     \texttt{trace(f, browser, at = 2)}
+
+  \item Can use at the beginning or end of the call \\
+     \texttt{trace(f, quote(print(x)), print = FALSE)}
+
+  
+  \item Call \SFunction{untrace} to remove the current
+      tracing action for the function.
+
+ \end{stepitemize}
+}
+
+
+\newslide{Loops}
+\liststepwise*{
+  \begin{stepitemize}
+    \item \texttt{for(i in obj) { \\
+            expressions involving i \\
+     }}
+
+    \item \texttt{while(condition) { \\
+            expressions 
+           }}
+
+    \item Condition must be a logical \textit{value} (not vector of
+    length $>$ 1)
+
+    \item Often use apply, lapply, sapply more effectively!
+
+  \end{stepitemize}
+}
+
+
+
+
+
+
+
+
+\end{document}

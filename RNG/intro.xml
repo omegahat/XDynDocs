@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<!DOCTYPE book SYSTEM "file:///usr/share/sgml/docbook/xml-dtd-4.1.2-1.0-8/docbookx.dtd">
+
+<section id="RNGIntro" xreflabel="Introduction">
+<title> Introduction</title>
+
+<para/>
+Not all of our data are recorded measurements.
+Sometimes, we make-up or generate our own data at random. 
+To do this, we use a <emphasis>random number generator</emphasis> 
+to sample measurements from a probability distribution.
+
+<para/>
+Take coin-tossing for example. We can flip a coin, record
+whether it lands heads with a 1 or tails with a 0 in order to
+generate a <emphasis>random sample</emphasis> from the 
+simple probability distribution where 0 and 1 each occur with chance 1/2. 
+The random sample consists of a sequence of independent 0s and 1s,
+where the chance the 10th number generated is a 0 or 1 does not depend on 
+the values of the first 9 numbers.  That is, the number 1 has chance 1/2 of being
+generated on the tenth toss, regardless of the numbers generated from the
+first nine tosses. 
+The coin toss is a very simple random number generator, and it 
+can be used to build other more complicated random number generators, such
+as the generator that produces a number from the integers 0, 1, 2, 3, 4, 5
+with equal probability (see the exercises).
+
+<para/>
+The computer can generate pseudo-random numbers using numerical algorithms.
+Although these numbers are deterministic (when you start the algorithm
+at a particular initial value, then the generator produces the same deterministic
+sequence of numbers), in many ways these generated numbers look very much like 
+random numbers.
+ 
+<para/>
+The use of computer-generated data has led to important advances
+in statistics.  It has promoted the development and evaluation of complex 
+statistical methods and the analysis of statistical properties of estimators
+based on complex data. 
+
+<para/>
+The main ideas to take from this chapter are the following:
+<itemizedlist>
+<listitem>
+Using numerical algorithms, the computer can generate pseudo-random 
+numbers that look like independent samples.
+In complex simulations, such as when simulating brownian motion, it
+is important to use good random number generators and to check 
+the behavior of your pseudo-random numbers.
+</listitem>
+
+<listitem> 
+When random number generators do not exist for a particular probability
+distribution, the inverse CDF method or the acceptance/rejection method
+may be used.
+</listitem>
+
+<listitem>
+Simulation studies, where we generate random numbers under various probability
+distributions, help us study the behavior of statistical estimators.
+For example, we may want to investigate the central limit theorem for 
+probability distributions with long tails. 
+</listitem>
+
+<listitem>
+In order for others (and you) to reproduce your simulation results,
+keep track of the initial value(s) used for the random number
+generation, and report the value(s)
+along with the specific random number generator used with
+your findings.
+</listitem>
+
+<listitem>
+Simulation studies offer useful comparisons of competing statistical
+procedures, especially when the procedure is data-adaptive. For
+example, if a <glossary>nuisance parameter</glossary>,
+must be specified for an estimator, we may want to compare
+two techniques for selecting the parameter, where the techniques
+depend on the data is a computationally complex way.  
+</listitem>
+
+<listitem>
+Resampling techniques, where we generate random samples from the observed data
+itself rather than from a probability distribution, are very useful computational tools.
+For example, they can approximate the sampling distribution of an estimator,
+help us choose nuisance parameters for statistical procedures, and 
+aid us in comparing the performance of various procedures.
+</listitem>
+</itemizedlist>
+
+<exercise> 
+<question>
+How can you generate an integer at random between 0 and 3?
+</question>
+<hint>
+Consider representing these integers as a sequence of 0s and 1s
+</hint>
+<answer>
+</answer>
+
+<question>
+How can you generate an integer at random between 0 and 5?
+</question>
+<hint>
+Try generate numbers at random between 0 and 7.
+</hint>
+<answer>
+
+</answer>
+
+<question>
+How can you generate two distinct integers at random between 0 and 5?
+That is, each ordered pair (0,1), (0,2), (0,3), (0, 4), (0,5), 
+(1,0), (1,2), (1,3), ... (5,4) is equally likely to be generated?
+</question>
+<answer>
+</answer>
+</exercise>
+
+<!-- DTL: Do we want them doing this or using sample().
+ In other words, do we want them to learn how things work
+ or how to utilize them.  -->
+
+
+</section>
+

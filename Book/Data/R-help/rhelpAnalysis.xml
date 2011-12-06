@@ -1,0 +1,600 @@
+<article xmlns:r="http://www.r-project.org">
+<xi:include href="/Users/duncan/authorInfo.xml" xmlns:xi="http://www.w3.org/2003/XInclude" />
+<title>Analyzing the R-help mailing list</title>
+<section>
+<title>Downloading the data</title>
+<para>
+Firstly, we have to fetch the files for each month.
+</para>
+<para>
+See R/download.R
+</para>
+<para>
+Having done this, we can find the size of the files.
+<r:code>
+info = file.info(list.files("../data", pattern = "txt\\.gz$", full.names = TRUE))
+</r:code>
+<r:code>
+summary(info$size)
+</r:code>
+<r:plot>
+densityplot(~ info$size)
+</r:plot>
+</para>
+<para>
+A time series plot is more interesting.
+To get the dates, we can replace the .txt.gz with -28
+for the end of the month and then convert this to a Date:
+<r:code>
+gz = filenames = list.files("../data", pattern = "txt\\.gz$")
+dates = as.Date(gsub("\\.txt\\.gz", "-1", filenames), "%Y-%B-%d")
+</r:code>
+If we assume that <r:var>info</r:var> is in the same order as dates,
+we can create our plot as
+<r:plot>
+plot(info$size ~ dates)
+</r:plot>
+</para>
+<para>
+This measure is of course rather crude. We would prefer to look at
+the number of messages or the number of "threads" rather than the size of the file.
+We may worry about attachments making these files bigger.
+So let's start reading the mail messages.
+</para>
+</section>
+<section>
+<title>Reading the Mail Messages</title>
+<para>
+We're going to want to build a collection of functions for processing
+one of these files.  We want to think of the data structure we want
+back.  Before we do this, we need to think about what we want to do
+with it.  The first analysis we will do is look at who is sending the
+messages and when, are they in reply to a message or an initial post,
+what is the subject.
+</para>
+<para>
+Can we identify weekends? holidays? Can we tell when some people are
+away from work?  Who ask questions commonly? Who reply often?  Do they
+reply about particular topics?  Are people "selling" their topic?
+What is the distribution of messages over the month, the day, i.e
+hours?  How are the members of the list distributed geographically?
+</para>
+<para>
+What is the distribution of waiting time for a reply to a question?
+Is it correlated with the length of the question? Any particular
+aspect of the question? Can we detect the presence of R code in the
+question? output from <r:func>sessionInfo</r:func>?
+</para>
+<para>
+Later we will want to look at the body of the message.  Are there
+attachments? What are the common words (ignoring the very common words
+such as a, the, as, and, but, ...)?  What are the R commands used in
+the messages?  Are these new to the thread or just part of the
+included message to which the sender is replying? 
+</para>
+<para>
+We'll want very different data structures for these, but of course
+there is an association as we will have a row in a data frame for a
+message and a collection of words, etc.  for the same message.
+</para>
+<section>
+<title>Reading the Message Meta-data</title>
+<para>
+What do we want to end up with?
+A data frame with the login and domain of the sender,
+the data, the subject, a logical indicating whether it was in reply to
+</para>
+<para>
+getMessages
+readHeader
+readBody
+
+<r:code>
+msgs = getMessages("../data/2007-October.txt.gz")
+rmsgs = lapply(msgs, readMessage)
+</r:code>
+<r:code>
+sender = senders(rmsgs)
+sort(table(paste(sender[,1], sender[,2], sep = "@")), decreasing = TRUE)
+</r:code>
+<r:code>
+allMsgs = lapply(paste("../data", gz, sep = .Platform$file.sep), getMessages)
+sum(sapply(allMsgs, length))
+</r:code>
+<r:code>
+gz.dates = as.Date(gsub(".txt.gz", "-28", gz, fixed = TRUE), "%Y-%B-%d")
+plot(gz.dates, sapply(allMsgs, length))
+</r:code>
+So we see that the file size was a good proxy for the number of messages.
+These are the months in early 2006 and have over 4000 messages.
+Is this an error in the archive? or in our code for reading the messages?
+<r:code>
+numMessages = sapply(allMsgs, length)
+gz.dates[ numMessages > 4000 ] 
+</r:code>
+March through May, 2006.
+Let's look at the messages on the mailing list archives.
+For May, it claims that there are 2029 messages.
+So let's see if there are 2029 lines in that file starting
+with "From "
+<r:code>
+xx = readLines(gzfile("../data/2006-May.txt.gz"))
+length(grep("^From ", xx))
+</r:code>
+This does claim there are 4789.  So perhaps our algorithm 
+needs to be a little more cautious.
+These may be in the body of the message.
+Perhaps we need to find all lines that start with "From "
+and whose next line starts with  "From: ".
+<r:code>
+i = grep("^From ", xx)
+length(grep("^From:", xx[i+1]))
+</r:code>
+But this yields the same results.
+So we need to investigate further.
+We should look at the file directly and 
+look at the first few messages there and in our 
+<r:var>allMsgs</r:var>. Hopefully the first few will 
+identify the issue.
+<r:code>
+names(allMsgs) = gz
+allMsgs[["2006-May.txt.gz"]][1:3]
+</r:code>
+There doesn't seem to be anything too obvious.
+</para>
+<para>
+Each email message should have a unique Message-ID field in the header.
+Let's see if these really are unique.
+<r:code>
+m = sapply(allMsgs[["2006-May.txt.gz"]], readMessage)
+ids = sapply(m, function(x) x$header["Message-ID"])
+length(unique(ids))
+</r:code>
+And presto - there are 2029 unique message ids, but 4789 messages.
+Are these message id's duplicated in the original file or did
+we do something strange?
+<r:code>
+mids = system("gunzip -c ../data/2006-May.txt.gz | grep '^Message-ID'",  intern = TRUE)
+</r:code>
+This gives 4802!
+And the number of unique message ids is 
+<r:code>
+length(unique(mids))
+</r:code>
+which gives 2033 - four more than the number we get from
+our messages and that the mailing list page declares.
+</para>
+<para>
+So let's go to the file and find the first repeated message id:
+<r:code>
+mids[duplicated(mids)][1]
+</r:code>
+We find this as
+<programlisting><![CDATA[
+From Cameron.Guenther at MyFWC.com  Wed May  3 21:34:53 2006
+From: Cameron.Guenther at MyFWC.com (Guenther, Cameron)
+Date: Wed, 3 May 2006 15:34:53 -0400
+Subject: [R] Aggregate?
+Message-ID: <BA6FF017E924044A9BF748AFAEEA6F30A53314@FWC-TLEX3.fwc.state.fl.us>
+
+An embedded and charset-unspecified text was scrubbed...
+Name: not available
+Url: https://stat.ethz.ch/pipermail/r-help/attachments/20060503/43879567/attachment.pl 
+
+From Cameron.Guenther at MyFWC.com  Wed May  3 21:34:53 2006
+From: Cameron.Guenther at MyFWC.com (Guenther, Cameron)
+Date: Wed, 3 May 2006 15:34:53 -0400
+Subject: [R] Aggregate?
+Message-ID: <BA6FF017E924044A9BF748AFAEEA6F30A53314@FWC-TLEX3.fwc.state.fl.us>
+
+An embedded and charset-unspecified text was scrubbed...
+Name: not available
+Url: https://stat.ethz.ch/pipermail/r-help/attachments/20060503/43879567/attachment-0001.pl 
+]]></programlisting>
+So these mails are "odd" in that they have an character set issue.
+Let's see if this applies to all the duplicates
+</para>
+<para>
+So now we should find all duplicate message ids and determine which are irrelevant/the same message
+and discard those.
+Are they all adjacent? Do they all have this "An embedded and charset-..." message?
+<r:code>
+v = table(ids)
+summary(v)
+unique(v)
+table(v)
+sum(table(v))
+</r:code>
+This gives us the 2029 messages.
+
+</para>
+
+<para>
+What about the 4 extra unique messages ids we get from
+looking for Message-ID directly in the file and from
+our reading the message.
+<r:code>
+setdiff(unique(gsub("Message-ID: ", "", mids)), unique(ids))
+</r:code>
+Let's search for these in the body of the messages we have found.
+The reason is that somebody who receives the list messages in
+"digest mode" has replied to a message. This means that their message
+includes the message they received which is all the messages in that digest!
+Note that the message id  <![CDATA["<445E65D8.5010504 at pdf.com>"]]>
+is different form the message-id in the actual message.
+That was <![CDATA["Message-ID: <445E65D8.5010504@pdf.com>"]]> at line 27541.
+<r:code>
+tmp = paste("Message-ID:", setdiff(unique(gsub("Message-ID: ", "", mids)), unique(ids)))
+i = sapply(m, function(x) any(tmp %in% x$body))
+sum(i)
+m[[ which(i)[1] ]]$body
+</r:code>
+What we note about these is that the Message-ID: entry
+is in a block that is introduced by "Message: n",
+where n is a number.
+</para>
+
+
+<para>
+Let's look at the message ids which have a count of 6.
+<r:code>
+names(v)[v == 6]
+<r:output><![CDATA[
+[1] "<971536df0605031327o56993db3n43d82a67fcab8b10@mail.gmail.com>"     
+[2] "<BA6FF017E924044A9BF748AFAEEA6F30A53314@FWC-TLEX3.fwc.state.fl.us>"
+]]></r:output>
+</r:code>
+The first appears to be literally many duplicates of the same message.
+</para>
+<para>
+How can we identify messages that are identical.
+It is probably easiest to do this when at the point of
+working with lines in the files and separating them into 
+messages.
+So let's return to that.
+<r:code>
+msg.txt = getMessages("../data/2006-May.txt.gz")
+</r:code>
+Now let's get the 6 messages corresponding to our first message that seems
+to be repeated 6 times.
+<r:code>
+sapply(names(v)[v == 6], function(id) {
+           i = id == names(msg.txt)
+           tmp = msg.txt[i]
+           sapply(tmp[-1], all.equal, tmp[[1]])
+       })
+</r:code>
+For the first of these ids, we see that the first two messages are identical, but the rest have an extra ""
+at the end.
+For the second message, none of them are identical. But when we look at the messages, we see that they are of the
+form
+<programlisting><![CDATA[
+ [1] "From Cameron.Guenther at MyFWC.com  Wed May  3 21:34:53 2006"                                
+ [2] "From: Cameron.Guenther at MyFWC.com (Guenther, Cameron)"                                     
+ [3] "Date: Wed, 3 May 2006 15:34:53 -0400"                                                        
+ [4] "Subject: [R] Aggregate?"                                                                     
+ [5] "Message-ID: <BA6FF017E924044A9BF748AFAEEA6F30A53314@FWC-TLEX3.fwc.state.fl.us>"              
+ [6] ""                                                                                            
+ [7] "An embedded and charset-unspecified text was scrubbed..."                                    
+ [8] "Name: not available"                                                                         
+ [9] "Url: https://stat.ethz.ch/pipermail/r-help/attachments/20060503/43879567/attachment-0002.pl "
+[10] ""                                                                                            
+]]></programlisting>
+It is the second to last line that changes. These are of the form
+<code>..../attachment-000n.pl</code>
+where n is a digit.
+</para>
+<para>
+Let's look at the 4 messages that are repeated just twice.
+<r:code><![CDATA[
+i = names(v)[v == 2]
+isSameMessage =
+function(x, y)
+{
+ is.logical(all.equal(x, y)) ||
+  (length(x) == length(y) + 1) && x[length(x)] == "" && is.logical(all.equal(x[-length(x)], y)) ||
+     (length(y) == length(x) + 1) && y[length(y)] == "" && is.logical(all.equal(y[-length(y)], x))
+}
+]]></r:code>
+This catches many but still leaves us with 2390 messages, rather than 2029.
+We need to add the test for the messages being these "An embedded and charset ..."
+that only differ in the last part of the URL in the message.
+We can test this with
+<r:code><![CDATA[
+ length(x) == length(y) &&
+     ( sum( x == y ) == length(x) - 1 ) &&
+       substring(x[ length(x) - 1 ], 1, 25) ==  substring(y[ length(y) - 1 ], 1, 25)
+]]></r:code>
+(See <r:func>isSameMessage</r:func> in <ulink url="R/messages.R"/>.)
+</para>
+<para>
+This catches a lot more and brings us to 2063, just 34 off where we want.
+And if we look at these, there are 34 duplicates.
+<r:code>
+a = getMessages("../data/2006-May.txt.gz")
+sum(duplicated(names(a)))
+</r:code>
+Let's look at some
+<r:code>
+names(a)[duplicated(names(a))][1:10]
+</r:code>
+Looking at the first of these, we see the two messages
+<programlisting><![CDATA[
+From Jeanne.Vallet at inh.fr  Fri May  5 15:26:16 2006
+From: Jeanne.Vallet at inh.fr (Jeanne Vallet)
+Date: Fri, 5 May 2006 15:26:16 +0200
+Subject: [R] MRPP in R
+Message-ID: <000001c67047$7d0b7690$a0756393@dittrichia>
+
+Un texte encapsul? et encod? dans un jeu de caract?res inconnu a ?t? nettoy?...
+Nom : non disponible
+Url : https://stat.ethz.ch/pipermail/r-help/attachments/20060505/056a4be5/attachment.pl 
+
+]]></programlisting>
+and
+<programlisting><![CDATA[
+From Jeanne.Vallet at inh.fr  Fri May  5 15:26:16 2006
+From: Jeanne.Vallet at inh.fr (Jeanne Vallet)
+Date: Fri, 5 May 2006 15:26:16 +0200
+Subject: [R] MRPP in R
+Message-ID: <000001c67047$7d0b7690$a0756393@dittrichia>
+
+An embedded and charset-unspecified text was scrubbed...
+Name: not available
+Url: https://stat.ethz.ch/pipermail/r-help/attachments/20060505/056a4be5/attachment-0001.pl 
+]]></programlisting>
+The difference is the language!
+<r:code><![CDATA[
+tmp = a[names(a) == "<000001c67047$7d0b7690$a0756393@dittrichia>"  ]
+]]></r:code>
+We were assuming all the lines in the body would be the same except for the Url: one.
+We can relax this and assume that if there are only 4 lines in the body
+and that the penultimate one is "Url: http://stat.ethz...", then these two messages
+are the same. 
+Another and perhaps more valid approach is to look at the "From " line
+that starts the message and if these two are the same, accept that they are the same
+given that the Message-ID is also.
+</para>
+<para>
+So our isSameMessage function becomes
+<r:function id="isSameMessage"><![CDATA[
+isSameMessage =
+function(x, y)
+{
+    # Check if they are  actually equal or only differ by a "" at the end of either.
+ ok = is.logical(all.equal(x, y)) ||
+       (length(x) == length(y) + 1) && x[length(x)] == "" && is.logical(all.equal(x[-length(x)], y)) ||
+         (length(y) == length(x) + 1) && y[length(y)] == "" && is.logical(all.equal(y[-length(y)], x))
+
+ if(ok)
+   return(ok)
+
+    # Now handle the case where they are very similar by differ in the URL for the attachment.
+   #
+   # [7] "An embedded and charset-unspecified text was scrubbed..."                                    
+   # [8] "Name: not available"                                                                         
+   # [9] "Url: https://stat.ethz.ch/pipermail/r-help/attachments/20060503/43879567/attachment-0002.pl "
+
+ ok = length(x) == length(y) &&
+       ( sum( x == y ) == length(x) - 1 ) &&
+         substring(x[ length(x) - 1 ], 1, 25) ==  substring(y[ length(y) - 1 ], 1, 25)
+
+ if(ok)
+   return(ok)
+
+ x[1] == y[1]
+ 
+}
+]]></r:function>
+</para>
+
+<para>
+So now that we built our functions to do the right thing regarding duplicates
+we can finish off reading the messages.
+<r:code id="getMessages">
+allMsgs = lapply(paste("../data", gz, sep = .Platform$file.sep), 
+                  getMessages)
+names(allMsgs) = gsub(".txt.gz$", "", gz)
+ # Get the dates and reorder the collection
+gz.dates = as.Date(gsub(".txt.gz", "-28", gz, fixed = TRUE), "%Y-%B-%d")
+allMsgs = allMsgs[order(gz.dates)]
+</r:code>
+<r:plot>
+plot(sort(gz.dates), sapply(allMsgs, length))
+</r:plot>
+The higher variance is consistent with the higher numbers.
+</para>
+<para>
+We still seem to have some duplicate messages
+<r:code>
+tmp = sapply(allMsgs, function(x) sum(duplicated(names(x))))
+table(tmp)
+sum(tmp)
+</r:code>
+So a total of 215 duplicated messages, out of <r:expr r:value="170889">sum(sapply(allMsgs, length))</r:expr>.
+</para>
+<para>
+There is one month (2007-November) which has 8 duplicated message ids.
+<r:code>
+which(tmp == 8)
+m = allMsgs[["2007-November"]]
+names(m)[duplicated(names(m))]
+<r:output><![CDATA[
+[1] "<13878723.post@talk.nabble.com>" "<13880048.post@talk.nabble.com>"
+[3] "<13880048.post@talk.nabble.com>" "<13939204.post@talk.nabble.com>"
+[5] "<13993446.post@talk.nabble.com>" "<14046941.post@talk.nabble.com>"
+[7] "<14086120.post@talk.nabble.com>" "<14040895.post@talk.nabble.com>"
+]]></r:output>
+</r:code>
+So these are all from nabble.
+</para>
+<para>
+There are 2 months that have 4 duplicates.
+<r:code>
+which(tmp == 4)
+<r:output>
+2003-March  2007-July 
+        72        124 
+</r:output>
+m = allMsgs[["2003-March"]]
+names(m)[duplicated(names(m))]
+</r:code>
+And these are the empty string, i.e. no message ID.
+<r:code>
+txt = readLines(gzFile("../data/2001-August.txt.gz"))
+length(grep("Message-ID: $", txt))
+</r:code>
+</para>
+
+<para>
+Now we want to turn the message text into the header and body
+for each message.
+<r:code id="readMessages">
+msgs = lapply(allMsgs, function(x) lapply(x, readMessage))
+</r:code>
+When we run this with our original code, we get an error
+in readMessage when the header is simply the string
+"From ?Sys.setlocale"
+This probably indicates that we fractured a message 
+where this was part of the body, and not the start of the message.
+So we should either check that the next line starts with "From: "
+or that the From line has an email address in and/or a date.
+The error is in 92, message number 1527
+When we fix this, we get too few messages, potentially.
+That's because we have to make certain to have a
+regular expression that matches all the possible characters 
+in an email login (before the domain and the "at" in the line).
+</para>
+
+<para>
+<r:code>
+amsgs = unlist(msgs, recursive = FALSE)
+names(amsgs) = unlist(lapply(msgs, names))
+</r:code>
+</para>
+</section>
+<section>
+<title>Threads</title>
+<para>
+Let's develop a function that can find all the messages in a give thread.
+(We can get some of this information from HTML files, but linking that back to
+the messages here may be tricky.)
+Let's identify which are the questions and which are the messages that
+have a "References" field.
+<r:code>
+isFollowup = sapply(amsgs, function(x) any(c("References", "In-Reply-To") %in% names(x$header)))
+is.question = !isFollowup
+sum(is.question)
+</r:code>
+This definition of a question may be too simplistic.
+</para>
+<para>
+<r:code>
+getReplyTo = 
+function(x) 
+{
+  unique(c(if(!is.na(x$header["In-Reply-To"])) x$header["In-Reply-To"], 
+           if(!is.na(x$header["References"])) trim(strsplit(x$header["References"], "[[:space:]]+")[[1]])))
+}
+replyTo = lapply(amsgs[isFollowup], getReplyTo)
+table(sapply(replyTo, length))
+</r:code>
+<r:code>
+sample(which(is.question), 1)
+z = amsgs[[ "<3D89204A1FF7D011AB5500A0C9664801920FCB@CORONADO>" ]]
+</r:code>
+Now we get its message id and find the messages which reference it.
+<r:code>
+i = sapply(replyTo, function(x) z$header["Message-ID"] %in% x)
+amsgs[[ names(replyTo)[i]]]
+</r:code>
+<r:code>
+tmp = sapply(amsgs, function(x) x$header["Date"])
+msg.times = strptime(tmp, "%a, %d %b %Y %H:%M:%S")
+msg.times[is.na(msg.times)] = strptime(tmp[is.na(msg.times)], "%d %b %Y %H:%M:%S")
+msg.times[is.na(msg.times)] = strptime(tmp[is.na(msg.times)], "%a, %d %b %Y %H:%M")
+msg.times[is.na(msg.times)] = strptime(tmp[is.na(msg.times)], "%a %b %d %H:%M:%S %Y")
+msg.times[is.na(msg.times)] = strptime(tmp[is.na(msg.times)], "%d-%b-%Y %H:%M:%S %z")
+msg.times[is.na(msg.times)] = strptime(tmp[is.na(msg.times)], "%a, %b %d %Y %H:%M:%S")
+msg.times[is.na(msg.times)] = strptime(tmp[is.na(msg.times)], "%a %d %b %Y %H:%M:%S")
+msg.times[is.na(msg.times)] = strptime(tmp[is.na(msg.times)], "%d %b %Y %H:%M")
+
+msg.times[is.na(msg.times)] = strptime(tmp[is.na(msg.times)], "vr, %d %b %Y %H:%M:%S")
+msg.times = as.POSIXct(msg.times)
+names(msg.times) = names(amsgs)
+</r:code>
+
+</para>
+<para>
+When are messages commonly posted?
+<r:plot>
+barchart(weekdays(msg.times))
+</r:plot>
+<r:plot>
+barplot(table(as.POSIXlt(msg.times)$hour))
+</r:plot>
+Have the dates been converted to a common time origin, e.g. GMT?
+</para>
+<para>
+To calculate the response time, let's look at all the questions and
+find the first response.
+<r:code>
+refs = structure(rep(seq(along = replyTo), sapply(replyTo, length)), 
+                 names = unlist(replyTo))
+f = match(names(amsgs)[is.question], names(refs)) 
+delay = msg.times[ names(replyTo[f]) ] - msg.times[ is.question ]
+</r:code>
+
+What about the negative times.
+There are <r:expr value="58">sum(delay < 0, na.rm = TRUE)</r:expr>.
+There 36,832  missing values.
+<r:code>
+msg.times[ ! is.na ( delay ) & delay < 0 ] 
+</r:code>
+</para>
+</section>
+
+
+<section>
+<title>Using Perl to Read the Messages</title>
+
+<para>
+Perl has several modules for reading emails.  They are very rich,
+comprehensive and flexible covering all major mailbox formats.  We
+could write some Perl code to read these and then compute the "data
+frame" variables and spit them out as a CSV file.  But that requires
+knowledge of Perl. Instead, we can call Perl from R and we can program
+the data collection in R.  We ask Perl about each message and its
+contents and details and put this in the form we want directly.
+</para>
+</section>
+</section>
+<section>
+<title>History</title>
+<para>
+We first looked at these lists in 2005, I believe.
+More recently, in response to the NYTimes article on R, 
+others examined the data on volume alone.
+Information is available at
+<ulink url="https://stat.ethz.ch/pipermail/r-help/2009-January/184196.html"/>
+and <ulink url="http://blog.revolution-computing.com/2009/01/comparing-mailing-list-traffic-for-r-sas-and-splus.html"/>
+They are working from the thread information rather than the raw messages. This makes some things
+simpler by of course reduces the amount of information. But we can use both.
+</para>
+</section>
+<section>
+<title>Compare the S-Plus mailing list</title>
+<para>
+Do we see a decline at the same time R-help is up
+</para>
+</section>
+<section>
+<title>R-devel Mailing List</title>
+</section>
+<section>
+<title>What about other projects?</title>
+<para>
+Python, MATLAB, Octave, SPSS, SAS, ...
+</para>
+</section>
+</article>

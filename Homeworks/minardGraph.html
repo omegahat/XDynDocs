@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+<title>STAT 133</title>
+<meta NAME="resource-type" CONTENT="document">
+<meta NAME="distribution" CONTENT="global">
+</head>
+
+<body  bgcolor="#f0e68c">
+
+<hr>
+<p>
+<div ALIGN="CENTER">
+<font COLOR="#000000"><font SIZE="+1"><b>STAT 133 Homework 4: Custom Graphics
+<br/>  Napoleon's March
+<br/> Due:  Friday, 9 Apr
+</b>
+</font>
+</font></div>
+
+<p/>
+One of the most famous statistical graphics is Minard's 
+figurative map of the succesive losses of men in the French army
+during the Russian campaign, 1812-1813.
+
+<p/>
+
+<img src="origMinard.gif">
+<br/>
+From Michael Friendly's website <a href="http://www.math.yorku.ca/SCS/Gallery/re-minard.html">Re-Vision's of Minard</a>.
+<p/>
+Wilkinson (<i>The Grammar of Graphics</i>, Chapter 15) 
+digitized the origial graphic, anlayzed the notations, and
+located geographic landmarks to produce the data behind Minard's
+graphic.
+These data consist of three tables:
+
+<ul>
+<li> <a href="minardCity.txt">City data</a> consisting of the longitude,
+latitude, and names of twenty cities. 
+</li>
+<li> <a href="minardTemp.txt">Temperature data</a> consisting of the longitude,
+temperature (degrees Celsius) and date (month and day) the temperature was recorded.
+</li>
+<li> <a href="minardArmy.txt">Army data</a> consisting of the longitude,
+latitude, troups (count), direction (A =advance, R=retreat), and subgroup of 
+the army (1, 2, 3).
+</li>
+</ul>
+
+<p/>
+From this data, Wilkinson produced the following graphic.
+
+<p/>
+<img src="wilkinsonMinard.jpg">
+<br/>
+From Michael Friendly's website <a href="http://www.math.yorku.ca/SCS/Gallery/re-minard.html">Re-Vision's of Minard</a>.
+
+<p/>
+Your assignment is to use R to reproduce Wilkinson's graphic.
+To help you in this task, we use Wilkinson's
+grammar to describe his rendition of the
+Minard graphic of Napoleon's March. 
+
+<ul>
+<li> TRANS: date = Use longitude to linearly interpolate the missing 
+date in the temperature variable.
+</li>
+<li> TRANS: days = Use first differences to determine the number of 
+days between dates of recorded temperatures.
+(Actually this transformation has been done for you, and included in the 
+data table as the variable Days).
+</li>
+<li> FRAME: longitude * latitude
+</li>
+<li> GRAPH: point(label points of longitude and latitude with the city names)
+</li>
+<li> GRAPH: path(use longitude and latitude to draw a path where the width
+is determined by the survivors, the color by the direction, and split
+according to the group) Note that when the number of survivors is very small,
+the path does not shrink proportionally in order to maintain visibility.
+Wilkinson use 
+</li>
+<li> GUIDE: legend for direction
+</li>
+<p/>
+<li> FRAME: longitude * temperature
+</li>
+<li> COORD: shrink dimension 2 to 0.2 the usual
+</li>
+<li> COORD: translate dimension 2 by -0.5
+</li>
+<li> GRAPH: line(labeled with date and where the granularity is determined
+by days)
+</li>
+<li> GUIDE: label axis1 with "Longitude"
+</li>
+<li> GUIDE: label axis2 with "Temperature" on the right
+</li>
+</ul>
+
+<p/>
+Your assignment should include the R code you used to create the
+graphic (in a plain text file) and a signed graphic (in
+pdf format).  To sign your graphic, put an inconspicuous, unique identifier
+somewhere on the graph (include the code to do this in your submission). 
+<p/>
+Please email your assignment to Gang Liang (liang at stat.berkeley.edu)
+by midnight Friday, April 9.
+
+</body>
+</html>

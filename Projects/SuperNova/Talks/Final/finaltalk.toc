@@ -1,0 +1,7 @@
+\beamer@endinputifotherversion {3.01pt}
+\beamer@sectionintoc {2}{Support vector machines}{5}{0}{1}
+\beamer@sectionintoc {3}{Trees}{8}{0}{2}
+\beamer@sectionintoc {4}{Bagging}{15}{0}{3}
+\beamer@sectionintoc {5}{Random forests}{18}{0}{4}
+\beamer@sectionintoc {6}{Boosting}{23}{0}{5}
+\beamer@sectionintoc {7}{Neural Networks}{28}{0}{6}

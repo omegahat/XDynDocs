@@ -1,0 +1,346 @@
+If one is fortunate to have an (relative) expert 
+in a subject, it is very tempting to ask that person 
+for answers to all of your problems about that topic.
+Of course, it saves time and it doesn't  
+take that person long. So you
+are more productive and the other person
+gets to feel good that she knows something and
+is being helpful. 
+It is a win-win situation. Right! Of course
+we all know that it consumes time from
+the other person. She has to switch gear
+and understand the general aspects
+of your problem and then do the debugging.
+That takes time and energy.   She has also
+had to spend a great deal of time learning
+the material and thinking about it in different
+ways so that she has an comprehensive
+understanding of it.  This takes time and 
+effort that could be spent on other, more
+direct results.  Yet it is a vital skill.
+So it is a little unfair to constantly 
+rely on others and to expect them to have
+put in the time to have learned something
+in depth so that you don't have to.
+Of course, it is fine if everyone
+specializes and we share our expertize in
+freely in all directions and give as much as we take.
+Computing does have a tendency to be used by many
+fields and be in constant demand,
+while high energy physics expertize is less 
+ubiquitously needed on a day-to-day basis.
+
+Let's also look at  things from the perspective
+of the non-expert.
+By deferring to others and allowing them to 
+solve the problem, that person can move on
+to the next step.
+However, they have lost a valuable opportunity to
+learn more.  And learning more will probably
+be useful in the future when dealing with
+the same problem in a marginally different context
+or dealing with entirely different problems.
+It is the process of learning about a
+specific that allows us to learn general things.
+Eliminating or even taking wrong paths 
+in exploring issues
+means that a single topic teaches us many things.
+We need to be less short-sighted and focussed on
+immediate results in the form of solving the
+task directly ahead of us. Instead, especially as students
+and researchers, amortize research over the longer
+term. Obviously there will be deadlines that must
+be met and constrain us at different times.
+However, if they are persistent and we don't
+feel like we have time to do anything else
+but meet the next deadline, perhaps we need to 
+look at the nature and quality of the work.
+New and hard ideas take thought and time,
+not merely activity.
+
+
+
+Having returned to academia and having students come to ask me
+questions about their R code has been very illuminating.  In Bell
+Labs, we were fortunate to have highly skilled and motivated
+researchers who all had a long history of working with data and doing
+their own computing.  They have strong background in the S language
+since it was developed there.  In universities, on the other hand, the
+students typically do not have the same experience either in S or of
+general problem solving.  The former is a specific skill; the latter
+is a vital skill for scientists and tends to help greatly with the
+former.  How we teach general problem solving is a very hard topic.
+We can however narrow our focus to how to solve problems in S.  There
+are two aspects to this.  One is to understand how to use the language
+(the syntax) and the idioms and style to create good programs.  This
+is an art, but a less individualistic art than many other forms.  The
+second aspect is how to recover from errors that we make in the code.
+To do this, we first need to identify the error, pin-point it, and
+then determine how to fix it.
+
+
+\section{Know what to expect}
+When something doesn't work
+because it either fails or gives you an incorrect
+answer, determine what should have happened.
+Think about the computations and
+figure out the different steps so that
+you have a rough model of what was being
+done at step.
+Then go back and look at any diagnostic
+messages that were emitted during the computations
+and compare those with what you expected.
+If anything seems strange, investigate that.
+This is an iterative process as your expectations
+ might be wrong. So something that seems strange may not
+be the cause of the problem, but investigating
+it will help you to get a better understanding of
+what is going.  It helps understand
+both the error as well as the way you are thinking
+about what you expected to happen.
+You can modify both.
+
+
+Consider the following example.  We create a simple package in R.  We
+aren't going to require that it pass the more strict checking
+facilities for packages, but instead just want to be able to install
+it.
+
+We arrange the files in the appropriate structure for an R package.
+That is, we put the R source files in the directory \dir{R}.  Next, we
+create the DESCRIPTION file.  The format of the DESCRIPTION file is
+described in the \cite{WritingRExtensions} manual. Since it is
+extended over time, we should keep up with the additional entries that
+it supports or even requires by either rereading the manual or
+checking the NEWS file providing with each new release of R.  Reading
+about the contents of the file in the abstract without any particular
+need to use them often means we don't remember them.  So a natural
+inclination given that we are focussed on using the code as package
+rather than exploring the details of the R package DESCRIPTION file is
+to find one that you created previously and copy it.  Suppose we do
+this.  We copy it from another package for which we have the source.
+Just to be concrete, suppose we take the one from the XML package and
+copy it to our package.
+Then the phone rings and we are asked to do something urgently.
+So we move to another virtual desktop and start on that.
+After a half hour, we finish with that new task and return to our
+package. 
+We set about installing it. 
+\begin{verbatim}
+R CMD INSTALL myPackage
+\end{verbatim}
+Seeing that there were no errors, we
+can assume everything went okay and 
+now load the package.
+So we start R
+and call
+\begin{verbatim}
+library(myPackage)
+\end{verbatim}
+The result is an error telling us that there is no such package.  Mmm.
+After a few moments of blaming the stupid software for getting it
+wrong and not having paid attention to what you just did, questioning
+the bright origins of the developers, and so on, you resign yourself
+to the idea that while it is not your fault, it is your problem.
+Where to start.
+As Julie Andrews sang, ``the beginning is a very good place to start''.
+Let's break down what we did into the high-level steps:
+\begin{itemize}
+\item created the package,
+\item installed the package,
+\item load the package in R.
+\end{itemize}
+Now the error could be anywhere.
+In some ways, it would be simplest if it
+was near where the error was.
+R couldn't find the package ``myPackage''.
+Did we spell it correctly?
+Check the command
+\begin{verbatim}
+library(myPackage)
+\end{verbatim}
+against the name of the directory 
+containing the package source.
+These seem to be the same, but make certain this is the case.
+If the package name is complex, we can write some R code to make
+certain
+they are the same:
+\begin{verbatim}
+> x = "myPackage"
+> library(x, character.only = TRUE)
+> any(list.files() == x)
+\end{verbatim}
+If the answer to the last command is 
+FALSE, then there is typo somewhere.
+
+Let's try to think about other explanations.  What if we are
+installing the package into one place but R is looking for it in
+another place.  When R installs packages, it installs them into either
+a local place you specify or into the system area where R is
+installed.  In many installations, regular users don't have
+permissions to add packages to the system area.  Therefore, you have
+to be adding them to a ``local'' area.  You can do this via the -l
+flag for R CMD INSTALL, or you can specify it with the environment
+variable R_LIBS.  Similarly, when R loads a library, it looks in
+different places.  You can explicitly tell it where to look, or it can
+use the value the R_LIBS environment variable, and lastly it will look
+in its own installation or system area.
+Now we can see a potential for a problem. Perhaps we installed
+it in one place using one setting for  R_LIBS
+and another when we tried to load it.
+So we need to check this.
+We check the environment variable in the shell
+in which we installed the package using the
+shell command
+\begin{verbatim}
+[shell] echo $R_LIBS
+\end{verbatim}
+and in R where we load the library
+\begin{verbatim}
+R> Sys.getenv("R_LIBS")
+\end{verbatim}
+Are they the same?
+What if we tell R to look for the package in
+the directory given by the first element of
+R_LIBS from the one in the shell
+\begin{verbatim}
+R> library(myPackage,  lib.loc= "/whever/my/Rpackages/go")
+\end{verbatim}
+Okay, so it wasn't that. We could have known that 
+since we were using the same shell
+for installing and running R.
+However, we might have been running the two commands in seperate
+windows or shells.
+And also, we could have manually set the R_LIBS variable
+and have it explicitly reset in our shell startup scripts.
+So it is always worthwhile to eliminate the possibilities.
+
+
+In our case, the loading error is only a manifestation of the problem.
+We have to dig more deeply.  Let's return to the first step.  Check
+that the package is correctly structured.  It has the R directory and
+there are (non-empty) files there.  The DESCRIPTION file is present.
+Everything looks okay here.  So let's move to part of the process that
+gave us some diagnostic output rather than looking at the package
+which is something we created and believe we created correctly but
+appears to have a problem and which is not actively telling us
+anything.  The installation step produced the following output.  No
+errors, so what could be the problem.  It was a source package, its
+name is XML, it has no help files....  Wait a second - its name is
+XML!  Oh yeah, I copied the DESCRIPTION file from the XML package and
+I never did get to change its contents.
+So let's do that. 
+
+But before we do, let's think for a moment to determine if that is the
+likely cause of the problem.  In other words, what are the
+consequences of having a DESCRIPTION file from another package in
+ours.  Well, we can try it and see if it works before thinking about
+why or why not.  But, again, there is something to be learned by
+thinking about this rather than actively trying things
+in a haphazard or non-thinking manner.
+The name of the package in the DESCRIPTION file is wrongly
+given as XML and that is what was being installed.
+So we have learned that the R installation procedure
+takes the name of the package from the DESCRIPTION file
+and not from the directory. Store that one away.
+How would we test this? Well, we could just put another
+name in there and see what happens.
+For example, change the name in the DESCRIPTION file to `XMLa'.
+First check that there is no package installed with the name
+XMLa. In other words, try to load it in R
+\begin{verbatim}
+library(XMLa)
+\end{verbatim}
+If you get an error, then you can install this new
+version of the package and try to load it in R.
+If it does load, then that confirms our hypothesis.
+
+Note that if we didn't confirm that there wasn't already a package
+there named `XMLa', our test would not have been conclusive. Instead,
+when we installed the new version of the package XMLa, it could have
+been installed under some other name and then we would have loaded the
+original one.  It is important to have tests that give you proof of
+what you are testing and only what you are testing.  If there are
+other potential explanations, you have to eliminate them.
+
+
+Let's suppose that didn't have the XML source package around. Instead,
+we copied a DESCRIPTION file from one of the packages that we had
+installed previously.  We know that R adds the DESCRIPTION file to the
+installation directory of the package when it is actually installed.
+So we can look in there for a sample DESCRIPTION file.  We copy that
+file into our package skeleton.  Again the phone rings.  We chose not
+to answer it as we read about what can go wrong when you get
+interrupted in the middle of a task and don't start exactly from where
+you left off. That can be a waste of a half hour or more!  So we edit
+the DESCRIPTION file.  We go through the fields and change the ones we
+understand.  Having done that, we are ready to re-install.
+Again, we do
+\begin{verbatim}
+R CMD INSTALL myPackage
+\end{verbatim}
+Again, there are no discernible problems.
+So we load the package in R and this time all is well.
+Now let's take a look at one of the functions
+in our package, say myFunction.
+When we type its name so that R will simply print it,
+R tells us that there is no such variable!
+Again, checking our spelling is a good idea.
+After this, we might as well see what variables
+are defined in this package.
+So we use the \SFunc{objects} function:
+\begin{verbatim}
+R> objects("package:myPackage")
+\end{verbatim}
+And much to our astonishment, the result
+is the empty vector, i.e. no variables
+are defined.  
+
+What is the problem.
+Again, break down what we did into high-level steps,
+and identify which one is causing the problem.
+Then break that step into its sub-steps and examine
+these. 
+Since we had good success in the other situation
+from examining the output of the
+R CMD INSTALL step, let's do that again.
+
+Again, look through the output and compare this with what we expected.
+Pretty quickly we come across the fact that we are installing a binary
+package.  Well ours is a source package, so why does it say it is a
+binary package.  So let's examine this.  It is hard to figure this out
+without reading the documentation or alternatively the code.  I find
+it as easy to look at the INSTALL script in $R_HOME/bin.  After
+loading that into an editor, we can look through it for occurrences of
+the word binary.  It is probably simplest to first look for this word
+within comments. This means we don't have to understand
+the details of the code to understand why it thinks the package is
+binary.
+And if we are very lucky, the nice R developers will
+have given us some helpful hints in English.
+As we scan through this file, we find a comment
+\begin{verbatim}
+  ## Figure out whether this is a source or binary package.
+  ## <NOTE>
+  ## If DESCRIPTION has a @samp{Built:} entry, this is a binary package.
+  ## This is the right test, but not available for packages installed
+  ## prior to R 1.4.  For some time, we thus checked for the existence
+\end{verbatim}
+So that tells us the problem - our DESCRIPTION file has 
+a Built: field. And that makes sense as the INSTALL
+process adds one to the DESCRIPTION file when it is installed.
+Since we copied the installed version, we have a problem.
+Removing the Built: field allows things to work.
+Of course, there may (and are) other fields that we also
+need to remove for everything to really work.
+
+
+
+
+
+
+
+
+\section{Have alternatives}
+
+

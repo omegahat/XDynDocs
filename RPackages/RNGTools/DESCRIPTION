@@ -1,0 +1,8 @@
+Package: RNGTools
+Version: 0.1-0
+Title: Random Number Generation Tools
+Description:  A collection of introductory tools for random number generation
+ and their use in simulation, Markov Chain Monte Carlo, etc.
+Author: Duncan Temple Lang
+Maintainer: Duncan Temple Lang  <duncan@wald.ucdavis.edu>
+License: GPL2

@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+
+<section>
+<title>Documentation for R</title>
+
+There are a numerous books written about different aspects of S for
+different audiences.  The books are primarily written for S-Plus, the
+commercial version of the S language.  Only recently have ones emerged
+for R.  However, most of the material applies to both so reading a
+book based on S-Plus will be valuable when applied to R.  In addition
+to books that you can get from the library or buy, there are on-line
+manuals for R covering different topics from a introduction, to a
+reference manual, to importing and exporting data, to extending the
+system with packages, etc.  See <ulink
+href="http://cran.r-project.org">R Web site</ulink>.  And there are
+contributed documents that provide different introductions to R with
+different perspectives (and even different languages).  See <ulink
+href="http://cran.r-project.org">contributed introductions</ulink>.
+
+The books are 
+<>
+
+There are mailing lists to which people post questions about aspects
+of R. The R-help list is the most likely one to be of value to people
+using R for general purpose statistical and programming tasks.  The
+list is archived so that people can look for previous questions and
+related answers and hopefully find the answer to their question.
+While the lists are helpful, they rely on voluntary contributions by
+the R developers and users. They are not for answering homework
+questions and are not a substitute for trying to find the answer in
+the documentation. They are meant as a resource for finding answers to
+unusual questions that are not covered in the documentation.  So do
+your homework before asking the list.  But don't be put off in
+general.  For the purpose of the class, it is useful to send mail to
+the class mailing list. You are likely to get input from me, the TA,
+or your classmates who might already know the answer or who can help
+to discover the answer.
+
+
+</section>
+
+
+
+Frank Harrell
+
+Mike Friendly
+
+R manuals on CRAN
+
+R tutorials
+
+
+www.MySQL.org
+
+Perl
+<link url="www.Perl.com">Perl</link>
+
+<link url="http://en.wikipedia.org">Wikipedia</link>
+
+

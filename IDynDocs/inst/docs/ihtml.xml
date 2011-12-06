@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--  For Docbook 5 -->
+
+<article xmlns="http://docbook.org/ns/docbook" 
+         xmlns:r="http://www.r-project.org"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+         version="5.0" xml:lang="en">
+ <info>
+  <title>Thoughts on Generating Interactive HTML</title>
+  <subtitle></subtitle>
+    <author><personname>
+     <firstname>Duncan</firstname>
+     <surname>Temple Lang</surname>
+     </personname></author>
+   <address><email>duncan@wald.ucdavis.edu</email></address>
+ </info>
+
+<section>
+<title></title>
+
+<para>
+The idea is that we start with an R-Docbook document.  It contains R
+code amid the text.  We convert this to HTML which is then processed
+by an HTML browser, typically run within R, to render the document as
+HTML.  This could be done entirely within R from the raw R-Docbook
+document in a single pass using the wxWidget HTML parser.  We would
+need to register handlers for the different XML elements/tags of
+interest.  However, it is probably more sensible to use the R-Docbook
+XSL files to at least convert the contents of the document to HTML,
+e.g. article, figure, xref, r:code, etc. nodes.  When do we evaluate
+the R code.  We could evaluate it while performing the R-Docbook to
+HTML conversion and generate the textual output.  This would allow for
+rapid display of the document without having to perform the R
+computations again when we render them in the R browser.  But this
+raises problems when we want to display the graphs which we cannot
+store and later render as simple text but want to use inlined/embedded
+graphics devices.  A good idea is to cache the R results and then draw
+to live graphics devices using those.  We will see how we can do this
+relatively easily using a hierarhicy of environments.
+</para>
+
+<para>
+Writing a dynamic document is relatively straightforward.
+We put code inside r:function, r:code, r:plot, r:expr, r:init and r:test
+nodes.  These are all quite similar, but the name identifies
+the purpose of the contained code.
+
+
+</para>
+<para>
+Using this array of different node names allows us to distinguish
+these nodes easily using, e.g., XPath.  We could always use a generic
+r:code and a type attribute, e.g.  
+
+<programlisting><![CDATA[ 
+<r:code type="function"> 
+f = function(n) rnorm(n, 2, 4) 
+</r:code>
+]]></programlisting> 
+
+We can of course use either, but having a convention means that the
+tools we write are more useful.  But extensibility is a key notion of
+the XML-based authoring tools we are considering and one should use it
+the way that makes it the most useful.
+</para>
+<para>
+Using these names probably simplifies the XSL rules making them
+less dependent on the actual content and avoiding the need
+to actually process the R code.
+</para>
+
+<para>
+
+There are several possible styles of adding interactivity to a
+document.  We can take an existing dynamic document and add markup for
+interactive controls to it.  This might be the case for an instructor
+taking a document written by a researcher.  Alternatively, a
+researcher or instructor might think about interactivity when she
+starts to author a document.  As with most things, if we have a clearer
+view of all the uses of a document early on, there will be some gains.
+But generally, we will need to support both approaches as both will arise 
+in practice.  
+Let's focus on the isim.xml document as an example.
+(We simulate from a Beta distribution and compute the maximum
+and look at the distribution of that estimate.)
+Our parameters or user inputs are  n, shape1, shape2, and F.
+If we are thinking of a dynamic document
+that records our computations, we might  just define
+the values using regular R commands:
+<r:code>
+n = 20
+shape1 = .1
+shape2 = .5
+F = function(n) rbeta(n, shape1, shape2)
+</r:code>
+If we knew from the inception that interactivity
+was a goal, we might abstract the specification of these
+variables.
+We could specify these as
+
+<figure>
+<programlisting><![CDATA[
+<r:integer var="n" min="1" max="300" value = "20" />
+<r:numeric var="shape1" min=".01" max="10" by=".01" value=".1" />
+<symbol  var="shape2" min=".01" max="10" by=".01" value=".5" r:type="numeric"/>
+<r:function var="F">
+F = function(n) rbeta(n, shape1, shape2)
+</r:function>
+]]></programlisting>
+<caption><para>
+Note that we can use the generic symbol node and specify a type,
+e.g. r:type="numeric" and possibly even for other languages
+such as perl:type="int".
+</para></caption>
+</figure>
+
+
+There  is little doubt that this is far more verbose and
+unnatural a way to write the R code above. 
+What do we get for this extra work?
+Firstly, it is not intrinsically tied to the R language but is a description
+of the general computation. 
+Apart from the function definition, we can take this information
+and make sense of it in Matlab, Python, Perl, etc.
+And it allows us to specify a type for the variables, e.g. integer
+which we cannot generally do in these languages.
+And we could provide alternative definitions for the function F,
+something like:
+
+<programlisting><![CDATA[
+<function var="F">
+ <r:code>F = function(n) rbeta(n, shape1, shape2)</r:code>
+ <matlab:code>F = ....</matlab:code>
+</function>
+]]></programlisting>
+
+And we don't need the assignment in the code, e.g. F = ...
+as it is implicit in the var="F" attribute.
+</para>
+
+<para>
+The second benefit we get from this indirect markup
+is that we can create interactive controls for the reader
+to set these documents. Just knowing the value of n = 20
+does not tell the software how to create an interactive
+control. We don't know the range of the values or what the
+type of control should be. Is it an integer or a real value?
+</para>
+
+<para>
+Creating this more abstract markup from existing code
+is tedious, but not very difficult.
+We can create software tools to automate this,
+identifying the variables and inferring
+the type.
+And we can also create the information within the 
+R language such as
+<r:code eval="false">
+n = Integer(20, min = 1, max = 300)
+shape1 = Real(.1, min = 0, resolution = .01)
+shape2 = Real(.5, min = 0, resolution = .01)
+F = function(n) rbeta(n, shape1, shape2)
+</r:code>
+And then we have the information about the ranges for our variables.
+Of course, this is not amenable to processing in XSL or even other programming languages.
+</para>
+
+
+<para>
+
+Let's return to the case where we have existing code
+and we want to add interactive components for it.
+We will specify the same type of information as we did in
+the abstract markup.
+We can specify the type and allow the rendering software
+determine the appropriate type of control
+or alternatively we can specify the control directly.
+For instance, we specify that we want a slider for each
+of the three variables n, shape1, shape2.
+For the function, we will leave it to the software
+to determine how to present this to the user.
+
+<programlisting><![CDATA[
+<i:slider var="n" min="1" max="300" by="1"/>
+<i:slider var="shape1" min=".01" max="10" by=".01"/>
+<i:slider var="shape2" min=".01" max="10" by=".01" />
+<i:symbol type="function" var="F" />
+]]></programlisting>
+
+We might also use a generic interactive control
+specification in the style of HTML's OBJECT element, e.g.
+<programlisting><![CDATA[
+<i:object type="app/x-R-editor" var="F"/>
+]]></programlisting>
+which says to dump the current contents of F
+into an editor and to assign any changes back to F.
+
+</para>
+
+<para>
+
+How do we process these documents?  We first apply an XSL stylesheet
+to transform the Docbook markup to HTML.  We can process the r: and i:
+nodes in the XSL or we can leave it to be done by the HTML parser.
+Indeed, we can even introduce a three-step approach where we use XSL
+to transform the Docbook components to HTML, then manipulate the
+resulting XML document in R to transform/rewrite the r: and i: nodes
+to HTML, and finally pass the HTML to wxHtml and have the parser pass
+the, e.g., OBJECT nodes to R to create the interactive components.
+This flexibility is a little daunting initially, but it allows us
+to program where we want and does not shoe-horn us into a particular
+approach.
+</para>
+<para>
+
+We can use rdocbook.xsl to process the Docbook part of the XML file.
+This allows all the r: and i: nodes to go through unaltered.  We can
+then deal with them in R.  We can have leave the r:code, etc.  nodes
+unaltered and pass them to wxHtml.  Since I am familiar with XSL, I
+find it easier to work in XSL.  It is more convenient to move nodes
+around and to modify them in XSL.
+
+</para>
+<para>
+
+When we have interactive components in our XML document, it is best to keep
+the initial definitions of variables in a separate r:code/r:init
+chunk.  If these definitions are mixed with additional code, it is
+harder to separate out the specification of the values from other
+actions.  And we want to just set the values of one or more variables
+interactively and then propogate the changes down to the subsequent
+code nodes.
+So the initialization code is best done in a separate chunk.
+</para>
+<para>
+Given this initialization chunk, where do we put the
+interactive markup?
+We can insert them into the r:code node such as
+
+<programlisting><![CDATA[
+<r:code>
+<i:slider var="n" min="1" max="300" r:type="integer"/>
+<i:slider var="shape1" min=".01" max="10" by=".01" r:type="numeric"/>
+<i:slider var="shape2" min=".01" max="10" by=".01" r:type="numeric"/>
+<i:object type="app/x-R-editor" var="F" />
+
+n = 20
+shape1 = .1
+shape2 = .5
+F = function(n) rbeta(n, shape1, shape2)
+</r:code>
+]]></programlisting>
+
+</para>
+<para>
+
+Alternatively, we can replace the r:code node with
+the more abstract markup that creates.
+</para>
+<para>
+
+And another approach is to specify the interactivity
+as a node and put the r:code inside to perform the default
+initialization.
+Given that we are often starting with existing code,
+it is probably simplest to do either the first
+or the third of these.
+How do we convert, say, the first form.
+One approach is in XSL and 
+extracts the i: nodes and puts them in a separate
+OBJECT. Then  we connect this interactive control container
+to the r:code node from which it came.
+This allows us to assign the new value of any of the 
+variables into the correct environment and 
+run the code from there on.
+
+
+</para>
+<para>
+The display of an r:code node might usefully have a check box 
+that allows the reader to control whether any changes 
+up-stream to the inputs are propogated to this block of
+code/plot. This would allow one to "lock" the current values.
+We also want to be able to copy the "output" and create
+a separate stream of execution. This would allow us to "lock"
+one branch, but to allow changes to propogate along another
+in order to do "what-if" analysis.
+
+</para>
+<para>
+
+How do we layout the objects in a app/x-R-interactive OBJECT?
+Is it easier for the "author" to specify this with R code?
+Will we get the benefit of making it toolkit-independent if 
+we mark it up in XML?
+
+At the very simplest, we should allow the author to do
+the layout in the flow of the HTML document.
+We need to connect the interactive component with a
+particular code node.
+
+</para>
+<para>
+
+In the interactive world, we create the display of the code
+and the output having evaluated the code. So it is the same
+as the regular display.
+
+We start with an environment.
+
+</para>
+
+
+
+
+</section>
+
+</article>

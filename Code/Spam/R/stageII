@@ -1,0 +1,101 @@
+
+From stage I, we have computed all the attachments.
+
+For each message, compute the collection of unique words.
+   messageText = lapply(messageAttachments, getText)
+   messageWords = lapply(messageText, createMessageWords)
+
+So our bag of words is 
+   unique(unlist(messageWords))
+
+Next step is to compute the frequencies of these words
+in spam and not spam messages. In other words,
+for each word, compute the count of the number of spam
+messages that contained this word, and similarly for not
+spam.
+
+  spam = sapply(messageAttachments, function(x) x$spam)
+  tb = computeFrequencies(messageWords, spam)
+
+
+Total number of spam messages
+   numSpam = sum(spam)
+   numHam = sum(!spam)  # length(spam) - numSpam
+
+Standardize the frequency table by dividing
+the spam counts by the number of spam messages.
+And similarly dividing the ham counts by the number
+of ham messages.
+And at the same time, add .5 to the count.
+
+   tb[1,] = (tb[1,] + .5)/numSpam
+   tb[2,] = (tb[2,] + .5)/numHam
+
+
+tb[3,] = log(tb[1,])- log(tb[2,])  # log(tb[1,]/tb[2,])
+tb[4,] = log((1 - tb[1,])) - log((1 - tb[2,]))
+
+For each message,  do the following computation
+
+ computeMessageProbability = 
+   function(words,  freqTable) {
+       see words.R
+   }
+
+ sapply(messageWords, computeMessageProbability, tb)
+  
+   
+
+
+
+
+
+Cross validation:
+
+ Create k groups of indices for the data.
+
+  # messages
+
+# recycle if length(messages) % k != 0
+# and so some values will appear in different sets.
+# But these are random.
+  samples = matrix(sample(1:length(messages), length(messages)), , k)
+
+
+lapply(1:k, function(x, samples, spam)  {
+                # Get the training data
+               trainingMessages = messages[-samples[, i]]
+                # Compute the bag of words for the training
+                # messages and the probabilities for these messages
+                # In this case, we want the bag of words to be the entire
+                # set from all our regular data, not just this training data. 
+                # Alternatively, we just drop words in our test data
+                # that aren't in the training data.
+               tb = fit(trainingMessages)
+               testMessages = samples[, i]
+              
+               probs = sapply(testMessages, computeMessageProbability,  tb)
+               
+               trainingSpam = spam[-samples[,i]]
+              
+               probs + log(sum(trainingSpam) / sum(!trainingSpam))
+
+            }, samples)
+
+
+For each element in the interval [0, max(probs)]
+  tau in unique(probs[probs > 0])
+
+classify the test message as SPAM or HAM.
+Compare with actual classification.
+Compute Type I and Type II.
+
+
+Loop over each message sorted by probs
+for probs > 0.
+
+# Ignoring duplicates
+for(i in probs[probs > 0])  {
+
+}
+

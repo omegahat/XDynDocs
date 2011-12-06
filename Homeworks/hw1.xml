@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+
+<article xmlns:r="http://www.r-project.org"
+         xmlns:s="http://cm.bell-labs.com/stat/S4">
+
+<title>Homework 1: Reading <SPAM/> data</title>
+
+A collection of <SPAM/> data is available in the R package
+<r:package>RSpamData</r:package>.  The dare were obtained from <ulink
+url="http://spamassassin.org/publiccorpus/">http://spamassassin.org/publiccorpus/</ulink>,
+which is a widely used <SPAM/> filter in  use today.
+
+<para/>
+There are 5 directories in the dataset: 3 contain regular mail, 2
+contain spam.  There are over 9,000 messages in all.
+Your tasks in this homework are to
+<itemizedlist>
+<listitem>
+ "Read" the data into R 
+</listitem>
+<listitem>
+ Explore the data and see if you can find any patterns
+ to spam and regular mail that would allow us to
+ identify either in some "automated" manner.
+</listitem>
+</itemizedlist>
+
+Each message is as it would appear in your mail folder.  It consists
+of header information and the text of the message.  The text is just
+the regular text one would read and that somebody wrote for the
+recipient.  In this simple format, attachments are identified in 
+very simply ways, typically separate by a "Boundary" identifier
+and "Next part"
+
+The header information is analogous to an envelope in physical
+mail. It identifies the intended receiver and, for regular mail, the
+identify of the sender.  It has a time and date stamp to say when it
+was sent.  It has routining information about what machines it was
+sent through on its way from the sender to the recipient.  There is
+information about the subject matter, whether this is a fresh topic or
+sent in reply to an existing mail message.  Each mail agent is
+entitled to add its own information to the header.  Fields such as
+mailing list information are often added.  Likewise, sometimes the
+name of the program which was used to compose the mail is included in
+the headers.  The MIME (Multipurpose Internet Mail Extensions) type of
+the message identifying the format of the body
+
+
+
+<section>
+<title>Reading the Data into R</title>
+
+What do want to end up with?
+
+We want a collection of all the mail messages in the directories.
+Each message should be broken into its header information, the body
+and an indicator whether it is spam or not.  The body can be broken
+into the regular text, included messages and attachments. For the
+moment, we will not do that.
+
+The header should be represented as a named vector
+giving the header field and its value.
+You will have to deal with entries in the header that
+span multiple lines, e.g.
+<literallayout>
+<![CDATA[
+Received: from localhost (localhost [127.0.0.1])
+	by phobos.labs.netnoteinc.com (Postfix) with ESMTP id E3D7B47C66
+	for <zzzz@localhost>; Thu, 22 Aug 2002 09:54:39 -0400 (EDT)
+]]>
+</literallayout>
+Note that all of these "continuation" lines can be identified
+by the fact that they are indented, i.e. start with white space.
+
+We identify whether the message is spam or not from the directory in
+which it is located.  The messages in the directories spam and spam_2
+are <SPAM/>, the remainder are not.
+
+<para/>
+What sort of R data structure should you use to store the data?
+Think about the nature of each "record" and also what we will
+want to do with in the next stage of the homework.
+
+</section>
+
+<section>
+<title>Exploring the Data</title>
+
+Once you have the data, explore it to understand what we have and the
+basic characteristics of the mail messages.  You might be interested
+in some of the following:
+
+<itemizedlist>
+ <listitem>
+   the distribution of the length of a message
+ </listitem>
+ <listitem>
+   the distribution of the number of attachments
+  (can we identify attachments in the messages?)
+ </listitem>
+ <listitem>
+   information about who sends mail, who receives mail
+ </listitem>
+ <listitem>
+   the times that messages are sent
+ </listitem>
+ <listitem>
+  What mail programs ("User-agent"s in the headers)
+  are common? Are there data on this?
+ </listitem>
+</itemizedlist>
+Some of these are not interesting!
+
+<para/> 
+
+Are there differences in the distributions of these variables
+for spam and regular mail?  How we can see this? Are these real
+differences, do you think? or just artifacts of this 
+particular dataset?
+
+</section>
+
+<section>
+<title>Useful R Commands</title>
+R commands that might be useful are
+
+<s:functionRef>list.files</s:functionRef>,
+<s:functionRef>readLines</s:functionRef>,
+<s:functionRef>strsplit</s:functionRef>,
+
+<s:functionRef>plot</s:functionRef>,
+<s:functionRef>hist</s:functionRef>,
+<s:functionRef>boxplot</s:functionRef>,
+<s:functionRef>summary</s:functionRef>,
+<s:functionRef>table</s:functionRef>,
+
+
+<s:functionRef>list.files</s:functionRef>,
+<s:functionRef>nchar</s:functionRef>,
+<s:functionRef>substring</s:functionRef>,
+
+
+
+<s:functionRef>grep</s:functionRef>
+<s:functionRef>gsub</s:functionRef>
+
+<s:functionRef>sapply</s:functionRef> and <s:functionRef>lapply</s:functionRef>,
+<s:functionRef>scan</s:functionRef>.
+</section>
+
+
+<section>
+<title>To Hand in</title>
+
+Prepare a short report discussing both the processing of the data to
+get it into the system and what you discovered when exploring the
+data. You should describe
+<itemizedlist>
+ <listitem>
+  what you did to read the data in,
+ </listitem>
+ <listitem>
+  what challenges you encountered with data, 
+ </listitem>
+ <listitem>
+  the 3 (or more) most interesting statistical features of the data.
+  Some of these features should relate to the differences, or lack
+  thereof, between  regular mail and spam.
+ </listitem>
+ <listitem>
+  Demonstrate and justify these features using
+  numerical and graphical summaries.
+ </listitem>
+ </itemizedlist>
+</section>
+
+</article>
+
+
+
+<!-- Use the code to catch errors in your understanding   -->
+
+
+
+
+
+
+
+

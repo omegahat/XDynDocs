@@ -1,0 +1,21 @@
+#!/bin/sh
+
+for group in 1 2 3 4 5 6 7 ; do
+#  groupString="duncan,nolan"
+  for u in `grep "^${group}," WebGroup.txt | cut -f 2 -d ',' ` ; do
+#    groupString="$groupString,$u"
+#    useradd -g s133group${group} -d /home/$u $u
+#     mkdir /home/$u
+#     chown $u /home/$u
+#     chgrp -R s133group${group} /home/$u
+#     mkdir /home/$u/.ssh
+#     chown ${u}.${u} /home/$u/.ssh
+
+      tsu
+      cd $u 
+      if ! test -f .ssh/id_rsa.pub ; then
+        ssh_keygen -t rsa
+      fi
+      scp .ssh/id_rsa.pub root@statdocs.berkeley.edu:.ssh/authorized_keys
+  done
+done

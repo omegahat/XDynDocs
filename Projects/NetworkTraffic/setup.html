@@ -1,0 +1,303 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title></title><meta name="generator" content="DocBook XSL Stylesheets V1.62.4"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="article" lang="en"><div class="titlepage"><div></div><div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#id2623407">Creating the Network Traffic Databases</a></span></dt><dt><span class="section"><a href="#id2579480">Creating the Data</a></span></dt><dt><span class="section"><a href="#id2579428">getTcp: Downloading the tcpdump files</a></span></dt><dt><span class="section"><a href="#id2579581">process: Processing packets into connections for the
+database.</a></span></dt><dt><span class="section"><a href="#id2624446">Service and Port Information</a></span></dt><dt><span class="section"><a href="#id2624503">Host Information</a></span></dt></dl></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2623407"></a>Creating the Network Traffic Databases</h2></div></div><div></div></div> For this
+project, we started with the data from the <a href="http://www.ll.mit.edu/IST/ideval/data/1999/1999_data_index.html" target="_top">Lincoln
+Labs intrustion detection simulation from 1999</a>.  
+We used most of the inside tcpdump training and test data from the five
+weeks. (For reasons that are not yet clear,
+processing the tcpdump data for
+week1 thursday
+week3 friday
+week4 tuesday
+week5 tuesday, thursday, friday
+caused the tcptrace program to "get stuck".
+)
+
+<p></p>
+
+There are currently four tables in the Network database on
+winnie.ucdavis.edu.  The login is bob and the is no password needed.
+As a result, the privileges are very limited for this user.  All that
+bob can do is issue SELECT commands in SQL (and a few simple commands
+such as DESCRIBE and USE).  
+
+<p></p>
+
+At present, we don't have information at the packet level.
+
+<p></p> The four tables are TCPConnections, OutsideTCPConnections,
+Services and HostInfo.  These give information about Transmission
+Control Protocol (TCP) connections between pairs of machines on a
+network.  The network is divided into two pieces - the inside and the
+outside.  The TCPConnections relation has records on all the TCP
+connections from within the given network.  The OutsideTCPConnections
+has records on TCP connections from between the inside and the outside
+network.  The Services table provides information about the different
+ports on a machine that are used by different applications.  For
+example, it lists 25 as being for SMTP, the Simple Mail Transfer
+Protocol; port 80 for HTTP, the HyperText Transfer Protocol used for
+HTML pages and Web browser; port 22 for ssh, the Secure shell for
+logging into machines; and so on.  This table allows you to connect
+the ports in TCPConnections and OutsideTCPConnections to actual
+applications/services such as HTTP, FTP, SSH, mail, and so on.  The
+final table is HostInfo and this provides information about some IP
+addresses in the TCP connections tuples.  The information gives the
+names, what operating system they are running, and whether they are
+machines on the inside or outside network or a hub or router device.
+
+<p></p>
+You can use the SQL command
+<table xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.c.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com" border="0"><tr align="left"><th><pre class="sql">
+ DESCRIBE <span class="emphasis"><em>table name</em></span>
+</pre></th></tr></table>
+to get information about the attributes about any of these tables.
+
+
+<p></p>
+
+There is a <a href="schema.html" target="_top">description of the fields</a>
+in the TCPConnections and OutsideTCPConnections
+
+</div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2579480"></a>Creating the Data</h2></div></div><div></div></div>
+
+The TCP connection data come from the Lincoln Labs Network Intrusion
+simulation project.  We focus on the TCP trace information in this
+simulation.  We have 5 weeks of data (three training and two test
+weeks), and we have TCP packet traces for both inter and intra network
+(outside and inside) for each day from Monday to Friday.  These traces
+are gathered using the <b>tcpdump</b> tool which
+monitors all TCP and UDP packets on a particular interface,
+e.g. ethernet card.  This creates a binary file containing all the
+information about the different packets.
+
+<p></p> 
+
+Our first task is to transform this information into records
+describing each TCP connection.  In other words, we have to gather the
+packets involved in each connection and then compute some derived
+variables describing that connection.  Fortunately, we don't have to
+do program these computations.  Instead, we can use the
+<b>tcptrace</b> program to do this.  This collects
+the packets and gives us information about the individual connections.
+It reports information such as the IP addresses of the two machines,
+the port numbers, the time of the first and last packet, the number of
+bytes, the number of packets, the number of ACKnowledgements and
+SYNchronize packets, different information about the window size used,
+and so on.  And it gives us this information separately for both hosts
+involved in the connection.
+
+<p></p>
+
+We can have tcptrace output the information for each
+connection in a TAb-delimited format using the --tsv flag.
+So we can invoke it as
+<table xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.c.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com" border="0"><tr align="left"><th><pre class="sql">
+tcptrace -ln --tsv tcpdump.file
+</pre></th></tr></table>
+to get the full or long output with no 
+name resolution on the IP addresses and in 
+TAB-delimited format.
+
+<p></p> There are several difficulties with this when we try to read
+this into a database.  Firstly, there are several fields that are
+given as n/m where n and m are counts.  We need to separate these into
+two variables for the database.  Also, we have values that are output
+as Y and N for Yes and No.  We need to turn these into 1 and 0 for
+BOOLEAN values in the database.  And we need to convert NAs to \N to
+represent NULLs in the input for the MySQL database.
+We can deal with these by filtering each output line
+and transforming the relevant pieces.
+
+<p></p>
+
+An even more problematic issue is the fact that we have to handle the
+connection identifier numbers across different files.  We have tcpdump
+data for each day in separate files.  When tcptrace processes a file,
+it starts the connection numbers anew. So we would end up with
+duplicates.  We can chose to omit the connection number when loading
+the data, but this can be slightly problematic.  Alternatively, we can
+make the numbers consecutive across files.
+
+<p></p>
+
+We can do all of these with a simple filter that takes in each line of
+output from tcptrace and transforms it appropriately.  When one
+tcpdump input file is finished, we can continue the connection number
+count to the start of the next file reasonably easily.  A Perl script
+could be used to do all these transformations.  Because we may also
+need to transform the way packets are processed, we chose to modify
+the tcptrace code itself to create the appropriate output.  This is
+rarely a good thing to do, namely modify an application with a
+standard distribution. We could write a module for tcptrace.  But
+instead we modify the source directly due to lack of time, not because
+it is a good thing to do!.
+</div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2579428"></a>getTcp: Downloading the tcpdump files</h2></div></div><div></div></div>
+We download the different tcpdump input files using the (Bourne) shell
+script <a href="getTcp" target="_top">getTcp</a>.  This automates the
+downloads of the files for the different weeks and days for which we
+have data from Lincoln Labs.  It places each file in the local
+directory giving each name of the form
+week<span class="emphasis"><em>i</em></span>-day-inside.tcpdump.gz.
+
+<p></p>
+The script also allows us to reasonably easily fetch other data such as that for the
+outside network, and that for the test weeks.  Note that we need to
+exclude some of the files since our (modified) tcptrace was having
+difficulties with them and simply "hanging".  We need to investigate
+this more.
+</div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2579581"></a>process: Processing packets into connections for the
+database.</h2></div></div><div></div></div> We use the (Bourne) shell script <a href="process" target="_top">process</a> to loop over the different tcpdump.gz
+files for each week and each day of the week.  This invokes
+<b>tcptrace</b> for each of these TCP trace files
+and stores the TAB-delimited output in a corresponding weeki-day.sql
+file containing the connections processed by tcptrace.  These files
+can be loaded into the table in our database.  This output file is in
+TAB-delimited form with NAs specified as \N for MySQL, and with the
+different fields of the form Y or N and a/b where a and b are booleans
+or counts separated and replaced with 1 and 0 for the booleans.  The
+modified version of tcptrace-6.6.1 is available.
+
+
+<p></p> As we loop over these files, we have to ensure that the
+connection numbers are different for each day so that we can use the
+connection number attribute (<b xmlns:sql="http://www.sql.org" class="sqlAttributeName">conn</b>) as a
+<span class="emphasis"><em>primary key</em></span> in our table/relation.
+<b>tcptrace</b> starts from 1 each time and this
+will cause duplicate values in the primary key.  So, we modified the
+tcptrace code to allow the starting connection number to be specified
+on the command line.  We use -k as the command line flag for
+specifying the starting connection number to
+<b>tcptrace</b>.  This was the immediately available
+flag remaining.  We specify it as -k10 to start at the TCP connection
+number output at 10.
+
+<p></p> Armed with this minor modification to
+<b>tcptrace</b>, the <a href="process" target="_top">process</a> command takes care of keeping the
+running total of connection numbers and starting each invocation of
+<b>tcptrace</b> with the appropriate starting value.
+The script computes the next number at which to start by looking at
+the <span class="emphasis"><em>last</em></span> record in the most recently processed
+file.  For example, if we have have just processed the file
+week2-tuesday-tcpdump.gz, we would look in the resulting
+week2-tuesday.sql file and get the last record.  If we used a (Perl)
+filter to modify each record to rewrite the NULL values, etc., we
+could simply output the connection number of the last processed
+connection in each file as the return value.  But there are two
+problems with this.  Firstly, we are (for better or worse) doing the
+rewriting in <b>tcptrace</b> so we don't have a
+filter. Secondly, the connection number may not fit in the data type
+returned from an application.  We may end up with a very large number
+of connections and the resulting number may be truncated or "botched"
+on some systems. As a result of these two issues, in our approach, it
+is simplest to fetch the last line of the tile of the most recently
+created .sql file and grab the first field.
+The call
+<table xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.c.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com" border="0"><tr align="left"><th><pre class="sql">
+tail -n 1 $w-$d.sql | perl -ne 'm/^([0-9]+)/ ; print $1,"\n";
+</pre></th></tr></table>
+does this by feeding the last line of the file to Perl and having it
+fetch the first field via a regular expression and printing it to the
+regular standard output.  We store this in a file so that if the
+processing of a given tcpdump file fails, we can continue on with the
+next one.  We should avoid using this temporary and intermediate file
+conId and it is easy to do this in retrospect.
+
+<p></p>
+Rather than using Perl here, we could also use
+the Unix tool
+<b>cut</b>:
+<table xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.c.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com" border="0"><tr align="left"><th><pre class="sql">
+tail -n 1 $w-$d.sql | cut -f 1
+</pre></th></tr></table>
+For this particular application, <b>cut</b>
+is apropriate. If we needed to do more,
+Perl would likely be the tool of choice.
+
+<p></p> The <a href="process" target="_top">process</a> script creates a data
+file file (week-day.sql) for each TCP trace file it processes.  Each
+of these can be loaded directly into an appropriately defined MySQL
+table.  And <a href="process" target="_top">process</a> also writes this
+command for each tcpdump file into the file named
+<tt class="filename">process.sql</tt>.  This can be used to load the entire
+collection of data files into the TCPConnections relations.
+
+<p></p> 
+
+So, after processing the input files, we have an SQL script named
+process.sql which will populate a table.  We also need define the
+table.  We do this via the manually generated script <a href="table.sql" target="_top">table.sql</a>.  This contains commmands to define
+the SQL relation in the Network database.  One can use the interactive
+<b>mysql</b> shell to execute these
+two files.
+
+</div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2624446"></a>Service and Port Information</h2></div></div><div></div></div>
+
+We also want to get the names and descriptions of the ports and their
+services into the database.  We read this from <a href="http://www.iana.org/assignments/port-numbers" target="_top">http://www.iana.org/assignments/port-numbers</a> and modify that
+file somewhat by hand to extract only the tables, ignoring the
+commentary and references.
+The result is in <tt class="filename">port-table</tt>.
+<p></p>
+
+Next, we read the lines into R and split
+them up into name, port number, protocol type, description.  We ignore
+comment lines (starting with #), and we also discard the entries that
+specify a range of ports (e.g.  the line
+<div class="literallayout"><p><br>
+ flex-lm         27000-27009 FLEX LM (1-10)<br>
+</p></div>
+)
+
+<p></p> 
+
+The S function <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.c.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com"><a href="s:function(%22servTable%22)">servTable</a></i> in <a href="services.R" target="_top">services.R</a> processes the file
+<tt class="filename">port-table</tt>.  We write the resulting matrix to a
+TAB-delimited file so that it can be read into the MySQL table.
+So the S script
+<pre xmlns:omg="http://www.omegahat.org" xmlns:rs="http://www.omegahat.org/RS" xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" class="Scode">
+ source("services.R")
+ x = servTable()
+ write.table(x, "port.data", sep="\t", na = "\\N", row.names = FALSE, col.names = FALSE)
+</pre>
+takes care of processing the <tt class="filename">port-table</tt>
+file to get it into a suitable form for MySQL.
+
+<p></p> And the file port.sql gives the SQL commands to create the
+table and populate it with the values generated from R.
+
+</div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2624503"></a>Host Information</h2></div></div><div></div></div> 
+
+And the final table is the information about the host machines in the
+networks from which we are gathering the TCP traces.  We have the
+association between some of the host names and their IP address that
+we see in the traces.  Using these names makes it slightly easier to
+refer to them. And we also have information about which operating
+system they are running, where in the network they are (e.g. inside or
+outside, or a switch or hub), and some additional notes on the
+machine.  We store this in a separate table,
+<i xmlns:sql="http://www.sql.org" class="sqlAttributeName">HostInfo</i> and define this table in
+the SQL file <a href="host.sql" target="_top">host.sql</a>.  We read the
+information from the HTML file (<a href="hosts.html" target="_top">hosts.html</a>) provided by the Lincoln Labs
+folks into R using the <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.c.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com"><a href="s:function(%22htmlTreeParse%22)">htmlTreeParse</a></i> function
+in the XML package.  We process each of the
+<font class="xmlTag">&lt;td&gt;</font> nodes and store the result if
+appropriate and end up with the relevant information as a list of
+character vectors.  This is done in the function
+<i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.c.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com"><a href="s:function(%22readHosts%22)">readHosts</a></i> in <a href="hosts.R" target="_top">hosts.R</a>.
+
+<p></p> After obtaining this host record information, we have to get
+it into a format suitable for MySQL and add on information about which
+machine is inside, outside or a hub/router.  We do this by specifying
+the groups manually and collapsing the values down to a matrix via the
+function <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.c.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com"><a href="s:function(%22reduce%22)">reduce</a></i>, again in <a href="hosts.R" target="_top">hosts.R</a> file.
+
+<p></p> Again, we write the R matrix to a file that can be loaded into
+MySQL.  And we define the
+<i xmlns:sql="http://www.sql.org" class="sqlAttributeName">HostInfo</i> table.
+The S code is
+<pre xmlns:omg="http://www.omegahat.org" xmlns:rs="http://www.omegahat.org/RS" xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" class="Scode">
+source("hosts.R")
+write.table(reduce(), file="host.data", sep="\t", row.names= FALSE, col.names = FALSE)
+</pre>
+and the SQL code is given in <a href="host.sql" target="_top">host.sql</a>.
+
+</div></div></body></html>

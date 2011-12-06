@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<!DOCTYPE book SYSTEM "file:///usr/share/sgml/docbook/xml-dtd-4.1.2-1.0-8/docbookx.dtd">
+
+<section>
+<title> Acceptance/Rejection Sampling</title>
+
+<para/> We use the acceptance/rejection method of generating random numbers
+when we do not have a random number generator for the probability
+distribution of interest and the CDF does not have a closed form solution
+so the inverse CDF method does not apply.
+
+<para/>
+The acceptance/rejection method relies on two simple properties
+related to sampling from the uniform distribution over a region in the plane.
+Figure xxx shows a region, B, in the (x,y) plane.
+A random sample of size n from the uniform distribution on B, would yield
+random pairs (x_j, y_j) where the chance that a particular pair falls in some 
+subregion C is the same for all subregions of the same area, and this chance is
+Area (C)/Area(B).
+We consider each property in turn. 
+
+<para/>
+The first property is based on the density function of a probability distribution.
+For a continuous CDF, F, the density function is the derivative of the CDF,
+typically denoted by <math:variable>f</math:variable>. 
+The density function is nonegative and bounded.
+Often times when the CDF is not of closed form, the density function is
+of closed form. A common example is the normal distribution, where
+the density function for the standard normal is
+<equation>
+phi(x) =  1/sqrt(2pi) exp( -0.5x^2)
+</equation>
+
+<para/>
+First property: 
+For a probability density function <math:fcn>f</math:fcn> on a compact interval, 
+say [0,1],
+consider the region in two dimensions formed by the points (x.y) bounded by the
+x-axis, y-axis, x = 1, and y = f(x). Call this region B.
+See figure  xxx for an example.
+If points (x_1,y_1), ... (x_n,y_n) are generated at random from the uniform
+distribution on region B, then the x-values will have CDF F (and density f).
+
+<para/>
+To see that this is the case, we need only determine the CDF of the generated
+x_j from the (x_j, y_j) pairs.  For any specific value x, the area under density
+f to the left of x, is F(x). This follows because f is the derivative of F.
+The chance that the randomly generated pair (x_j, y_j) falls in this region
+is F(x) because the Area(B) = 1. 
+
+<para/>
+If we could generate data from the uniform distribution on this region B, then
+we would have a random sample from the probability distribution of interest.
+Unfortunately, this is typically not the case. For if we could generate
+numbers uniformly from B then typically we would also be able to generate
+numbers via the inverse CDF method.  The next property helps us out of this
+problem.
+
+<para/>
+Second property: 
+For a region <math:variable>A</math:variable> that contains a subregion 
+<math:variable>B</math:variable>,
+suppose we take a uniform random sample of <math:variable>n</math:variable> points 
+from <math:variable> A</math:variable>,
+and <math:variable>m</math:variable> of the <math:variable>n</math:variable> 
+points fall in subregion <math:variable>B</math:variable>. See figure xxx, for an example.
+Then those points that fall in <math:variable>B</math:variable> will form a uniform 
+random sample of <math:variable>m</math:variable> 
+points from <math:variable>B</math:variable>.
+
+<para/>
+This means that if we are able to include the region formed by the density f in a
+larger region where we do have the tools to sample from the larger region, the
+we simply discard those points that fall outside of the region of interest, and
+take the x-coordinates to get a sample from F.  Note that if the containing
+region is much bigger than the region formed by the density then we will be
+discarding many points, and we need to continue sampling until n points fall
+in the density's region.
+
+<para/>
+Clearly, the acceptance/rejection method is not as efficient as the inverse CDF method.
+It generates two numbers, the x-coordinate and the y-coordinate, and discards the
+y-coordinate, and it discards (x, y) pairs from the region outside the area formed
+by the density and the x-axis.
+
+<para/>
+In practice, the larger region A is formed by scaling another density function g
+so that c*g ge f for all x.
+In order to do this, the support of g must contain the support of f, 
+i.e. if g(x)>0 then f(x)>0. 
+We choose the density function g to be one where we have
+a random number generator for the corresponding distribution.
+We can always firnd such a generator, for in the worstr case, we can select the 
+uniform distribution on the support of f.  
+Then to generate (x,y) pairs at random from the region
+between c*g and the x-axis, we first generate x-values from g, and for each x-value,
+generate a y-value uniformly between 0 and cg(x). If the resulting y is less than
+f(x) then x is kept as part of the sample, otherwise it is discarded. 
+ 
+<exercise>
+<question>
+Use the acceptance/rejection method with the uniform distribution 
+to generate 100 observations from the standard normal distribution.
+Keep track of the (x,y) coordinates of all the numbers generated 
+(both the rejected and accepted).
+Plot these numbers on the (x,y) plane and overlay the plot with
+the normal curve.
+</question>
+<question>
+Use the acceptance/rejection method with the beta(x,x) distribution 
+to generate 100 observations from the standard normal distribution.
+Keep track of the (x,y) coordinates of all the numbers generated 
+(both the rejected and accepted).
+Plot these numbers on the (x,y) plane and overlay the plot with
+the normal curve.
+Do you think that this approach was more efficient than the first?
+This is not the approach used to generate normals in the rnorm function.
+Describe it?
+</question>
+
+<question>
+Use a modification of the acceptance rejection method from part 2 above
+to generate pseudo-random numbers from the standard normal contaminatedat 
+at the 5% level with observations from the normal with mean 3 and sd 0.1.
+</question>
+
+<answer>
+</answser>  
+</exercise>
+
+</section>
+

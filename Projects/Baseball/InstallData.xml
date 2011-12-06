@@ -1,0 +1,352 @@
+<article  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+		xmlns:r="http://www.r-project.org"
+		xmlns:sh="http://www.shell.org"
+		xmlns:s="http://cm.bell-labs.com/stat/S4"
+                xmlns:perl="http://www.perl.org"
+		xmlns:omegahat="http://www.omegahat.org"
+		xmlns:sql="http://www.sql.org"
+		xmlns:mysql="http://www.mysql.org"
+>
+
+
+<section>
+<title></title>
+The data is available from
+http://baseball1.info Web site.
+Specfically,
+download the file
+http://baseball1.info/statistics/lahman52_csv.zip.
+
+Create a directory, say DB04 (or whatever year is appropriate),
+and change into that as the working directory
+<code>
+mkdir DB04
+cd DB04 
+</code>
+Now, extract all of the files from the CSV ZIP file.
+<code>
+unzip ../lahman52_csv.zip
+</code>
+
+The result should be 22 files
+<literallayout>
+Allstar.csv
+AwardsManagers.csv
+AwardsPlayers.csv
+AwardsShareManagers.csv
+AwardsSharePlayers.csv
+Batting.csv
+BattingPost.csv
+Fielding.csv
+FieldingOF.csv
+FieldingPost.csv
+HallOfFame.csv
+Managers.csv
+ManagersHalf.csv
+Master.csv
+Pitching.csv
+PitchingPost.csv
+Salaries.csv
+SeriesPost.csv
+Teams.csv
+TeamsFranchises.csv
+TeamsHalf.csv
+readme52.txt
+</literallayout>
+The .csv files are the ones of interest.
+Before we can read their contents into MySQL, however, we need to 
+modify them somewhat.
+Specifically, we need to ensure that all the values are
+surrounded by quotes.
+So a line like
+<literallayout>
+"aaronha01",1955,"NL"
+</literallayout>
+must be changed to
+<literallayout>
+"aaronha01","1955","NL"
+</literallayout>
+The only difference is that 1955, the second field, is
+now in quotes.
+We need to do this for all .csv files.
+
+<para/>
+The following shell script loops over the file names
+on the command line and executes the Perl script
+quote.pl on each. 
+<sh:script file="quote">
+#!/bin/sh
+
+while test -n "${1}" ; do
+  echo "${1}"
+  if test -r "${1}1" ; then
+    echo "Skipping ${1}"
+  else
+    perl -np ../quote.pl ${1} > ${1}1
+  fi
+  shift
+done
+</sh:script>
+The script is very simple.  It merely loops over the command line
+arguments, fixes up the quotes and puts the output in a new file named
+by adding '1' to the name of the original file.  The script is smart
+enough to avoid repeating the task if the '1' file alread exists, but
+this is not very important.
+
+
+<para/>
+To run this script, we use the command
+<sh:code>
+../quote *.csv
+</sh:code>
+This assumes that the scripts are in the directory
+above the current one, i.e. in the parent of DB04.
+If not, one has to identify the quote script
+directly or in your shell's path variable and 
+also ensure that the quote script can find the
+quote.pl script.
+
+
+<para/>
+The Perl script to fix up the quotes  is
+merely a sequence of regular expression substitutions.
+<perl:script file="quote.pl">
+#!/usr/bin/perl
+
+s/^([0-9.]+),/"\1",/g;
+s/,([0-9.]+),/,"\1",/g;
+s/([0-9.]+)$/"\1"/g;
+</perl:script>
+We fix the first field, then all of the
+middle ones, and finally the last.
+Note that the only fields that are of interest are the 
+numeric ones. The only other type of field in the
+.csv files is a string which has the surrounding
+quotes already in place.
+
+
+<para/>
+
+The next step is to create the database in MySQL and define the tables
+to store the data.  The file TableDefs.sql contains the relevant SQL
+commands to define the tables.
+<note>
+The definition for FieldingPost was added after the others (in 2005)
+and may need to be modified.
+</note>
+To define the tables, we need to execute the commands
+in this .sql file.
+The simplest way to do this is to 
+use the mysql command-line client.
+We run this, connecting as a user that has permissions
+to create a database, e.g.
+<sh:code>
+mysql -u root -p
+</sh:code>
+
+Next, we create the database.
+<sql:code>
+CREATE DATABASE BaseballDatabank04;
+</sql:code>
+
+Then, make this the active database:
+<sql:code>
+USE BaseballDatabank04;
+</sql:code>
+
+Now, we can evaluate the CREATE TABLE commands.
+We read the commands in from the TableDefs.sql file
+using the command
+<sql:code>
+source TableDefs.sql
+</sql:code>
+(Of course, change the path to the file, as appropriate.)
+
+<para/>
+Since there are 22
+<footnote>
+<para>Is it 21 or 22? What is xref_stats?</para>
+</footnote>
+ tables, we should see
+that many lines of the form
+<literallayout>
+Query OK, 0 rows affected, 1 warning (0.09 sec)
+</literallayout>
+If any of them fail, investigate!
+
+<para/>
+
+The next step is to 
+load the data.
+We use the MySQL command
+LOAD DATA INFILE command.
+This requires that we specify the full path for each of the
+.csv1 files.
+To make this simpler, we use the following script
+that generates the 22 SQL commands.
+<sh:script file="load">
+#!/bin/sh
+
+while test -n "${1}" ; do
+  n=`echo $1 | sed -e 's/\.csv1$//'`
+    echo "LOAD DATA INFILE \"${PWD}/${1}\" INTO TABLE $n FIELDS TERMINATED BY \",\" ENCLOSED BY \"\\\"\";"
+  shift
+done
+</sh:script>
+This is used via the command
+<sh:code>
+load *.csv1 > LOAD.sql
+</sh:code>
+which puts the SQL commands into a file LOAD.sql
+which we can source into the
+mysql client to load the data.
+
+<sql:code>
+source LOAD.sql
+</sql:code>
+This actually loads the data into the database tables.
+
+<para/>
+
+Once we have loaded the data into MySQL, it is important to verify
+that the data were read correctly.  You should check that each of the
+LOAD DATA INFILE commands did not generate any warnings.  If they did,
+you can look at them in MySQL for versions 4 and greater using the
+command
+<sql:code>
+SHOW WARNINGS;
+</sql:code>
+
+</section>
+
+<section>
+<title>Student Access to the Data</title> Now that we have loaded the
+data and verified it is correct, we need to make it accessible to the
+students.  One approach is to provide a single account for the entire
+class, say guest.  Then, all the students use this one account with no
+password or with one that is shared with the entire class.  The MySQL
+account should have minimal permissions/privileges:
+<sql:code>
+GRANT SELECT ON BaseballDatabank04.* TO 'guest'@'localhost' IDENTIFIED BY 'SillyPassword';
+</sql:code>
+
+
+<para/>
+A better approach is to give each student a separate login for the
+database with their own password.  For 50 students, one does not want
+to do this manually.  Also, there is the issue of conveying the
+password to each student.  A reasonable approach is the following.
+Suppose we can obtain a list of all of the email addresses of the
+students in the class.  In most cases, we will be able to get this
+from a Web-based roster provided by the University administration.  We
+have used these email addresses to create the logins on the Unix
+machines for each of the students.  This direct mapping from email to
+Unix login makes certain things simple. And we can take advantage of
+it to then use the same login ids for the MySQL database.  What we do
+is grant privileges for each of these login names and generate a
+password for each.  The password is placed in the home directory of
+the corresponding Unix account in a file named .my.cnf.  Only the
+person who owns that account can read that file.  The MySQL tools (the
+command-line client, the RMySQL package, etc.)  consult this file and
+so the user need never deal with passwords.  If she wants to access
+the database from a different machine, they can use the same password
+by finding it in the .my.cnf file without having to explicitly ask for
+it from the instructor.  Of course, somebody will have to extend the
+privileges for the database to allow access for that login from the
+other machine.
+
+<para/>
+Now that we have a  procedure in place, we can write a 
+simple R script to generate the SQL commands
+to specify the GRANT privileges, login names, passwords
+and create the .my.cnf files.
+We use R since it is an easy language to use to
+read the roster files, extract the email names, 
+generate passwords and create the .my.cnf files.
+The R script is 
+<r:script file="mysqlAccess">
+if(file.exists("passwords.rda")) {
+ load("passwords.rda")
+} else {
+ d = read.table("200501_91042_roster.txt", sep="\t" , header = TRUE, as.is = TRUE)  
+
+ passwd = paste(substring(d$SID, 5), as.integer(runif(nrow(d), 100, 999)), sep = "")
+ names(passwd) = login = gsub("@.*$", "", as.character(d$Email))
+ save(passwd, file = "passwords.rda")
+}
+
+# Create the SQL commands to grant the privileges with passwords, etc.
+sql = paste("GRANT SELECT ON BaseballDatabank03.* TO ",  paste("'", names(passwd), "'", sep = ""),
+                "@'localhost' IDENTIFIED BY ",  paste("'", passwd, "'", sep = ""), sep = "")
+cat(sql, sep = "\n", file = "mysqlAccounts.sql")
+
+
+for(i in names(passwd) ) {
+
+   # Check if the user's home directory exists for this email address.
+  if(!file.exists(paste("~", i, sep = ""))) {
+    cat("No home directory for ", i, "\n")
+    next
+  }
+
+   # If the .my.cnf file already exists, skip this user.
+  f = paste("~", i, "/.my.cnf", sep = "")
+  if(file.exists(f)) {
+    cat("File exists for ", i, "\n")
+    next
+  }
+
+    # Write the .my.cnf file.
+  con = file(f, "w")
+  cat('\n[client]\npassword="', passwd[i], '"\n', sep = "", file = con)
+  close(con)
+    # Change ownership and permissions.
+  system(paste("chmod og-rw ", f, " ; chown ", i, ".", i, " ", f, sep = "))
+}
+</r:script>
+
+The script is reasonably straightforward.
+It allows us to create the passwords separately from
+this script or alternatively each time the script is run.
+The benefit of this is that we can fix the passwords and regenerate 
+different privilege commands. If we didn't allow this, we would have
+to communicate the new passwords each time.
+
+<para/>
+The passwords are generated in a very simple manner.
+We use the last 4 digits of the students' 9 digit student id. (SID)
+that is in the roster table.
+We append to this a random sequence of 3 digits.
+
+<para/>
+Next, we generate the SQL commands granting the privileges
+with the login and password in the command.
+These commands are written to the file
+<filename>mysqlAccounts.sql</filename>.
+
+<para/>
+The next step is to create the .my.cnf files
+in each student's directory.
+We check that there is a home directory for that
+account and that they don't already have
+a .my.cnf file. Most will not.
+And then we write the .my.cnf file
+and change its ownership and permissions
+so that the student account owns the file
+and is the only user that can read it.
+
+<para/>
+The format of each .my.cnf file
+is document in the MySQL Options file page.
+We only use the simplest version
+<literallayout>
+
+[client]
+password="3455353"
+
+</literallayout>
+
+
+</section>
+
+</article>

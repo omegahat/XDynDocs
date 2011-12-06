@@ -1,0 +1,9 @@
+
+
+attach("FRprecip.Rbin")
+pdf(file="operatingStations.pdf",width=6,height=3)
+par(mar=c(4,2,0,0), mgp=c(1,2,0))
+plot(c(1948,2002),c(1,56),xlab="",ylab="Station",type="n",axes=FALSE)
+stripchart(FRobs$time,add=TRUE,col="blue",pch=".")
+axis(1)
+dev.off()

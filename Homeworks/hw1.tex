@@ -1,0 +1,304 @@
+\documentclass[10pt]{article}
+
+\usepackage{fullpage}
+\usepackage{times}
+\def\SPAM{SPAM}
+
+\def\TA{Bitao}
+\def\InstructorMail{\texttt{duncan@wald.ucdavis.edu}}
+\def\TAMail{\texttt{btliu@ucdavis.edu}}
+
+\def\SFunctionRef#1{\textbf{#1}}
+\def\Rpackage#1{\textit{#1}}
+\usepackage{hyperref}
+
+\date{}
+\title{Stat 141, Winter 04 \\
+    Project: Stage 1\\
+    Reading \SPAM{} data \\
+   \textbf{Due:  Wednesday, 28th, 5:00 pm}\hfill
+}
+\begin{document}
+\maketitle
+
+A collection of mail message data is available in the R package
+\Rpackage{RSpamData}.  It is installed on the Linux machine already,
+and it is available for download to other machines from the
+\url{http://winnie.ucdavis.edu/stat141/Winter04/RPackages/RSpamData_1.0.tar.gz}{class
+  Web site}.  The data were obtained from
+\url{http://spamassassin.org/publiccorpus/}
+which is a \SPAM{} filter that is widely used today.
+
+
+There are five (5) directories in the dataset: three contain regular
+mail (termed HAM), two contain \SPAM.  There are over 9,000 messages
+in all.  Read the \url{http://spamassassin.org/publiccorpus/}{Spam
+  Assassin Web page} to find out about the naming convention for the
+files.  In the package, these five subdirectories are installed under
+the \textbf{messages/} directory.
+
+Your high-level tasks in this homework are to:
+\begin{itemize}
+\item  ``Read" the data into R. 
+\item Explore the data and see if you can find any patterns
+ to spam and regular mail that would allow us to
+ identify either in some "automated" manner.
+\end{itemize}
+
+Each message is as it would appear in your mail folder.  It consists
+of header information and the text of the message (see the sample
+message below).  The text is just the regular text one would read and that
+somebody wrote for the recipient.  In this format, attachments are
+contained in the message and identified in very simple ways, typically
+separated by a ``Boundary" identifier and ``Next part".
+
+The header information is analogous to an envelope in physical
+mail. It identifies the intended receiver and, for regular mail, the
+identity of the sender.  It has a time and date stamp to say when it
+was sent.  It has routing information about what machines it was
+sent through on its way from the sender to the recipient.  There is
+information about the subject matter, whether this is a fresh topic or
+sent in reply to an existing mail message.  Each mail agent is
+entitled to add its own information to the header.  Fields such as
+mailing list information are often added.  Likewise, sometimes the
+name of the program which was used to compose the mail is included in
+the header.  The MIME (Multipurpose Internet Mail Extensions) type of
+the message identifies the format of the body.
+Each filed in the header is identified by its name followed by a colon
+and the field information.
+
+Note that the header and the body of a message are separated by an
+empty line.
+
+
+Before reading the data into R, what is a convenient way to determine
+the proportion of \SPAM{} messages?
+
+
+\section{Reading the Data into R}
+How do we want the data to be arranged after we have read it in?
+
+We want a collection of all the mail messages found in the five directories.
+Each message should be broken into three parts: its header information, the body,
+and an indicator whether it is spam or not.  The body can be further broken
+into the regular text, included messages and attachments. For the
+moment, we will not do that.
+
+The header should be represented as a named vector, where each
+header field constitutes an element of the vector.  The name should
+give the name of the header field, and the element should contain the header
+field value.
+You will have to deal with fields in the header that
+span multiple lines, e.g.
+
+\begin{verbatim}
+Received: from localhost (localhost [127.0.0.1])
+        by phobos.labs.netnoteinc.com (Postfix) with ESMTP id E3D7B47C66
+        for <zzzz@localhost>; Thu, 22 Aug 2002 09:54:39 -0400 (EDT)
+\end{verbatim}
+
+Note that all of these ``continuation" lines can be identified
+by the fact that they are indented, i.e. start with white space.
+
+We identify whether the message is spam or not from the directory in
+which it is located.  The messages in the directories spam and spam\_2
+are \SPAM, the remainder are not.
+
+
+What sort of R data structure should you use to store the data?
+Think about the nature of each ``record" and also what we will
+want to do with it in the next stage of the homework.
+
+When reading in the data, you will be both learning about R and 
+understanding the details of the data.  It is often helpful to
+explicitly raise errors when your code encounters something it can't
+yet handle.  If you see the error, then that special case is contained
+in the data and you will need to handle it.  If the error is not 
+encountered then you may not have to add unnecessary complexity to the code.
+
+To help you, I have put two functions (\SFunctionRef{readAllMessages}
+and \SFunctionRef{readMessages}) into the  R package \Rpackage{RSpamData}.  The first function will do
+the necessary looping over the directories containing the messages,
+finding the top-level directory appropriately in a system independent
+manner.  The function \SFunctionRef{readAllMessages} calls
+\SFunctionRef{readMessages}, but the latter doesn't do anything at
+present. It is just a template for you to fill in. It should contain the code to actually
+read the messages in the different directories. The template establishes the
+arguments with which the function can be called and serve as inputs to your
+code.  There are help pages for each function.
+
+
+\section{Exploring the Data}
+
+Once you have the data, explore it to understand what we have and the
+basic characteristics of the mail messages.  You might be interested
+in some of the following features:
+\begin{itemize}
+\item 
+   the distribution of the length of a message
+\item
+   the distribution of the number of attachments
+  (can we identify attachments in the messages?)
+\item
+   information about who sends mail, who receives mail
+\item
+   the times that messages are sent
+\item
+  what mail programs (e.g. the "X-mailer" field in some headers)
+  appear to be commonly used 
+\end{itemize}
+Some of these are not interesting,
+and you should think about what other information
+is in the data that might be worthwhile to investigate.
+
+We will be using this data to try to classify new messages as \SPAM{}
+or regular mail. So we are primarily interested in the differences in
+the distributions of various variables for \SPAM{} and regular mail to
+see if we can find some distinguishing characteristics.  How we can
+see this? Do you think the differences are real? or just artifacts of
+this particular dataset?   How might we tell?
+
+
+
+
+\section{Useful R Commands}
+The following are the names of some R functions that might be useful.
+These are just hints. You should look at the help pages for these to
+see what they do and follow the references to the other associated
+functions given in the `See Also' sections of the help pages.
+
+\begin{itemize}
+\item Input/Output: \SFunctionRef{list.files},
+\SFunctionRef{readLines},
+\SFunctionRef{scan},
+\SFunctionRef{list.files},
+\SFunctionRef{system.file}.
+\item String Manipulation:
+\SFunctionRef{nchar},
+\SFunctionRef{substring},
+\SFunctionRef{strsplit},
+\SFunctionRef{grep},
+\SFunctionRef{gsub}.
+\item Vector Operators:
+\SFunctionRef{unlist}, \SFunctionRef{sapply} and \SFunctionRef{lapply}.
+\item Error Handling:
+ \SFunctionRef{stop}, \SFunctionRef{warning},
+\SFunctionRef{try}.
+\item Statistical Summaries:
+\SFunctionRef{summary},
+\SFunctionRef{table},
+\SFunctionRef{plot},
+\SFunctionRef{par},
+\SFunctionRef{layout},
+\SFunctionRef{hist},
+\SFunctionRef{boxplot},
+\SFunctionRef{lm}.
+
+\end{itemize}
+
+
+\section{To Submit}
+Prepare a short report discussing both the processing of the data to
+get it into the system and what you discovered when exploring the
+data. You should: 
+\begin{itemize}
+\item
+  describe what you did to read the data in,
+\item
+  include what challenges you encountered with data, 
+\item
+  present the 3 (or more) most interesting statistical features of the data --
+  some of these features should relate to the differences, or lack
+  thereof, between  regular mail and spam,
+\item
+  demonstrate and justify these features using
+  numerical and graphical summaries.
+\end{itemize}
+
+Please create the report as a PDF or HTML file. To do this, you can
+use Word, PageMaker, Mozilla composer, LaTeX, etc.  You can generate
+figures/plots in different formats (e.g. JPEG, PDF, $\ldots$) in R
+that should suit your needs.  Use the class bulletin board to ask
+questions, discuss tools, etc. or ask \TA{} or me in class, office
+hours, $\ldots$.
+
+You should submit 
+\begin{itemize}
+\item the report
+\item your code, arranged in files with the extension .R
+\item any other auxiliary material such as plots, etc.
+  that are not directly  contained in the plot
+  (such as images and pages that serve as links from an HTML page).
+\end{itemize}
+Do this by creating an archive that contains all the files within a
+single file.  You can use either ZIP or tar to create the archive.
+
+Submit your work via email to \InstructorMail{} and \TAMail{}.
+
+Make certain to also save a copy of what you submit.
+
+
+
+\section{Sample Message}
+
+\begin{verbatim}
+Return-Path: whisper@oz.net
+Delivery-Date: Fri Sep  6 20:53:36 2002
+From: whisper@oz.net (David LeBlanc)
+Date: Fri, 6 Sep 2002 12:53:36 -0700
+Subject: [Spambayes] Deployment
+In-Reply-To: <LNBBLJKPBEHFEDALKOLCIEJABCAB.tim.one@comcast.net>
+Message-ID: <GCEDKONBLEFPPADDJCOECEHJENAA.whisper@oz.net>
+                                                                                
+                                                                                You missed the part that said that spam is kept in the "eThunk" and was
+viewable by a simple viewer for final disposition?
+
+Of course, with Outbloat, you could fire up PythonWin and stuff the spam
+into the Junk Email folder... but then you loose the ability to retrain on
+the user classified ham/spam.
+
+David LeBlanc
+Seattle, WA USA
+
+> -----Original Message-----
+> From: spambayes-bounces+whisper=oz.net@python.org
+> [mailto:spambayes-bounces+whisper=oz.net@python.org]On Behalf Of Tim
+> Peters
+> Sent: Friday, September 06, 2002 12:24
+> To: spambayes@python.org
+> Subject: RE: [Spambayes] Deployment
+>
+>
+> [Guido]
+> > ...
+> > - A program that acts both as a pop client and a pop server.  You
+> >   configure it by telling it about your real pop servers.  You then
+> >   point your mail reader to the pop server at localhost.  When it
+> >   receives a connection, it connects to the remote pop servers, reads
+> >   your mail, and gives you only the non-spam.
+>
+> FYI, I'll never trust such a scheme:  I have no tolerance for false
+> positives, and indeed do nothing to try to block spam on any of my email
+> accounts now for that reason.  Deliver all suspected spam to a Spam folder
+> instead and I'd love it.
+>
+>
+> _______________________________________________
+> Spambayes mailing list
+> Spambayes@python.org
+> http://mail.python.org/mailman-21/listinfo/spambayes
+\end{verbatim}
+
+\end{document}
+
+<title>Homework 1: Reading <SPAM/> data</title>
+
+<!-- Use the code to catch errors in your understanding   -->
+
+
+
+
+
+
+
+

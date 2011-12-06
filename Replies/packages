@@ -1,0 +1,87 @@
+Good question.
+
+Remember the search() command I showed you in class.
+In my version of R, it returns
+> search()
+[1] ".GlobalEnv"       "package:Rbits"    "package:methods"  "package:stats"   
+[5] "package:graphics" "package:utils"    "Autoloads"        "package:base"    
+(The names in your version might look a little different.)
+
+This gives you a character vector of the names of the "things" that R
+searches through to find a variable.  Apart from our workspace for the
+particular R session, the entries identify different packages
+(e.g. stats, graphics, utils, base) and each of these is loaded by
+default when R starts via the library() function. So library()
+loads a package.
+
+Packages are essentially collections of R functions and data,
+potentially accompanying C code, help files for the R objects.  A
+package combines functionality related to a particular concept or task
+such as fitting survival models, or specifying graphics models,
+creating particular graphics or plots, or just making data available
+such as the RSpamData.  To create a package, you read the "Writing R
+Extensions" manual and copy an existing one, replacing the components
+with your own code and data. 
+
+What's the point of packages?  Well, they combine different
+pieces of code, in different languages (R and C/Fortran),
+with help pages, and data and put them on a user's
+machine in a way that makes them easy to access. 
+
+When you store things in your directories from an R session, either by
+quitting (q()) and saying 'y' to the question about whether to save
+the image, or if you explicitly save one or more objects using the
+save() command, you are doing all the management of the objects.
+You will only see those saved values again if you
+a) start R in that directory, or
+b) explicitly load() them back into another R session.
+So you must know where the objects are located, and you must
+coordinate them.
+
+For packages, R knows where they live and when you load a package (via
+library()), then R has access to the R code, the help files, the data,
+etc.  And you don't need to know the name of the directory in which
+the different pieces were installed. Instead, R hides all that from
+you.  And that is one of the main reasons I put the mail messages into
+the RSpamData package. You can write your code to read the directories,
+and the different mail messages without ever having to explicitly
+reference a directory on the machine on which you are working.
+That means your code will run on your machine even if the data
+is located in a different place, and it will run on my machine
+when you give me the code, and so on.
+
+As you write S functions that you want to use in different projects,
+etc., it is convenient to put them into a package, document them so
+you can find out what each does and how to use it months after you
+wrote it and have forgotten the details.  Then, you can load the
+package into R regardless of the directory in which you started R.
+And, as many people do, you can distribute that package for others to
+use, or simply install it on different machines that you use with
+minimal fuss and bother of having to manage the files on different
+machines.  
+
+The package mechanism is one of the very nice things in R that S-Plus
+and Matlab don't have to the same extent. You can update and install
+packages over the Web, verify that the code in the examples work, that
+all the help files have the correct syntax, document the arguments of
+the functions, etc.  And the package mechanism have made a big
+difference for research in statistical methodology.  People make new
+techniques available as R packages so that others can try them out on
+different datasets. This is a very good thing to do and really, it is
+not very hard.  It just amounts to putting your R code into a
+particular directory structure and documenting your functions by
+filling in a reasonably simple template.
+
+Hope this helps.  Bring it up in class if you have any questions.  We
+are really trying to think about how these technologies work and what
+they are good for rather than just simply trying to get things done
+without understanding what is going on. So the more conceptual
+questions, the better.
+
+Thanks for bring this up.
+
+ D.
+
+
+
+

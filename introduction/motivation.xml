@@ -1,0 +1,369 @@
+<?xml version="1.0"?>
+
+<chapter>
+<title>Modern Statistical Computing</title>
+<section>
+<title>Motivation</title>
+
+This course is a change from the traditional "statistical computing"
+class taught in previous years.  Hopefully it will be both more
+exciting and also more useful to you in whatever directions each of
+your careers bring you.  This course focusses on computational
+developments and techniques that are used in statistics. 
+ This is an exciting area that blends applied
+computer science and statistics and data together.  It is a rapidly
+changing field and one that applies to all areas of science and
+business involving data, simulations, visualization, i.e. all domains
+involving information. 
+
+<para/>
+
+For the most part, we focus on data technologies with which we work to
+get data in and out of our statistical software and computational and
+graphical techniques for exploring the data.  Accordingly, there is
+less focus on particular statistical methodology, as this is more
+naturally and better covered in other classes.  The focus on data
+technologies is becoming more important as the diversity of different
+types and sources of data is increasing dramatically.  Often,
+statisticians spend significantly more time accessing it from its raw
+format and understanding the structure of the data than fitting
+particular models to the dataset.  In the past, we have been given
+data by "clients".  If we were lucky, the data would come from an
+experiment, and if we were very lucky, we would have been consulted
+about the design before the experiment was undertaken.  Nowadays, data
+are stored in databases; gathered from devices that generate vast
+amounts of information in factories, etc.; generated on computers and
+routers about network traffic, email correspondence, Web hits, logins
+to machines, instant messaging, and so on.  Rather than having just a
+collection of numbers, we typically have what is called
+<emphasis>meta-information</emphasis>.  This is auxiliary information
+about the measurements themselves.  This might be as simple as units,
+the identity of the person who took the measurements, or it might be
+much more such as the type of the computer on which logins were
+recorded, the speed of the data link in network traffic monitoring,
+etc.
+
+<para/> The combination of data and meta-information is the data on
+which we typically want to do analysis. The meta-information may not
+be relevant to some of the questions we want to ask of the data, but
+<emphasis>a priori</emphasis> we do not want to discard it.  And this
+is an important aspect of why we need to be able to access and process
+data ourselves rather than relying on it being given to us by our
+clients.  Essentially, there are three reasons that making
+having data processing skills desirable, if not essential.
+<itemizedlist>
+<listitem>
+If we are given data, we do not know what was omitted,
+what errors and biases were introduced in the processing, etc.
+In other words, the data are censored by our supplier
+and variables that might be useful to us may have been discarded,
+convenient coding of values may have been applie that mask
+information. 
+</listitem>
+<listitem>
+Statisticians are more commonly applying their skills
+in new areas as part of their own scientific research
+rather than being consultants in well-defined projects.
+To be able to get started on such research projects,
+one needs to be able to fetch data.
+</listitem>
+<listitem>
+In many consulting situations, the client is very busy (as is the
+statistician).  Additionally, the client may be skeptical of the value
+the statistician will add to the overall project.  As a result of
+these two things, it may be hard to get the client to free resources
+to get the data in different forms that are convenient to work with
+from a statistical point of view.  It may take longer to tell a client
+or her staff what form the data should be in.  And if the statistician
+changes his mind on this, he must return to the client and ask for the
+data in a different form or request additional information.
+</listitem>
+</itemizedlist>
+
+So, generally, we are moving away from assuming that data for a
+particular analysis will be delivered to us in the form we want.
+Since we deal with data all the time, centralizing the processing
+skills with us is more efficient than having scientists from different
+disciplines all learn the same skills to present data to us that is
+context-specific. Instead, we must iterate with clients and share 
+the processing steps to get an understanding of the data and the
+collection mechanism.
+
+<para/>
+
+
+For statistics to realize its full potential, it is important that
+non-statisticians can also access these statistical methods and
+results that we develop and deploy.  So we must be able to provide the
+results from data analyses to "clients" in such a way that they can
+use them in their daily work environment and tools such as PowerPoint,
+Excel, etc.  And when statistical methods are deployed in more
+automated roles (e.g. process control, network monitoring and
+management), the statistician must work with these other tools to
+acquire the inputs and provide the outputs.  And we also make
+extensive use of the computer for Monte Carlo simulations, or
+computer-based experiments, to explore the characteristics of
+stochastic processes, estimators, dynamical systems, etc.  We need not
+only to be able to program the simulation and specify the nature of
+the random inputs, but also explore the results both graphically and
+numerically.  When we consider all of these things, the computer is
+becoming not only a vital medium for working with clients and data,
+but also is becoming a source of data and important questions
+itself. And so it is important that statisticians at all levels of
+expertise have a basic knowledge of how and when to use computers for
+different tasks and to have a core set of skills that allows them to
+at least adequately adress problems that are communicated via the
+computer.
+
+<para/>
+
+The previous versions of this class have presented what is
+"computational statistics".  <citation id="Gentle:Elements of Statistical
+Computing">Gentle</citation> refers to the distinction and cites Wegman as
+drawing the distinction.  The terms "computational statistics" and
+"statistical computing" are different and a quick consideration of the
+phrases should indicate the fundamendatal distinction.
+Statistical computing relates to computational matters tailored to
+statistics. Essentially, this is the application of computer science
+to statistics.  Statistical computation on the other hand relates to
+the computational aspects of statistical methodology. Obviously, in
+the past decade, statistical methods have become increasingly and
+ubiquitously computational. Methods such as Markov Chain Monte Carlo
+(MCMC), the Expectation-Maximization (EM) algorithm, resampling
+including bootstrapping and cross-validation, etc. are just some of
+the techniques that are dependent on the computer due to their
+compute-intensive nature.  Computational statistics is about how we
+perform the computations for different methods.  In essence, they do
+not "require" a computer but some fast repetitive machine for
+performing computations.  Statistical computing on the other hand
+relates to computer science.
+
+<para/>
+
+Computational statistics has been a (small) focus of the statistics,
+and more generally the scientific, community for many years.  As a
+result, there is a great deal of literature and software dealing with
+issues that arise in computational statistics.  Linear algebra
+algorithms that respect certain statistical concepts such as pivoting,
+computing intermediate results about sub-models, etc.  have been
+"solved to death".  Lessons from numerical analysis and how they
+pertain to statistics have been incorporated into software such as
+Lapack and BLAS and these into higher-level languages such as S and
+Matlab.  As a result, one would be stupid to charge off and develop
+one's own version of standard tools when faced with a statistical
+problem.  Reusing software both saves you time and also reduces the
+probability of introducing error in the form of bugs and numerical
+oddities arising in special, but not uncommon, cases.  Just as
+performing a literature review before embarking on a statistical
+problem is expected and required, identifying available software that
+can be used or modified to perform a task should be a fundamental
+reflex of good computational statisticians.  As a result,
+understanding the details of algorithms developed by researches in
+computational statistics is becoming less important than the surge in
+new technologies with we are faced to access data. We can use the
+existing algorithms as "black boxes", trusting that those who have
+spent years researching the issues have provided a good basis for good
+software.  High-level environments such as S (the commercial version,
+S-Plus or the Open Source version R) provide a rich, and growing,
+collection of functions for deploying modern statistical methods.
+Being widely used, they are well tested and hide many of the low-level
+details from us for performing routine statistical computations.  They
+remove the need for the general user to master these traditional
+topics of computational statistics classes.  For those writing their
+own code to perform these lower-level computations, I encourage you to
+look at using these higher-level systems as there are many details to
+consider and reusing well-tested code is highly preferrable.
+
+
+<para/>
+
+Of course, it would be desirable to understand these low-level
+algorithms and learn from them so we can include the lessons they
+provide in new settings. However, there is so much that a student of
+statistics could learn that we must prioritize given the few courses
+they take and concepts to which they are exposes.  And in this current
+age, we feel that the priorities lie in familiarizing students with
+new developments in computing so that they can easily use statistical
+methods in different settings rather than being excluded at the onset
+by not being able to easily access or understand the data.  Data
+technologies is a phenomenally active area of research and
+development.  Some of the new advances such as Web services will be
+with us for many years, or provide the basis for many of the future
+tools.  We want students to understand these and also to be familiar
+with older, but equally as important, tools such as relational
+database management systems and regular expressions so that they can
+easily access different types of data used in other disciplines.
+Also, we want students to understand modern, computational methods of
+statistics such as resampling that have become important because of
+the widespread availablility of computational capabilities.
+
+<para/>
+
+ During the course, we also want the student to gain an appreciation
+for generalities of computing and not just "learn" particular
+software.  We want the students to be able to appreciate and discern
+differences in alternative technologies and approaches and to be able
+to intelligently discuss the trade-offs of these alternatives.  We
+will focus on the S programming language and environment which is the
+de facto standard environment for statistical research.
+Specifically, we will use R, an Open Source version of the S system.
+Its cousin - S-Plus - is a commercial version with different
+characteristics, but essentially the same core.
+
+<para/> 
+
+Time does not permit us to look at other languages in depth.  Perl and
+Python are two with which it is very useful for statisticians to be
+familiar. In many regards, Perl is the "quick and dirty" way of
+getting things done when working on large amounts of text in
+non-trivial ways. Python is a way of doing similar things, but is more
+structured and promotes "better" programming practices and reuse.
+Perl and Python are modern replacements for the combination of shell,
+sed and awk programming.
+
+<para/>
+
+We might also want to look at Matlab. In many respects, this is
+similar to S (R and S-Plus).  Matlab stands for Matrix Laboratory and
+its focus is on matrices and graphics, and particularly for the
+engineering community.  It has support for statistics via an add-on
+package, termed a toolbox. So it is not necessarily available in all
+versions of Matlab (one must purchase the toolbox).  Additionally, and
+more importantly, statistical concepts are not built into the
+language, and nor do they underly the data types and computations
+offered by the system.  We believe that it is important to express
+computations at a high-level that indicates what they mean rather than
+how they are done. This facilitates others reading the tasks and
+understanding them.  It reduces the likelihood of errors from detailed
+computations. Just as we choose to use high-level languages such as S
+and Matlab over C/C++, Java, etc., as statisticians, we should
+probably take that argument to its logical conclusion and use a
+statistical language.  S supports a view of data related to variables
+and observations rather than matrices only which relate to how
+computations are done in modelling.  S supports specifying models and
+graphics using a high-level, consistent language (e.g. y ~ x | z).
+Factors or categorical variables are expanded in model matrices,
+contrasts are specifiable, etc. rather than needing to be done
+by the statistician when fitting a model.
+
+<para/> Matlab has focussed less on programming facilities such as
+object orientation. For interactive or scripting use, this is not in
+any way an issue. If one is developing packages for others to use, it
+becomes a problem. Distributing packages can also be problematic, but
+something R has done well.  Most of all, Matlab is very efficient in
+the way in which it does certain types of computations in comparison
+with R.  There are good reasons for this. Neither language is better
+or worse than the other.  They have very different purposes and we try
+to use the one that best fits the task at hand.
+
+<para/>
+
+What do we want to achieve in this course?  Let's think of a couple of
+concrete scenarios.  When a student goes to analyze data that is not
+in a standard, ASCII table format, she should have sufficient
+familiarity with a variety of different tools from this course to be
+able to transform and process most types of data.  These tools may not
+be the best for the task, but they should provide the basis for a
+reasonable approach to most tasks.  What we really want is for the
+student not to be overawed or intimidated by the task of just getting
+the data. Instead, while it may require serious thought, just as the
+data analysis will, they should be able to understand the issues and
+devise one or more strategies.
+
+<para/>
+When a student moves on to a lab or business setting, she may
+be asked to do new tasks related to managing data,
+creating solutions to data-related problems that involve
+disseminating results, integrating data sources, fitting statistical
+models, performing simulations to understand the behavior of different
+approaches, and generating output to provide the results to 
+others.  Some students will end up doing this work, and others may
+end up in a managerial role. It is important the people in either
+situation can read up on new technologies, make reasonable 
+decisions in disentagling hype from fact about these new technologies
+and understand the basic issues.
+
+<para/> 
+
+Just like with data analysis, we aim to give students a familiarity
+with the basic concepts of statistical computing. There are no
+univeral answers to computational problems involving data.  Our goal
+is to provide a suitable basic understanding of basic technologies,
+they way they work and how to think about them so that interested
+people can readily use them, learn about new ones without much extra
+work and be equipped with a large enough bag of practical tools to do
+most tasks.  We will learn about R and treat it as a large box of
+tools, both for statistical methodology and data manipulation.  We
+will try to understand what tools we have, what they can be used for,
+and how we can use them to build new tools.
+
+<para/>
+
+In general, data are rarely delivered to us in convenient, complete
+form.  As statistics becomes increasingly more interdisciplinary and
+relevant to other sciences, statisticians must fetch the data
+themselves from different sources, be it on the Web, relational
+databases, computer logs, etc.  And this step typically consumes a
+great deal of time and requires creative thinking about how the data
+was stored, out to get it, how to process it and what we are trying to
+do overall.  It is important that statisticians at least understand
+how the data are collected and processed so that they can identify any
+artifacts that the procedure might introduce.
+
+The common elements of the different
+examples described above are
+
+<itemizedlist>
+<listitem>
+           Data acquisition
+</listitem>
+<listitem>
+           Data cleaning, verification
+</listitem>
+<listitem>
+           Exploratory Data Analysis - visualization, summaries
+</listitem>
+<listitem>
+           Meta-information
+</listitem>
+
+<listitem>
+      Different sources of related data.
+</listitem>
+</itemizedlist>
+We need to use different technologies and devices to get the data in
+the first place.  Then we need process it into the format we want.
+We use EDA to verify the data is as we expect and
+to find anomolies in the values.
+
+<para/>
+
+
+Overall, we have to work to get data in the format we want and we then
+have to explore the data and then work with its "owners" to understand
+and model it to answer questions that are interesting not only to us.
+This involves exchanging information and views about the data and the
+subject matter, and much of this is done electronically.  When we
+focus on the statistical modelling and understanding of the data, then
+we can use our (hopefully) familiar statistical tools and to a large
+extent we can delegate the details of the calculations to that
+software, e.g. S-Plus or R, SAS, etc.  If we did not already have such
+high-level data manipulatin and statistical techniques in place, we
+would first create them and test them, and then use them in the data
+analysis steps.  Having S, SAS, etc. merely means we need not concern
+ourselves with these steps in general.  If we need to develop new
+techniques, we try to build them in these higher-level languages using
+existing functionalty.  If that does not suffice, we can build new
+algorithms from scratch.  In this case, we need to think about
+making the computations efficient, numerically stable, handling
+special cases, etc.  
+
+<!-- Tighten this up a lot. -->
+
+
+
+
+</section>
+
+
+</chapter>

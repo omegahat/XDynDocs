@@ -1,0 +1,202 @@
+\documentclass[11pt,timesroman]{article}
+\usepackage{times}
+\usepackage{fullpage}
+
+\begin{document}
+
+\begin{enumerate}
+
+\item{Introduction}
+\begin{itemize}
+        \item Data - three examples: 
+          \begin{itemize}
+            \item rainfall - times series at several geographic locations, the length of the time series varies with location, there is much missing data
+            \item spam - text as data
+            \item traffic video - video and images as data
+           \end{itemize}
+        \item Statistical Thinking and the Data Analysis process (outline)
+        \item Overview of material in the book. (outline)
+        \item Goals of the book. (outline)
+\end{itemize}
+
+\paragraph{PART I: Technologies}
+
+\item{Computing Basics}
+        \begin{itemize}
+        \item History of the Pc
+        \item Parts of the computer - motherboard, CPU, memory (RAM, ROM, bios), operating system, storage devices, 
+        \item Digital information - Bits and bytes, characters, numbers, colors.
+        \item Electronic Files - file formats, identifying files, organizing files into directories
+        \item Computation -- evaluation of expressions, algorithms, pseudo-random number generation
+        \item Computing languages -- compiled, virtual machines, interpreted
+        \end{itemize}
+
+\item{Shell Tools}
+        \begin{itemize}
+        \item Command shell versus GUI
+        \item Project management -  help, navigating file system, globbing, grep and sed.  Example: NASA files
+        \item Example: Web logs - simple summary statistics - grep and sed, for and while loops, shell scripts
+        \item Example: Spam - cross-validation, word frequency tables
+        \item Environment variables
+        \item Executable path and Process management - (Missing) 
+        \end{itemize}
+
+\item{Introduction to Programming with R -- Need to get file from xml}
+        \begin{itemize}
+        \item Expressions - single, compound, ill-formed
+        \item Data types and structures, managing variables
+        \item Functions and packages - help, arguments, scope, search path
+        \item Operators - vectorized, recycling
+        \item Subsetting - position, logical, exclusion, name
+        \item Matrices and arrays
+        \item Lists and data frames
+        \item Loops, conditional statements, \texttt{ifelse}.
+        \item Writing functions - 
+                \begin{itemize}
+                \item How to approach problems,
+                \item General, Extensible
+                \item Comments
+                \end{itemize}
+        \item Recursion.
+        \item closures.
+        \item Lazy evaluation.
+        \item Dirty Dozen
+        \end{itemize}
+
+
+\item{Regular Expressions} 
+    \begin{itemize}
+      \item Purpose - extract text, create variable, clean and transform, mine
+      \item Example: maps - searching for literal strings
+      \item Example: Spam filtering creating variables from information in text - character classes, meta characters
+      \item Example: Web lokgs transform into csv file - grouping and referencing, alternation, number of matches
+      \item Example: Natural language processing looking for loosely defined text - greedy matching
+    \end{itemize}
+
+\item{RDBMS}
+        \begin{itemize}
+        \item Introduction 
+        \item The basic relational model - the table
+        \item Entity, meta information, missing values
+        \item Queries and the Select statement  example: baseball (need to add)
+        \item Multiple tables and the relational model
+        \item Interfaces - Accessing a database from R - example: wireless data (need to add)
+        \item SQL for statisticians - where to perform the statistics - example: TCP connections
+        \item Considerations for managing and designing your own database
+        \item Alternatives to databases (outline)
+        \end{itemize}
+
+
+\item{XML}
+
+        \begin{itemize}
+        \item what is XML?
+        \item XML syntax
+        \item Valid XML 
+        \item XML examples - OIM (SAS/Oracle/Microsoft), StatDataML, 
+        \item The XML document as a tree
+        \item Reading XML as a tree
+        \item DOM Parser
+        \item Walking the DOM object
+        \item Customizing the DOM parser
+        \item Examples - election results from web, searching google pages, writing GML 
+        \item SAX
+        \item Monitoring SAX.
+        \item Hybrid parser model (outline). 
+        \end{itemize}
+
+
+\paragraph{Part II: Modern Statistical Methods}
+
+\item{Simulation}
+        \begin{itemize}
+        \item Random number generation
+        \item Inverse CDF
+        \item Acceptance rejection sampling
+        \item Monte Carlo - example - computer experiment?
+        \item Example - Adhoc Networks (outline)
+        \item Monte Carlo Markov Chain
+        \end{itemize}
+
+
+\item{Visualization - class notes}
+        \begin{itemize}
+        \item Elements of a graph
+        \item eda
+        \item complex composite plots
+        \item Wilkinson's grammar of graphics
+        \item Examples of complex graphs
+        \item lattice.
+        \item Dynamic graphics, Ggobi
+        \end{itemize}
+
+\item{Modern Methods - class notes}
+        \begin{itemize}
+        \item Maximum likelihood techniques: EM, Naive Bayes, hierarchical Bayes, partial likelihood
+        \item Smoothing - Nearest neighbor methods, spline, kernels
+        \item Classification - CART, SVM
+        \item Clustering - k-means, hierarchical
+        \item Resampling - bootstrap, cross-validation, boosting, bagging
+        \end{itemize}
+
+\paragraph{Part III: Case Studies}
+
+
+\item{Spam - Naive Bayes}
+\\
+technology: regular expressions
+\\
+statistical methods: Naive Bayes; Cross-validation
+
+\item{Spam - Nearest neighbor}
+\\
+technology: regular expressions
+\\
+statistical methods: nearest neighbor, classification trees,
+cross-validation
+
+\item{Election Maps}
+\\
+technology: understanding packages, gml
+\\
+statistical methods: maps, color
+
+
+\item{Wireless Networks}
+\\
+technology:
+\\
+statistical methods: 
+
+
+\item{Auction fraud detection}
+\\
+technology: 
+\\
+statistical methods:social networks
+
+\item{TCP intrusion detection}
+\\
+technology: databases
+\\
+statistical methods: exploratory data analysis
+
+
+\item{Image analysis?? Young cho's thesis}
+
+\item{Microarray}
+\\
+technology: 
+\\
+statistical methods: clustering
+
+\item{Rainfall data and Geographical data.}
+\\
+technology: netcdf
+\\
+statistical methods: spline smoothing, bootstrap 
+
+\end{enumerate}
+
+
+\end{document}

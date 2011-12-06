@@ -1,0 +1,167 @@
+\documentclass[12pt]{article}
+\def\SFunction#1{\textbf{#1}()}
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{comment}
+
+\title{Homework 2 \hfill Stat 141 Winter '05 \\
+Due:  Wednesday, 2nd February, Midnight.  \\
+\textit{Using R for Exploratory Data Analysis of
+WebLog Data.}
+}
+\author{Duncan Temple Lang}
+\begin{document}
+\maketitle
+
+
+
+In this homework, we will use 
+some of the exploratory
+data analysis facilities in
+R to learn about the features
+of the Web log data and become familiar
+with R itself.
+You should think about how we might do
+some of these things in the shell
+and how R and the shell tools are different.
+It is important to be able to 
+identify the appropriate tools for a task.
+
+
+\begin{enumerate}
+
+\item Read the data from the file \textsl{OmegahatLogData.txt}
+into R.
+The result should be a data frame with as many rows as there are
+records in the log file. Programmatically verify this
+by computing the two numbers from R.
+There should be 6 variables, and you can name them 
+IP, Date, Document, Referral, UserAgent and Bytes
+
+The IP addresses are to be treated as regular strings.
+We will want to be able to do arithmetic, ordering, etc.
+of the Dates field, so we need to convert it to a suitable data structure.
+POSIXct (see the help for DateTimeClasses in R) is
+the best;  POSIXlt is another alternative.
+Document, Referral and UserAgent are just character strings.
+And the Bytes field should consist of  integers.
+
+
+\item Find the most active robots, and the most active 
+(i.e. number of hits)
+regular or non-robot requesters.  In other words, identify
+the records associated with robots and its complement
+and look at the frequency table for hits on each set of records.
+
+
+\item 
+For the entire period,  what were the most active days?
+And the most active hours? Is there a period in the day that is most active.
+Use plots and/or summary statistics to find and illustrate
+the answer.
+You can also look at whether the results are the same
+if we think of ``active'' as meaning
+number of requests or the number of bytes transferred.
+
+
+\begin{comment}
+\item  What are the common Web browsers being used
+when accessing this site?  Look at this by
+browser and operating system combinations.
+You want to look only at non-robot records.
+\end{comment}
+
+
+\item
+Figure out how to get the data from
+the raw Web log files (omegahat.log*) 
+into the data frame.
+There are two possible approaches:
+\begin{enumerate}
+\item write R code to read each record in the raw files and obtain
+  the relevant fields; or
+\item transform the data using UNIX/shell tools we used in Homework 1
+to a file that we can easily read directly as a data frame in R.
+\end{enumerate}
+Chose one approach (or both for bonus points) and write
+the code to do it.
+Clearly, I did approach 2. If you chose that one, you need
+to write a script similar to mine and use the code in question 1. 
+It is interesting to write R code for the entire task
+and compare it with the use of a shell script and reading
+the rectangular table of data it into R.
+
+
+\item Describe an interesting feature of the data
+using plots or summary statistics to support
+your reasoning.
+
+
+\end{enumerate} 
+
+
+Again, hand in a PDF file giving the answers
+to the problems.  The answers should contain
+the code along with annotations describing it for a human
+to read,  output from R and any plots you created.
+
+
+When creating plots, take time to consider the best
+way to display the information.
+Consider different plot types, transforming the data
+(e.g. using logs),  putting data for different categories
+(e.g. robots and non-robots)
+on the same plot and using a legend,
+ensuring the scales are appropriate and the same across related plots.
+
+And take the opportunity to discuss alternative approaches,
+solutions, algorithms, code segments, etc.  This is a wonderful
+way to learn how things work, and when one is better than the other.
+There are bonus points for discussing the different approaches.
+
+
+\textbf{Useful Functions in R}\\
+\textit{Input and Text Manipulation}
+\SFunction{read.table}, \SFunction{read.csv},
+\SFunction{count.fields},
+\SFunction{readLines},
+\SFunction{scan},
+\SFunction{system},
+\SFunction{nchar},
+\SFunction{strsplit},
+\SFunction{gsub},
+\SFunction{grep}.
+
+\textit{Dates}
+\SFunction{strptime},
+\SFunction{as.POSIXct}
+
+
+\textit{Summary Tables}:
+\SFunction{cut}
+\SFunction{by},
+\SFunction{summary},
+\SFunction{table},
+\SFunction{ftable},
+
+\textit{Graphics}: 
+\SFunction{plot,}
+\SFunction{hist},
+\SFunction{boxplot},
+\SFunction{matplot},
+\SFunction{points},
+\SFunction{lines},
+\SFunction{text},
+\SFunction{legend},
+\SFunction{par},
+\SFunction{lattice},
+\SFunction{xyplot}.
+
+
+\textit{General}
+\SFunction{sort},
+\SFunction{rev},
+\SFunction{as.numeric}.
+
+
+\end{document}

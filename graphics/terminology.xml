@@ -1,0 +1,39 @@
+
+Graph terminology
+
+
+Display the elements in an interactive plot via an image map.  Use
+Paul's or the Blue books decomposition of the plot region in to
+different pieces:
+  points, axis, labels, tick marks, legend, title
+  S plotting region versus plot components/elements.
+
+Border 
+	scale line
+		horizontal scale, vertical scale
+		scale label
+	tick mark 
+		tick mark label
+
+Interior
+	data region
+	plotting symbol
+	panel
+
+Notations
+	data label
+	marker
+	reference line
+	key
+
+Exterior
+	title
+	legend
+
+Position
+	Superposed
+	Juxtaposed
+
+Number of units per cm.
+
+

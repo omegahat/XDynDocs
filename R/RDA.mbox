@@ -1,0 +1,40 @@
+From duncan@localhost.localdomain  Tue Jul 31 10:54:22 2007
+Return-Path: <duncan@localhost.localdomain>
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by localhost.localdomain (8.13.5/8.13.5) with ESMTP id l6VHsMBZ027061
+	for <duncan@localhost.localdomain>; Tue, 31 Jul 2007 10:54:22 -0700
+Received: (from duncan@localhost)
+	by localhost.localdomain (8.13.5/8.13.5/Submit) id l6VHsM3I027060
+	for duncan@localhost.localdomain; Tue, 31 Jul 2007 10:54:22 -0700
+Date: Tue, 31 Jul 2007 10:54:22 -0700
+From: Duncan Temple Lang <duncan@localhost.localdomain>
+To: Duncan Temple Lang <duncan@localhost.localdomain>
+Subject: RDA file
+Message-ID: <20070731175422.GA27053@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="oyUTqETQ0mS9luUI"
+Content-Disposition: inline
+User-Agent: Mutt/1.4.2.1i
+Status: RO
+Content-Length: 429
+Lines: 18
+
+
+--oyUTqETQ0mS9luUI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+This is a message with an attached R vector in RDA format.
+
+ D. 
+
+--oyUTqETQ0mS9luUI
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename="x.rda"
+Content-Transfer-Encoding: base64
+
+H4sIAAAAAAAAAwtyiTDiiuBiYGBgYmBiA5LMQCYLE5BgZGAQ4ATRFUCCF4i5IIIMIEmwKiBm
+BWKgLgZ2IOYAYk6oun8AbJ6mm1gAAAA=
+
+--oyUTqETQ0mS9luUI--
+

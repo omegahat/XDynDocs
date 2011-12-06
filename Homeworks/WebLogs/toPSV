@@ -1,0 +1,11 @@
+cat omegahat.log* | cut -f 4-5 -d ' ' | sed -re 's/\]//' | sed -re 's/\[//' > Times
+cat omegahat.log* | cut -f 1 -d ' ' > IPaddresses
+cat omegahat.log* | cut -f 7 -d ' ' > RequestedFiles
+cat omegahat.log* | cut -f 11 -d ' ' > ReferralFields
+
+cat omegahat.log* | cut -f 10 -d ' ' > Bytes
+
+cat omegahat.log* | cut -f 12- -d ' ' > UserAgents 
+
+#-d '|'
+paste  IPaddresses  Times  RequestedFiles  ReferralFields  UserAgents Bytes | sed -e 's/"//g' > PSV

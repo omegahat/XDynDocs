@@ -1,0 +1,112 @@
+
+Rules of thumb.
+
+Show as much data as possible: maximize the data density.
+ 
+Make the data stand out: maximize the data-ink ratio. 
+
+If it has been done well in the past, use it. 
+
+Iterate and experiment with graphical display
+
+do not hesiate to make two or more plots of hte same data to make a point
+
+=========================================================================
+	
+Avoid using unnecessary backgound images, three-dimensional blocks instead of bars, 
+fancy borders, and other chart junk.
+
+Use visually prominent graphical elements to show data. 
+
+Data points
+	Use large plotting symbols
+
+	When points overlap use plotting symbols to distinguish the overlap, or use
+	separate plotting symbols to denote the number of points overlapping, or 
+	jitter the points so that they do not overlap 
+
+	Do not let lines obscure data points.
+
+	Keep points off the scale lines.
+
+
+Tick Marks 
+	Graph data in context, eg. supply tick mark labels.
+
+	Keep tick marks outside of data region.
+
+	Use 3-10 tick marks on a scale line.
+
+	Choose range of tick marks to include all or nearly all of the data
+
+  
+Scale
+	Choose a scale such that the data occupy a large part of the data region.
+
+	Surround graph on all sides with scale lines.
+
+	Do not change scales in mid-axis. Instead use separate panels, and if 
+	possible keep the units per centimeter constant accross panels. 
+
+	With mulitple panels in a graph, keep scales the same across panels unless
+	there is a problem with resolution
+
+	Consider showing two scales, on oppostie sides of the data region, eg. age in
+	years and date of birth, log-scale and orginal scale, or units and percent
+	change from base.
+
+	Do not insist that 0 be included on the scale.
+
+   
+Additional information
+	Put notes in legend
+
+	Keep data region clear of keys and reference markers if they obscure the data 
+
+	Label legibly, completely, correctly, and unambiguously.
+
+	Use a reference marker rather than a reference line if the precision
+	is not needed
+
+	Make reference lines less prominent than data lines.
+
+	Make graphs and legends stand alone, i.e. not dependent on the information
+	provided in the text of the document.
+
+Honor the visual metaphor altogether. For example, do not use three dimensional
+plots to portray one-dimensional data.
+    
+Do not present information in two or three dimensions when it is one-dimensional.  
+
+Plot time-series data on a time scale.
+In a time series, time typically goes on the horizontal scale
+       
+Layout
+	Emphasize the important comparison. For example, with two categorical 
+	variables, make it easy to compare groups of the important category. 
+	
+	Do not jiggle the baseline, that is,
+	 
+	When the data points have labels, do not order the data alphabetically
+	by label, but according to the size of the variable being graphed. 
+ 
+More is murkier, more decimal places, more dimensions, more colors, etc.
+  
+Scale
+
+   scale of observations versus scale of variable.
+       observed range verus range meta information
+
+Resolution
+
+Maintain the shape data 
+	put tick marks outside data region
+
+Iterating based on the contents/views of one plot
+to get another.  Think of changing scale, examining
+the residuals to understand the residual structure
+to plot an auxillary.
+
+   standardizing/scaling, baselines, 
+   Log transformation
+   Residuals

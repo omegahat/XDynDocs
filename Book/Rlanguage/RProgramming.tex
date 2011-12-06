@@ -1,0 +1,975 @@
+\chapter{Programming Concepts}
+\label{chap:RProgramming}
+
+At htis point the reader should be familiar with the basic data types
+and the facilities in the R language for manipulating R objects. In
+addition to these data structures, there are also the standard control
+flow operations that are in other languages. These allow us to branch
+our computations based on conditions (i.e. the if--else clause) and
+perform iterations in loops (using for, while and/or do-while
+constructs).
+
+\subsection{Conditional Evaluation}
+
+\subsubsection{The if-else clause}
+The \SOperator{if} in R allows us to perform computations
+conditionally.  The basic format is as follows, where depending on the
+condition, which appears in \verb+( )+, the expressions in the curly
+braces are evaluated.  If the condition is not met then the statements
+in the curly braces following the \SKeyword{else} are evaluated.
+\begin{verbatim}
+if(condition) {
+  do something
+} else {
+  do something else
+}
+\end{verbatim}
+Note that we don't have to have the \SKeyword{else} part. A simple
+\SKeyword{if} statement is fine.
+\begin{verbatim}
+if(condition) {
+  expressions
+}
+\end{verbatim}
+
+We can also combine multiple conditions in nested logical statements.
+\begin{verbatim}
+if(condition1) {
+  expressions
+} else if(condition2) {
+  expressions
+} else {
+  elpressions
+}
+\end{verbatim}
+
+Or
+\begin{verbatim}
+if(condition1) {
+  expressions
+  if(condition2) {
+     expressions
+  } 
+}
+\end{verbatim}
+
+In all cases, the condition in the \SOperator{if} should evaluate to a
+value that will be coerced to a logical value (i.e. a logical vector
+of length 1). If, this is \textsl{TRUE}, then the expressions in the
+{\em{do something}} clause are evaluated. If the value is
+\textsl{FALSE}, then the expressions in the {\em{do something else}}
+clause are evaluated.
+
+Since the condition should be a single logical value, we often have to
+map a logical vector of length $n$ to one of length 1 to express our
+condition. The functions \SFunction{all} and \SFunction{any} are often
+used for this. For example, let's suppose our test is that any of the
+values are missing in the vector \SVariable{x}. We can write this as
+\begin{verbatim}
+if(any(is.na(x))) {
+ stop("Missing values present")
+}
+\end{verbatim}
+Similarly, if we wanted to test that all the values are greater than
+10, we might do something like
+\begin{verbatim}
+if(all(x > 10)) {
+  # do something
+}
+\end{verbatim}
+
+\paragraph{EXAMPLE}
+
+\subsubsection{The ifelse clause}
+The \SFunction{ifelse} is essentially an element-wise or vectorized
+version of the \SKeyword{if} statement. Remember that the condition in
+an \SKeyword{if} statement must be a single logical value. If we want
+to iterate over several elements in a logical vector and do something
+for each depending on whether it is \textsl{TRUE} or \textsl{FALSE},
+we would have to explicitly loop (using \verb|for(i in x)| or
+\SFunction{sapply}. The \SFunction{ifelse} is a further convenience
+than \SFunction{sapply} here.
+
+Let's start with a simple example. Suppose we want to compute the
+square root of a vector of numbers, say
+\begin{verbatim}
+> x = rnorm(10)
+\end{verbatim}
+We have to be careful to skip over any negative values since we will
+get NaNs and warnings.
+\begin{verbatim}
+> sqrt(x)
+ [1] 0.8101283        NaN          NaN    0.8841332 1.1162295 
+ [6] 1.0555023        NaN          NaN    1.0695558 0.4869805
+Warning message: 
+NaNs produced in: sqrt(rnorm(10)) 
+\end{verbatim}
+What we might want to do is return \textit{NA} for these negative
+values and avoid the warning. \SFunction{ifelse} will assist us here.
+\begin{verbatim}
+> sqrt(ifelse(x > 0,  x, NA))
+\end{verbatim}
+What is going on here? \SFunction{ifelse} works in the following
+way. The first argument should be a logical vector. The other two
+values should be vectors of the same length as this logical vector of
+conditions. So we have three parallel vectors, i.e. of the same
+length. If the i-th element in this condition vector is \textsl{TRUE},
+the i-th element of the result is taken from the i-th element of the
+second vector, the \SArg{yes} argument. Otherwise, the i-th element of
+the result is taken as the i-th element of the \SArg{no} argument. It
+is the same as the following in subsetting terms:
+\begin{verbatim}[]
+ ans = numeric(length(test))
+ ans[test] = yes[test]
+ ans[!test] = no[test]
+\end{verbatim}
+So basically, the result is a vector as long as \SArg{test}, the
+condition, with elements taken from \SArg{yes} or \SArg{no} depending
+on whether the condition is \textsl{TRUE} or \textsl{FALSE}. Having
+evaluated the condition, R creates a vector corresponding to the
+result of evaluating the condition. It then fills in each
+corresponding element in the result that is \textsl{TRUE} in the
+condition with the value from \SArg{yes}, and similarly with the
+result from the corresponding \SArg{no} value for \textsl{FALSE}
+values. The result can actually be a matrix or array also, but of
+course that is still a vector. (Remember how arrays are represented!)
+Basically, it is the same type as the \SArg{test} object.
+
+\subsubsection{The switch statement}
+
+The \SFunction{switch} is another type of branching statement. It lets
+you use the value of a variable to identify which one of many
+different alternative expressions to evaluate. It is more convenient
+than multiple if-else statements and is used when we have a finite
+number of possible branches that we can identify by the value of the
+condition itself. Consider the following example. We want to let the
+user specify the name of a probability distribution, and from that we
+will generate a sample of size 1 from the default distribution of that
+type. For instance, if they specify the value "Normal", we will create
+a sample from a standard Normal distribution (N(0, 1)). If they
+specify "Exponential", we will generate a value from an Exponential(1)
+distribution. Similarly, for a Poisson, we will generate a Poisson(1);
+for a Bernoulli/Binomial, Bernoulli(.5), and so on. We can implement
+this in a variety of different ways.  A simple way to do this is to
+use the \SFunction{switch} function. Let's suppose the name of the
+distribution the user specifies is given in the variable
+\SVariable{distName}. Then, we would write the expression as follows.
+\begin{verbatim}
+switch(distName, Normal = rnorm(1),
+                 Exponential = rexp(1),
+                 Poisson = rpois(1),
+                 Bernoulli =, Binomial = rbinom(1, p = .5),
+                 Gamma = rgamma(1, 1))
+\end{verbatim}
+Now, when we evaluate this expression with \SVariable{distName} as
+``Normal'', we get a value from an N(0, 1).
+\begin{verbatim}
+> distName = "Normal"
+> switch(distName, Normal = rnorm(1),
+                 Exponential = rexp(1),
+                 Poisson = rpois(1),
+                 Bernoulli =, Binomial = rbinom(1, 1, p = .5),
+                 Gamma = rgamma(1, 1),
+                 stop("Unhandled distribution name"))
+ [1] -0.5397505
+\end{verbatim}
+Of course, we would put this into a function and \SVariable{distName}
+would be an input. Say, we define the function \SFunction{Sample} to
+simply invoke this expression with \SVariable{distName} given as the
+only argument. Then,
+\begin{verbatim}
+> Sample("Normal")
+[1] -0.05923842[1
+> Sample("Gamma")
+[1] 1.561399
+> Sample("Binomial")
+[1] 1
+> Sample("made up")
+Error in switch(distName, Normal = rnorm(1),
+                 Exponential = rexp(1), Poisson = rpois(1),  : 
+	Unhandled distribution name
+\end{verbatim}
+
+
+Now that we have seen the code ``in action'', let's try to understand
+it. It is relatively straightforward. The value of the first argument,
+the expression \SVariable{distName} in this case, identifies which of
+the different alternatives given next is evaluated and returned. In
+our case, the value is a string, the name of the distribution. So
+switch then looks for a named argument that matches that value. In the
+case of "Normal", it of course finds the second argument and evaluates
+the expression for that argument: \verb|rnorm(1)|. If we pass "Gamma"
+as our distribution name, the \SFunction{switch} function matches the
+argument named Gamma and evaluates \verb|rgamma(1, 1)|. If the
+distribution name doesn't match any of the named arguments,
+\SFunction{switch} matches the default argument which is the last
+one. In this case, it is a call to \SFunction{stop} which raises an
+error.
+
+There is one additional curiosity. If we call \SFunction{Sample} with
+the either of the values ``Bernoulli'' or ``Binomial'', we get a
+random value from a Bernoulli(.5) distribution. That is because of the
+arguments
+\begin{verbatim}
+    Bernoulli =, Binomial = rbinom(1, 1, p = .5),
+\end{verbatim}
+in the \SFunction{switch} statement. The \verb|Bernoulli=, | term
+looks weird. What it means is ``use the expression in the next
+argument'', in this case the argument named "Binomial". So if
+\SVariable{distName} is "Bernoulli", \SFunction{switch} matches the
+Bernoulli argument and then looks to the next one with an actual
+expression and so uses \verb|rbinom(1, 1, p = .5)|.
+
+\SFunction{switch} also works when the first argument is a number. If
+this value is an integer (between 1 and the the number of additional
+arguments), the corresponding alternative is evaluated by matching
+positions of all the alternative expressions. So \verb|Sample(2)| is
+equivalent to \verb|Sample("Exponential")|. Note that you might think
+we could use a named vector to hold the values and just subset this
+using a distribution name.
+\begin{verbatim}
+> v = c(Normal = rnorm(1),
+        Exponential = rexp(1),
+        Poisson = rpois(1),
+        Binomial = rbinom(1, 1, p = .5),
+        Gamma = rgamma(1, 1),
+       )
+> v["Normal"]
+> v["Normal"]
+\end{verbatim}
+The problem with this is that we don't get to reevaluate the
+expressions each time. We will get the same value each time for the
+particular distribution name. That is because we have evaluated the
+expressions to generate the sample value for each distribution when
+creating the vector that we assign to
+\SVariable{v}. \SFunction{switch} allows us to evaluate expressions
+and return the resulting value. So it is much more flexible, and much
+simpler than multiple if-else statements.
+
+
+\section{Functions}
+We have talked about and used functions a lot in this exposition of
+how R works. It is now time to consider them in a little more
+depth. There are two aspects to functions: calling them and creating
+them.
+
+\subsection{Calling a function}
+There are many functions already built-in to R and its packages. For
+example, plot, length, sum, apply, matrix, as.integer, etc. are all
+functions. A function is essentially a localized action that typically
+takes inputs, performs some computations, and returns its output
+value. Ideally, the actions in the function have no side effects. In
+other words, it doesn't change the state of things outside of the
+function. Each function has parameters or formal arguments. These
+define the different inputs the function can accept. When we actually
+call or invoke a function, the arguments we provide are mapped to
+these formal arguments in a particular way that we will discuss
+shortly. Regardless of how the arguments are mapped to the parameters,
+the result is that each function call effectively creates a local
+workspace much like our top-level/session workspace with the formal
+arguments containing the input values or actual arguments. An example
+will make this more concrete. Consider the function
+\SFunction{substring}
+\begin{verbatim}
+function (text, first, last = 1e+06) 
+{
+    storage.mode(text) <- "character"
+    n <- max(lt <- length(text), length(first), 
+             length(last))
+    if (lt && lt < n) 
+        text <- rep(text, length = n)
+    substr(text, first, last)
+}
+\end{verbatim}
+This has 3 parameters: text, first and last. If we make the call
+\begin{verbatim}
+substring("This is a value", 3, 5)
+\end{verbatim} 
+R will create a call frame in which to evaluate the call and associate
+the input values/arguments with the parameters as we might expect:
+\begin{itemize}
+%--- Item
+\item text = ``This is a value'',
+
+%--- Item
+\item first = 3,
+
+%--- Item
+\item last = 5
+\end{itemize}
+\noindent It now evaluates the expressions in the {\em{body}} of the
+function, i.e. 
+\begin{verbatim}
+storage.mode(text) = "character"
+\end{verbatim}
+When it looks for variables - both functions and data - such as
+\SFunction{storage.mode} and \SVariable{text}, R looks in the local
+call frame first. If it finds the variable there, it uses the value
+stored with the variable. Otherwise, the basic idea is that R
+continues looking for the variable along the search path. This is the
+same thing we discussed about looking for variables for commands
+issued at the prompt. So, it looks in the workspace, then the next
+element of the search path, and so on.
+
+In this example, it will find \SVariable{text} locally in the call
+frame as a formal parameter. R will not find \SFunction{storage.mode}
+locally, but instead it will look through the search path and find it
+in the {\RPackage{base} package.
+
+When assignments are made in these expressions such as n
+\textless{}- max(lt \textless{}- length(text), length(first),
+length(last)) these are generally made locally within the call
+frame. So \SVariable{n} and \SVariable{lt} become new variables in
+the function call.
+
+When the function returns, the call frame disappears and all the
+variables are discarded. We don't have to manage these and remove them
+ourselves. (If some of the values are no longer needed within a
+function and they are very big, it can be useful to explicitly discard
+the values to save memory. The easiest way to do this is to assign a
+new small value to the variable, such as \textsl{NULL}.)
+
+We have now described how a call to a function is evaluated except
+for two things: the way the arguments are mapped to the formal
+arguments in the call frame and how we exit from a function and return
+control to the caller. We'll deal with exiting first. 
+
+\subsubsection{Exiting a function}
+The simplest way a function can exit and hand control back to the
+caller is with an explicit \SKeyword{return} expression. This can be
+called with no arguments or with a single value which can be any S
+object. If we want to return two or more values, we put them in a list
+and return that single list object. For example, suppose we wanted to
+return both the text of a mail message and the header information, we
+might create a named list with these two elements and then return
+that:
+\begin{verbatim}
+  return(list(text = messageLines, header = header))
+\end{verbatim}
+This is a list with two named elements, but we are returning a single
+R object, the list. If we don't want to return anything, we can call
+\SKeyword{return} with no argument, but that actually returns
+\textsl{NULL}.
+
+Explicitly calling \SKeyword{return} allows us to exit from a function
+within loops, if-else statements, and so on. In many functions, we
+often want to do some computations and return the last computed
+value. R helps us do this by making the value returned by a function
+the result of evaluating the last expression. So in the absence of an
+explicit \SKeyword{return} being evaluated, R returns the last result
+evaluated. This means you will often see something like
+\begin{verbatim}
+ function(x) {
+   x = x[!is.na(x)]
+   x = x[x > 0]
+   sum(x)/length(x)
+ }
+\end{verbatim}
+and the result is the last expression \verb|sum(x)/length(x)|. 
+
+When we call a function, either from the prompt or in other functions,
+we can assign the result to a variable in the standard way:
+\begin{verbatim}
+ x = sum(1:10)
+\end{verbatim}
+
+\subsubsection{Mapping inputs to formal arguments}
+The last remaining thing to understand about calling functions is how
+the inputs we give it are mapped to the formal arguments and how we
+can use this conveniently. We have seen that formal arguments in a
+function definition have names, and some may have default values. When
+we call a function, R maps these inputs to the formal argument names
+and puts them into a call frame with variables corresponding to these
+formal argument names. One can think of this step in the following
+way. R first creates a list (or table) of variables with one variable
+named for each of the formal arguments. Next, it assigns the default
+value for each formal argument that has one to the corresponding
+variable. So in our substring example above,
+\begin{verbatim}
+function (text, first, last = 1e+06) {
+
+}
+\end{verbatim}
+R would create a call frame with variables named \SVariable{text},
+\SVariable{first} and \SVariable{last}. It would then assign the value
+1e+06 to \SVariable{last}.
+
+It is at this point that R starts to try to map the inputs to these
+variables. Suppose we have a call of the form as before.
+\begin{verbatim}
+ substring("This is a value", 3, last = 5)
+\end{verbatim}
+R starts first by matching named arguments. So in this case it looks
+at `last' and recognizes that that matches the name of a formal
+argument. So it assigns the value 5 to \SVariable{last} in the call
+frame table. Now, there are no other named arguments, so it starts
+matching by position. ``This is a value'' is assigned to the first
+formal argument, \SVariable{text}. The next step is to match 3 to the
+next formal argument which is \SVariable{first}. Now we are ready to
+go.
+
+We have seen calls like the following.
+\begin{verbatim}
+ matrix(, 3, 4)
+\end{verbatim}
+This creates a 3 by 4 matrix with an \textit{NA} value in each
+element. How does this work with matching the arguments to the formal
+arguments of the function matrix:
+\begin{verbatim}
+function (data = NA, nrow = 1, ncol = 1, 
+          byrow = FALSE, dimnames = NULL) 
+{
+    data <- as.vector(data)
+    if (missing(nrow)) 
+        nrow <- ceiling(length(data)/ncol)
+    else if (missing(ncol)) 
+        ncol <- ceiling(length(data)/nrow)
+    x <- .Internal(matrix(data, nrow, ncol, byrow))
+    dimnames(x) <- dimnames
+    x
+}
+\end{verbatim}
+
+
+The rule is that we first handle all the named arguments. In this
+case, there are no named arguments. So we skip to the next stage of
+the matching. This involves matching by position. The first argument
+is intentionally missing (i.e. the lack of argument before the first
+comma in \verb|matrix( , 3, 4)|). So we count that as the first formal
+argument (\SArg{data}) but leave its default value as the actual value
+in the call. Then we process the value 3. This is assigned to the next
+formal argument which is first actual argument is 3 and that gets
+matched to the second formal argument, \SArg{nrow}. Lastly, we match 5
+to the next formal argument which is \SArg{ncol}.
+
+R does have a mechanism that allows us to abbreviate argument names
+when they unambiguously identify the particular argument. For example,
+rather than using the command 
+\begin{verbatim}
+matrix(1:10, ncol = 5)
+\end{verbatim}
+we could
+abbreviate the ``ncol'' to 
+\begin{verbatim}
+matrix(1:10, nc = 5)
+\end{verbatim}
+as that matches only the \SArg{ncol}. This style of abbreviated
+argument names is called partial matching and can make code much
+harder to read and confusing. It can also lead to some very subtle and
+frustrating bugs so you should avoid using it, and if you do chose to
+use it, do so only in interactive use!
+
+There is one additional style of formal argument in R functions. This
+is the $\ldots$ mechanism. When R cannot match an argument by name or
+by position, and there is a formal argument $\ldots$ in the signature
+of the function, the argument is added to this list. This is a
+mechanism by which we can have an arbitrary number of arguments for
+the list. While it does allow us to have any number of arguments in
+functions like \SFunction{c}, \SFunction{list}, \SFunction{sum} and so
+on, it also has another purpose. It allows us to write top-level
+functions that use $\ldots$ to take any arguments which it then passes
+on to lower-level functions.
+
+\subsection{Writing Functions}
+We can add our own functions to the R system and use them just as we
+do regular, ``built-in'' functions. A very common style of writing and
+managing functions is to create them in a regular ASCII/text file
+somewhere in your account. Then, when you want to try them in R, use
+the function \SFunction{source} to read and evaluate the commands in
+that file. This will define the functions you have created in the
+file as regular variables in your workspace, ready for you to use and
+check. Then, if you need to modify the function to fix a bug or make
+it more general, then change it in the file again, and
+re\SFunction{source} the file into R.
+
+Let's suppose we wanted to take lines of the form {\em{name=value}}
+and turn them into a vector of {\em{value}} elements with names given
+by the vector of {\em{name}} elements. For example, we might have a
+file something like
+\begin{verbatim}
+font=Times
+color=red
+font-size=12
+\end{verbatim}
+to specify appearance of text. The result of our function should
+return the named character vector
+\begin{verbatim}
+  c(font = "Times", color = "red", "font-size" = "12")
+\end{verbatim}
+How do we go about writing a function to transform general lines like
+this into the corresponding vector? When programming a task, we break
+it into its smaller units or steps. First, we need to read in the
+lines. Next, we need to break the lines into the name and value
+pieces. Then we need to create the vector. Then, we need to put
+the names on the resulting vector. We start by writing a function that
+takes the name of the file as its input. We do this by using the
+function. We define a function using the \SKeyword{function} and
+supplying the list of formal arguments.
+\begin{verbatim}
+function(filename)
+{
+
+}
+\end{verbatim}
+This just defines the function as an R object, but does not assign it
+to an R variable. This means that it will just disappear. It is what
+we call an anonymous function. We will see that this is very useful,
+but more often we want to assign the function to a variable. We do
+this just like we do for any assignment.
+\begin{verbatim}
+readProperties =
+function(filename) 
+{
+
+}
+\end{verbatim}
+
+
+So far, so good. We have created a function that takes one argument
+and assigned it to the variable
+\SVariable{readProperties}. Unfortunately, it doesn't do much. We have
+to supply R expressions that perform the actions of the function and
+put them in the body. We do this by putting these expressions between
+the \{...\}
+
+Let's start by trying to map the steps we outlined for the function
+into actual code. The first step is to read in each line from the
+file. We do this with the \SFunction{readLines} function. So we call
+this and store the results in a local variable, say \SVariable{txt}.
+\begin{verbatim}
+readProperties =
+function(filename) 
+{
+  txt = readLines(filename)
+}
+\end{verbatim}
+Now we want to split each line into the bit before the first = sign
+and the rest to the left. Before we head off to write a function to do
+this, we should look through R's collection of functions to see if
+such a function already exists. Fortunately it does, in the form
+of the \SFunction{strsplit} function.
+\begin{verbatim}
+readProperties =
+function(filename) 
+{
+  txt = readLines(filename)
+
+  splits = strsplit(txt, "=")
+}
+\end{verbatim}
+Now we have a list with character vector entries of the following form.
+\begin{verbatim}
+c("font", "Times"), c("color", "red") and c("font-size", "12")
+\end{verbatim} 
+So our task is to extract the second element as our values and the
+first elements as names.
+\begin{verbatim}
+readProperties =
+function(filename) 
+{
+  txt = readLines(filename)
+  splits = strsplit(txt, "=")
+
+  values = sapply(splits, function(x) x[2])
+  names(values) = sapply(splits, function(x) x[1])
+
+  values
+}
+
+
+\end{verbatim}
+The calls to \SFunction{sapply} do just these two steps and we assign
+the names to the vector of values. Finally, we return the result
+with the line \verb|values| at the end of the function, and we have
+written a new function in R.
+
+We now \SFunction{source} this into R by \SFunction{source}'ing the
+file in which we created this file. The next step is to test the
+function. To do this, we need to prepare a test file to use as the
+input. We can take the three example lines above as a start. Of
+course, we need to test on more interesting and complex data if we
+want to have any confidence our function will work in general
+situations, but let's start with these three lines and put them in a
+file, say {\texttt{props.txt}}. Then we can invoke this function as
+\begin{verbatim}
+ readProperties("props.txt")
+\end{verbatim}
+Sure enough, we get the correct result. 
+\begin{verbatim}
+     font     color font-size      <NA> 
+  "Times"     "red"      "12"        NA 
+\end{verbatim}
+
+Note, however, that some people may have obtained a different
+result. For example, with a slight change to the {\texttt{props.txt}}
+file, we get
+\begin{verbatim}
+     font     color font-size       <NA> 
+  "Times"     "red"      "12"        NA 
+\end{verbatim}
+Where did this NA come from? Think about it. Being able to diagnose
+problems from the output or other symptoms is one of the important
+skills in being able to write functions. Since it worked on the
+original file, lets look to see what is different about this file and
+the previous version. There are utilities to find differences between
+files which might help. In this case, we can see that there is an
+extra blank line at the end of the new version of the file. So
+somehow, the NA is coming from the blank line. Our job is to
+understand how and then to try to fix it.
+
+What does \SFunction{strsplit} do with a blank line. It returns an
+empty character vector, i.e. of length 0. So \SFunction{strsplit} is
+not the problem. But where do the NAs come from? Since there are few
+other expressions in our function, let's look at the next few
+commands. What happens in the \SFunction{sapply} commands? The
+functions that extract the first and second elements may be causing
+problems. What is the first element of a character vector of 0 length?
+We can try this in R to see the result:
+\begin{verbatim}
+> character(0)[1]
+[1] NA
+\end{verbatim}
+So that seems to be our problem, especially since we are getting
+\textit{NA}s in the values and the names.
+
+Now that we know what the problem is, how do we fix it? We could
+adapt the functions in the \SFunction{sapply} calls to not return
+\textit{NA} when the vector has length 0, but that will unnecessarily
+complicate them and also misses the real point. Instead, we just want
+to drop entirely blank lines in our input before call
+\SFunction{strsplit}. So we just need to add a line something like
+\verb| txt = txt[txt != ""]| and our function will be better behaved.
+\begin{verbatim}
+readProperties =
+function(filename) 
+{
+  txt = readLines(filename)
+  txt = txt[txt != ""]
+
+  splits = strsplit(txt, "=")
+
+  values = sapply(splits, function(x) x[2])
+  names(values) = sapply(splits, function(x) x[1])
+
+  values
+}
+\end{verbatim}
+We retest after re\SFunction{source}'ing this into R. 
+\begin{verbatim}
+> readProperties("props.txt")
+     font     color font-size 
+  "Times"     "red"      "12" 
+\end{verbatim}
+We get the correct answer. 
+
+Notice how we are making our function more robust and general and
+iteratively refining it by prototyping and testing and recoding, and
+doing this over and over again until we are happy with the
+function. This is a good style. First, break the function into
+small steps and write down code to do each one. Then test, fix, test,
+... Then test on different inputs.
+
+These properties files can be written in different formats,
+specifically using : instead of the = sign to separate the name and
+value on a line. It would be silly to write another function to handle
+files in that form. Instead, we can add an additional formal argument
+to the function to allow the user specify the particular separator
+that is used in the file. Let's call this argument \SArg{sep}. Now
+we have to replace the hard-coded value of ``='' with the value that is
+specified via this formal argument. Fortunately, there is only one
+case, in \SFunction{strsplit}.
+
+\begin{verbatim}
+readProperties =
+function(filename, sep) 
+{
+  txt = readLines(filename)
+  txt = txt[txt != ""]
+
+  splits = strsplit(txt, sep)
+
+  values = sapply(splits, function(x) x[2])
+  names(values) = sapply(splits, function(x) x[1])
+
+  values
+}
+\end{verbatim}
+
+It is good to avoid hard coded constants for this reason and to make
+them variables either within the function or formal arguments so that
+the caller can specify them. But now our function can handle two types
+of separators.
+
+It is slightly frustrating for the caller to always have to specify a
+value for the \SArg{sep} argument when it is typically =, say. We
+would like a way to allow a caller to specify this, but not insist on
+it. Default values will come to our assistance here. We can supply a
+default value for the \SArg{sep} argument:
+\begin{verbatim}
+readProperties =
+function(filename, sep = "=") 
+{
+  txt = readLines(filename)
+  txt = txt[txt != ""]
+
+  splits = strsplit(txt, sep)
+
+  values = sapply(splits, function(x) x[2])
+  names(values) = sapply(splits, function(x) x[1])
+
+  values
+}
+\end{verbatim}
+Now we can call this as 
+\begin{verbatim}
+readProperties("props.txt")
+\end{verbatim}
+or for clarity,
+\begin{verbatim}
+\verb|readProperties("props.txt", "=")
+\end{verbatim}
+or
+\begin{verbatim}
+readProperties("otherprops.txt", ":")
+\end{verbatim}
+This way, we get the best of all worlds: convenience but still
+adaptable and parameterizable.
+
+There are additional ways we may want to make this function more
+general. Firstly, it is possible that the right hand side of a
+name-value property contains the separator string. For example, the
+label on a radio button in a GUI may read
+\begin{verbatim}
+label=  intercept = 0?
+\end{verbatim}
+When we apply \SFunction{strsplit} to this line, we will get a
+character vector with 3 entries - 
+\begin{verbatim}
+c("label", "intercept ", "0?")
+\end{verbatim}
+This is just the left and right hand side. So when we get the value,
+we need to put the second and third elements back together again into
+a single string. We would do this with the command
+\begin{verbatim}
+  values = sapply(splits, function(x) paste(x[-1], collapse = sep)
+\end{verbatim}
+
+
+We also need to handle the case where a value is continued across
+multiple lines. For example, we may have a property file of the form
+\begin{verbatim}
+label=This is a multi line
+    value
+\end{verbatim}
+What we know about such files is that the continuation lines start
+with white space.  [exercise] \textbf{Q:}~\textit{Extend this function
+  to handle these continuation lines.}  [/exercise]
+
+
+There are some important aspects of style you should think about when
+writing functions. Firstly, indent your code so that it is easier to
+read. By this we mean align commands that are at the same level and
+put additional white space in front of commands within loops, if-else
+statements, etc. to indicate their relationship to that collection of
+expression. Compare the two functions
+\begin{verbatim}
+function(x) {
+if(any(x)<=0)
+x[x<=0]=epsilon
+for(i in x) {
+g(x)
+}
+}
+\end{verbatim}
+and 
+\begin{verbatim}
+function(x) {
+
+  if(any(x) <= 0)
+     x[x<=0] = epsilon
+
+  for(i in x) {
+     g(x)
+  }
+}
+\end{verbatim}
+
+
+The next thing to do is put comments in your code. A comment is
+introduced by the \# character. All text after this to the end of the
+line is ignored by S. So you can put in informative remarks to remind
+yourself or the reader what the purpose of command(s) is.
+\begin{verbatim}
+readProperties =
+function(filename, sep) 
+{
+   # Read the lines into a character vector with
+   # one element per line.
+  txt = readLines(filename)
+
+   # Discard the empty lines.
+  txt = txt[txt != ""]
+
+    # Break the string by the value of sep
+  splits = strsplit(txt, sep)
+
+    # Get the right hand side of each line, putting the elements
+    # back together if they were split by sep.
+  values = sapply(splits, function(x) paste(x[-1], collapse = sep)
+    # Get the left hand side of the line which is the name
+    # put this on the values vector.
+  names(values) = sapply(splits, function(x) x[1])
+
+  values
+}
+\end{verbatim}
+
+
+It is also useful to give meaningful names to the variables and formal
+arguments to make the code easier to read. The names should be
+suggestive of the purpose or nature of the values being stored in the
+variable.
+
+\subsection{Debugging Functions}
+
+One of the nice things about writing code in an interpreted language
+like R or Matlab is that there is no compilation step. We just source
+our function into R and we can use it. Compilation does provide an
+opportunity to check certain things about the code however that we
+don't have when we source into R. The only thing that is checked when
+we read the code into R is the syntax. It is common to have forgotten
+to close a " or a parenthesis, or to have omitted a , between
+arguments in a call, or whatever. The result is a syntax error and R
+will announce where it thinks it is by giving a line number. Often,
+this identifies the problem precisely. At other times, it may be the
+expression before that line that hasn't been terminated properly.
+
+But after that, the interpreter does not examine the code in the
+function to try to detect any errors. Rather, it waits until the
+function is called and then only finds errors that affect that actual
+run-time behavior of the actions of the code. However, it is quite
+common to introduce problems when we build up functions incrementally
+by interactively issuing commands at the R prompt and then
+cut-and-paste them into a file. Often, we make use of variables that
+are in the session when we evaluate the command interactively, but
+which aren't present when we run the function, e.g. when we return to
+a new R session and source our functions. In these circumstances, when
+we call the function, it will complain about a variable not being
+found. There are functions available for R in the
+\RPackage{codetools} that will identify these ``free'' variables.
+
+The more interesting case of an error is when something in the
+computations actually go wrong for more subtle reasons. There are two
+basic situations that we need to be worried about. Firstly, there is
+an error and R terminates the call to the function with an error
+message. This is actually the best type of error. We see the message
+and can try to make sense of it, and as we shall see, we can go in and
+investigate what the states of the different variables were at the
+time of the error.
+
+The more insidious problem arises when one's code returns an incorrect
+value, e.g. returning a negative value or an \textit{NA} when it is
+not supposed to. It is hard to detect these situations because there
+is no abnormal termination of a function call, no error message. In
+fact, there is no sign that anything has gone wrong because the system
+does not know that anything has indeed gone wrong. Unfortunately, it
+is a problem-specific issue. The author of the function needs to
+identify that there is an error. A strongly-typed language which
+allows/requires the author of the function to specify the return value
+might help in catching such ``errors'', but there are trade-offs.
+
+So how do we go about finding the cause of an error, be it explicit or
+implicit? Most people quickly gravitate to the idea of adding
+expressions to the computations at ``approriate'' places that print
+the results of intermediate computations. One can use
+\SFunction{print} and \SFunction{cat} to output information on the R
+console. One of the problems with this is that it tends to generate a
+large amount of output and some of the important details that would
+identify an error get lost in the multitude of text that scrolls
+by. So one has to be judicious in adding these output
+statements. Additionally, the process of adding the \SFunction{print}
+statements, running the commands, analyzing the output and then adding
+more specific \SFunction{print} statements tends to be quite time
+consuming. This is especially true if the computations take a long
+time before getting to these \SFunction{print} statements. The reason
+things take a long time, or more precisely numerous cycles, is that we
+tend to initially print general information such as the length or type
+of a variable. Then we make "guesses" or formulate hypothesis about
+what might be wrong and arrange to print out diagnostic information to
+explore that. Then we rerun the computations and repeat the
+process. Sometimes we make things slower by having errors in our
+debugging print commands! But even if we don't, often our guesses are
+not quite correct and we go down the wrong path. Often the problem
+lies not with a single variable but the other variables that were used
+in computing its value. So we need to go back and explore different
+hypothesis for what might be wrong and use more information. This is a
+very tedious process when done in the edit-print-debug cycle.
+
+A much more sensible approach that an overwhelming number of people do
+NOT use is to take advantage of explicit tools for debugging. So many
+people think that their particular problem will reveal itself in the
+first iteration of the edit-print-debug cycle and so there is no need
+to take the time to take a detour and learn about the debugging tools
+in R (or another language they are using). This is, at best,
+optimisticl as statisticians, it is a foolish lack of learning from
+data and experience. So often I have sat down with users and tried to
+help them solve a problem. I often watch them use their approaches for
+twenty minutes or so and try to help them along. Then I "take over"
+and illustrate how to use the more structured debugging tools and
+identify the problem within a minute. This is not unusual. The tools
+combined with experience are remarkably more effective than seemingly
+``simpler'' methods. So use them and you will save time!
+
+Let's consider the case where you get an error and you don't
+understand it. The first thing you want to do is actually read the
+error message and break into its components. What is the nature or
+type of the error? Is there any information about what variables are
+involved? Where did the error occur? Of course, it occurred as a
+result of your command, but as that command was being evaluated, it
+called other functions, which called other functions and so on. This
+is the (function) call stack, a hierarchy of function calls and
+associated evaluation frames for local variables, etc. It is very
+helpful to know where in this call stack the error occurred. It gives
+us much more information about the nature and origins of the error. So
+we'd like to be able to see the call stack and find out in which
+function the error occurred and which function called that one, and
+which called that one, and so on. Rather than just finding out
+this "static" information, we would like to be able to jump into any
+of those function calls and look around, issuing R commands to explore
+and examine the values of the variables.
+
+When the R interpreter encounters an error, by default it emits an
+error message and jumps back to the top-level prompt and waits for a
+new command. However, we can instruct the interpreter to handle the
+error in our own user-definable way. We can specify a function or
+command to run when any error occurs by specifying the function or
+expression of interest as the value for the \SArg{error} option in the
+\SFunction{options} function. In order to get interactive debugging
+that gives us the properties we discussed in the previous paragraph,
+the most common value to specify for this option is the
+\SFunction{recover} function. We can specify this at any time during
+the R session as
+\begin{verbatim}
+options(error = recover) 
+\end{verbatim}
+It is a good idea to put this in your [file] .Rprofile [/file] file in
+your home directory so that it is automatically set at the beginning
+of each R session. Use the code
+\begin{verbatim}
+library(utils)
+options(error = utils::recover) 
+\end{verbatim}
+to ensure that the relevant package is loaded.
+
+\subsubsection{Post-mortem Debugging}
+Now that we have seen the mechanics of debugging, it is helpful to
+think about how we approach debugging more generally. The first thing
+to be said is that you want to be approach debugging as a detective
+looking for the actual cause of the problem, keeping your mind open to
+different possible conclusions, but prioritizing different hunches or
+intuitive educated "guesses" as to what is happening. As you get more
+information, reevaluate the different hypotheses or possible
+conclusions and eliminate those that no longer make sense and be keen
+to reprioritize these possibilities. Usually, there are several
+possible explanations and you want to rational and logical when
+debugging.

@@ -1,0 +1,314 @@
+\documentclass[11pt]{book}
+
+\usepackage{comment}
+\usepackage{times}
+\usepackage{natbib}
+\usepackage{fullpage}
+\usepackage{moreverb}
+\usepackage{amsmath}
+\usepackage{lscape}
+
+\bibliographystyle{plain} % prsty, unsrt
+%\usepackage[gather]{chapterbib}
+\usepackage{bibunits}
+
+\usepackage{hyperref}
+\input{WebMacros}
+\input{Smacros}
+\input{XMLMacros}
+\input{HTMLMacros}
+
+\def\lt{$<$}
+\def\gt{$>$}
+
+
+\usepackage[pdftex]{graphicx}
+
+\def\env#1{\texttt{#1}}
+\def\Rfunc#1{\textbf{\texttt{#1()}}}
+\def\Rcode#1{\texttt{#1}}
+
+\begin{document}
+
+\tableofcontents
+\pagebreak
+
+\include{prefaceSciCompWData}
+
+\chapter{Introduction}
+
+\chapter{Introduction to Programming:  Getting Started}
+
+\chapter{The Foundations of the Language}
+
+%\input{RNG/RNG}
+
+\chapter{Basics of Visualizing Data}
+The basics of graphics devices, high-level plots,
+annotating plots, and even 
+\Rcode{par(mfrow = c(r, c))} and 
+\Rfunc{layout}.
+
+This will also  cover the basics of lattice.
+
+\chapter{Data Input}
+\section{Reading regular/tabular data.}
+\section{More complex data}
+\subsection{connections}
+\section{Dealing with Large Data}
+
+\chapter{Working with Complex Data: Text}
+
+
+\chapter{UNIX Tools}
+This chapter discusses the basics of using unix tools on different
+platforms (Linux, Mac OS X, cygwin).  We present some of the standard
+UNIX tools such as wc, grep, sort, uniq, cut, and so on.  We also
+present the ideas of redirection and pipes and how we can connect the
+output of one command as the input to another.  We also constrast
+these approaches to using built-in R functions and how, under certain
+circumstances, we can gain remarkably efficiency in our computations.
+It also illustrates how we have to think about which tool we use for
+particular tasks and how we can combine these tools for an overal
+task. In this way, this is the initial introduction to inter-system
+interfaces, but in a relatively traditional manner.
+
+
+\section{The UNIX Command Line}
+Thi chapter focuses on using the shell remotely or interactively
+generally.  It builds on the previous chapter and may even be a
+subsection.  This covers topics such job creation and control,
+i.e. nohup, batch jobs, \&, kill.  We also cover ssh, scp, X11
+forwarding, ssh configuration.
+
+% Shells
+
+%\input{Geolocation/Geolocation}
+
+\chapter{Relational Databases}
+%\input{RDBMS/dbms} 
+
+\chapter{Basics of XML}
+\section{The structure of XML}
+\section{Parsing XML}
+ \subsection{xmlParse}
+ \subsection{XPath}
+ \subsection{htmlParse}
+ \subsection{xmlEventParse}
+ SAX event parsing
+ \subsection{xmlTreeParse}
+ R-based objects
+
+\section{Generating XML within R}
+ \subsection{HTML}
+
+\chapter{Web Services}
+ \section{HTML Forms}
+ \section{REST}
+   \subsection{GET and parameters}
+ \section{RCurl}
+   \subsection{Controlling the HTTP request}
+ \section{SSOAP}
+   \subsection{.SOAP}
+   \subsection{WSDL}
+
+
+
+\chapter{Efficient Code}
+This chapter is concerned with making code run quicker or with less
+memory.  We start by measuring the time a function or piece of code
+takes to run as a function of the size of the inputs.  This introduces
+the notion of empirical algorithmic complexity.
+
+We then discuss how to write efficient code, i.e. code
+that runs quickly and does not use excessive memory.  We present some
+general rules to keep in mind when writing R code, or indeed code in
+most languages.  We illustrate the effects of these guidelines on some
+relatively simple examples to show how much improvement we obtain. 
+
+We then move on to general tools for identifying which code
+
+ \section{system.time, gc, --min-vsize}
+ \section{Pre-allocating results rather than concatenation}
+ \section{Avoiding Recalculation}
+   Here we talk about the obvious idea of avoiding recomputing
+   expressions that we don't have to. This arises often when we 
+   try to 
+ \section{Profiling}
+   \Rfunc{Rprof}
+ \section{Memory Profiling}
+   \Rfunc{tracemem}
+
+\section{Compiled Code}
+ The next step in making code run more quickly is to use a faster
+ programming language.
+
+ \subsection{The Anatomy of Compiled Code}
+  Compilation, linking, loading
+  dyn.load
+  nm, ldd/otool, %\env{(DY)LD\_LIBRARY\_PATH}
+  \subsubsection{Why is C code faster than R code?}
+  \subsection{.C}
+  \subsection{.Call}
+
+  \subsection{Interfacing to C++}  
+     extern and name mangling
+   \subsubsection{Rcpp}
+   \subsubsection{Implementing and Extending C++ classes with R functions}
+  \subsection{Using dyncall}
+  \subsection{Automating the Process: GCC Translation Unit}
+  \subsection{SWIG}
+  \subsection{Type libraries on Windows}
+
+
+ \section{Basics of High Performance Computing}
+   (This might be a separate chapter)
+
+
+
+
+
+\chapter{Software Tools}
+
+\section{Version Control}
+ make (ant), version control (svn or git)
+
+\section{Literate programming}
+
+\section{R Tools for working with source}
+ (e.g. ptoc, codetools, CodeDepends)
+
+\section{}
+ patch \& diff
+
+\section{shell scripting}
+
+  test
+
+\section{Configuration and Portability}
+
+ autoconf, configuration and portable code.
+
+
+ sed, (g)awk
+
+ find
+
+ cron jobs
+
+\section{File Permissions}
+ file permissions
+
+
+\chapter{Distributing Software}
+  \section{R Packages}
+   \subsection{Basics}
+   \subsection{Name Spaces}
+
+ \section{Installing 3rd party code}
+   without having adminstration privileges
+
+\chapter{Dynamic Documents and Reproducible Research}
+%Sweave, XDynDocs, RWordDynDoc
+
+Here we talk about the concept of dynamic documents 
+in which code is inserted into the document where the results
+are supposed to be. Then we process the document and 
+evaluate the code and insert the results of the computations.
+\section{Sweave}
+\section{XDynDocs}
+\section{odfWeave}
+\section{RWordDoc}
+
+
+\chapter{Object Oriented Programming}
+In this chapter we discuss the basic ideas and merits of
+object-oriented programming.  The idea is to introduce method
+dispatch, polymorphism, structured type defintions.
+We will go through several reasonably involved examples/case-studies
+which illustrate how to think about designing and programming S3 and
+S4 classes.
+
+\section{S3 Classes and Methods}
+ This is the simple and marginally old-fashioned approach to 
+ 
+   
+ \section{S4 Classes and Methods}
+ Here we discuss the S4 class and method mechanism.
+
+
+ \section{Combinging S3 and S4}
+ In some cases, we will have S3 classes and we won't want to update
+  them to S4 classes.  However, we will want to use some of these classes
+  with S4 methods.  So we will have to understand how these interact.
+
+
+\chapter{Graphical User Interfaces}
+\textbf{Much of this will come from our wxWidgets paper.
+However, we might target Qt.}
+
+  \section{Toolkits: Gtk, wxWidgets, Qt, Tk, gWidgets}
+   We do not focus on Tk, but rather the other three toolkits and
+   their relative merits and similarities.
+  \section{Widgets}
+    We discuss the creation of widgets in the different toolkits.
+  \section{Callbacks}
+    We present the ideas of signals, events and event handler functions.
+   \subsection{Closures/Lexical Scoping}
+     Here  we talk about how we can define a collection of functions
+     that  share a set of variables that are unique to a particular
+     instance of a GUI. 
+     This is the notion of scoping based on closures or lexical scoping.
+  
+  \section{GUI Designers}
+     Using GUI applications to create GUIs interactively.
+     libglade, wx's GUI designer
+  \section{Mozilla}
+
+\chapter{Inter-system interfaces}
+ \section{General Philosophy}
+Here we discuss the general idea of inter-system interfaces.
+This is the idea that the programmer in one language can call
+functions written in another as if they were  native to the programmer's own
+language.  The idea is very simple but frequently not used. 
+
+
+ \section{RSPython/Rpy}
+ This illustrates how we can call Python functionality and classes
+ from R and R functionality from R.  We work through different case
+ studies/examples that illustrate the utlity of Python as a scientific
+ programming language in combination with R.
+ \section{RSPerl}
+  We look at how we can can interact with Perl from R and vice-versa.
+  Again, there are lots of examples such as processing email messages.
+ \section{rJava/RSJava}
+  There are two R-Java  bridges. These allow R programmers to
+  interface with Java classes and methods in different  manners.
+  Similarly, Java programmers can use R functionality.
+
+ \section{DCOM}
+ CORBA and DCOM are what are called middle-ware.  They act as brokers
+ between applications to provide ``remote procedure invocation''.  We
+ show how we can use R as a DCOM client using either RDCOMClient or
+ rcom.  We also show how we can export a collection of R functions to
+ implement an server object via RDCOMServer.  We use the combination
+ of RDCOMServer and RDCOMClient to implement DCOM event handlers (via
+ RDCOMEvents).
+
+%\part{Visualization}
+
+%\chapter{Advanced Graphics: Grid}
+
+
+\chapter{Advanced Visualization: Interactive, Annotated Graphics}
+
+\section{Low-level graphics: grid}
+
+\section{SVG}
+\section{Flash MXML}
+\section{KML}
+
+\section{rgl}
+
+
+\end{document}

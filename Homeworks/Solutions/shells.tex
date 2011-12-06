@@ -1,0 +1,885 @@
+\documentclass[10pt]{article}
+\usepackage{fullpage}
+\usepackage{times}
+\usepackage{comment}
+
+\title{Solutions to Stat 141, Homework 1\\
+Duncan Temple Lang}
+\def\executable#1{\textbf{#1}}
+
+\begin{document}
+\maketitle
+
+In addition to the official questions, 
+I asked lots of questions on this homework
+as part of the background to the data.
+It is always good to get as full an understanding
+as possible.
+
+\textit{ What other sort of HTML page will give rise to multiple
+  requests?} Firstly, each request will result in sub-requests for
+documents referenced within it such as images, JavaScript files, etc.
+Another type of page that will produce (multiple) sub-requests is an
+HTML document made up of ``frames'', i.e.  separate documents in the
+same browser page.  Each sub-document within the screen will be
+requested separately.  Similarly, when one visits a site, an icon for
+the site is often displayed in the URI field of the browser to provide
+a quick visual reference of the identity of the page's host site.
+
+
+
+\textbf{Answers to the official questions.}
+\begin{enumerate}
+\item 
+To get the number of requests, we just want the number of lines in the
+files. We do want to ensure that we don't include comment lines.
+These are lines that start with a \# character.
+So before we start looking at records, we should check whether there
+are any comment lines. If there are, we should filter them out from
+the orignal files or we will have to filter them out for each command.
+We can check for comment lines  using 
+\executable{grep} and a suitable pattern. 
+I mentioned in class that the $\hat.$ symbol in a ``regular expression''
+(which what \executable{grep} uses for specifying patterns)
+means ``the beginning of the line''. (The ``\$'' character means the
+end of the line.)
+So to express the text pattern ``the start of the line followed
+immediately by the \# character'', we can use
+\begin{verbatim}
+  grep '^#' *log*
+\end{verbatim}
+Note that the shell expands the file names for the shell glob
+pattern \verb+*log*+
+We can use any pattern here that matches the files we want:
+\verb+*.log*+,  \verb+*log*+.
+We just want to make certain we catch all the ones we want and
+no more. So we can always test this with
+\begin{verbatim}
+ echo *log*
+\end{verbatim}
+and we will see what the shell passed to \executable{echo}
+as the sequence of arguments it expanded.
+
+Sinc I have files named omegahat.log and omegahat\_error.log
+in my directory, I use
+\begin{verbatim}
+  omegahat.log*
+\end{verbatim}
+to match all files starting with the literal string
+\verb+omegahat.log+ and followed by any characters, including
+no characters (i.e. omegahat.log).
+This avoids the error log files which \verb+*.log*+
+would include.
+
+The command
+\begin{verbatim}
+  grep '^#' *log*
+\end{verbatim}
+produces no output and so we have no comment lines. This means
+we can work on these raw logs for all our questions related to
+real records without having to filter them.
+
+So, now we can count the number of records by just
+counting the number of lines in all the files.
+We use \executable{wc} and ask only for the lines
+and we get results 
+\begin{verbatim}
+% wc -l omegahat.log*
+    1004 omegahat.log
+   28022 omegahat.log.1
+   21609 omegahat.log.2
+   25963 omegahat.log.3
+   28885 omegahat.log.4
+  105483 total
+\end{verbatim}
+For interactive, exploratory data analysis, this is great.
+We  have now got an idea about how many records there are;
+i.e. how many observations we have.
+
+If we had a lot of files or if were writing a report and wanted 
+to put the value into a file directly (e.g. to use it in a loop)
+we would want only the total and not the lines for each of the
+individual  files.
+We can do this by grabbing just the last line:
+\begin{verbatim}
+ wc -l omegahat.log* | tail -1
+\end{verbatim}
+And now we technically want just the number and not the word
+``total'', so we can filter this out also.
+We can use \executable{cut} for this, but it 
+is a little tricky. It depends on knowing how many spaces
+there are preceeding the count.
+The command
+\begin{verbatim}
+ wc -l omegahat.log* | tail -1 | cut -f3 -d ' '
+\end{verbatim}
+words, but  when we look at just the files
+omegahat.log.1, omegahat.log.2 and omegahat.log.3,
+we get no answer:
+\begin{verbatim}
+ wc -l omegahat.log.[1-3] | tail -1 | cut -f3 -d ' '
+\end{verbatim}
+So we need something more robust, i.e. not dependent
+on the format of the actual result.
+What is going on here?  The 3 in \verb+cut -f3+
+means the third field so we are looking for 2 spaces
+followed by the field we want - the count of the lines.
+But when the count is less than $100,000$, 
+\executable{wc} is preceeding the total with more
+spaces and so it is no longer the third field we want
+
+We can use \executable{sed} which is often
+used for doing substitutions of text patterns 
+in lines.
+We give sed an expression to run on each line
+via the -e flag.
+In this case, we want to substitute or replace the
+literal string  `` total'' with the empty string.
+The command
+\begin{verbatim}
+sed -e 's/ total//'
+\end{verbatim}
+works for this.  The substitution command in \executable{sed}
+is the character `s' and we tell it what to look for and
+what to replace it with by separating these two inputs
+with the `/' character. (In fact, we can use any character
+that is not in either of the two inputs.  So 
+\verb+ s| total||+ would work also.)
+
+And now we have our command
+\begin{verbatim}
+ wc -l omegahat.log* | tail -1  | sed -e 's/ total//'
+\end{verbatim}
+We can check that this gives the correct result for
+the subset of the files as well to ensure that this
+is reasonably general.
+
+We might also want to remove the leading spaces,
+for example, to use in calculations (via \executable{bc}
+or using the shell's own simple arithmetic).
+To do this, we could use either
+\executable{tr} for translating sets of characters to different
+characters, or we could use \executable{sed} to replace the
+space characters with nothing.
+\begin{verbatim}
+ wc -l omegahat.log* | tail -1  | sed -e 's/ total//'  | tr -d " "
+\end{verbatim}
+or
+\begin{verbatim}
+ wc -l omegahat.log* | tail -1  | sed -e 's/ total//'  | sed -e 's/ //g'
+\end{verbatim}
+Note the `g' at the end of the \executable{sed} expression.
+This says make the substitutions ``global'' and don't just stop
+at the first one.
+
+We have now pretty much exhausted that question but hopefully 
+illustrated lots of other aspects of the shell tools.
+
+
+\item The start and end date for each log file can be obtained using
+head and tail. 
+The earliest record is the first one in the file.
+The latest is the last record in the file.
+This is because the log files are written sequentially.
+So we can get the first and last record for each log file
+via two commands
+\begin{verbatim}
+ head -n 1 omegahat.log.1
+ tail -n 1 omegahat.log.1
+\end{verbatim}
+Now, we want these for all the files.
+Fortunately, \executable{head} and \executable{tail}
+accept multiple files as inputs.
+So we can get all the initial records
+{\footnotesize
+\begin{verbatim}
+head -n 1 omegahat.log*
+==> omegahat.log <==
+133.51.21.64 - - [09/Jan/2005:04:06:37 -0800] "GET /robots.txt HTTP/1.1" 404 1070 "-" "wish-la"
+
+==> omegahat.log.1 <==
+81.155.137.144 - - [02/Jan/2005:04:03:13 -0800] 
+"GET /RSJava/man/Java/html/file.choose.html HTTP/1.1" 
+ 200 1757 
+"http://www.google.co.uk/search?q=file+dialog+file+filter+java&hl=en&lr=&start=30&sa=N" 
+ "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 1.0.3705; FDM)"
+
+==> omegahat.log.2 <==
+195.208.220.215 - - [26/Dec/2004:04:02:08 -0800] "GET /robots.txt HTTP/1.0" 404 1070 "-" "-"
+
+==> omegahat.log.3 <==
+207.46.98.30 - - [19/Dec/2004:04:02:07 -0800] "GET /RSXML/WritingXML.html HTTP/1.0"
+     200 15554 "-" "msnbot/0.3 (+http://search.msn.com/msnbot.htm)"
+
+==> omegahat.log.4 <==
+66.151.181.4 - - [12/Dec/2004:04:02:41 -0800] 
+  "GET /RSPerl/man/RSPerl/html/PerlExpr.html HTTP/1.0"
+   200 1687 "-" 
+   "FAST-WebCrawler/3.8/Scirus (scirus-crawler@fast.no; http://www.scirus.com/srsapp/contactus/)"
+\end{verbatim}
+}
+Now, we don't want to have to deal with these extraneous lines in the
+output that identify each file.
+So we want to filter these out.
+We can do this by matching lines that starts with \verb+==>+
+and excluding these. The -v flag for \executable{grep} 
+allows exclusion of matching lines, or inverse matching.
+\begin{verbatim}
+head -n 1 omegahat.log* | grep -v '==>'
+\end{verbatim}
+We are still left with the blank lines which would be nice to
+eradicate also.
+A blank line can be identified with the pattern
+expressed in English as 
+``a line that starts with a beginning of line and is followed
+immediately by an end of line''.
+Using regular expressions, we can say this as
+\verb+^$+ since
+$\hat.$ means ``beginning of line'' and '\$' means ``end of line''.
+Again, we want to exclude such lines
+\begin{verbatim}
+head -n 1 omegahat.log* | grep -v '==>' | grep -v '^$'
+\end{verbatim}
+And now we have exactly the starting records we want. 
+
+All we need to do is fetch the date field.
+We can use cut for this.
+To get the entire string (with time zone), we can use 
+\begin{verbatim}
+cut -f4-5 -d' '
+\end{verbatim}
+Note that we want to do this after we have filtered the records of
+interest (e.g. after the call to \executable{head}).  We could do it
+first, but then we will be operating on all the lines and then
+subsetting the ones we want. So doing the \executable{cut} at the end
+means we don't do extra work.
+
+We can do the same thing for the records at the end
+of the files using \executable{tail}.
+\begin{verbatim}
+tail -n 1 omegahat.log* | grep -v '==>' | grep -v '^$' | cut -f4-5 -d' '
+\end{verbatim}
+
+Now it is convenient to arrange the start and end dates
+in two columns for each file.
+We can do this using \executable{paste}.
+We want to combine the two computations via paste.
+To do this, we could store the output from each
+in a file and then \executable{paste} these
+two files together.
+\begin{verbatim}
+head -n 1 omegahat.log* | grep -v '==>' | grep -v '^$' | 
+                 cut -f4-5 -d' ' > Start
+tail -n 1 omegahat.log* | grep -v '==>' | grep -v '^$' |
+                 cut -f4-5 -d' ' > End
+paste Start End
+\end{verbatim}
+We then have to clean up these temporary files.
+\begin{verbatim}
+rm Start End
+\end{verbatim}
+
+Typically, when we have intermediate files (like Start and End),
+we can avoid them by using in-lined computations via 
+the pipe (|) or execute-and-replace (\textit{`cmd`}).
+This is a little hard for these computations above
+and is not worth the hassle.
+
+We can get rid of the brackets around the date if we want,
+although it is not essential.
+We can do this via \executable{tr}:
+\begin{verbatim}
+head -n 1 omegahat.log* | grep -v '==>' | grep -v '^$' |
+     cut -f4-5 -d' ' | tr -d ']['
+\end{verbatim}
+
+
+\item
+Identifying the robot records is an iterative task.
+First, we want to identify the records that are ``obviously''
+robots.  These are the ones that request the file
+\textsl{robots.txt}.
+Additionally,  we can use a list of well known robot
+user agent identifiers (e.g. Googlebot, Yahoo Slurp)
+to identify the same and additional  records.
+The additional records are the requests that these robots
+submitted for files other than \textsl{robots.txt}.
+To find these records, we use \executable{grep}
+as we are looking for lines that contain particular strings.
+To find those that request \textsl{robots.txt}, we might use
+\begin{verbatim}
+grep robots.txt omegahat.log*
+\end{verbatim}
+This might include requests that just mention robots.txt in the line
+but that are not requests for that file.
+To test this, we might look at all the lines that do not have
+the request field \texttt{GET /robots.txt}.
+\begin{verbatim}
+grep robots.txt omegahat.log*  | grep -v 'GET /robots.txt'
+\end{verbatim}
+The result is 6 lines of
+the form
+\begin{verbatim}
+omegahat.log.1:61.135.131.209 - - [04/Jan/2005:15:37:54 -0800] 
+          "GET //robots.txt HTTP/1.1" 404 1070 "-" "sohu-search"
+\end{verbatim}
+So the only difference is that there are two / in the request!
+So we use these.
+
+We can now look at both the IP and User Agent fields in these collection of robot records.
+Let's compute the IP address for each of these records and then search the 
+full collection of records again to match for any of these.
+The result will be that we get
+not only the original records we matched (when looking for robots.txt),
+but also any other requests from any of those machines.  Since Web crawlers
+probably don't  have dynamic IP addresses (i.e. assigned to them each time they connect to the
+internet), any requests from an IP address identified as Web  crawler once, are likely
+to also be from a Web crawler.
+In other words, 
+if we identify 61.135.131.209 as a robot, then 
+any other requests from that machine are likely to be robot requests.
+
+To get the IP addresses of the robots, we use \executable{cut}
+to get just the IP addresses and then we make them into a set
+of unique elements, i.e. removing any duplicated entries.
+\begin{verbatim}
+grep robots.txt omegahat.log* | cut -f1 -d' ' | sort | uniq > RobotIP
+\end{verbatim}
+It is a good idea to look through this file, or at least compute the number of
+lines within it to verify it is what you expect:
+\begin{verbatim}
+wc -l RobotIP 
+     422 RobotIP
+\end{verbatim}
+So it has a reasonable number of lines, but we can look at the contents
+using \executable{head} or \executable{more}.
+The first $3$ lines look like:
+\begin{verbatim}
+omegahat.log.1:12.175.0.44
+omegahat.log.1:139.18.2.68
+omegahat.log.1:194.150.123.1
+\end{verbatim}
+The omegahat.log.1 is the name of the file in which the match occurred.
+We don't want this as we want just the IP addresses.
+We can get what we want in at least two different ways.
+The first way might be to take this file and use
+\executable{cut} to get the second field where the delimiter or separator
+is the : character.
+\begin{verbatim}
+ cut -f2 -d: RobotIP  
+\end{verbatim}
+We can do this as the last element of the pipe in the original command before redirecting
+to RobotIP,  or after we have created RobotIP. If we operate on RobotIP as above, 
+we cannot immediately redirect to RobotIP.
+In other words,
+\begin{verbatim}
+ cut -f2 -d: RobotIP  > RobotIP
+\end{verbatim}
+WILL NOT work.   Think about why? When does the file into which the output is redirected
+get created?
+
+The other and simpler approach to eradicating the names of the log file identifying the matches
+is to avoid them in the first place.
+They arise because we gave \executable{grep} a list of files  to work on.
+If we just gave it a stream of lines to process, then it would not know the name
+of the files and wouldn't  attempt to distinguish them. 
+So rather than listing the file names in the \executable{grep} command, we can
+\executable{cat} the contents of the files to 
+\begin{verbatim}
+cat omegahat.log* | grep robots.txt | cut -f1 -d' ' | 
+       sort | uniq > RobotIP
+\end{verbatim}
+This now gives us the file in the form we want.
+
+
+Now, we want to ask \executable{grep} to find all the records that match these
+IP addresses.
+Fortunately, \executable{grep} can read the patterns to match 
+from a file rather than the command line and it can be used
+for just the circumstances we have.
+We specify the file containing the patterns we want to match
+via the \textbf{-f} argument.
+\begin{verbatim}
+grep -f RobotIP omegahat.log*
+\end{verbatim}
+If we hadn't checked the contents of the RobotIP file and found the file prefix on each line (i.e.
+the \texttt{omegahat.log.1:}), we would end up with no matches at all. And this would have prompted
+us to find out what \executable{grep} was looking for as we know we should have at least matched all
+the same lines as the original search for \textsl{robots.txt}.
+
+We can now find out how many requests were made by robots in addition
+to 
+or different from the
+ones for \textsl{robots.txt}.
+\begin{verbatim}
+grep -f RobotIP omegahat.log* | grep -v 'robots.txt'
+\end{verbatim}
+Running this through \executable{wc -l} indicates that there are $34,210$
+records that match.
+Is that all the robot requests?
+
+We can also look at the IP addresses of the robots and look for
+related IP addresses.  Specifically, we could look for machines on the
+same domain. The domain is identified by the the first 3 components of
+the IP address.  For example, for the IP address 66.194.55.242, the
+domain is 66.194.55. The machine identifier within this is 242.  And
+robots often work as a team and make requests from the same domain.
+So one, e.g. 66.194.55.242, might ask for the robots.txt and another
+related machine, e.g. 66.194.55.12, might ask for some other file as
+part of the crawling.  So, we can filter on just the domain part of
+the IP addresses.  To do this, we find the IP addresses of the
+``known'' robots.  Then, we strip off the last component, e.g. the
+.242 and then pass these patterns to \executable{grep}.  We can work
+from the RobotIP file and just remove the machine name.
+\begin{verbatim}
+sed -e 's/\(.*\)\..*/\1/g' RobotIP  > RobotDomains
+\end{verbatim}
+Then we can use grep to filter these records.
+\begin{verbatim}
+cat omegahat.log* | grep -f RobotDomains 
+\end{verbatim}
+This might be too agressive and find non-robots 
+on the same domain.
+
+We can do even more. We can look at all of these records and build up a collection of user-agent
+identifiers.  And we can combine them with the ones we already know such as Googlebot, msnbot, Yahoo
+Slurp, etc.  So we use the initial filtering to identify robots and then use the User Agent fields
+from these to find more.
+We get the user-agent from fields 12 and beyond (via \verb+-f 12-+).
+\begin{verbatim}
+cat omegahat.log* | grep -f RobotDomains  
+     | cut -d ' ' -f 12- | sort | uniq | tr -d '"'  > RobotAgents
+\end{verbatim}
+Now we could add these to the filtering for non-robots:
+\begin{verbatim}
+cat omegahat.log* | grep  -v -f RobotDomains | grep -v -f RobotAgents
+\end{verbatim}
+or alternatively, we can concatenate the two files
+RobotDomains and RobotAgents into a single larger file
+and pass that to grep.
+And we can also check whether \executable{grep}
+accepts multiple -f arguments.
+Unfortunately, when we do any of these, we end up with no
+non-robot records. So we have to figure out why.
+We used the domains to search  for the user agent fields.
+And this ended up including regular browsers such as  Mozilla, Sherlock (on the Mac), 
+and so on. So it may be more sensible to go back to using the 
+full IP address of the machines, or
+taking only the user agents that we know to be robots, or excluding
+the ones in our robot filter  that we know to be non-robots.
+In fact, it is most likely that we have to be more intelligent
+about how we use the user agent field and we have to
+examine entries such as 
+\begin{verbatim}
+Mozilla/5.0 (compatible; Yahoo! Slurp; 
+    http://help.yahoo.com/help/us/ysearch/slurp)
+\end{verbatim}
+to identify the compatible and Yahoo ! Slurp.
+Using the list of robot names 
+whose URI  was posted on the 
+newsgroup is a good idea, and can be done
+using \verb+grep -f+
+
+
+
+
+Ideally, we would want to do the second, third, etc. searches only on the subset 
+that didn't match earlier searches. We have done this above
+via sequential filtering:
+\begin{verbatim}
+cat omegahat.log* | grep -v -f RobotDomains | grep -v -f RobotAgents
+\end{verbatim}
+and then we can look at the results to count the number of requests from each category of robots.
+In R, we can work with the indices of the matching records, compute the sets of
+unique indices, their lengths, their unions and interesections, etc.  And importantly, we can also
+find the times of these requests and look at requests in short intervals around these, look for
+requests from machines on the same sub-network within a fixed period of the initial request from the
+robot (e.g. the robots.txt request).
+
+
+\item %4
+We can compute the list of all the unique IP addresses that accessed the site
+by filtering out the first field in all the files via \executable{cut}.
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' '
+\end{verbatim}
+This gives the entire list, including
+duplicates, etc.
+So we need to simplify this to the unique set of IP addresses.
+We can use the \verb+sort | uniq+ idiom in the shell to 
+first arrange the lines and then compute the unique set.
+(Note that if we don't use \executable{sort} first, we get the wrong
+answer as \executable{uniq} works on adjacent lines and does not sort
+over them first.)
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq 
+\end{verbatim}
+This gives us the list of unique IP addresses.
+We can run this through \executable{wc} to get a count
+of the total number of IP addresses.
+And the result is $9,426$.
+
+The next part of the question asks about the most active IP addresses.
+For this, we need to get counts of the number of requests for each IP address.
+So this is count-within-IP  address, and not the overall count.
+Fortunately,  we can use \executable{uniq} to do this directly
+as the \textbf{-c} flag will give us not only the 
+unique lines of input, but also the count of how often each occurred.
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c
+\end{verbatim}
+
+This command produces output organized by the order in which 
+\executable{uniq} sees the different IP addresses.
+So there is no particular structure to it for our purposes.
+Instead, we need to arrange it by the number of requests
+and then extract the top 5.
+To do this, we have to sort the counts in the first field of the output.
+We have to do this respecting the fact that they are numbers and not simple
+strings.
+\executable{sort} has a command line flag for this which is -g.
+We also
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c | sort -g | tail -n 5
+\end{verbatim}
+The results are
+\begin{verbatim}
+3002 66.194.55.242
+3277 66.151.181.4
+3827 207.46.98.33
+4626 63.238.163.75
+4790 207.46.98.32
+\end{verbatim}
+
+What happens if you reverse the sort so that the biggest are first and
+then use \executable{head} to pull out the top 5? Can you explain this?
+
+To get the names of machines for the different IP addresses, we might
+try to find a program that takes a collection of IP addresses
+and looks each one up and returns the name for each one in turn.
+The program \executable{host} unfortunately works on only
+one IP per call. To use it, we have to loop over the top 5 IP addresses.
+We can do this using a for loop :
+\begin{verbatim}
+for i in 66.194.55.242    66.51.181.4  ; do
+  echo $i `host $i`
+done
+\end{verbatim}
+But of course, we don't type the IP addresses directly.
+Instead, we have to calculate them.
+Suppose we saved the output of the original command above
+to compute the frequency table to a file, say TopIPs:
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c 
+       | sort -g | tail -n 5  > TopIPs
+\end{verbatim}
+Then, we could get a list of the IP addresses using
+the \executable{cut} command and put this as the list
+of ``words'' to iterate over in the for-loop.
+\begin{verbatim}
+for i in `cut -f2 -d' ' TopIPs` ; do
+  echo `host $i`
+done
+\end{verbatim}
+
+How can we get rid of the extraneous output from \executable{host}.
+The output from a call to host is
+\begin{verbatim}
+% host 66.194.55.242
+242.55.194.66.in-addr.arpa domain name pointer 66-194-55-242.gen.twtelecom.net.
+\end{verbatim}
+The first bit tells us about our query.
+The bit after the string ``pointer''  gives us our answer.
+So we can strip away the first bit.
+We could do this with cut and access the 5th field using space
+delimiters.
+Alternatively, we can just discard any characters to the end of 
+the string ``pointer '' (including the trailing space).
+We can do this with \executable{sed}
+and a simple regular expression:
+\begin{verbatim}
+host 66.194.55.242 | sed -e 's/.*pointer //'
+\end{verbatim}
+
+
+We can do this filtering within each iteration of the
+loop or in one step at the end.
+\begin{verbatim}
+for i in `cut -f2 -d' ' TopIPs` ; do
+  echo `host $i`
+done      | sed -e 's/.*pointer //' 
+\end{verbatim}
+
+We can then paste the result with the columns in
+TopIPs giving a frequency table with IP addresses
+and resolved names.
+\begin{verbatim}
+for i in `cut -f2 -d' ' TopIPs` ; do
+  echo `host $i`
+done      | sed -e 's/.*pointer //'  > Resolved
+
+paste TopIPs Resolved
+\end{verbatim}
+
+
+\item  % 5 Popular pages.
+To find the most popular pages, we can use the same technique as in
+the previous question for ranking IP addresses.
+We extract the requested document field (number 7)
+and then sort and count them.
+\begin{verbatim}
+cat omegahat.log* | cut -f7 -d' ' | sort | uniq -c | sort -gr | head -n 10
+\end{verbatim}
+
+Note that it might be more instructive to do this for 
+the robots and the non-robots separately.
+To do this, we can use our robot filter from question 3.
+
+To find the pages selected by robots, we use the following command.
+\begin{verbatim}
+cat omegahat.log* | grep  -f RobotDomains | grep -f RobotAgents |  
+       cut -f7 -d' ' | sort | uniq -c | sort -gr | head -n 10
+\end{verbatim}
+And we get the following output 
+\begin{verbatim}
+2571 /robots.txt
+ 268 /
+ 259 /omegahat-bugs
+ 257 /bugs
+ 245 /philosophy.html
+ 245 /SASXML
+ 237 /SJava
+ 222 /cvsweb
+ 213 /Java
+ 200 /bugs.html
+\end{verbatim}
+
+For non-robots, we use 
+\begin{verbatim}
+cat omegahat.log* | grep -v -f RobotDomains | grep -v -f RobotAgents |
+       cut -f7 -d' ' | sort | uniq -c | sort -gr | head -n 10
+\end{verbatim}
+Note the -v flags to negate or reverse the filtering.
+XXX
+
+
+\item
+Here we need to use a loop.
+We can find the most active $n$ IP addresses in the logs using
+the code in question 4.
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c | sort -rg | 
+         head -n 5 | cut -f2 -d' '
+\end{verbatim}
+We need to be able to allow the user to easily specify the value for
+$n$
+in this command, i.e. where we have 5. So we put this in a script
+by creating a new file, say getTopIPRequests.
+The first line of the file must be
+\begin{verbatim}
+#!/bin/sh
+\end{verbatim}
+so that the operating system knows to pass the contents of the file
+to the shell interpreter to execute the code within the file.
+
+The main command so far in the script is
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c | sort -rg |
+           head -n $n | cut -f2 -d' '
+\end{verbatim}
+where we have replaced 5 with the value of the variable $n$,
+i.e. \verb+$n+.
+For this to be of any use, we must define $n$ earlier in the script.
+We can do this by giving it a default value, say 5.
+\begin{verbatim}
+#!/bin/sh
+
+n=5
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c | sort -rg | 
+        head -n $n | cut -f2 -d' '
+\end{verbatim}
+
+We make the script executable or callable to tell the operating system
+that it is a regular command that we can invoke in the shell.
+We use 
+\begin{verbatim}
+ chmod +x getTopIPRequests
+\end{verbatim}
+
+Now, we can go ahead and call this command from the shell prompt:
+\begin{verbatim}
+./getTopIPRequests
+\end{verbatim}
+(Note that we explicitly specify the script file and don't let the
+shell find it by searching the path. If . - the current working
+directory - is in your path, then getTopIPRequests will work also.)
+
+Of course, the value of 5 for $n$ is fixed in the script.
+We want to allow the caller to specify it as the single argument
+to this script, e.g.
+\begin{verbatim}
+getTOPIPRequests 20
+\end{verbatim}
+The first argument to a script is in \verb+$1+x,
+so we can use the command
+\begin{verbatim}
+n=$1
+\end{verbatim}
+But we need to do this only when the user has specified an actual
+value.
+Otherwise, we want to stick with our default of 5.
+We can check whether the value in the argument is 
+non-empty using
+\begin{verbatim}
+test -n "$1"
+\end{verbatim}
+since the -n flag for test means non-zero or non-empty.
+We can then use an if statement to conditionally assign
+the value to $n$. So our updated script looks like
+\begin{verbatim}
+#!/bin/sh
+
+n=5
+
+if test -n "$1" ; then
+ n=$1
+fi
+
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c | sort -rg | 
+       head -n $n | cut -f2 -d' '
+\end{verbatim}
+
+Go ahead and invoke this with different values for $n$ and with no
+argument at all to verify it works.
+Do we get $n$  lines back.
+
+Before we leave this topic, we should note that we can use a
+convenient shortcut to assign a default value to a variable.
+Instead of assigning a value and then testing for an argument,
+we can use the simpler, single command
+\begin{verbatim}
+n=${varName-default}
+\end{verbatim}
+In other words, we say assign to a variable $n$ the current value
+in varName or, if that is not defined, the value default.
+So we can simplify our script to 
+\begin{verbatim}
+#!/bin/sh
+
+n=${1-5}
+
+cat omegahat.log* | cut -f 1 -d ' ' | sort | uniq -c | sort -rg | 
+         head -n $n | cut -f2 -d' '
+\end{verbatim}
+
+We should also note that we get ``weird'' results back for $n > 7$.
+\begin{verbatim}
+./getTopIPRequests 10
+207.46.98.32
+63.238.163.75
+207.46.98.33
+66.151.181.4
+66.194.55.242
+207.46.98.30
+65.54.188.109
+896
+820
+654
+\end{verbatim}
+What are the last 3 lines about?
+The answer is that the table produced by the
+\verb+sort | uniq -c | sort -rg+ sequence
+is formatted to align the counts in the first column.
+Since these values have a different number of digits,
+the smaller numbers are padded with spaces.
+But of course, we are using spaces as the delimiter
+to pull out the second field which we expect to be
+the IP address.
+So we need to be more intelligent about this to handle
+cases where the counts have a different number of digits!
+The simplest thing to do is to strip all the characters
+away until the last space on each line, and this leaves just the 
+IP address.
+Our useful tool \executable{sed} can do this.
+\begin{verbatim}
+sed -e 's/.* //'
+\end{verbatim}
+The pattern means any character any number of times (\verb+.*+)
+followed by a space. And the replacement is the empty string
+(\verb+//+) and so we get what we want.
+\begin{verbatim}
+cat omegahat.log* | cut -f 1 -d ' ' |
+         sort | uniq -c | sort -rg |head -n $n | sed -e 's/.* //'
+\end{verbatim}
+
+Now, we have to loop over the the resulting IP addresses and
+get all the documents each requested.
+To do this, we can store the output from the command to get IP
+addresses either in a file or in a variable.
+We'll do the latter so we don't have to clean up after them.
+\begin{verbatim}
+IP=`cat omegahat.log* | cut -f 1 -d ' ' 
+         | sort | uniq -c | sort -rg |  head -n $n | sed -e 's/.* //'`
+\end{verbatim}
+Here we just execute the command and replace it with its output via
+the `` and assign this to the variable named $IP$.
+
+Next, we can use the separate words (IP addresses) in our loop.
+\begin{verbatim}
+for ip in $IP ; do 
+
+done
+\end{verbatim}
+And all we have to do is figure out what to do in the loop.
+We want to use \executable{grep}  to find all
+requests for that IP address in \verb+$ip+ and store
+the 7th field in the file named \verb+$ip+.
+\begin{verbatim}
+for ip in $IP ; do 
+  grep $ip | cut -f7 -d' ' > $ip
+done
+\end{verbatim}
+
+\item
+The homework also included:
+{\textit
+On this Web site, at least in the log files, there are no files  
+that are served up by the Web server
+whose names contain spaces. 
+This makes matters easier and can be used.
+How can we verify this in the log files?
+}
+There are of course numerous different ways to go about this.
+The following is one quite kludgy approach using the tools
+we have learned to this point.
+We know that the 7th field contains the name of the document
+being requested. The 8th field, if there are no spaces
+should be the HTTP/1.0.
+So we can extract the 8th field and see if it starts
+with HTTP.
+\begin{verbatim}
+cat omegahat.log* | cut -f8 -d' ' | grep -v 'HTTP/1'
+\end{verbatim}
+This does indeed return the 31 lines that have a space within them,
+each being 
+\verb+onmousedown="return+.
+
+To extract the full document being requested with the spaces,
+we can use regular expressions as we will discuss in class.
+
+If we wanted to find out the IP addresses of these requests, we could
+use a command such as
+\begin{verbatim}
+cat omegahat.log* | cut -n -f1,8 -d' ' | grep -v 'HTTP/1' | 
+     cut -f1 -d' '|sort | uniq
+\end{verbatim}
+which extracts both the first and eighth field, using the 8th field to
+identify  which are not HTTP and then giving a list of just the IP addresses.
+
+
+
+\end{enumerate}
+
+
+\end{document}
+xargs

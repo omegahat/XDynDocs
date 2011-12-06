@@ -1,0 +1,113 @@
+drop database BaseballDatabank;
+create database BaseballDatabank;
+
+
+mysql> create database BaseballDatabank;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> \. ../ALL.sql
+Query OK, 0 rows affected (0.01 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> \. ../LOAD.sql
+Query OK, 3978 rows affected (0.07 sec)
+Records: 3978  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 43 rows affected (0.00 sec)
+Records: 43  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 1455 rows affected (0.04 sec)
+Records: 1455  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 255 rows affected (0.01 sec)
+Records: 255  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 5745 rows affected (0.10 sec)
+Records: 5745  Deleted: 0  Skipped: 0  Warnings: 358
+
+Query OK, 8542 rows affected (0.41 sec)
+Records: 8542  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 84633 rows affected (2.89 sec)
+Records: 84633  Deleted: 0  Skipped: 0  Warnings: 140772
+
+Query OK, 21600 rows affected (0.37 sec)
+Records: 21600  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 121685 rows affected (3.70 sec)
+Records: 121685  Deleted: 0  Skipped: 0  Warnings: 137351
+
+Query OK, 3283 rows affected (0.09 sec)
+Records: 3283  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 93 rows affected (0.01 sec)
+Records: 93  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 2998 rows affected (0.05 sec)
+Records: 2998  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 16150 rows affected (1.88 sec)
+Records: 16150  Deleted: 0  Skipped: 0  Warnings: 2720
+
+Query OK, 3330 rows affected (0.12 sec)
+Records: 3330  Deleted: 0  Skipped: 0  Warnings: 4166
+
+Query OK, 35565 rows affected (1.32 sec)
+Records: 35565  Deleted: 0  Skipped: 0  Warnings: 18473
+
+Query OK, 15616 rows affected (0.62 sec)
+Records: 15616  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 215 rows affected (0.00 sec)
+Records: 215  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 120 rows affected (0.01 sec)
+Records: 120  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 52 rows affected (0.00 sec)
+Records: 52  Deleted: 0  Skipped: 0  Warnings: 0
+
+Query OK, 2445 rows affected (0.09 sec)
+Records: 2445  Deleted: 0  Skipped: 0  Warnings: 5773
+
+Query OK, 15999 rows affected (0.30 sec)
+Records: 15999  Deleted: 0  Skipped: 0  Warnings: 0

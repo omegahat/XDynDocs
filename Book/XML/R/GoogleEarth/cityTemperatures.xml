@@ -1,0 +1,381 @@
+<?xml version="1.0"?>
+  <!-- order may be important here. Remote one comes first or the browser gets messed up. -->
+<?xml-stylesheet type="text/xsl" href="http://www.omegahat.org/XSL/Rsource.xsl" ?>
+<!--
+ <?xml-stylesheet type="text/xsl" href="/Users/duncan/Projects/org/omegahat/Docs/XSL/Rsource.xsl" ?>
+-->
+
+<source xmlns:r="http://www.r-project.org"
+        xmlns="http://www.r-project.org"
+        xmlns:docbook="http://docbook.org/ns/docbook"
+>
+
+<invisible>
+This won't show up!
+</invisible>
+
+<docbook:note>
+To load and execute this code in R, you will need the XML package,
+and the following command
+<pre>
+doc = xmlTreeParse("http://www.omegahat.org/GoogleEarth/CityTemperatures/CityTemperatures.xml", useInternal = TRUE)
+v = getNodeSet(doc, "//r:init|//r:code|//r:function", "r")
+sapply(v, function(node) {  cmd = parse(text = xmlValue(node)); eval(cmd, globalenv())})
+</pre>
+This merely finds all the relevant nodes and parses and evaluates them to emulate
+what source() does.
+We have a package that provides a function <r:func>xmlSource</r:func> that does this.
+</docbook:note>
+
+We start by loading the XML library and defining some global
+variables that  control the computations in function calls 
+that create the KML document.
+<r:init>
+library(XML)
+
+useStyle = TRUE
+</r:init>
+
+If we already have the data, then there is no need to load it.
+Otherwise, we fetch it from the URL below.
+We also add a new variable which breaks the temperatures into 
+four groups.
+<r:init id="LoadData">
+if(!exists("temperature") || class(temperature) != "data.frame") {
+   # This version has intentional errors.
+  load(url("http://eeyore.ucdavis.edu/stat32/Data/Temperature.rda"))
+  temperature$level = cut(temperature$temp, 4)
+}
+</r:init>
+
+We will want to identify these four temperature groups 
+by different colors and we use a rainbow color,
+with red corresponding to high values and blue/purple corresponding
+to colder values.
+<r:init>
+  # Generate some colors to use to represent the different levels of temperature
+temperatureColors = rev(rainbow(length(levels(temperature$level))))
+</r:init>
+
+
+A KML document starts with a "kml" node
+and then a Document sub-node.
+Note that we make the default namespace the Google Earth
+namespace. There is no name on this element in the vector,
+so it becomes the default namespace.
+<r:code id="StartDocument">
+  # Create the KML document
+tt = xmlTree("kml", namespaces = c("http://earth.google.com/kml/2.1"))
+tt$addTag("Document", close = FALSE)
+</r:code>
+
+We put a general description for the contents of the entire file
+which will be shown when the user clicks on the top-level node
+for this file in the Places panel.
+Note that the content can be HTML, and not just simple text.
+So we add a link to my web site. We could easily use
+other markup and insert images. We'll see that later.
+<r:code id="AddDescription">
+   # Put a little HTML description of what we are displaying.
+tt$addTag("description",
+           'Illustrates the temperatures of 50 different cities at 4 different times of the year.\nGenerated from R by <a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>')
+</r:code>
+
+We'd like to have a single place that controls how the 
+labels on the points in the Placemarks are displayed,
+e.g. the color, the size and so on.
+We define a Style and give the attributes we want to 
+control. In each Placemark element in the document, we
+can refer to this style so that it takes effect for that
+particular Placemark.
+
+<para/>
+We specify sub-elements for both the icon and the label styles.
+We specify a scale and a color.
+The colors are given in slightly different form
+than in R. There are four values giving
+alpha, blue, green and red.
+Each value is from 00 to FF in hexadecimal.
+00 means transparent for the alpha blending.
+<r:code id="GeneralStyle">
+  # A top-level, global style to which we can refer within Placemarks, etc.
+if(useStyle) {
+ tt$addTag("Style", attrs = list(id = "me"), close = FALSE)
+    tt$addTag("IconStyle", close = FALSE)
+      tt$addTag("scale", .35)
+      tt$addTag("color", "#FFFF0000")
+      tt$closeNode()
+    tt$addTag("LabelStyle", close = FALSE)
+    tt$addTag("scale", 1)
+           # note the alpha-blue-green-red order
+      tt$addTag("color", "#FFFFFF00")
+      tt$closeNode()
+ tt$closeNode() 
+}
+</r:code>
+
+This is the function that does all the work to
+generate the content.
+<r:function id="MainFunction">
+<![CDATA[
+f =
+  #
+  #  loop over the cities and process each of the specified
+  #  months
+  #
+  #
+function(showImages = FALSE, style = "me", months = levels(temperature$month))
+{
+ invisible(
+  by(temperature, temperature$city,
+     function(city) {
+
+       name = strsplit(city[1, "city"], ",")[[1]][1]
+       tt$addNode("Folder", close = FALSE)
+       tt$addNode("name", name)
+       
+       by(city, city$month,
+           function(row) {
+
+                 tt$addNode("Placemark", attrs = c(id = row[1, "city"]), close = FALSE)
+                   mnth = as.character(row[1, "month"])
+                   label = if(length(months) > 1) paste(row[1, "temp"], mnth) else row[1, "temp"]
+                   tt$addNode("name", label)
+
+                 if(showImages) {
+                   tt$addTag("IconStyle", close = FALSE)
+                      tt$addTag("Icon", close = FALSE)
+                        tt$addTag("href", imageName(city[1, "city"]))
+                      tt$closeNode()                 
+                   tt$closeNode()
+                 } else {
+                   tt$addNode("styleUrl", paste("#", style, sep = ""))                   
+                 }
+                 
+                 tt$addNode("TimeStamp", close = FALSE)
+                   tt$addNode("when", paste("1997", sprintf("%02d", match(mnth, month.name)), sep = "-"))
+                   #tt$closeNode()
+                 tt$closeNode()
+                 
+                 if(length(months) > 1) {
+                       # we don't need the table now that we have 
+                   desc = list(name,
+                               "<table>",
+                               c("<tr>", paste("<td>", months, "</td>", sep = ""), "</tr>"),
+                               c("<tr>", paste("<th>", city$temp, "</th>", sep = ""), "</tr>"),
+                               "</table>",
+                               c("<img src='", imageName(city[1, "city"], mini = TRUE), "'>"))
+                   desc = paste(sapply(desc, paste, collapse = ""), collapse = "\n")
+                   tt$addNode("description", close = FALSE)
+                      tt$addCData(desc)
+                   tt$closeNode() # description
+                 } else {
+                   desc = paste("Temperature for", city, row["temp"], "in", mnth)
+                   tt$addNode("description", desc)
+                 }
+                 tt$addNode("Point", close = FALSE)
+                    tt$addNode("coordinates", paste(- as.numeric(row["longitude"]),  row["latitude"], sep = ", "))
+                 tt$closeNode() # Point
+                 tt$closeNode() # Placemark         # should be one closeTag(2)                 
+           })
+
+
+               # Ground Overlay to show the time series curve of temperature across the 4 months.
+       tt$addNode("GroundOverlay", close = FALSE)
+         tt$addNode("name", city[1, "city"])       
+         tt$addNode("Icon", close = FALSE)
+           tt$addNode("color", "#88FFFFFF")
+           tt$addTag("href", imageName(city[1, "city"]))
+           tt$closeNode()
+         tt$addNode("LatLonBox", close = FALSE)
+           off = c(.5, .5)*3
+           loc = as.numeric(city[1, c("longitude", "latitude")])
+           box = c(north = loc[2] + off[2], south = loc[2] - off[2],
+                   east = -loc[1] + off[1], west = -loc[1] - off[1])
+           sapply(names(box), function(i) tt$addNode(i, box[i]))
+         tt$closeNode() # LatLonBox
+       tt$closeNode() # GroundOverlay
+
+       tt$closeNode() # Folder
+   })
+ )
+}
+]]>
+</r:function>
+
+
+We now arrange to call this function.
+(Note that we had several different functions in an earlier version
+and we arranged them as functions so that we could easily control
+which one was invoked.)
+<r:code id="CreateFolder">
+f()
+</r:code>
+
+
+And finally, we want to place the legend on the screen.
+It is not tied to a particular longitude, latitude pair.
+Rather, it should be in the lower-left corner of the screen.
+So we use a ScreenOverlay element.
+We give a name so that users can identify it more readily in
+the Places tree.  We specify the icon to display by giving
+the name of the file.
+And we specify its coordinates, using pixel units
+rather than proportions, etc.
+<r:code id="ShowLegend">
+ # Create the screen overlay that will display the legend in the lower left corner.
+ # The legend should have no margins in R.
+tt$addNode("ScreenOverlay", close = FALSE)
+  tt$addNode("name", "Temperature legend")
+  tt$addNode("Icon", "legend.png")
+  tt$addNode("screenXY", attrs = c("x" = 2, "y" = 2, xunits = "pixels", yunits = "pixels"))
+  tt$addNode("overlayXY", attrs = c("x" = 0, "y" = 0))
+  tt$addNode("size", attrs = c("x" = 300, "y" = 300, xunits = "pixels", yunits = "pixels"))
+tt$closeNode()  # ScreenOverlay
+</r:code>
+
+And finally, we close the top-level kml node.
+(Is this actually the Document node?  It doesn't really matter as we are not adding any more nodes
+so they don't have to be closed explicitly.)
+<r:code>
+tt$closeNode()  # KML root node
+</r:code>
+
+And finally, we write this to a file
+and tell Google Earth to open it.
+This works on the Mac. On Windows, we could use DCOM
+and on Linux, we would use a slightly different approach
+which we have to work out soon.
+<r:code id="ShowDocument">
+saveXML(tt, "/tmp/doc.kml")
+system("open /tmp/doc.kml")
+</r:code>
+
+
+<para/>
+In order to be able to distribute the KML file and the associated
+images, we compress them into a single file
+<r:code ignore="true">
+setwd("/tmp")
+system("zip CityTemperatures.kmz doc.kml *.png")
+</r:code>
+
+An alternative is to actually enumerate the files explicitly.
+We can get the names of these from the calls to <r:func>createHist</r:func>.
+<r:code id="createZip">
+if(file.exists("/tmp/CityTemperatures.kmz"))
+ unlink("/tmp/CityTemperatures.kmz")
+files = c("doc.kml", createHist(temperature), createHist(temperature, mini = TRUE), createLegend(temperature))
+cur = getwd()
+setwd("/tmp")
+system(paste("zip /tmp/CityTemperatures.kmz", paste(basename(files), collapse = " ")))
+setwd(cur)
+</r:code>
+
+<section id="Appendix">
+<title>Appendix</title>
+Here we include the code that creates the images and
+manages the names of these images
+so that the functions that create the files 
+and the code that references those files are synchornized and refer to the same file.
+
+<para/>
+This function computes the name of the file that will be used to store
+the image for the given city.  This deals with prepending the
+directory if <r:arg>full</r:arg> is given and whether the file is for
+the image on the Google Earth display or in the popup window.
+<r:function>
+imageName =
+function(city, full = FALSE, mini = FALSE, ext = "png") {
+  id = gsub("[ ,]", "_", city)
+
+  if(is.logical(full)) {
+     if(full)
+       id = paste("file://", getwd(), id, sep = .Platform$file.sep)
+  } else
+       id = paste(full, id, sep = .Platform$file.sep)      
+
+  if(mini)
+    id = paste(id, "mini", sep = "_")
+
+  id = paste(id, ext, sep = ".")
+  id
+}
+</r:function>
+
+<para/>
+This function creates the time-series plot for a given city.
+<r:function>
+makeHist =
+function(z, device = png, ylim = range(z$temp), full = FALSE, mini = FALSE,
+          cols = temperatureColors)
+{
+#  cols = rainbow(length(levels(z$level)))
+  id = imageName(z[1, "city"], full, mini = mini)
+  if(!is.null(device)) {
+    device(id, width = 300, height = 300, bg = "transparent")
+    on.exit(dev.off())
+  }
+
+  plot(z$temp, xlab = "", ylab = "", axes = FALSE, ylim = ylim,
+          col = cols[z$level])
+  segments(1:3, z$temp[1:3], 2:4, z$temp[2:4], col = cols[z$level], lwd = if(mini) 2 else 30)
+  axis(2)
+
+  id
+}  
+</r:function>
+
+<para/>
+This is the function that we use to create the time series
+plots that appear on the Google Earth display.
+If <r:arg>mini</r:arg> is <r:true/>, then the
+plots for the balloon popup windows are created.
+This function creates a plot for each city.
+<r:function>
+createHist =
+function(data = temperature, f = makeHist, full = "/tmp", mini = FALSE)
+{
+  invisible(by(data, factor(data$city), f, ylim = range(data$temp), full = full, mini = mini))
+}  
+</r:function>
+
+<para/>
+
+This function is used to create the legend that appears
+in the lower-left corner of the Google Earth screen.
+<r:function id="createLegend">
+<![CDATA[
+createLegend =
+function(values, filename = "/tmp/legend.png", colors = temperatureColors)
+{
+  library(lattice)
+  library(grid)
+  key.width = 8
+
+  levels = values$level
+  
+    if(length(filename) && nchar(filename) > 0) {
+       trellis.device(png, filename = filename, bg = "transparent")
+       on.exit(dev.off())
+     }
+
+  trellis.par.set(axis.text = list(col = "white", cex=1.2, font=2))
+#    print(simpleKey(levels(levels?dra), rectangles = list(TRUE, col = rainbow(4)))
+  breaks = c(min(values$temp), by(values$temp, values$level, max))
+  k = list(at = breaks, 
+           labels = as.character(breaks),
+           col= colors,
+           width= key.width
+           )
+  draw.colorkey(key = k, draw = TRUE, viewport(height = unit(.9, "npc")))
+
+  filename
+}  
+]]>
+</r:function>
+
+</section>
+
+
+</source>

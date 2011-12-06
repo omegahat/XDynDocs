@@ -1,0 +1,202 @@
+\documentclass{article}
+\input{WebMacros}
+\input{SMacros}
+\usepackage{html}
+
+\newcommand{\Href}[2]{\htmladdnormallinkfoot{#2}{#1}}
+\author{Duncan Temple Lang}
+\title{Cross Validation for the nai\"eve Bayes Classifier of
+SPAM}
+\begin{document}
+\maketitle
+
+In this homework, we focus on two aspects: text processing and
+statistical cross-validation.  The data we use is again mail messages.
+We will build the classifier using a new collection of messages that
+are in simpler form.  We will then test our classifier developed with
+this ``lingspam'' data using the independently collected Spam Assassin
+data.
+
+Our goal is to create a classifier to predict whether a new mail
+message is SPAM or HAM.  We will use what is called a nai\"eve Bayes
+classifier which uses the words in the mail message to attempt to
+discriminate between SPAM and HAM.  The computations that make up this
+classifier involve comparing the probabilities of words being in SPAM
+messages relative to the probabilities of those words being in HAM
+messages.  Essentially, we look at the ratio of the probabilities of
+the message being SPAM and HAM:
+$$ \frac{P(SPAM | message contents)}{ P(HAM | message contents)} $$
+Values of this ratio $>1$ indicate that the message is more likely
+to be SPAM than HAM.  Since classifying a regular message (HAM) as
+SPAM is more serious than classifying SPAM as HAM, we have to be
+careful to control these Type I errors in our classification/testing.
+So, to create the classifier that actually predicts whether a
+new message is HAM or SPAM, we need a threshold value above which we
+infer that the probability of being SPAM is sufficiently larger than
+being HAM, and below which we conclude the message is HAM.  We use
+cross-validation to determine the value of this threshold so that we
+can control Type I errors (i.e. the probability of classifying an
+actual HAM message as SPAM).
+
+The lingspam dataset consists of a collection of 2893 messages, with
+approximately 17\%.  The messages are contained in the \dir{messages}
+directory in the \SPackage{NaieveBayes} available from
+\Href{http://winnie.ucdavis.edu/stat141/Winter04/RPackages/}{the
+  Web site}.  (You can use \SFunction{list.files} and
+\SFunction{system.file} to get a list of the message file names.)  The
+SPAM messages are in the files starting with the string ``spm'', e.g.
+spmsgc64.txt.  The HAM messages are all the remaining messages, and
+have the form \textit{digit-digits}msg.txt.  (Use this information to
+compute the proportion of SPAM in the corpus.)
+
+Again, the important thing is to break the task into sub-parts.  We
+start from the list of 2893 mail messages and break them into a form
+we can use to compute the naieve Bayes classifier.
+For each message, you need to get the words
+in the message.  So you will have a
+character vector of words for each 
+message.
+
+\begin{itemize}
+\item read the text of each message
+\item convert the text into words and clean these up (i.e. removing
+  punctuation, discardings words that are numbers, whitespace "words",
+  changing to lower case).
+  You need to split the lines into words and at the same
+  time make the relevant substitutions to discard the unwanted
+  word types and characters.
+
+\item  Remove basic words from each message which we call ``stop'' words.
+These stop words are available in the
+\SPackage{NaieveBayes} package in the variable
+\SVariable{StopWords} that is made available
+via the S expression
+\begin{verbatim}
+data(StopWords)
+\end{verbatim}
+
+\item Get the unique words for each message and discard the degenerate
+  words (i.e. "").
+
+\end{itemize}
+Now we have the relevant inputs for the naieve Bayes classifier and
+are ready for the cross validation step.  We will do 10-fold cross
+validation, i.e. create 10 different test sets.  (You can explore the
+behaviour of choosing different values for $K$ in K-fold cross
+validation for extra credit.)
+
+For each of the $K$ training sets of message words, we can use the
+function \SFunction{computeFrequencies} to compute the terms used in
+the probabilities/log-odds in the naieve Bayes classifier for the
+individual words in the training set.  See the help file for more
+information.  For each observation in the $i^{th}$ test data (i.e.
+corresponding to the $i^{th}$ training set), we compute the log-odds
+for the probability of being SPAM and HAM by calling the function
+\SFunction{computeMessageProbability} with the words in the message
+and the probabilities from \SFunction{computeFrequencies} for the
+corresponding training data.  We need to augment this value with the
+$log(P(SPAM_{i})/P(HAM_{i}))$ computed for the $i^{th}$ training
+set.  Regardless of the threshold that we use for the classifier,
+these log-odds/probabilities are the same. 
+
+Having computed these log-odds/probabilities for each of the
+observations in each of the $K$ test sets, we now need to find the
+``optimum'' value for the threshold for the classifier.  We need to
+find the value of $\tau$ for which the Type I error is what we want it
+to be.  For each message, we have a probability.  For a given $\tau$,
+we classify the message as SPAM if the probability is $ > \tau$.
+Since this is test set, we know whether the message is SPAM or HAM and
+so we can determine whether we correctly classified the message or
+made a Type I or Type II error.  For a given $\tau$ and for all
+messages in each of the cross-validation test sets, we can construct
+the \textit{confusion} matrix - the 2 x 2 table of actual and
+classified counts for SPAM and HAM.  Our task is to find the suitable
+value for $\tau$ that yields a Type I error rate of, say, 1\%.  In
+theory, we have to search over all possible values of $\tau \in
+(-\infty, \infty)]$.  Of course, we are only interested in values of
+$\tau$ for which $P(SPAM| message) > P(HAM | message)$ so we can
+determine the value of $\tau$ for which this is true, say $\tau_0$.
+We might then divide the interval $[\tau_0, \infty]$ into discrete
+bins and compute the Type I error rate for the mid point of each of
+these bins.  Can we be more efficient or intelligent than this?
+
+\textit{Plot the Type I and Type II error rates for the different
+  values of $\tau$. Select a value for $\tau$ that defines a
+  classifier with a ``suitable'' error rate. What is the variability
+  of this estimate of Type I error?  What is the associated Type II
+  error rate?  }
+
+
+\par
+
+Given the cross-validated classifier, we have an estimate for the Type
+I and Type II error rates.  However, we know that these are based on
+the lingspam data which we used to develop the classifier.
+We have the luxury of having a second set of data - the Spam Assassin
+data. We can use this to get a sense of how accurate our
+estimates of the Type I and II error rates are.
+
+To use the Spam Assassin data, you can fetch the serialized R list
+containing all the processed messages from the \dir{messages}
+directory in the \SPackage{RSPamData} package.  This is available at
+\Href{http://winnie.ucdavis.edu/stat141/Winter04/RPackages/MailAttachments}{MailAttachments}.
+Each element in this list represents a message
+and has the following fields/elements:
+\begin{itemize}
+\item[header] a character vector of the 
+  name: value fields in the mail message;
+\item[body] consisting of a list
+  with the text from the body
+  and a list of the attachments, if there are any.
+  Each attachment object is itself a list
+  with two named elements: 
+  \begin{itemize}
+  \item[header] information about the content type
+   of the header, the character set, etc.
+  \item[text] the actually body of the attachment.
+  \end{itemize}
+\item[spam] a logical value indicating whether the message is
+ SPAM (TRUE) or HAM (FALSE).
+\end{itemize}
+
+To use these messages, we need to get the words from the text part of
+the message.  The text part might simply be the body of the message or
+alternatively it might be an attachment.  We can tell this from the
+value of the \texttt{Content-Type} field in the header.  If this is
+text/plain, the message is regular text.  If it is text/HTML or
+text/html, the text is formatted with HTML and we need to extract only
+the words from that. And finally, the text of the message may be in an
+attachment. So we have to look at the attachments and determine their
+type from the attachment header.  (Ask questions if this is not clear
+when you look at the data.)
+
+So, the steps are to 
+\begin{itemize}
+\item get the text part of each message, meaning any plain text or
+  HTML content either in the body or as an explicit attachment. I have
+  provided code (the \SFunction{getHTMLText} function) to extract the
+  text from an HTML message. You will need to install the 
+  \Href{http://www.omegahat.org/RSXML}{XML package}
+  to use this. You have to look at the messages and
+  identify which attachments or regular body is "readable text" and
+  whether it is HTML or regular plain text.
+
+\item clean the text to remove punctuation, remove the stop words,
+  change to lower case, etc. as above.
+
+\item Apply your classifier to the different collection of
+ messages and compare your classification errors to the ones
+ obtained from cross-validation.
+
+\end{itemize}
+
+You might want to work with only a sample of the Spam Assassin data,
+such as the messages in the \SPackage{RSPamDataMini} package or by
+sampling elements from \SVariable{MailAttachments}.
+
+
+
+
+
+
+\end{document}

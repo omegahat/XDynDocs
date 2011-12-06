@@ -1,0 +1,78 @@
+\section{Introduction}
+
+To be able to instruct a computer to perform a task, we need to know
+some commands and a way to specify the commands and inputs to
+parameterize them.  However, simply knowing the syntax or format of a
+programming language and its commands does not make us good
+programmers.  Instead, we also need to be able to think properly about
+programming a task and write it well.  This is very similar to how we
+write essays: we first need to master the language and, given that
+capacity, we need to think about how to construct the contents of the
+essay, breaking it into a logical sequence of units.
+For programming, we need to consider numerous different
+aspects of composing the units that make up the task.
+Good programming is not simply about getting the job done,
+i.e. the code to run,  but how we can maintain and reuse
+the code, explain it to others, and so on.
+These are the high-level aspects of programming
+and important to master.  Writing well is important,
+and so is programming well.  Style matters, and especially
+in computing!
+
+
+
+
+When writing an essay, there are aspects that are the same for all
+languages and some that are specific to the language.  The same is
+true for programming.  In this chapter we will talk about programming
+in general and also focus on programming in S to improve style.
+
+
+
+\section{}
+It would be nice to think that we can sit down and just write code to
+implement a particular task.  In practice, the development is more
+evolutionary and iterative. We learn more about the task as we develop
+the code.  Details that we didn't consider or skipped over in the
+planning stages become more important and require more specification
+and attention.  Special cases become important and understanding how
+to include these reasonably or even elegantly without perturbing code
+that has already been tested is important.  This is where
+``defensive'' programming at the early stages helps greatly and pays
+dividends.  Programming a task by dividing it into components that can
+be reused and easily adapted seems like the long way towards doing
+things when it would appear that we can just write the entire task.
+However, repeated experience illustrates that we do need to debug
+code, adapt the elements and use them in different ways for different
+cases.  So doing it right early on typically is rewarded.  It
+encourages and facilitates experiments that would otherwise involve
+too much work.  Specifically, the distance from the current code to
+that which supports an additional feature might be large if the code
+is written with blinkers on to support just the specified task.
+However, if the code is well structured, the effort to support an
+additional idea might be small. This allows us to quickly try that
+idea and discard it if it is not worthwhile.  In short, the software
+components (i.e. the code) becomes a collection of tools which can be
+used for similar and related tasks that are not exactly the same as
+the original task.
+However, if the code is written in the ``obvious'' manner
+with little or no regard for such reuse, then
+the result is software for a particular task.
+
+The httpClient is a good example. By setting up an OO framework, it is
+easy to add methods for handling conversion to different character
+sets for different form elements and experiment to see if this is the
+right thing to do by testing with an HTTP server.
+It removes the need to understand the HTTP specification ahead of
+time.
+
+
+
+
+\begin{bibunit}
+\nocite{*}
+\putbib{Programming/programming}  
+\end{bibunit}
+%\bibliography{Programming/programming}
+
+

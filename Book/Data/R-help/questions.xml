@@ -1,0 +1,143 @@
+<questions xmlns:r="http://www.r-project.org">
+<q><para>
+How many questions are there ? and how many replies are there?
+</para>
+<answer>
+<para>
+Starting with the messages in msgs  (i.e. the split header/body messages)
+<r:code><![CDATA[
+x = lapply(msgs, function(x) 
+                   sapply(x, function(x) "References" %in% names(x$header))
+                 )
+numReferences = sapply(x, sum)
+numQuestions = sapply(x, length) - numReferences
+tmp = data.frame( count = c(numReferences, numQuestions),
+                  type = rep(c("reply", "question"), each = length(x)),
+                  date = rep(sort(gz.dates), 2))
+xyplot( count ~ date, tmp, group = type, auto.key = list(columns = 2))
+]]></r:code>
+Does this mean there are more questions than answers up to a certain point in time?
+What other considerations do we have to take into account?
+Announcements R-pkgs, R releases, ...
+</para>
+</answer>
+</q>
+
+<q><para>
+Can you identify threads, i.e. groups of messages
+that are in reply to each other. The subject line may provide a clue
+but not be good enough by itself. The Message-ID and the References fields
+should go a long way.
+</para></q>
+
+
+<q><para>
+What is the distribution of initial response time to a question?
+For how long do discussions related to a particular question go on?
+You may want to ungroup the messages by month so that you can deal with
+transition across the file boundaries, i.e. messages posted
+on the last day of one month and answered on the next day, i.e.
+at the beginning of the next month.
+</para>
+<answer><para>
+This is a convenient approach and very fast.
+This doesn't guarantee the first match.
+<r:code>
+refs = references[!is.na(references)]
+reply = match(names(allMsgs)[is.question], refs)
+sum(is.na(reply))
+sum(is.na(reply))/sum(is.question)  # 57%
+replyTo = which(!is.na(references))[reply]
+</r:code>
+So over 50% of the questions didn't get a response.
+Does this mean we need to rethink what it means to be a question and a response,
+i.e. our computations?
+A major part of reading text data is trying to learn the format as we go,
+expanding or constraining our text patterns to build rules that capture more
+of the structure that we uncover empirically.
+</para>
+<para>
+<r:code>
+allMsgs = structure(unlist(msgs, recursive = FALSE), 
+                     names = unlist(lapply(msgs, names)))
+
+references = sapply(allMsgs, function(x) x$header["References"])
+is.question = rep(FALSE, length(allMsgs))
+is.question[is.na(references)] = TRUE
+sum(is.question)
+</r:code>
+<r:code>
+idx = which(is.question)
+first.reply = sapply(idx, function(i) {
+                            id = names(allMsgs)[i]
+                              # Can be a lot smarter about this since we know it is likely to be within 
+                              # a few minutes, hours or days. Perhaps loop, starting at the index of the message
+                              # and breaking when we find the match.
+                            which.min(id == references)
+                          } )
+</r:code>
+<r:code>
+first.reply = sapply(idx, function(i) {
+                            id = names(allMsgs)[i]
+                            for(k in seq(i + 1, length(allMsgs)))
+                               if(references[k] == id)
+                                 return(k)
+
+                            NA
+                          } )
+</r:code>
+</para>
+<para>
+Maybe not all messages that are really in reply to another have a References.
+So we have to look at the body as  well.
+When is the earliest message with a References field in the header.
+<r:code>
+min(which(!is.na(references)))
+</r:code>
+</para>
+</answer>
+</q>
+
+<q><para>
+Does the group of people asking questions change over time?
+Similarly, does the group of people answering questions change over time?
+Do those asking questions later begin to answer questions?
+</para></q>
+
+<q><para> 
+Identify R functions being mentioned in a message.  Look for
+"foo()" and "foo(a, b, c....)"  Also compare the words (before
+stemming) in the body and subject to the variables in the R search
+path.  Can you identify package names in the text and add the
+variables from those packages?  
+</para></q>
+
+<q><para>
+What can we tell from the subject lines?
+</para></q>
+
+<q><para>
+Can we "cluster" the messages by topic?
+Do we want to do this by message or by thread?
+Does these change over time?
+To analyze the text of the message, you will
+want to remove common "stop" words
+and stem words so that, for example,
+stop, stopped and stopping all map to stop.
+</para></q>
+
+<q><para>
+Can we identify the code elements within the body of a message.
+This is made more complicated because of the &lt;
+used to prefix lines from an included message as well
+as the prompt  for R.
+</para></q>
+
+<q><para>
+We ask that people include a minimal example and
+also the output of <r:func>sessionInfo</r:func>. How many questions (i.e. the start of a thread)
+do contain this information? Has it increased over time?
+</para></q>
+
+
+</questions>

@@ -1,0 +1,98 @@
+<foilgroup>
+<title>Analyzing Web Logs</title>
+<foil>
+<title>Analyzing Web Logs</title>
+
+ <itemizedlist>
+  <listitem>Each request to a Web site for a page = hit</listitem>
+  <listitem>Each hit recorded by Web server in a <emphasis>Web
+  log</emphasis></listitem>
+  <listitem>Provides information about site
+    <itemizedlist>
+      <listitem>popular pages</listitem>
+      <listitem>common navigation paths through sites</listitem>
+      <listitem>busy times</listitem>
+      <listitem>resource usage and allocation</listitem>
+      <listitem>pre-fetching of pages</listitem>
+      <listitem>efficient proxy information</listitem>
+    </itemizedlist>
+  </listitem>
+ </itemizedlist>
+
+</foil>
+
+<foil>
+ <title>Structure of data</title>
+
+<literallayout>
+nchass03.telenet-ops.be - - [28/Dec/2003:06:33:55 -0600] "GET / HTTP/1.1" 200 718
+nchass03.telenet-ops.be - - [28/Dec/2003:06:34:03 -0600] "GET /R.css HTTP/1.1" 200 658
+nchass03.telenet-ops.be - - [28/Dec/2003:06:34:13 -0600] "GET /logo.html HTTP/1.1" 200 244
+nchass03.telenet-ops.be - - [28/Dec/2003:06:34:23 -0600] "GET /navbar.html HTTP/1.1" 200 1418
+nchass03.telenet-ops.be - - [28/Dec/2003:06:34:23 -0600] "GET /banner.shtml HTTP/1.1" 200 3185
+nchass03.telenet-ops.be - - [28/Dec/2003:06:34:33 -0600] "GET /Rlogo.jpg HTTP/1.1" 200 8793
+pcp07845748pcs.wilmsc01.tn.comcast.net - - [28/Dec/2003:06:36:06 -0600] "GET /contrib/extra/dcom HTTP/1.1" 301 342
+pcp07845748pcs.wilmsc01.tn.comcast.net - - [28/Dec/2003:06:36:06 -0600] "GET /contrib/extra/dcom/ HTTP/1.1" 200 1404
+pcp07845748pcs.wilmsc01.tn.comcast.net - - [28/Dec/2003:06:36:06 -0600] "GET /icons/blank.gif HTTP/1.1" 200 148
+pcp07845748pcs.wilmsc01.tn.comcast.net - - [28/Dec/2003:06:36:06 -0600] "GET /icons/binary.gif HTTP/1.1" 200 246
+pcp07845748pcs.wilmsc01.tn.comcast.net - - [28/Dec/2003:06:36:06 -0600] "GET /icons/back.gif HTTP/1.1" 200 216
+pcp07845748pcs.wilmsc01.tn.comcast.net - - [28/Dec/2003:06:36:07 -0600] "GET /icons/compressed.gif HTTP/1.1" 200 1038
+pcp07845748pcs.wilmsc01.tn.comcast.net - - [28/Dec/2003:06:36:07 -0600] "GET /icons/text.gif HTTP/1.1" 200 229
+pcp07845748pcs.wilmsc01.tn.comcast.net - - [28/Dec/2003:06:36:15 -0600] "GET /contrib/extra/dcom/ReadMe.txt HTTP/1.1" 200 12247
+nchass03.telenet-ops.be - - [28/Dec/2003:06:37:15 -0600] "GET /bin/windows HTTP/1.1" 301 335
+nchass03.telenet-ops.be - - [28/Dec/2003:06:37:32 -0600] "GET /bin/windows/ HTTP/1.1" 200 1353
+pr3-ts.telepac.pt - - [28/Dec/2003:06:38:53 -0600] "GET /bin/linux/debian/dists/sarge/main/binary-i386/Packages.gz HTTP/1.1" 200 2994
+pr3-ts.telepac.pt - - [28/Dec/2003:06:39:02 -0600] "GET /bin/linux/debian/dists/sarge/main/binary-i386/Packages.gz HTTP/1.1" 200 2994
+pr3-ts.telepac.pt - - [28/Dec/2003:06:39:17 -0600] "GET /bin/linux/debian/dists/sarge/main/binary-i386/Packages.gz HTTP/1.1" 200 2994
+nchass03.telenet-ops.be - - [28/Dec/2003:06:39:28 -0600] "GET /bin/windows/base HTTP/1.1" 301 340
+nchass03.telenet-ops.be - - [28/Dec/2003:06:39:47 -0600] "GET /bin/windows/base/ HTTP/1.1" 200 2167
+nchass03.telenet-ops.be - - [28/Dec/2003:06:41:28 -0600] "GET /bin/windows/base/README.rw1081 HTTP/1.1" 200 11036
+ip142177159155.ns.aliant.net - - [28/Dec/2003:06:42:22 -0600] "GET /robots.txt HTTP/1.1" 404 294
+p38.nas2.is4.u-net.net - - [28/Dec/2003:06:43:40 -0600] "GET / HTTP/1.1" 200 718
+p38.nas2.is4.u-net.net - - [28/Dec/2003:06:43:41 -0600] "GET /R.css HTTP/1.1" 200 658
+p38.nas2.is4.u-net.net - - [28/Dec/2003:06:43:41 -0600] "GET /logo.html HTTP/1.1" 200 244
+p38.nas2.is4.u-net.net - - [28/Dec/2003:06:43:41 -0600] "GET /navbar.html HTTP/1.1" 200 1418
+p38.nas2.is4.u-net.net - - [28/Dec/2003:06:43:42 -0600] "GET /banner.shtml HTTP/1.1" 200 3185
+p38.nas2.is4.u-net.net - - [28/Dec/2003:06:43:43 -0600] "GET /Rlogo.jpg HTTP/1.1" 200 8793
+lj1229.inktomisearch.com - - [28/Dec/2003:06:45:34 -0600] "GET /robots.txt HTTP/1.0" 404 283
+</literallayout>
+
+</foil>
+
+<foil>
+ <title>Steps</title>
+  <itemizedlist>
+   <listitem>
+     Collapse sequence of lines into top-level page request
+      <itemizedlist>
+       <listitem>
+         Find included pages
+         <?line-break?>
+          Read HTML.
+       </listitem>
+      </itemizedlist>
+   </listitem>
+   <listitem>
+     Find links in pages to get connectivity.
+    <?line-break?>
+       Read HTML.
+   </listitem>
+    <listitem>
+      Analyze connectivity and hits.
+    </listitem>
+    <listitem>
+      Explore data graphically - mining.
+    </listitem>
+    <listitem>
+      Pre-fetching model: fit 2-step Markov models for transitions between pages.
+    </listitem>
+    <listitem>
+      Evaluate fit.
+    </listitem>
+    <listitem>
+      Deploy pre-fetching model: Client or Server?
+    </listitem>
+  </itemizedlist>
+</foil>
+
+</foilgroup>

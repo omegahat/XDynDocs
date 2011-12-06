@@ -1,0 +1,108 @@
+\documentclass[11pt]{book}
+\usepackage{comment}
+\usepackage{times}
+\usepackage{natbib}
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage{lscape}
+%\usepackage{graphics}
+\usepackage{epsfig}
+%\usepackage[pdftex]{graphicx}
+
+\usepackage{moreverb}
+
+\bibliographystyle{plain} % prsty, unsrt
+%\usepackage[gather]{chapterbib}
+\usepackage{bibunits}
+
+\usepackage{hyperref}
+\input{WebMacros}
+\input{Smacros}
+\input{XMLMacros}
+\input{HTMLMacros}
+
+
+\newenvironment{summary}{
+\textbf{{\Large Summary}}\\
+\begin{it}
+}
+{\end{it}
+}
+
+
+\def\Rcode#1{\texttt{#1}}
+\def\File#1{\texttt{#1}}
+\def\Directory#1{\texttt{#1/}}
+
+\def\Sfunc#1{\texttt{#1()}}
+\def\Svar#1{\textbf{#1}}
+\def\Rfunc#1{\textsl{#1}}
+\def\Rpkg#1{\textit{#1}}
+
+\def\lt{$<$}
+\def\gt{$>$}
+
+
+
+
+\def\url#1{\textbf{#1}}
+\def\red{}
+
+\def\SASName#1{\textit{#1}}
+\def\remind#1{\textsl{#1}}
+
+
+% \usepackage{latexsym}         
+% \usepackage{enumerate}         
+% \usepackage{fancybox}      
+% \usepackage{float}       
+% \usepackage{ragged2e}       
+% \usepackage{fancyvrb}         
+
+%\input{db2}
+
+\begin{document}
+
+\input{RegExpr/regexpr}
+\input{Shells/shells}
+\end{document}
+
+%\def\includegraphics#1{#1}
+
+\input{Introduction/Introduction}
+\input{computerIntro/computerIntro}
+
+%\input{Rlanguage/Rlanguage} % Should we work from the XML or the
+                            % Rintro or RLanguage.tex files.
+\input{Graphics/BasicGraphics}
+
+\input{RNG/RNG} % Is this simulation too?
+
+\input{RegExpr/regexpr}
+\input{Shells/shells}
+%\input{Geolocation/Geolocation}
+
+\input{RDBMS/dbms} 
+
+\input{XML/XML}
+
+\input{Spam/spam}
+%\input{electionMaps/map}
+
+\input{Graphics/AdvancedGraphics}
+
+\input{WritingSoftware/WritingSoftware} 
+
+\input{Efficiency/Efficiency}
+
+\input{InterfacingToC/InterfacingToC}
+
+
+\chapter{Bibliography}
+\bibliographystyle{plain}
+\bibliography{statcomp}
+
+\begin{comment}
+\end{comment}
+
+\end{document}

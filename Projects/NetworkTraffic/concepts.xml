@@ -1,0 +1,15 @@
+TCP/IP connections
+
+segments and windows.
+
+zero window probe
+
+1323 window rescaling requests
+
+total stream length ttl_stream_length.
+
+
+<questions>
+out of order packets - which direction is meant?
+
+xmit time.

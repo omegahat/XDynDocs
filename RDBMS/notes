@@ -1,0 +1,216 @@
+
+What to learn?
+
+* DBMSs were a bold advance over storing data in a group of related files; 
+letting various applications be written on top of the same underlying data; 
+all the while transparently managing the physical translation to the 
+underlying in physical storage.
+
+* A database system provides a means by which access to data may be 
+shared and integrated amongst a set of applications.
+As a result:
+     * Redundancy can be reduced - redundancy occurs when the same data appears
+     in different files, with possibly different names, for different 
+     applications, i.e. a waste of space
+     * Inconsistency can be avoided - with redundancy, changes in data for one 
+     application may not be reflected in the data used by other applications. 
+     When information is updated, we want it to propagate to all applications.
+     * Standards can be enforced when updates are propagated and when new data
+     is added to the database
+     * Conflicting requirements can be balanced
+     * Data independence - physical independence means that applications 
+     are immune changes in underlying storage.  Logical independence
+     means that applications are immune to changes in the logical representation.
+
+* In addition, a database provides facilities for ensuring security of the data,
+controlling concurrent access of the data, and supporting mulitple views of the
+data.
+
+* Database design is the process by which the requirements of a database
+are modeled prior to implementation.
+
+* The conceptual model of a database is a logical data model independent of 
+any particular form of implementation.  
+A database design is not the same as the "physical level" of the database,
+although some people speak as if it were.
+
+* There are various approaches to conceptual modeling, all of which incorporate
+certain aspects of semantic modelling.
+
+* Basic notions of how objects relate to each other:
+
+Generalization and specialization - set of objects are associated together in a generalized type (eg. a manager, clerical, technical are specializations of the
+general object employee) This is a one to one map -- each manager maps to one
+employee. "is-a" relation
+
+Aggregation - a series of otherwise independent objects that are associated
+together in an aggregated type (eg. engine, chasis, wheelset are aggregated
+into car) "is-part-of" relation
+
+Grouping - a series of objects that are all "a-type-of" another object.
+For example, an engine, with a unique engine number, is a type of engine,
+such as a four cylinder, diesel engine.  This is a many-to-one relation.
+
+These are important aspects of object relativity that a conceptual model 
+should attempt to represent.
+
+* Relational theory provides a strict way to get your database into higher 
+and righer normal forms, but in practice it isn't always necessary or 
+desirable to have your database in the highest NF possible. 
+
+
+Table - Basic unit of storage composed of rows and columns
+        Also called a relation
+	row - tuple
+        column - attribute
+	degree - number of attributes
+	cardinallity - number of rows
+
+View - Logically represents subsets of data from one or more tables
+Sequence - Generates primary key values
+Index - Improves the performance of some queries
+Synonym - Alternate name for an object
+
+
+A DBMS is a suite of programs which typically manage large structured sets of persistent
+data, offering ad hoc query facilities to many users. 
+They are widely used in business applications.
+
+A database management system (DBMS) can be an extremely complex set of software programs
+that controls the organisation, storage and retrieval of data (fields, records and files)
+in a database. 
+It also controls the security and integrity of the database. 
+The DBMS accepts requests for data from the application program and instructs the 
+operating system to transfer the appropriate data.
+
+When a DBMS is used, information systems can be changed much more easily as the 
+organisation's information requirements change. 
+New categories of data can be added to the database without disruption to the 
+existing system.
+
+Data security prevents unauthorised users from viewing or updating the database. 
+Using passwords, users are allowed access to the entire database or subsets of the 
+database, called subschemas. 
+
+The DBMS can maintain the integrity of the database by not allowing more than one user 
+to update the same record at the same time. 
+
+The DBMS can keep duplicate records out of the database; for example, no two customers 
+with the same customer numbers (key fields) can be entered into the database.
+
+Query languages and report writers allow users to interactively interrogate the database
+and analyse its data.
+
+If the DBMS provides a way to interactively enter and update the database, 
+as well as interrogate it, this capability allows for managing personal databases. 
+However, it may not leave an audit trail of actions or provide the kinds of controls 
+necessary in a multi-user organisation. 
+These controls are only available when a set of application programs are customised 
+for each data entry and updating function.
+
+Database design is the process of deciding how to organize data into record types and 
+how the record types will relate to each other. 
+The DBMS should mirror the organisation's data structure and process transactions 
+efficiently.
+
+Database machines are specially designed computers that hold the actual databases and 
+run only the DBMS and related software. 
+Connected to one or more mainframes via a high-speed channel, 
+database machines are used in large volume transaction processing environments. 
+Database machines have a large number of DBMS functions built into the hardware and 
+also provide special techniques for accessing the disks containing the databases, 
+such as using multiple processors concurrently for high-speed searches.
+
+RDBMS - relational database management system -  
+A database based on the relational model developed by E.F. Codd. 
+A relational database allows the definition of data structures, storage and retrieval 
+operations and integrity constraints. 
+In such a database the data and relations between them are organised in tables. 
+A table is a collection of rows or records and each row in a table contains the same 
+fields. 
+Certain fields may be designated as keys, which means that searches for specific values
+of that field will use indexing to speed them up.
+
+Where fields in two different tables take values from the same set, 
+a join operation can be performed to select related records in the two tables by 
+matching values in those fields. 
+Often, but not always, the fields will have the same name in both tables. 
+For example, an "orders" table might contain (customer_id, product_code) pairs and a 
+"products" table might contain (product_code, price) pairs so to calculate a given 
+customer's bill you would sum the prices of all products ordered by that customer 
+by joining on the product-code fields of the two tables. 
+This can be extended to joining multiple tables on multiple fields. 
+Because these relationships are only specified at retreival time, relational databases 
+are classed as dynamic database management system.
+
+
+
+Data Modelling 
+The construction of a model of the data requirements of the organization 
+Data requirements are more stable than processing requirements 
+what data exists and what is the most efficient way of organising it?
+	Identify and describe the data that are used 
+	Identify the characteristics of each data element
+  	numeric, text, date/time, etc
+	Examine the tasks carried out using the information
+	Examine the results or reports created using information
+
+Data modelling is the analysis of data in organizations,
+It captures all the data uses, and   
+organises data into an efficient structure
+
+
+
+An entity is an object of interest to the organisation
+
+
+An instance of an entity is a single occurrence of an entity 
+  It describes, for example, one particular customer or product
+  The student John Browne is an instance of the Student entity
+  Need shape to represent entity on diagram
+
+
+The attributes of an entity are the pieces of data we want to store about an entity
+ An attribute  is a descriptive property or characteristic of an entity
+
+The value of an attribute is the value of that attribute for a 
+particular entity occurrence
+
+The primary key to an entity is an attribute or set of attributes that 
+uniquely identify each occurrence of the entity
+A key consisting of a group of attributes is called a compound key
+An entity can have more than one key
+A candidate key is a key that could potentially become a primary key
+Any candidate key that is not selected to be a primary key is termed 
+an alternate key
+
+A primary key 
+ Must be unique for each occurrence of an entity
+ Must always have a value
+ Should not contain an attribute whose value is likely to change
+
+A relationship is a link or an association between two entities which 
+is meaningful for the organisation
+
+E/R model:
+A conceptual data model comprising of three main components:
+
+Entities (Things)
+Attributes (Properties)
+Relationships (Associations)
+
+degree of relationship 
+1-1
+1-many
+many to many
+
+Relationships:
+Entities are associated through Relationships. 
+Relationships have a number of properties:
+
+Name
+Degree or order
+Participation
+Role
+Cardinality
+

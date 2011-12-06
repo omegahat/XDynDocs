@@ -1,0 +1,254 @@
+\documentclass[11pt,timesroman]{article}
+\usepackage{times}
+\usepackage{fullpage}
+
+\begin{document}
+
+\begin{enumerate}
+
+\item{Introduction - needs polish}
+\begin{itemize}
+        \item Data - three examples: rainfall, spam, traffic video
+        \item Statistical Thinking and the Data Analysis process
+        \item The role of computing in statistics and data analysis.
+        \item Organization of rest of book (missing)
+\end{itemize}
+
+\paragraph{PART I: Technologies}
+
+\item{Introduction to Computing - rough draft}
+        \begin{itemize}
+        \item History of the Pc
+        \item Parts of the computer
+        \item Taxonomy of languages and systems -- R, Matlab, Perl, Python, Java, C/C++, SAS, Excel
+        \item Computation -- expressions, functions, variables 
+        \item Bits, numbers, and characters
+        \item Files and directories (class notes)
+        \end{itemize}
+
+\item{Shell Tools - detailed class notes}
+        \begin{itemize}
+        \item Command shell versus GUI
+        \item File Management
+        \item Pattern matching
+        \item Process management 
+        \item Advanced shell tools - scripts, looping, sed,
+        \end{itemize}
+
+\item{Introduction to Programming - detailed class notes}
+        \begin{itemize}
+        \item Expressions - single, compound, ill-formed
+        \item Data types and structures, managing variables
+        \item Functions and packages - help, arguments, scope, search path
+        \item Operators - vectorized, recycling
+        \item Subsetting - position, logical, exclusion, name
+        \item Matrices and arrays
+        \item Lists and data frames
+        \end{itemize}
+
+\item{Programming - detailed class notes}
+% Connected to chapter Advanced programming.
+        \begin{itemize}
+        \item Loops, conditional statements, \texttt{ifelse}.
+        \item Writing functions - 
+                \begin{itemize}
+                \item How to approach problems,
+                \item General, Extensible
+                \item Comments
+                \end{itemize}
+        \item Recursion.
+        \item closures.
+        \item Lazy evaluation.
+        \item Dirty Dozen
+        \end{itemize}
+
+
+\item{Regular Expressions - class notes} 
+
+\item{RDBMS - needs polish}
+        \begin{itemize}
+        \item Introduction 
+        \item The basic relational model - the table
+        \item Entity, meta information, missing values
+        \item Queries and the Select statement
+        \item Multiple tables and the relational model
+        \item Interfaces - Accessing a database from R 
+        \item SQL for statisticians - where to perform the statistics
+        \item Considerations for managing and designing your own database
+        \item Alternatives to databases
+        \end{itemize}
+
+
+\item{XML - needs polish}
+
+        \begin{itemize}
+        \item what is XML?
+        \item XML syntax
+        \item Valid XML 
+        \item XML examples - OIM (SAS/Oracle/Microsoft), StatDataML, 
+        \item The XML document as a tree
+        \item Reading XML as a tree
+        \item DOM Parser
+        \item Walking the DOM object
+        \item Customizing the DOM parser
+        \item Examples - HTML, GML, 
+        \item SAX
+        \item Monitoring SAX.
+        \item Hybrid parser model. 
+        \end{itemize}
+
+\item{SOAP - ?}
+
+\item{Inter-System Interfaces - ?}
+SJava, RSPerl, etc.
+\\
+KEGG, PubMed
+\\
+DCOM, GUIs, GIS, HTTP and Sockets
+
+
+\item{Distributed Computing}
+  \begin{itemize}
+  \item HTTP requests and RCurl.
+  \item Web Services and SOAP.
+  \item DCOM.
+  \item High-level view of SNOW.
+  \item Inter-system interfaces. \\
+      SJava, RSPerl, RMatlab, etc. \\
+      GUIs 
+  \end{itemize}
+>>>>>>> 1.3
+
+\item{Advanced computing - detailed class notes}
+<<<<<<< toc_Nov_2005.tex
+        \begin{itemize}
+        \item Representing numbers, precision and comparison
+        \item Efficiency - memory, time, profiling
+        \end{itemize}
+=======
+        \begin{itemize}
+        \item Representing numbers, precision and comparison
+        \item Efficiency - memory, time, profiling
+        \item Batch jobs.
+        \item Debugging
+        \item Classes - S3 and S4.
+        \end{itemize}
+>>>>>>> 1.3
+
+
+\paragraph{Part II: \textit{Statistical} Computing - omit?}
+
+\item{Simulation}
+        \begin{itemize}
+        \item Random number generation
+        \item Inverse CDF, Acceptance rejection sampling
+        \item Monte Carlo
+        \item Resampling - bootstrap, cross-validation
+        \item Monte Carlo Markov Chain
+        \end{itemize}
+
+
+\item{Visualization class notes}
+<<<<<<< toc_Nov_2005.tex
+        \begin{itemize}
+        \item Elements of a graph
+        \item eda
+        \item complex composite plots
+        \item Wilkinson's grammar of graphics
+        \item Examples of complex graphs
+        \item Dynamic graphics, Ggobi
+        \end{itemize}
+=======
+        \begin{itemize}
+        \item Elements of a graph
+        \item eda
+        \item complex composite plots
+        \item Wilkinson's grammar of graphics
+        \item Examples of complex graphs
+        \item lattice.
+        \item Dynamic graphics, Ggobi
+        \end{itemize}
+>>>>>>> 1.3
+
+
+\paragraph{Part III: Case Studies}
+
+
+\item{Spam - Naive Bayes (needs polish)}
+\\
+technology: regular expressions
+\\
+statistical methods: Naive Bayes; Cross-validation
+
+\item{Spam - Nearest neighbor (needs polish)}
+\\
+technology: regular expressions
+\\
+statistical methods: nearest neighbor, classification trees,
+cross-validation
+
+\item{Election Maps - half finished}
+\\
+technology: understanding packages, gml
+\\
+statistical methods: maps, color
+
+
+\item{Ad hoc Networks - detailed class notes}
+\\
+technology: random number generation and simulation
+\\
+statistical methods: acceptance-rejection sampling, monte carlo
+
+
+\item{Google}
+\\
+technology: XML
+\\
+statistical methods: markov chains and simulation
+
+\item{Baseball?}
+\\
+technology: databases
+\\
+statistical methods: exploratory data analysis
+
+
+\item{Mailing Lists}
+social networks
+
+
+\item{Image analysis}
+
+\item{Web Logs}
+
+\item{TCP Intrusion detection}
+
+\item{Genetics}
+        SOAP
+
+\item{Rainfall data and Geographical data.}
+\item{Code Profiling}
+
+\item{Citation clustering}
+
+
+\item{Credit scoring}
+
+
+\end{enumerate}
+
+\appendix
+
+\section{Getting, Installing and Working with R}
+Installation.
+
+Editors.
+
+
+\section{Tools for Windows}
+
+cygwin
+XEmacs.
+
+\end{document}

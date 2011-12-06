@@ -1,0 +1,43 @@
+\begin{table}[htbp]
+\begin{center}
+{\Large Description of Variables }\vskip.3in
+  \leavevmode
+\begin{tabular}{llp{4in}}
+isSpam & logical & whether mail is Spam (TRUE) or Ham (FALSE) \\
+isRe                   &  logical  &  if the string Re: appears as the first word in the subject of the message \\
+numLinesInBody         &  integer & a count of the number of lines in the body of the email message \\
+bodyCharacterCount     &   integer & the number of characters in the body of the email message \\
+replyUnderline         &  logical  & wheteher the Reply-To field in the header has an underline and numbers/letters \\
+subjectExclamationCount&   integer & a count of the number of exclamation marks (!) in the subject of the message \\
+subjectQuestCount      &  integer &  the number of question marks in the subject \\
+numAttachments         &  integer &  the number of attachments in the message. \\
+priority               &  logical & whether the message's header had an X-Priority or X-Msmail-Priority that was set to high \\
+numRecipients          &  integer &  the number of recipients in the To, Cc fields \\
+percentCapitals        &  numeric & the percentage of the characters in the body of the email that
+are upper case (excluding blanks, numbers, and punctuation) \\
+isInReplyTo            &  logical &  whether the header of the message has an In-Reply-To field. \\
+sortedRecipients       &  logical & the recipient list is sorted by address \\
+subjectPunctuationCheck&   logical &  whether the subject has punctuation or digits surrounded by characters,
+e.g. V?agra and pay1ng, but not New!\\
+hourSent               &  integer & the hour in the day the mail was sent (0 -- 23) \\
+multipartText          &  logical &  whether the header states that the message is a multipart/text, i.e. with attachments. \\
+containsImages         &  logical & whether the message contain images (in HTML)  \\
+isPGPsigned            &  logical  & indicates whether the mail was digitally signed (e.g. using PGP or GPG) \\
+percentHTMLTags        &   numeric &  the proportion of any HTML text in the message's body that is made up of HTML markup and not content. \\
+subjectSpamWords       &  logical  &  whether the subject contains one of the following phrases:
+viagra, pounds, free, weight, guarantee, millions, dollars,
+credit, risk, prescription, generic, drug, money back, credit card.\\
+percentSubjectBlanks   &  numeric  & the percentage of blanks in the subject \\
+messageIdHasNoHostname &  logical  & whether the message id that uniquely identifies the message has no component identifying the machine from which it was set \\
+fromNumericEnd         &  logical &  whether the user login in the From: field ends in numbers \\
+isYelling              &  logical  &  whether the Subject of the mail is in capital letters \\
+percentForwards        &  numeric & percent of the message's body  that is made up of content included from other messages  \\
+isOriginalMessage      &  logical & body does not contain the phrase ``original message'' or something similar \\
+isDear                 &  logical & whether the message body contains a form of the introduction Dear $\ldots$ \\
+isWrote                &  logical &  whether the text includes a line indicating an included message as identified by the word wrote: in several different possible languages  \\
+averageWordLength      &  numeric & the average length of the words in the body of the message \\
+%XX
+numDollarSigns         &   integer &  the number of dollar signs in the body of the message \\
+\end{tabular}   
+\end{center}
+\end{table}

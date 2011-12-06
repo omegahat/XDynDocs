@@ -1,0 +1,2 @@
+#!/bin/sh
+svn status | egrep -v '\.(o|so|fo|aux|log|pdf|bbl|blg|out|toc|tar.gz)$' | grep -v 'R-help/data/thread'

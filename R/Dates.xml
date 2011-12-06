@@ -1,0 +1,1029 @@
+<?xml version="1.0"?>
+
+<article xmlns:s="http://cm.bell-labs.com/stat/S4"
+         xmlns:r="http://www.r-project.org"
+         xmlns:c="http://www.c.org"
+         xmlns:sh="http://www.shell.org"
+         xmlns:rx="http://www.regex.org"
+         xmlns:perl="http://www.perl.org">
+<section>
+
+This is a short document that discusses dates in R and some
+computations we often want to do on them for exploratory purposes.
+We'll consider the simple data context.  We have information about
+when mail messages are sent.  We have the day and time, the sender and
+the size of the mail.  The records are in the following format
+<literallayout>
+Date, Sender, Number of Recipients, Subject, Number of Lines, Message size as number of Bytes 
+</literallayout>
+The files are TAB delimited.
+
+<para/>
+
+To read the messages from a particular MBOX folder into R, we can   use the following
+call to 
+<s:functionRef>read.table</s:functionRef>:
+<s:code>
+d = read.table("RHelpInfo", sep = "\t", quote = "", comment.char = "", 
+               colClasses  = c("character", "character", "integer", "character", "integer", "integer"), 
+               col.names =  c("Date", "Sender", "NumRecipients", "Subject", "Lines", "ContentSize"))
+</s:code>
+We want to work with this to illustrate the use of dates and times.
+Accordingly, we convert the date-time field into a suitable form so
+that we can do arithmetic on the values. We convert the values to
+POSIXct using <s:functionRef>strptime</s:functionRef> and
+<s:functionRef>as.POSIXct</s:functionRef>:
+<s:code>
+d[["Date"]] = as.POSIXct(strptime(d[["Date"]], "%a %b %d %H:%M:%S %Y"))
+</s:code>
+
+</section>
+
+We make this into a function so that we can apply to individual
+MBOX folders.
+<s:functionDef>
+readMailArchive =
+function(fileName = "RHelpInfo")
+{
+ d = read.table(fileName, sep = "\t", quote = "", comment.char = "", 
+                colClasses  = c("character", "character", "integer", "character", "integer", "integer"), 
+                col.names =  c("Date", "Sender", "NumRecipients", "Subject", "Lines", "ContentSize"))
+
+ d[["Date"]] = as.POSIXct(strptime(d[["Date"]], "%a %b %d %H:%M:%S %Y"))
+ invisible(d)
+}
+</s:functionDef>
+
+<para/>
+
+To read our data, we first combine the archive files for each month
+of each year.
+We can do this best in the shell.
+<sh:code>
+ cat *.txt > RHelp.txt
+</sh:code>
+Then we run the Perl script to extract the records
+containing the data in which we are interested.
+<sh:code>
+ mail.pl RHelp.txt > RHelpRecords
+</sh:code>
+And finally, we return to R and 
+load the records in using <s:functionRef>readMailArchive</s:functionRef>:
+<s:code>
+ rhelp = readMailArchive("RHelpRecords")
+</s:code>
+
+Of course, we check the basic features of this data to ensure that it was read correctly.
+As we find problems,  we adapt either the code to read the records
+or the Perl script to generate the records.  For example, as new messages 
+are processed, some may contain characters that cause problems. In our case,
+we had to return to the Perl script to have it replace the \t to identify a TAB
+in the subject field into \\t in the output so that R could read it more readily.
+This form of iterative processing of the data where the code is updated to handle
+newly discovered aspects  of the inputs is very common and a good thing.
+
+<s:code>
+dim(rhelp)
+</s:code>
+We can check that this has the same number of records as there are lines
+in the original file
+by counting the lines
+<s:code>
+length(readLines("RHelp-97-05.archive"))
+</s:code>
+
+We can check the types of the variables:
+<s:output>
+sapply(rhelp, class)
+$Date
+[1] "POSIXt"  "POSIXct"
+
+$Sender
+[1] "character"
+
+$NumRecipients
+[1] "integer"
+
+$Subject
+[1] "character"
+
+$Lines
+[1] "integer"
+
+$ContentSize
+[1] "integer"
+</s:output>
+
+We can look at numerical summaries for each of the variables:
+<s:code>
+summary(rhelp)
+</s:code>
+<s:output>
+      Date                        Sender          NumRecipients
+ Min.   :2003-04-10 02:56:38   Length:63620       Min.   :0    
+ 1st Qu.:2003-04-10 03:46:11   Class :character   1st Qu.:0    
+ Median :2003-05-06 08:48:39   Mode  :character   Median :0    
+ Mean   :2003-10-06 15:08:19                      Mean   :0    
+ 3rd Qu.:2004-04-10 06:13:02                      3rd Qu.:0    
+ Max.   :2005-01-28 18:28:46                      Max.   :0    
+   Subject              Lines          ContentSize   
+ Length:63620       Min.   :   5.00   Min.   :  129  
+ Class :character   1st Qu.:  29.00   1st Qu.: 1011  
+ Mode  :character   Median :  41.00   Median : 1480  
+                    Mean   :  50.91   Mean   : 1785  
+                    3rd Qu.:  61.00   3rd Qu.: 2140  
+                    Max.   :4124.00   Max.   :99518  
+</s:output>
+Clearly, the number of recipients variable has  a problem.
+Also, the dates seem to start in April 03, yet the message
+archives date back to 1997!
+
+<para/>
+Let's look at the number of recipients issue.
+Firstly, we check what is in the file that we read into R.
+Does it have 0 for each value or is it during the <s:functionRef>read.table</s:functionRef>
+call that we are getting the wrong value?
+Sure enough, if we look at the first few lines of the file, we see
+<literallayout>
+Thu Apr 10 02:56:38 2003	ihaka	0	R-alpha: R-testers: pmin heisenbug	66	2322
+Thu Apr 10 02:56:38 2003	p.dalgaard	0	R-beta: Re: R-alpha: windows advice	35	1596
+Thu Apr 10 02:56:38 2003	maechler	0	R-beta: "R-announce", "R-help", "R-devel" : 3 mailing lists for R	58	2429
+Thu Apr 10 02:56:39 2003	rossini	0	R-beta: Re: R-alpha: windows advice	47	2113
+</literallayout>
+And each of the records has a 0 in the third field corresponding
+to the number of recipients of the message.
+We can check that every record in the file contains
+0 for this field using the following shell command:
+<sh:code>
+cut -f3 RHelp--97-05.archive | sort | uniq -c
+</sh:code>
+And, sure enough, we get
+<sh:output>
+63620 0
+</sh:output>
+So this means that at least reading the data into R was correct for this variable.
+
+<para/>
+So now we have to look at the original source of this file of records.
+This was derived from the concatenation of the individual monthly
+archive message files and then processed via the Perl script that read
+the MBOX format and extract the relevant information.  The Perl script
+is a likely source of error.  We can run it on a smaller sample of
+messages by using a different MBOX file and see if that yields the 
+same problem.
+You can run this on your own mail folder. When we do this,
+we find that it does indeed give appropriate results.
+So, what could the problem be - it works on my mail box,
+but not on the R-help archive messages?
+
+<para/>
+The natural thing to do is to look at the R-help messages
+and find an example message which has a To, CC or Bcc
+field in the message and find out why the Perl script
+doesn't handle that.  Digging in the Perl script and the
+associated 3rd party code is going to be hard, but
+it definitely helps to have a specific counter-example
+that we can use to test things.
+Again, we can start looking through the message file one at a time.
+If we do this, we will notice that the first few messages have no
+To, CC or Bcc field. And as we continue, we get the idea that none
+of the messages contain this information. So, perhaps the number of
+recipients being reported as 0 is correct. 
+Again, we would like to be able to verify this for the entire file
+and not just leave it to our eyes to verify it by looking at a few
+messages.
+Again, the shell tools help.
+<sh:code>
+grep '^To:' RHelp-97-05.archive | wc -l
+</sh:code>
+We get no lines from this search and so our suspicions
+are confirmed.
+
+<para/>
+It would be good to know why there are no recipient fields in each
+message. The reason is that these are public archives.  And the l
+address fields of individuals has been suppressed to avoid computer
+programs harvesting valid e-mail addresses for use in SPAM.  So the 0
+fields are entirely legitimate in this case.  We have the Perl script
+produce this information as it is useful for regular MBOX message
+files.
+
+
+
+<para/>
+The second aspect that concerned us from the summary output
+is the dates spanned by the archive messages.
+We know that the archives are from April 1997 to January 2005.
+So why is the earliest date 2003-04-10 02:56:38?
+Again, it helps to look at the raw data.  Go back to the 
+1997-April.txt file and look at the messages within that.
+Specifically, if we look at the Date field in the messages
+via 
+<sh:code>
+grep '^Date:' 1997-April.txt
+</sh:code>
+we see that all but one 
+are within a 5 minute period Thu Apr 10 09:56:39 2003.
+(The exception has an unusual format  "23-Apr-97"
+and so doesn't get picked up by our 
+<s:functionRef>strptime</s:functionRef> format string.)
+
+<para/>
+Again, rather than simply accepting the fact that these dates are from 2003
+and not the original posting date, it is helpful to have an explanation.
+A possible reason is that the mail messages were archived by "bouncing"
+them from one mailbox to a different one and that this was done on
+April 10, 2003.  We could find more evidence for this if we
+found that the archiving for messages after this point was more typical
+and similar to that of the current archiving.
+That is statistics and we have already used summary statistics to
+find these two characteristics of the data.
+
+
+
+<section>
+<title>Exploring the Data</title>
+Once we have the data, we can take a look at different characteristics.
+Firstly, let's look at how many messages come in a month.  The date
+and times are continuous or integer valued variables.  We can create
+a categorical variable that identifies each record as being in a
+particular month within a particular year.  This is a categorical
+variable derived from the time-stamp.  The function
+<s:functionRef>cut</s:functionRef> does this. It basically takes data
+from a continuous variable and breaks it up into groups or categories.
+Dates and times are of course special as the categories such as
+by-minute, by-hour, by-month, by-year etc. have a natural meaning.
+For general continuous variables, there may not be any obvious
+categories and so <s:functionRef>cut</s:functionRef> works more like a
+histogram and creates bins based on the density of the data.
+<s:code>
+months = cut(rhelp[,"Date"], "month")
+</s:code>
+The function that is actually called to do the work is
+<s:functionRef>cut.POSIXct</s:functionRef>.
+This is because
+<s:functionRef>cut</s:functionRef> is what is called
+a generic function and so tries to find a particular
+"method" for the operation (in this case, cut) 
+for the particular class of data that it is given.
+Our Date field is of class POSIXt and POSIXct 
+and so, the generic function mechanism
+tries to find a 
+special version of <s:functionRef>cut</s:functionRef>
+by the name
+<s:functionRef>cut.POSIXt</s:functionRef>
+or
+<s:functionRef>cut.POSIXct</s:functionRef>,
+in that order. 
+If it finds one, it calls that function instead of itself.
+Otherwise, it does the default thing.
+This is the S3 object-oriented method dispatch mechanism.
+It is used a lot in R and S-Plus to allow a function
+to behave in different ways for different types of inputs.
+For example, <s:functionRef>plot</s:functionRef>
+knows how to deal with vectors, factors, matrices, linear model fits, etc.
+The presence of 
+<s:functionRef>cut.POSIXct</s:functionRef>
+hopefully illustrates the usefulness of converting
+the date strings to something that we can compute on
+directly and the fact that we have a method for
+<s:functionRef>cut</s:functionRef> makes calling
+the function even simpler. We don't have to remember which
+version of <s:functionRef>cut</s:functionRef> to call
+but rather let the system find the appropriate one for us.
+
+
+<para/>
+
+We can use the output of <s:functionRef>cut</s:functionRef> directly
+to find out how many messages happened within each month.
+The output from cut is a factor or categorical variable.
+It has the same length as the original variable from which it was derived,
+i.e. it as many entries as there are records in the original input, 
+<s:expression>rhelp[["Date"]]</s:expression>.
+So we have a value for each message in the archive.
+And we can find the possible values of the factor using the 
+<s:functionRef>levels</s:functionRef> function.
+<s:code>
+levels(months)
+</s:code>
+<s:output>
+ [1] "2003-04-01" "2003-05-01" "2003-06-01" "2003-07-01" "2003-08-01"
+ [6] "2003-09-01" "2003-10-01" "2003-11-01" "2003-12-01" "2004-01-01"
+[11] "2004-02-01" "2004-03-01" "2004-04-01" "2004-05-01" "2004-06-01"
+[16] "2004-07-01" "2004-08-01" "2004-09-01" "2004-10-01" "2004-11-01"
+[21] "2004-12-01" "2005-01-01"
+</s:output>
+This shows that there are 22 months and no month is missed
+from the period April 2003 to January 2005.
+(Is there are good way to verify this programmatically?)
+
+<para/>
+Each value in the factor is an indicator as to which month, i.e. level,
+that message belongs.
+So we can use the function 
+<s:functionRef>table</s:functionRef>
+to compute a frequency table for the number of messages in each month:
+<s:code>
+table(months)
+</s:code>
+<s:output>
+2003-04-01 2003-05-01 2003-06-01 2003-07-01 2003-08-01 2003-09-01 2003-10-01 
+     31649       1273       1324       1345       1215       1445       1573 
+2003-11-01 2003-12-01 2004-01-01 2004-02-01 2004-03-01 2004-04-01 2004-05-01 
+      1604       1151       1136       1601       1965       1637       1570 
+2004-06-01 2004-07-01 2004-08-01 2004-09-01 2004-10-01 2004-11-01 2004-12-01 
+      1730       1606       1497       1536       1729       1912       1479 
+2005-01-01 
+      1643 
+</s:output>
+A barchart is probably more readily informative.
+<s:plot img="months.png">
+plot(rhelp$months, main = "R-Help messages by month")
+</s:plot>
+
+We immediately see the very large number of messages in the first
+month. This is because all the messages that were collected between
+April 1997 and April 2003 are considered to be from April 2003.
+This amounts to 7 years, or 84 months. So, on average, this
+amounts to 376 messages per month.
+This is much lower than all the remaining months since then,
+so the idea that these 31649 messages are uniformly
+distributed over the 84 months is, perhaps, dubious.
+
+<para/>
+Let's redraw the plot with these early messages removed.  To do this,
+we subset the <s:variable>months</s:variable> vector.  We want all of
+the observations or elements in <s:variable>months</s:variable>
+that are not in the first category/level.
+This is done via the expression
+<s:code>
+months[months != levels(months)[1]]
+</s:code>
+And a plot of this subset is
+<s:plot img="recentMonths.png">
+plot(months[months != levels(months)[1]], main = "Number of R-Help messages by month")
+</s:plot>
+gives a bar plot that  emphasizes the more recent months
+and their differences.
+Is there any trend or feature that is suggested by the plot?
+
+<para/>
+Note that we still end up with the April-1997 month as a level
+in our subset, but that it has no entries.
+This is often useful as we may want to include the existence of the
+level in the definition of the variable, even when we subset 
+to exclude observations within that level.
+In other cases, like this one, we may want to drop that
+level altogether.
+We can do this using the 
+<s:arg>drop</s:arg> argument for the 
+subset operator
+<s:operator>[</s:operator>:
+<s:plot>
+plot(months[ months != levels(months)[1], drop = TRUE ])
+</s:plot>
+The resulting plot excludes that omitted month.
+
+<!--
+<para/>
+A boxplot is also a useful display of the counts by months.
+<s:plot img="boxplot.png">
+boxplot(months[ months != levels(months)[1], drop = TRUE ])
+</s:plot>
+-->
+
+<para/>
+Using the context of the data, we can add to our plot.
+Let's also add the dates on which the different versions were
+released.
+We know the dates of the major and minor releases
+of R. We can find this out from the R web site
+at <link uri="http://cran.r-project.org/src/base">Source downloads</link>.
+We can get this programmatically
+using <s:functionRef>htmlTreeParse</s:functionRef>
+and extracting the relevant information.
+We have done this already
+and put it into the file
+<filename>R-releases.txt</filename>
+<literallayout>
+R-1.0.0   29-Feb-2000 
+R-1.0.1   14-Apr-2000 
+R-1.1.0   15-Jun-2000 
+R-1.1.1   15-Aug-2000 
+R-1.2.0   15-Dec-2000 
+R-1.2.1   15-Jan-2001 
+R-1.2.2   26-Feb-2001 
+R-1.2.3   26-Apr-2001
+R-1.3.0   22-Jun-2001
+R-1.3.1   31-Aug-2001
+R-1.4.0   19-Dec-2001
+R-1.4.1   30-Jan-2002
+R-1.5.0   29-Apr-2002
+R-1.5.1   17-Jun-2002
+R-1.6.0   01-Oct-2002
+R-1.6.1   01-Nov-2002 
+R-1.6.2   10-Jan-2003
+R-1.7.0   16-Apr-2003
+R-1.7.1   16-Jun-2003
+R-1.8.0   08-Oct-2003
+R-1.8.1   21-Nov-2003
+R-1.9.0   12-Apr-2004
+R-1.9.1   21-Jun-2004
+R-2.0.0   04-Oct-2004  
+R-2.0.1   15-Nov-2004  
+</literallayout>
+
+We read these into R using
+<s:functionRef>read.table</s:functionRef>:
+<s:code>
+releaseDates = read.table("../R-releases.txt", header = FALSE, as.is = TRUE)
+names(releaseDates) = c("Version", "Date")
+releaseDates[["Date"]] = as.POSIXct(strptime(releaseDates[["Date"]], "%d-%b-%Y"))
+</s:code>
+Next, we want to identify the release as either being
+a major revision (when the first digit in the version number changes),
+a "minor" release (when the second digit changes),
+and a patch or bug-fix release (when the last digit changes).
+We can create a factor with three levels indicating
+Major, Minor or Patch.
+<s:code>
+releaseDates[["type"]] = factor(rep(NA, nrow(releaseDates)), levels = c('Major', 'Minor', 'Patch'))
+
+releaseDates[ as.integer(substring(releaseDates[["Version"]], 7)) != 0, "type"] = 'Patch'
+releaseDates[ grep("R-[12]\.0\.0", releaseDates[["Version"]]), "type"]  = 'Major'
+releaseDates[is.na(releaseDates[["type"]]), "type"] = 'Minor'
+</s:code>
+
+
+Now it would be nice to be able to simply use
+<s:functionRef>abline</s:functionRef> to place vertical
+lines at the relevant dates.
+Unfortunately, the <s:functionRef>barplot</s:functionRef> creates its own scale on the axis and does not
+use the dates associated with the months induced by <s:functionRef>cut(, "month")</s:functionRef>.
+This make sense as it is merely dealing with levels or categories within a variable and does not
+need to know about dates and times.
+But this makes our job of annotating the plot with lines identifying dates a little more difficult.
+We draw the barplot, but we also store the results as these identify the locations on the X-axis
+of the barplots.  
+<s:plot img="monthsReleases.png">
+ticks = plot(months[ months != levels(months)[1], drop = TRUE], main = "Number of messages in R-help mailing list, by month")
+</s:plot>
+We can then do the computations to figure out where the dates of the releases should lie on
+this coordinate system.
+We have the labels from the months factor.
+We can turn these into POSIXct objects and get the range they span.
+Then a simple linear mapping of our release dates into this range to get the
+proportion along the range of the time spanned  by the barplot axis gives
+us the positions on the actual scale of the barplot.
+<!-- Check the month.ct is okay. Added it after did the plot and it may need to be different. -->
+<s:code>
+month.ct = as.POSIXct(strptime(names(table(months)), "%Y-%m-%d"))
+dates.x = as.numeric((releaseDates$Date - min(month.ct)))/as.numeric(diff(range(month.ct)))*diff(range(ticks))
+</s:code>
+Now that we have the locations for the releases, we draw the lines, using
+red for a major release, yellow for a minor release and green for a patch.
+Similarly, we use a decreasing line width to represent the different levels.
+We use a trick of converting the factor to the indices for the level set to
+map the values into different sets or values.
+
+<s:plot img="monthsReleases.png">
+abline(v = dates.x, lwd = abs(4 - as.integer(releaseDates[["type"]])), col = c("red", "yellow", "green")[as.integer(releaseDates[["type"]])])
+text(dates.x, .95*max(table(months[ months != levels(months)[1], drop = TRUE])), substring(releaseDates$Version, 3), srt = -45, adj = 1) 
+</s:plot>
+The srt argument tells the <s:functionRef>text</s:functionRef> to rotate the text by -45 degrees.
+The adj argument tells it to right align the text at the x coordinate, i.e. position the
+end of the text at the x coordinate and go to the left.
+
+<para/>
+We also add a legend to explain these color and line-width combinations.
+<s:plot img="monthsReleases.png">
+legend(1, .95*max(table(months[ months != levels(months)[1], drop = TRUE])), c("Major", "Minor", "Patch"), lwd = 3:1, col = c("red", "yellow", "green"))
+</s:plot>
+
+</section>
+
+<section>
+<title>
+Statistics by Day.
+</title>
+<s:functionRef>cut</s:functionRef> allows us to easily determine the
+distribution of the number of messages within a given time interval,
+i.e. minute, hour, day, month, year.
+However, what if we wanted to look at statistics other than counts
+within those time periods.
+For example, suppose we wanted to find out the number of
+bytes that was sent each day.
+We need to arrange the observations in 
+our data frame into days and then within each of those
+subgroups or categories, we need to add up the 
+ContentSize field for those observations.
+Organizing the observations by day is quite easy; 
+<s:functionRef>cut</s:functionRef> can do this for us
+to produce a factor with levels indicating to which 
+day a record belongs.
+<s:code>
+days = cut(rhelp[["Date"]], "days")
+</s:code>
+We might want to exclude the early messages that are dated April 10, 2003.
+<s:code>
+recent = months != levels(months)[1]
+days = cut(rhelp[ recent , "Date"], "days")
+</s:code>
+
+<para/>
+Now we could explicitly loop over each day
+(i.e. the levels) of this factor, and find the
+observations matching that level.
+Then we could get the ContentSize values for these and compute our
+statistic.
+But this is a very common thing that we want to do in statistics,
+so you can be reasonably assured that somebody has already done it and provided it as
+a function in R.
+The <s:functionRef>by</s:functionRef> function helps us in this way.
+We give it our data frame and one or more factors identifying the
+subgroups.  It takes care of separating the subgroups and calling a
+function on those observations.
+We can specify any function and can compute anything we want, 
+even drawing a plot, etc.
+<s:code>
+by( rhelp[recent, ], days, function(data) sum(data[, "ContentSize"]))
+</s:code>
+This takes some time as there are a lot of computations to do.
+But examine how simple this is.
+
+Let's draw boxplots of the distributions of ContentSize 
+for each month. We will put these all on the same plot
+so that we can easily compare them.
+<s:plot img="sizeByMonths.png">
+mts = cut(rhelp[ recent , "Date"], "months")
+boxplot(ContentSize ~ mts, data = rhelp[recent,], main = "Number of Bytes by Month")
+</s:plot>
+
+While we have the <s:variable>mts</s:variable> separate
+from the data, when looking at subsets it is convenient to have
+it as a parallel variable within the data frame. This makes the data
+a self-contained unit and this is convenient when using formulas
+and the <s:arg>data</s:arg> argument. 
+We can do this as
+<s:code>
+rhelp$months = cut(rhelp$Date, "month")
+</s:code>
+
+We might look at the distributions
+without those large values.
+We can do the latter by excluding the observations
+for which the ContentSize was greater than the
+90\%ile: 
+ as
+<s:plot img="TrimmedSizeByMonth.png">
+<![CDATA[
+boxplot(ContentSize ~ months, data = rhelp[recent & rhelp$ContentSize <= quantile(rhelp$ContentSize, .9),],
+         main = "Trimmed bytes by month")
+]]>
+</s:plot>
+And indeed, we see very little different between the distributions. 
+
+<para/>
+We might also chose to identify the outliers
+and understand why they are so large.
+Let's look at the subject phrase for these
+large messages.
+Let's start with the largest message.
+We can identify its index with the command
+<s:code>
+which(rhelp$ContentSize == max(rhelp$ContentSize))
+</s:code>
+and now look at the entire record as
+<s:code>
+rhelp[35395,]
+                     Date  Sender NumRecipients
+35395 2003-06-27 22:46:09 lcheung             0
+                                           Subject Lines ContentSize     months
+35395 [R] R-help Digest, Vol 4, Issue 27 ( -Reply)  3194       99518 2003-06-01
+</s:code>
+Interestingly, it mentions the Digest. What is this?
+People can subscribe to the R-help mailing lists
+in two modes. In one case, each message is sent to the subscriber when it is 
+received by the list server.  In the other mode, the list server
+sends all the messages for that day at the end of the day to the
+"digest" subscribers.  As a result, the digest "message" is
+quite large, consisting of the days messages concatenated together!
+Since we have the date from this message's record, we can check the
+message contents itself by looking at the 2003-June.txt file.
+And  indeed, the message does contain the entire digest.
+
+<para/>
+What about the other larger email messages?
+First, lets find the 10 largest email messages.
+We do this by getting the 10 largest sizes
+and then finding the indices of the records
+whose ContentSize is in that set.
+<s:code>
+big10 = sort(rhelp$ContentSize, decreasing = TRUE)[1:10]
+rhelp[which(rhelp$ContentSize %in% big10), ]
+</s:code>
+The results are
+<s:output>
+                     Date              Sender NumRecipients                                             Subject Lines
+2157  2003-04-10 03:08:51 owner-r-help-digest             0                            [R] R-help Digest V1 #34  2095
+12023 2003-04-10 03:36:49             ljlehou             0                               [R] Installation help  1170
+19494 2003-04-10 03:47:11         wei_xiaoyan             0               [R] installing R-1.3.1 on Solaris 2.6  1083
+35395 2003-06-27 22:46:09             lcheung             0        [R] R-help Digest, Vol 4, Issue 27 ( -Reply)  3194
+36202 2003-04-10 04:25:21            mandevip             0                                     [R] Tukey's HSD  2985
+36216 2003-04-10 04:25:25     Torsten.Hothorn             0                                     [R] Tukey's HSD  3003
+37443 2003-05-19 07:58:31     Andre.Dos.Anjos             0                [R] R doesn't support 3D histograms?  4124
+45602 2004-08-27 12:18:42          S.Nyangoma             0 [R] selecting unique columns of a matrix/data frame  2664
+50550 2004-07-12 16:36:38               cliff             0             [R] Where does R search when source() ?  2090
+57386 2004-11-11 08:11:09         chris.brown             0                   [R] ROracle SQL length limitation  2877
+      ContentSize     months
+2157        83730 2003-04-01
+12023       61910 2003-04-01
+19494       61444 2003-04-01
+35395       99518 2003-06-01
+36202       68415 2003-04-01
+36216       74844 2003-04-01
+37443       66625 2003-05-01
+45602       90438 2004-08-01
+50550       64735 2004-07-01
+57386       88637 2004-11-01
+</s:output>
+We see two instances of the  "digest" issue.
+From the months field, we also see that half of these were in
+April-2003, i.e. all messages before May, 2003.
+Looking at the individual message from the most recent
+large message in this group (2004-11-11, ROracle SQL length limitation),
+we can look in 2004-November.txt and find that the particular message includes
+an entire digest message.
+Similarly, the message 2004-7-12 is in response to the digest.
+For the question on "3D histograms" (2003-05-19), the sender includes a dataset.
+Likewise, the messages about Tukey's HSD (honest significant difference for multiple comparison tests)
+contain a non-trivial dataset.
+
+<para/>
+We can also look for the presence of attachments.
+We can do this in the shell by looking for 
+the pattern
+<rx:pattern>'^ContentType: multipart'</rx:pattern>.
+We can also get the Perl script that examines each message in the MBOX file(s)
+to include the number of "parts"/attachments in the message and include this in our 
+dataset.
+</section>
+
+
+<section>
+<title>Subject Words</title>
+We can look at the contents of the subject phrases for each message and look
+at the common words used.
+These might suggest recurring issues or themes. 
+We want to remove all the typical words used in sentences
+such as "and", "or",  etc. that contribute little 
+to identifying the subject matter.
+To do this, we first build a list of these words which we want to 
+discard.
+We just put these in a character vector and store this
+as <s:var>stopWords</s:var>.
+
+<s:code>
+<![CDATA[
+stopWords = c("[R]", "in", "R", "a", "and", "with", "from", "of", "to", "on", "the", "?",
+              "when", "as", "by", "for", "Re:", "--", "was", "is", "(was", "(no", "no", "A", 
+               "The", "&", "or", "How", "how", "-", "help", "about", "an", "under", "not", "into", "use", "does")
+]]>
+</s:code>
+
+<para/>
+Next, we want get all the subject lines and break them into "words".
+We will just split the strings into words separated by spaces.
+What we want to have happen here is that we loop
+over each message and split its subject line into a character vector of
+words.  So each message will have a corresponding character
+vector and all of these will have potentially different lengths.
+What we want is a list with an element for each message,
+and the element will be a character vector containing the words for that
+message's subject line.
+In order to do this looping and end up with a list, it is easiest to 
+use the function <s:functionRef>lapply</s:functionRef>.
+This will loop over the vector we give it (<s:expression>rhelp$Subject</s:expression>)
+and call the specified function for each element, i.e. each subject line.
+The function <s:functionRef>strsplit</s:functionRef> takes the string and breaks it into
+pieces based on the pattern we specify as the second argument to
+<s:functionRef>strsplit</s:functionRef>.  Since we want to pass 
+the pattern <rx:pattern>" +"</rx:pattern>, which means one or more consecutive spaces,
+to <s:functionRef>strsplit</s:functionRef> which will itself be called by
+<s:functionRef>lapply</s:functionRef>, we pass it as an additional argument
+to <s:functionRef>lapply</s:functionRef> and it will be included in each call
+to <s:functionRef>strsplit</s:functionRef>.
+<s:code>
+words = lapply(rhelp$Subject, strsplit, " +")
+</s:code>
+
+<para/>
+Now we have to actual words in our subject lines.
+Since we are not really interested in which messages have which words,
+but rather just want to look at the most popular words overall.
+So we can treat the words as one large vector. We turn them from this
+2-dimensional "ragged" array of words within message to a flat
+list using <s:functionRef>unlist</s:functionRef>.
+And next we can compute the frequency table of this vector.
+<s:code>
+f = table(unlist(words))
+</s:code>
+<para/>
+If we look at the most common words in <s:var>f</s:var>, we
+will see "[R]" which is put into each subject line by the mailing
+list server. So that is not very interesting.  Indeed, we need to 
+remove all the words we put in <s:var>stopWords</s:var>.
+To do this, we can use the names on the frequency table
+and discard the elements that match an element in the
+<s:var>stopWords</s:var> set.
+The <s:operator>%in%</s:operator> operator
+in R is a convenient way of getting a 
+logical vector indicating which elements on
+the left hand side are in the set on the right hand side.
+(This is just a convenient way of calling the underlying
+function <s:functionRef>match</s:functionRef>.)
+<s:code>
+f = f[!(names(f) %in% stopWords)]
+</s:code>
+Now we can look at the most popular words, say the first 100.
+<s:code>
+sort(f, decreasing = TRUE)[1:100]
+</s:code>
+</section>
+
+
+
+
+<para/>
+What if we wanted to find out which words were popular by month?
+It might be interesting to see if the same words were popular 
+over time, or if the topics changed.
+Again, we can use the months categorical variable
+obtained by <s:functionRef>cut</s:functionRef>.
+And we can group the messages by this factor
+and compute the common words within these subgroups.
+<s:code>
+dd = data.frame(words = I(words))
+by(dd[recent,], rhelp$months[recent], function(x) { tmp = table(unlist(x)); sort(tmp[!(names(tmp) %in% stopWords)], decreasing = TRUE)[1:5]})
+</s:code>
+
+
+<section>
+<title>Frequent Contributors</title>
+
+
+</section>
+
+<section>
+<title>
+Getting the data
+</title>
+The mailing list archives are available from the mailman listserv.
+There is a table presenting the archive files by Thread, Subject,
+Author, Date or plain text.  We can interactively download these via a
+Web browser.  However, it is also convenient to automate this and to
+know which files are available without having to be actually present
+or do the bookkeeping ourselves.  We can download the HTML page
+listing the available files and we can parse this and extract the
+links.  Unfortunately, we cannot use the XML package as the files are
+available via HTTPS (i.e. SSL) and libxml does not support this.
+Fortunately, we can use RCurl to fetch URLs but we do need to have it
+deal with the SSL certificates. 
+To do this, we use
+<s:code>
+ getURL("https://stat.ethz.ch/pipermail/r-help/index.html", ssl.verifypeer = FALSE)
+</s:code>
+Alternatively, wget can be used to download to the
+file and store them on the local file system.
+<s:functionRef>download.url</s:functionRef> can be used in R.
+We have to remember to clean up the temporary files however.
+
+ 
+<para/>
+Assuming we have downloaded the 
+file https://stat.ethz.ch/pipermail/r-help/
+as index.html on the local file system,
+we can parse its contents and find the available 
+compressed text archives.
+<s:code>
+<![CDATA[
+hh = function(){ 
+   links = character(0)
+   list(a = function(x) { 
+               links <<- c(links, xmlGetAttr(x, "href"))
+            },
+        links = function() links)
+}
+
+
+links = htmlTreeParse("index.html", handlers = hh())$links()
+
+gz = links[grep("\.gz$", links)]
+
+uris = paste("https://stat.ethz.ch/pipermail/r-help/", gz, sep = "")
+download.file(uris)
+# or system(paste("wget", paste(uris, collapse = " ")))
+unlink("index.html")
+]]>
+</s:code>
+
+
+Next, we uncompress each of the files and then concatenate them into a single
+file.
+<sh:code>
+gunzip *.gz
+cat *.txt > R-Help.archive
+</sh:code>
+This could be done more succinctly as 
+<sh:code>
+gunzip -c *.gz > R-Help.archive 
+</sh:code>
+which uncompresses the files to standard output.
+
+
+<para/>
+Note that to avoid explicitly downloading the file
+index.html to the file system and removing it after
+we have read its contents, we need only change
+the call to <s:func>htmlTreeParse</s:func>.
+<s:code>
+txt = getURL("https://stat.ethz.ch/pipermail/r-help/index.html", ssl.verifypeer = FALSE)
+links = htmlTreeParse(txt, handlers = hh(), asText = TRUE)$links()
+</s:code>
+There is no need to remove the file and there is less chance of errors
+due to full file systems, overwriting an existing file, etc.  In
+short, we are not relying global resources potentially shared across
+applications, i.e. files.
+
+
+<para/>
+
+There are issues with the earlier files as the dates are from when the
+messages were collected and archived rather than when they were sent.
+Some of this is recoverable by looking in the Message-ID field, or in
+the reply when it contains something like
+"Bob wrote on ..."
+
+
+The Perl script that we use to process the MBOX archive of messages
+into records is given
+below.
+<perl:code>
+#!/usr/bin/perl -w
+
+use Mail::Box::Mbox;
+
+# For more information on the Mail::Address classs, see
+#       http://www.monster-submit.com/resources/docs/modules/Mail/Address.html
+
+my $mailspool = "$ARGV[0]";
+
+my $folder =  Mail::Box::Mbox->new(folder => $mailspool);
+
+foreach $msg ($folder->messages()) {
+
+      # Time stamp
+    print scalar(localtime($msg->timestamp())), "\t";
+
+#  print $msg->sender()->address(), "\t";
+# We don't use sender as the mailing list R-help-bounces will appear
+# to be the sender of (almost) all of the messages.
+# See msg->from()->format(), and user() and host() also.
+    @f = $msg->from();
+    print $f[0]->address(), "\t";
+
+# Handle the To, CC, Bcc and print the number of unique addresses in this 
+# collection.
+    @d = $msg->destinations();
+    print $#d + 1, "\t";
+
+# Subject, and get rid of any TAB and escape any \t 
+# characters so that they can be read by R.
+    $subj = $msg->subject();
+    $subj =~ s/\t/ /g;
+    $subj =~ s/\\t/\\\\t /g;
+    print $subj, "\t";
+
+# Number of lines and the number of bytes in the message.
+    print $msg->nrLines, "\t", $msg->size();
+
+    print "\n";
+}
+
+</perl:code>
+
+</section>
+
+<section>
+<title>Other Points to Explore</title>
+We might want to look at things like SOMs for topic maps; growth of
+topics by individuals over time; threads and their duration,
+participants, etc.
+
+
+Newsgroups (e.g. SAS, etc.)
+Listservs
+
+Compare people migrating from one list to another (e.g. Snews to R-help).
+
+People active on many lists.
+
+Cross-postings to multiple lists.
+
+
+Newbies starting to answer questions.
+
+
+Length of a thread.
+
+What are common topics.
+
+Can we extract FAQs from
+
+Hubs and authorities by subject or generally.
+
+Topics and self-organizing maps. 
+ over time.
+
+
+RSPerl
+</section>
+
+
+<section>
+<title>Threads</title>
+</section>
+
+To get the number of threads in a mail box, we can use the following
+script.
+<perl:code>
+!/usr/bin/perl -w                                                                                               
+                                                                                                                 
+#use Mail::Box::Manager;                                                                                         
+use Mail::Box::Mbox;                                                                                             
+                                                                                                                 
+use Mail::Thread;                                                                                                
+                                                                                                                 
+                                                                                                                 
+                                                                                                                 
+# Mail::Message                                                                                                  
+#       http://search.cpan.org/dist/Mail-Box/lib/Mail/Box/Mbox/Message.pod                                       
+# Mail::Address                                                                                                  
+#       http://www.monster-submit.com/resources/docs/modules/Mail/Address.html                                   
+                                                                                                                 
+my $mailspool = "$ARGV[0]";                                                                                      
+                                                                                                                 
+my $folder =  Mail::Box::Mbox->new(folder => $mailspool);                                                        
+                                                                                                                 
+my $threader = Mail::Thread->new($folder->messages());                                                           
+$threader->thread;                                                                                               
+                                                                                                                 
+my @msgs = $folder->messages();                                                                                  
+print "Number of messages: ", ($#msgs+1), "\n";                                                                  
+                                                                                                                 
+my @threads = $threader->rootset();                                                                              
+print "Number of threads: ", $#threads, "\n";                                                                    
+</perl:code>
+
+We can of course extend this to compute the length of each thread,
+report the initial message or sequence of all the messages,
+subject line or lines for each message.
+
+
+<section>
+<title>Installation of Perl modules</title>
+Mail::Thread needs Email::Abstract and 
+Email::Abstract neees Email::Simple and Module::Pluggable.
+</section>
+
+<section>
+<title>
+Integrating R and Perl for Mail Reading
+</title>
+
+
+
+<![CDATA[
+
+library(RSPerl)
+
+m = .PerlPackage("Mail::Box")   # ::Mbox")
+folder = .PerlNew(m, folder = "R-Help.archive")
+
+
+numMessages = folder$count()
+
+dates = rep(0, numMessages)
+
+for(i in 1:numMessages) {
+  msg = folder$messages(i)
+  dates[i] = msg$timestamp()
+}
+
+
+]]>
+
+</section>
+
+</article>

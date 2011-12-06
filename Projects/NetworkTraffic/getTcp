@@ -1,0 +1,15 @@
+#!/bin/sh
+
+WHICH=${WHICH-inside}
+
+URL=${URL-http://www.ll.mit.edu/IST/ideval/data/1999/training}
+WEEKS=${WEEKS-week1 week2 week3}
+DAYS=${DAYS-monday tuesday wednesday thursday friday}
+
+for w in $WEEKS ; do
+ for d in $DAYS ; do
+   echo "$w-$d-${WHICH}.tcpdump.gz"
+   wget $URL/$w/$d/${WHICH}.tcpdump.gz
+   mv ${WHICH}.tcpdump.gz $w-$d-${WHICH}.tcpdump.gz
+ done
+done

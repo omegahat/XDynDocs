@@ -1,0 +1,585 @@
+<?xml version="1.0"?>
+
+<article xmlns:s="http://cm.bell-labs.com/stat/S4"
+         xmlns:r="http://www.r-project.org"
+         xmlns:c="http://www.c.org"
+         xmlns:sh="http://www.shell.org"
+         xmlns:rx="http://www.regex.org"
+         xmlns:perl="http://www.perl.org">
+
+
+<section>
+<title>Motivation</title>
+
+Binary files allow us to explicitly encode the type of a value, be it
+an integer or real number, a string, etc.  However, so much of the
+data we deal with are given to us as text.  We input numbers in text
+files, we download text files from Web and FTP servers, we save
+spreadsheets as comma-separated values in .csv files.
+
+
+Numbers are
+often organized in tables and transferred in regular text files.
+Genomic sequence data are long strings from the 4 letter alphabet {A,
+C, G, T}.  In these cases, the data are merely represented by their
+text form and are easily interpreted by applications.  However, there
+are many examples of more complex situations where the data are not as
+easily interpreted as numbers.  Instead, the text must be processed to
+create the values of interest.  The simplest examples of such text is
+when the values are embedded into the text, but not in a regular or
+simple format.  Instead, we must extract the different elements from
+the content by identifying the patterns where the values occur.  In
+other cases, the text is the data and we must search for the presence
+of certain words or phrases in particular contexts or places.  We
+might be intested in how often each word is used, the names of the
+author(s), references to other documents, etc.
+
+
+Nowadays, documents and text are treated directly as
+data such as in search engines, databases,
+and so on.   
+
+Web logs are a good example
+
+Mail messages
+
+Mail logs
+
+Network packet data (tcpdumpdata)
+
+
+</section>
+
+<section>
+<title>Regular Expressions</title>
+In order to be able to manipulate textual data, we
+need tools to express some common tasks and operations
+on the data.  We need to be able
+to ask questions such as
+<itemizedlist>
+<listitem>
+does this text contain a particular 
+word or sequence of characters 
+</listitem>
+<listitem>
+does this line start with the text "From:"
+</listitem>
+<listitem>
+does this text contain a sub-string
+of the form three A's followed by either a G or two T's.
+</listitem>
+<listitem>
+does the text contain any word repeated twice in succession,
+e.g. a a, the the, cat cat.
+</listitem>
+<listitem>
+substitute any occurrence of the string "bob" 
+with "Bob".
+</listitem>
+<listitem>
+discard any comments in the text identified 
+by # to the end of the line.
+</listitem>
+</itemizedlist>
+
+Using any general programming language such as 
+Matlab, Java, C, Perl, etc.,
+we could develop functions to perform 
+these different sample tasks for operating
+on strings and patterns within them.
+Most people would approach these problems in a
+reasonable way by breaking the input text
+into a collection of characters and 
+implementing the different operations
+by iterating over these characters
+looking for the particular pattern.
+For example, we might write an R function
+that would determine if the input text
+<s:variable>string</s:variable>
+contained the word given by the
+argument <s:variable>pattern</s:variable>.
+<s:functionDef>
+findWord =
+function(string, pattern) 
+{
+  letters = substring(string, 1:nchar(string), 1:nchar(string))
+
+  el = substring(pattern, 1, 1)
+  possibles = which(letters == el)
+
+  any(pattern == substring(string, possibles, possibles + nchar(pattern) - 1))
+}
+</s:functionDef>
+This matches literal strings given by <s:variable>pattern</s:variable>
+within the given <s:variable>string</s:variable> by searching for all
+the occurrences of the first character in
+<s:variable>pattern</s:variable> and then looking at all substrings
+with the same length as <s:variable>pattern</s:variable> starting from
+those points.  This works fine, but is quite limited.  It cannot
+handle anything but literal patterns to match.  In many circumstances,
+we want to specify more complicated patterns than simple literal
+strings.  Instead, we want to ask about alternative patterns, i.e. of
+the form this or that.  For example, we might want to ask does a
+string contain the pattern duncan@wald.ucdavis.edu or
+duncantl@ucdavis.edu, my two e-mail accounts at UC Davis.  We can
+perform two searches, one on each literal string and combine the
+results.  We could even do this in our function by allowing
+<s:variable>pattern</s:variable> to be a vector rather than a simple
+string.  Would this mean that a match occurs if any of the values in
+<s:variable>pattern</s:variable> are found? or only if all the
+patterns are found?  The burden is on the caller to specify the two
+literal strings.  If these patterns are long but very similar, this
+gets tedious and error prone.  For example, suppose I have two e-mail
+accounts duncantl@wald.ucdavis.edu and duncan@wald.ucdavis.edu.  Then
+I would like to look for both but specify this more conveniently
+than specifying them both in explicit form.
+Looking at the two strings, I would like to be able to express the
+concept of "find a match for duncan, optionally followed by 'tl', and
+then followed by @wald.ucdavis.edu".  So we need a way of specifying
+an optional piece of the pattern. 
+
+To solve the problem of looking for patterns that start a new line,
+for example, we would need the caller to specify this in the pattern
+as "\nFrom".
+
+
+We can write a suite of functions to perform the different types of
+matching and substitutions we have outlined. Since they are commonly
+needed, it is reasonable to guess that others might have already
+implemented these for their purposes and the might be able to reuse
+their code.  As with all software, we would like to reuse such code as
+it is likely to be better tested and more efficient than our initial
+efforts.  And it turns out that indeed people have written such tools.
+Even with such tools, the users have to remember the different
+functions and their arguments to express different types of matching
+and substitution.  The functions might be part of a programming
+language, but within this programming language, we have to handle
+invoking the relevant function for our intent.  Ideally, we would be
+able to use a language to express these patterns in a unified manner.
+And indeed, there is such a general language with several
+implementations that are well-tested and efficient.  Patterns
+specified in this language are called regular expressions.  And, like
+many programming languages, the language of regular expressions
+provides basic building blocks from which we can create
+
+
+In the course of the next few sections, we will try to movtivate some
+of the building blocks of the regular expression language and
+illustrate their use.  Since it is essentially a programming language,
+we can develop complicated constructs by combining the different
+elements in different ways.  The goal here is to teach you about these
+basic elements of the language, how to remember what they do and how
+they can be combined to express patterns we want.  There are many
+tutorials and examples on the Web that cover different uses and
+applications of regular expressions.  There are also books on the
+subject that you can read to get more examples and a greater
+understanding of how regular expressions work.  You are strongly
+encouraged to read these documents to see different examples.  And
+most of all, you need to practice creating regular expressions and
+testing them on data in R or an other programming language
+to get  both an understanding and experience so that when you
+need to use them, they will be familiar.
+
+
+<para/>
+
+</section>
+<section>
+<title>R Functions for Regular Expressions</title>
+
+There are several building blocks in the regular expression language
+for specifying patterns that are to be matched in a piece of text.
+These allow us to match literal strings, a character from a particular
+set of characters or its complement (character sets), one sub-pattern
+or another (alternation).  We can also match by position such as at
+the beginning or end of a line, and we can create sub-patterns from
+individual patterns by specifying the number of times the pattern
+should be match (quantifiers).
+
+<para/> We will look first at simply matching patterns in
+text/strings.  There are two functions in R that allow us to do this.
+These are <s:function>grep</s:function> and
+<s:function>regexpr</s:function>.  Each of these takes the regular
+expression specifying the overall pattern to match and then a
+character vector containing the different text strings.
+<s:function>grep</s:function> returns the indices of the elements of
+that character vector for which there was a match (or the empty
+integer vector if none matched).  This can be readily used to subset
+the character vector to get only the elements containing or not
+containing that pattern.  It is used as a means to find the strings
+that matched.  For example, to find the elements in the character
+vector <s:expression> c("a test", "a basic string", "and one that we
+want", "one two three")</s:expression> that contain the literal string
+"one", we can use <s:function>grep</s:function>:
+<s:code>
+<![CDATA[
+> grep("one", c("a test", "a basic string", "and one that we want", "one two three"))
+[1] 3 4
+]]>
+</s:code>
+This indicates that the 3rd and 4th elements contained a match.
+The first two elements did not.
+
+
+<para/> 
+
+
+<s:function>regexpr</s:function> returns more detailed
+information telling us a) which elements of the character vector
+actually contained the pattern in the regular expression, and also b)
+identifies the position of the substring that was matched by the
+regular expression pattern.
+In our simple example above looking for the string "one",
+we can use <s:functionRef>regexpr</s:functionRef>.
+<s:code>
+<![CDATA[
+> regexpr("one", c("a test", "a basic string", "and one that we want", "one two three"))
+[1] -1 -1  5  1
+attr(,"match.length")
+[1] -1 -1  3  3
+]]>
+</s:code> 
+The return value is an integer vector with an element
+for each of the elements in the strings vector. 
+Each element gives the position of the starting character of the match,
+if it exists, and -1 when no match occurs for that string.
+To identify the end of the substring that matches the pattern,
+we need the position of the last character for each string.
+This is given by the second integer vector
+returned from <s:functionRef>regexpr</s:functionRef>.
+This is returned in a slightly odd form, namely
+as an attribute attached to the first integer
+vector of starting positions.
+This is a particular way in S that we can treat
+the return value directly as a simple integer vector
+(in this case) while still carrying around additional
+information with it.
+To get the substrings in each string that correspond to the
+vector, we can use this return value along with
+<s:functionRef>substring</s:functionRef>:
+<s:code>
+<![CDATA[
+> substring(c("a test", "a basic string", "and one that we want", "one two three"), x, x + attr(x, "match.length")-1)
+[1] ""    ""    "one" "one"
+> 
+]]>
+</s:code>
+
+This is a very useful tool for getting an understanding of what a
+particular pattern atcually matches.  We can create a pattern to match
+and then give it different test strings and see which parts actually
+match.  This is a very important exercise to practice to really
+understand regular expressions.
+
+<para/> There are more general ways to get the matching substring via
+substitution and these allow us to match multiple sub-patterns within
+our overall match and extract the different pieces directly.  And that
+brings us to the other functions in R for dealing with regular
+expressions.  <s:function>gsub</s:function> and
+<s:function>sub</s:function> are the two functions that allow us to
+replace patterns (or a single pattern) within a string with some other
+text.  Each of these functions takes the regular expression defining
+what to match, another regular expression to use as the replacement
+text, and then the text/strings on which to do the matching and
+substitution.
+We can take our example above with a slightly different
+set of strings to illustrate what 
+<s:functionRef>gsub</s:functionRef>
+does and how it differs from 
+<s:functionRef>sub</s:functionRef>.
+We will replace the word (or literal string, actually) "one"
+with the digit 1.
+<s:code>
+<![CDATA[
+> gsub("one", "1", c("a test", "and one and one is two", "one two three"))
+[1] "a test"             "and 1 and 1 is two" "1 two three"       
+> 
+]]>
+</s:code>
+There was no "one" in the first string ("a test"), so there was no way
+to substitute the match with the replacement text ("1").  So it
+remains unaltered and is returned "as is".  In the second string,
+there are two occurrences of the string "one".  Each of these are
+replaced with the digit "1".  And similarly, the third string has its
+occurrence of "one" replaced with "1".
+
+<para/>
+The 'g' in the name <s:functionRef>gsub</s:functionRef>
+refers to <emphasis>global</emphasis>.
+This means that we should change all the matches of the 
+regular expression in the text with the replacement pattern.
+The <s:functionRef>sub</s:functionRef>
+is almost exactly the same as 
+<s:functionRef>gsub</s:functionRef>
+except that it only replaces the first occurrence
+of the pattern with the replacement text.
+<s:code>
+<![CDATA[
+> sub("one", "1", c("a test", "and one and one is two", "one two three"))
+[1] "a test"               "and 1 and one is two" "1 two three"         
+]]>
+</s:code>
+
+</section>
+
+<section>
+<title>Literal Strings</title>
+
+The most basic building block in a language that supports matching
+patterns in text is a facility for specifying a little string of text
+as a pattern to match.  We have already seen this: we look for the
+literal string "one" in the the text "and one and one is two".  When
+we write down a regular expression pattern like "one", what we mean is
+really the following: find the character 'o' immediately (i.e. the
+next character) followed by an 'n' and that followed immediately by
+'e'.  What the regular expression matching engine does is, for each of
+the target strings, start at the first character and check to see if
+it is a 'o'. If not, it then moves to the second character and starts
+looking there.  When it finds a 'o', it then checks if the next
+character is an 'n'. If not, it starts looking for the 'o' at the next
+starting position.  So we can think of the literal string as being
+made up of three consecutive sub-patterns: 'o', 'n' and 'e'.  Thinking
+of the pattern "one" in this way makes it easier to see how we can
+combine different types of complex patterns (see below) to define a
+sequence.
+
+</section>
+
+
+<section>
+<title>Alternatives</title>
+</section>
+
+<section>
+<title>Character Classes</title>
+
+Suppose we want to match a white space character, i.e.  a space, a
+TAB, etc.  We can use alternation that we described above as in the
+pattern " |\t".  And if we wanted to match any digit, i.e. 0, 1, 2, 3,
+4, 5, 6, 7, 8 or 9, we could use the construction:
+"0|1|2|3|4|5|6|7|8|9".  This is tedious to write and becomes difficult
+to read as the number of characters to be matched becomes lengthy.  We
+are not expressing a concept of "match a digit", but instead
+explicitly enumerating the characters.  This makes maintaining and
+understanding the regular expression more difficult.
+Additionally, these single character alternations
+are not very efficient. They can slow down
+the speed with which the regular expression automata
+performs the matching.
+
+<para/>
+Instead of using alternations for single characters,
+the regular expression language provides
+a way to specify  a match as being any character in a specified
+set. These patterns are called character classes.
+We use the [ ] notation
+to identify a character class and 
+specify the collection of characters that constitute a match.
+For example, to match a space or a TAB character, we use
+<literallayout>
+ [ \t]
+</literallayout>
+To match a digit or A, B, C, D, E or F, 
+we can use
+<literallayout>
+ [0123456789ABCDEF]
+</literallayout>
+This gives us the "digits" in hexadecimal numbers.
+
+<para/>
+
+Basically, we can enumerate any collection of characters within the [
+] and these are included in the set that constitutes a match.  We can
+also adapt this notation very slightly to indicate a match on the
+complement of the set of characters.  There are many collections of
+characters that are commonly used. For example, we often want to
+specify all the letters of the alphabet, lower or upper case or
+both. And we often want all the digits.  And in other cases, like the
+hexadecimal digits, we want a subset of these sets.
+The - character when used within the character class pattern (i.e. the
+[]) typically identifies a range.
+We can specify the digits 3,4, 5, 6 more readily as
+<literallayout>
+ [3-6]
+</literallayout>
+and this is the same as 
+<literallayout>
+ [3456]
+</literallayout>
+Similarly, we can specify
+<literallayout>
+ [0-9A-Fa-f]
+</literallayout>
+to match all the hexadecimal digits, both lower and upper case.
+And you will often see 
+<literallayout>
+ [A-Za-z]
+</literallayout>
+for all letters in the alphabet.
+Once again, we are expressing higher level concepts
+that are easier to read than explicitly enumerating
+the elements of the set.
+Consider 
+<literallayout>
+ [0-8]
+</literallayout>
+and
+<literallayout>
+ [012345678]
+</literallayout>
+To compare these, we have to look at the second and verify that
+the numbers are contiguous and we are not omitting any of the earlier
+values.
+
+<para/>
+If we want to include the character - in our set
+of characters to match, then we must put this
+at the beginning of the character set.
+For example, to match the basic arithmetic operators - +, -, * or  / -
+we can use
+<literallayout>
+ [-+*/]
+</literallayout>
+<footnote>
+The * here is not a meta-character since it is inside
+the character class.
+</footnote>
+Or to match a digit with either a + or - in front of it,
+we can use
+<literallayout>
+ [-+][0-9]
+</literallayout>
+This example illustrates how we make up
+the overall pattern with a 
+<emphasis>sequence</emphasis>
+of sub-patterns and each of these 
+sub-patterns is made up using the primitive elements.
+</section>
+
+
+<section>
+<title>Named Character Classes</title>
+
+Character classes are very convenient, and the range operator (-) to
+succinctly specify collections of characters further simplifies their
+use.  The regular expression language provides a collection of
+built-in character sets for commonly used collections.  Each of these
+is identified by a short name given in the list below
+and includes the collection described there.
+<itemizedlist>  
+    <listitem>All alphabetic and numeric <emphasis>(alnum)</emphasis></listitem>
+    <listitem>All alphabetic (<emphasis>alpha</emphasis>)</listitem>
+    <listitem>Blank characters, i.e. space or tab <emphasis>(blank)</emphasis>)</listitem>
+    <listitem>Control characters <emphasis>(cntrl)</emphasis></listitem>
+    <listitem>Digits <emphasis>(digit)</emphasis></listitem>
+    <listitem>Printable character except space <emphasis>(graph)</emphasis></listitem>
+    <listitem>Lower case alphabetic characters <emphasis>(lower)</emphasis></listitem>
+    <listitem>Upper case alphabetic characters <emphasis>(upper)</emphasis></listitem>
+    <listitem>Printable characters <emphasis>(print)</emphasis></listitem>
+    <listitem>Punctuation characters <emphasis>(punct</emphasis>)</listitem>
+    <listitem>White space <emphasis>(space)</emphasis></listitem>
+    <listitem>Hexadecimal digit <emphasis>(xdigit)</emphasis></listitem>
+</itemizedlist>
+
+We use these collections using the same [] notation, but we specify
+the named character set with an additional [: :] pair.  So, for
+example, we can specify the punctuation characters as
+<literallayout>
+[[:punct:]]
+</literallayout>
+The '[:punct:]' term is the named character class.  We can include
+additional characters in the overall set such as
+<literallayout>
+[[:punct:]a-h]
+</literallayout>
+to match punctuation characters <emphasis>and</emphasis>
+the characters  a, b, c, d, e, f, g, h.
+
+
+</section>
+
+<section>
+<title>Character Set Complement</title> The character set mechanism is
+convenient for specifying a set of characters that we want to match.
+In some circumstances, we want specify a set of characters that we
+don't want to match.  Or more specifically, we want to match an
+element in the complement of a particular set, i.e. anything but an
+element amongst these.  Once again, the regular expression language
+provides us with a mechanism to do this.  By putting the ^ (caret)
+character at the beginning of the character set, we specify the
+complement of the set of specified characters.
+So, for example, the pattern
+<literallayout>
+ "[^0-9]"
+</literallayout>
+would match anyt character except a digit.
+We often use this to find the end of a quote
+or HTML tag as follows:
+<s:code>
+<![CDATA[
+grep('<[^<]>', '<a>nested <e>elements</e></a>"')
+]]>
+</s:code>
+This means match the &lt; 
+starting an HTML tag and then match any
+character after this except a &lt;
+until we find a &gt;
+
+
+<para/>
+
+If we want to include ^ in a regular character set and not mean the
+complement, we need only list it in the set in any position
+other than the first.
+
+<s:code>
+<![CDATA[
+> regexpr("[a-z^]", "0^2")
+[1] 2
+attr(,"match.length")
+[1] 1
+]]>
+</s:code>
+
+
+</section>
+
+
+
+<section>
+<title>Meta-Characters</title>
+
+Matching literal strings is very useful and we use this
+commonly. However, we often want to match more flexible It is
+
+
+The next thing we might want to do is specify that a pattern must
+match at the beginning or end of a string.  For example, in the email
+headers, we are interested in lines that start with a word followed by
+a ':'. And we find continuation lines in the message header by looking
+for lines that start with a TAB or a space character.
+In other 
+The regular expression language provides two
+special characters, one to specify the beginning of the
+string and the other to specify the end.
+
+
+<section>
+<title>
+Escaping Meta-Characters
+</title>
+</section>
+
+</section>
+
+
+
+<bibliography>
+
+Mastering Regular Expressions, Jeffrey E. F. Friedl.
+O'Reilly. Second edition.
+
+David Mertz, http://gnosis.cx/publish/programming/regular_expressions.html
+Text Processing in Python.
+</bibliography>
+</article>

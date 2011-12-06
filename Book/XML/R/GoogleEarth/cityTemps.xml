@@ -1,0 +1,293 @@
+<?xml version="1.0"?>
+<article>
+<section>
+<title>The Basic Setup</title>
+
+The idea is that we have temperature data for 100 cities in the US for each of four time periods 
+within the year.
+We can display this in different ways and we will think about some.
+The goal is to think about
+<itemizedlist>
+<listitem>good ways to present the data graphically
+</listitem>
+<listitem>
+interact with Google Earth to display the data
+</listitem>
+<listitem>
+construct the inputs for Google Earth from within R using XML
+</listitem>
+</itemizedlist>
+
+We have the data as a data frame with month (the time point), the
+temperature, the name, and the latitude and longitude.  We will start
+by simply putting the text values for the temperatures on the map at
+the correct points.
+
+Let's just assume that we can pass the XML to Google Earth from R and that
+GE will then show this. We are more concerned about how do we learn enough
+about Google Earth's file format and model for allowing  us to display
+content. How do we start to figure out how to go about this?
+We google Google Earth and find the documentation.
+<url>http://code.google.com/apis/kml/documentation/kml_tags_21.html</url>
+You can look at some samples or you can look at the reference manual and the examples within those.
+
+<para/>
+We will need a top-level XML document as all XML documents must be a single rooted tree.
+We want kml as the name of the top-level node, and we want that to be associated
+with the namespace URI http://earth.google.com/kml/2.1. We can use that as the default namespace for the document
+and all subnodes since we are dealing with KML nodes only at this point.
+<r:code>
+tt = xmlTree("kml", namespaces = c("http://earth.google.com/kml/2.1"))
+</r:code>
+
+<para/>
+
+If we look at the Google Earth documentation, we realize that a feature
+is something that appears on the map (how do we figure this out?). 
+So if we look at the hierarchy of types,
+we see NetworkLink, Placemark, Overlay and Container.
+Two of these are abstract and have concrete subclasses.
+Placemark and Overlay seems promising. Let's look at the documentation for Placemark.
+If we click on this and jump to the details of Placemark, we see the collection
+of possible children. 
+We are trying to put in a point, and yet there is no mention of point.
+However, the last possible child entry is in italics and named
+Geometry. The italics means  that this is an abstract type and
+so there are possible sub-types that might be of interest.
+The example for Placemark uses Point and so this bodes well.
+Let's look at the definition of Geometry and see the collection of sub-classes, etc.
+A point has a coordinates child in which the longitude and latitude are given
+as a pair of values separated by a comma.
+
+<![CDATA[
+Placemark
+   name
+   description
+   point
+]]>
+</section>
+
+<section>
+<title>Adding the basic points</title>
+So, let's add these points to the document for summer measurements.
+<r:code>
+  <xi:include href="cityTemperatures.R"/>
+</r:code>
+
+Then we save the resulting tree to a file and tell Google Earth to 
+open it.
+<r:code>
+saveXML(tt, "/tmp/points.kml")
+system("open /tmp/points.kml")
+</r:code>
+
+Unfortunately, this doesn't work properly.
+The placemarks are at various locations near the north pole!
+They are spread out so they are at least not all at the same point.
+But this suggests that are coordinates are incorrect.
+Did we mistake latitude and longitude?
+Are we using a different form of these? specifically, do we need
+to a common scheme such as greenwich meridian, etc.
+Let's look at a city in new york in the data.
+<r:code>
+subset(temperature, state == "NY")
+<r:output>
+<![CDATA[
+1   22.2 January   Albany, N.Y.    42.75     73.80    NY
+16  24.5 January  Buffalo, N.Y.    42.93     78.73    NY
+67  32.1 January New York, N.Y.    40.77     73.98    NY
+101 46.6   April   Albany, N.Y.    42.75     73.80    NY
+116 45.3   April  Buffalo, N.Y.    42.93     78.73    NY
+167 52.5   April New York, N.Y.    40.77     73.98    NY
+201 71.1    July   Albany, N.Y.    42.75     73.80    NY
+216 70.8    July  Buffalo, N.Y.    42.93     78.73    NY
+267 76.5    July New York, N.Y.    40.77     73.98    NY
+301 49.3 October   Albany, N.Y.    42.75     73.80    NY
+316 50.7 October  Buffalo, N.Y.    42.93     78.73    NY
+367 56.6 October New York, N.Y.    40.77     73.98    NY
+]]>
+</r:output>
+</r:code>
+Now, go to one of these cities in Google Earth and get its
+longitude and latitude coordinates. For example,
+put Buffalo into the search box in GE and then right click
+on Buffalo and select Get Info. We see that the location is
+42.8 and -78.8
+So this almost exactly the same, except the longitude is negative
+and not positive. This is because the data we have are using a different
+coordinate system. Negating the values may work.
+
+<para/>
+We do this by simply negating the number, although it is given to us
+as a string since the entire row of values is converted to a character.
+(Check this with <r:expr>apply(temperature[1:4,], 1, class)</r:expr>.)
+<r:code>
+ tt$addNode("coordinates", paste(row["latitude"], - as.numeric(row["longitude"]), sep = ", "))
+</r:code>
+
+<para/>
+That still doesn't fix things.
+It seems that latitude and longitude are miss labelled in the 
+original data or given to Google Earth in the wrong order.
+Let's reverse them:
+<r:code>
+  tt$addNode("coordinates", paste(- as.numeric(row["longitude"]),  row["latitude"], sep = ", "))
+</r:code>
+Now, things behave as expected.
+Although, we only see the pin-markers on Google Earth. We need to zoom in to see the labels
+identifying the cities.
+<question>Can we achieve this directly within our XML document so that the user doesn't have
+to control things to see these labels?</question>
+Explore the LookAt tag.
+
+<para/>
+Now that we can see that data, explore it and verify that everything is sensible?
+Are any points strange?
+<answer>
+Grand Rapids is in Canada.
+</answer>
+
+</section>
+<section>
+<title>The next step</title>
+Now that we have something displayed on GE, we might think about how we can improve
+the display.
+Is the name of the city important? Perhaps we can just display the value.
+
+
+<questions>
+<question>What about getting rid of the pins?
+<answer>
+If we specify a global style, say named "me", 
+and then use this for all the Placemark elements via a styleUrl element.
+</answer>
+</question>
+
+
+<question>What about tooltips?
+<answer>
+Look at the StyleMap and the &lt;key&gt;highlight element.
+</answer>
+</question>
+<question>What about putting a colored circle where the color indicates the temperature.
+<answer>
+We can use any appropriate icon and specify a color for it.
+See the icons available from Google's server
+</answer>
+</question>
+
+</section>
+
+<section>
+<title>How can we add an animation changing the values of the points over the 4 time periods?</title>
+We can add all the points identifying when they were "observed"
+using the TimeStamp node.
+Then, the animation widget/control appears in the GE application.
+It calculates the earliest and latest dates in all of the elements
+that are currently displayed and these are the end points of the animation
+control.
+We can control what is displayed and hence these end points by checking the
+boxes of interest in the Places panel on the left of GE.
+
+<para/>
+As we move forward in the animation, we not that we see the points 
+for, say, January, then nothing and then the next set of points
+for April, and then nothing and so on. In other words, we see the
+points for a period only at that period and there is a lot of "dead air"
+where nothing is displayed. The user can change the "lag" or duration
+by stretching the "window" calipers to range across 3 months.
+Specifically, drag the right most end of the calipers to 
+March 31st. Then, as we move the entire window, we get a more continuous
+display.
+Unfortunately, the labels change position giving a jarring effect if one is 
+looking at a particular location.
+<para/>
+Note that we could also specify time stamps that express a duration.
+We could say that the points in the data set corresponding to January
+actually begin in mid-November and end in mid-February.
+Similarly, the points in April begin in mid-February and end in min mid-May.
+And so on. In this way, we get a continuous span.
+The TimePrimitive supports a begin and end
+<para/>
+In the first approach, we also get a discontinuity and a short, abrupt shift when
+we get to October.
+In the second approach, January is not displayed when we cycle. 
+We need to add "invisible" or proxy placemarks that have a duration 
+of
+</section>
+
+
+<section>
+<title>Plots</title>
+We want to put plots on the map.
+We might put a smoothed surface giving predictions
+of temperature at each location, at each moment in time.
+We might elevate it from the ground and show residuals
+if we have different points.
+Fit an interpolation model that predicts temperature at all places and
+then we "drape" this over the US.
+
+<para/>
+We might show plots within the bubble window via img src="" tags.
+
+<para/>
+And we can put boxplots, histograms, etc. at the different locations.
+</section>
+
+
+
+
+
+<section>
+<title>Link back to computations in R</title>
+
+<section>
+<title>GUIs
+</title>
+We can setup a GUI in R so that we can identify data in R and have the
+corresponding view in GE displayed.  For example, we select a point in
+time and then we have GE move to that time period.  Or we "brush" a
+region in long.-lat. space and have GE zoom to that. (We can do this
+with GE directly.)  Or we can identify a region in density plot and
+find the corresponding points and have them displayed in GE.  We might
+turn the others off, or simply remove them by providing a new file
+with only the subset of interest, or use a different color.
+
+We can do this with  either a simple graphics
+device and interaction via locator,
+or we can use a more general graphics device technique
+where we have events on the canvas.
+And we can also have events on general GUI controls such as
+sliders, trees, etc.
+</section>
+
+<section>
+<title>via a Web server
+</title>
+We  can arrange to have URIs in the ballon boxes, etc.
+that connect back to a Web server where we control the computations
+based on information in the URI that tells us the context.
+</section>
+</section>
+
+
+<section>
+<questions> 
+<question>
+How can we tell GE to go to a particular time?
+</question>
+
+</questions>
+</section>
+
+<section>
+<title>References</title>
+Documentation for Google Maps:
+http://www.google.com/apis/maps/documentation/
+
+DCOM interface:
+http://services.google.com/earth/earth.idl
+</section>
+
+</article>
+

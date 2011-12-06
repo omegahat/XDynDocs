@@ -1,0 +1,648 @@
+\section{Tools}
+
+Let's take a look at how we can do some simple data analysis using the
+shell and some of the system tools.  For our example, we will look at
+a collection of email messages.  We will use the lingspam data
+\cite{lingspam}.  The messages are divided (arbitrarily) into $10$
+directories named \dir{part1}, \dir{part2}, $\ldots$, \dir{part10}.
+In each directory, there are numerous messages divided into two
+categories - ham and spam.  Each message is in its own file and the
+names of the spam messages all start with 'spmsga'.  The regular or
+ham messages all end with msg\textit{digits}.txt where digits is a set
+of literal digits, i.e. 1, 2, $\ldots$, 9.
+
+The contents of each file is just the message (having been
+stemmed\footnote{Stemming involves mapping words with the same basic
+  root the same, e.g. stop, stopped and stopping map to stop.}
+
+You should start by taking a look at the data and familiarizing
+yourself with the structure of the directories, the files and the
+contents.
+
+
+A reasonably obvious question to ask is how many messages do we have
+altogether, and how many are spam? and how many are ham?
+Let's think about how to do this using the shell.
+There are a variety of different ways.
+
+To count the number of spam messages, we can use 
+a command such as
+\begin{verbatim}
+ls -R -1 | grep ^spmsg | wc -l
+\end{verbatim}
+This lists all the files in all the sub-directories of the current
+working directory (via the -R for recursive flag for \exec{ls}) and
+lists them one per line so we can count them separately.  Note that
+this \exec{ls} command can be written as \verb+ls -1R+.  And more
+importantly, it also lists the names of the sub-directories and the
+contents of the current directory (\dir{lemm}) as well.  So we can't
+use this by itself to get an accurate count of the total number of
+messages. We would have to remove this additional lines.
+
+We pipe the output from the \exec{ls} command and then look for lines
+that start with the spam prefix 'spmsg'.  The \^ in the regular
+expression means "at the beginning of the line" rather than anywhere
+within the line. If we didn't have that, we run the risk of matching a
+file name, for example, message-spmsg.txt.  In this data, that is not
+an issue and so we don't really need the \^.  But it makes things
+clearer: files with the prefix spmsg.
+
+As with all of these hybrid or composite shell commands, you are
+encouraged to run the individual stages by themselves and look at the
+output. That is run \verb+ls -1R+ and look at the output by putting it
+in a file (using redirection) or by piping it through a pager such as
+more:
+\begin{verbatim}
+ ls -1R | more
+\end{verbatim}
+Then run the first two pieces and verify that it is giving you what
+you want, and discarding the lines with the ham messages and the
+directory names:
+\begin{verbatim}
+ ls -1R | grep ^spmsg | more
+\end{verbatim}
+
+Since we are interested in getting a count of the number of spam
+messages, we use \exec{wc} and count the number of lines.  This, of course,
+is exactly what we want as each line represents a SPAM message.
+
+So how do we find the number of HAM messages?
+Well, of course, if we knew the total number of messages, we could
+subtract the number of SPAM messages from this.
+Alternatively, we could use the same approach we use to count
+SPAM messages, but look for the HAM pattern in the lines.
+We might try something like
+\begin{verbatim}
+ls -1R | grep msg | wc -l
+\end{verbatim}
+Unfortunately, this matches the strings spmsg since msg is in
+both. So we have to be more intelligent in our pattern matching.
+What we want is the fact that the line does not start with
+spmsg since that is the prefix for the SPAM message file names.
+So we might try to invert the \exec{grep} filter to discard
+such SPAM message lines:
+\begin{verbatim}
+ls -1R | grep -v ^spmsg | wc -l
+\end{verbatim}
+Does this give us the right answer?
+It yields 2442.
+
+Well let's check if this is correct by doing the calculation a different way.
+We know that all the mail messages have the suffix .txt.
+So let's compute the total number of mail messages using this
+observation:
+\begin{verbatim}
+ls -1R | grep '\.txt$' | wc -l
+\end{verbatim}
+We get a count of 2893.
+Subtracting 481, the number of SPAM messages from this
+would imply that we have 2412 HAM messages.
+So we see that our calculation by excluding SPAM
+messages gives a different answer that is 30 bigger.
+
+Which is correct? Now we have to think about both and
+check the logic.  This is a good time to break the
+computations down into steps and look  at the intermediate
+output.
+Let's try
+\begin{verbatim}
+ls -1R | grep -v ^spmsg | more
+\end{verbatim}
+If we do this, we immediately see that the first 10 lines are the
+names of the sub-directories.  The 11th line is blank and the 12th
+line is the name of the first sub-directory.  There are 10
+sub-directories, and each is listed in the contents of the working
+directory, then as the ``header'' for the contents of its own files
+and preceded by blank line. So each sub-directory contributes 3 extra
+lines, giving us the additional 30 we observed!
+
+How do we fix this?  We might change the pattern in the grep filter to
+also remove lines containing the string "part".  If we also remove the
+blank lines, then we would get the right answer. This would work but
+is slightly more awkward to specify to grep.  It involves a more
+complex regular expression.  But perhaps more importantly, it is not
+very robust.  What if there is a file named part that is a legitimate
+message.  (This is not the case in this example, but if we want to use
+the tools in other contexts, it would be nice not to have to rethink
+things entirely.)  Instead, we should focus on what we really want to
+do.  We want to find all \textit{files}, not directories, that whose
+names do not start with "spmsg".  The \exec{find} command is useful
+here.  It can tell the difference between various types of files, e.g.
+directories, symbolic links, empty files, and so on.  It can also
+match patterns in names.
+\begin{verbatim}
+find  . -type f -not -name 'spmsg*' | wc -l
+\end{verbatim}
+Note that we don't need the \^ in the name pattern.
+Why?  
+% Because this is not matching lines, but file names as single
+% strings. Therefore 'spmsg*'  means the literal string spmsg to start
+% with followed by anything else.
+
+And if we run this command, we do indeed get 2412.
+It may be slightly more complex, but it is easier to read
+once we know the format of the \exec{find} command.
+It explicitly says to look for files whose names
+do not start with spmsg and count the number of them.
+And there is only one pipe here. Does this  make it faster?
+
+
+Let's return to thinking about using the approach of counting the
+total number of files and subtracting off the number of SPAM messages.
+We used 
+\begin{verbatim}
+ls -1R | grep '\.txt$' | wc -l
+\end{verbatim}
+to get the total number of messages.
+We could also use
+\begin{verbatim}
+find . -type f | wc -l
+\end{verbatim}
+since we know all regular files are messages.
+
+And we have a command to compute the number of SPAM messages.  We can
+clearly subtract the numbers in our head.  But what if we wanted to do
+it programmatically - can we use the shell?  It turns out that it is
+quite awkward. The basic shell has no concept of numbers.  It looks
+like a programming language, but it really only deals with text and
+words.  Again, we would have to delegate the subtraction to a command
+or tool called by the shell.  The program \exec{bc} is calculator.
+You can use it interactively, e.g.
+\begin{verbatim}
+% bc
+1+2
+3
+\end{verbatim}
+And we can set up a call to \exec{bc} with the values
+computed from other commands.
+\begin{verbatim}
+echo "`find . -type f | wc -l` - `find . -type f -name 'spmsg*' | 
+   wc -l`" | bc
+\end{verbatim}
+Running this, we get 2412!  But it is unsightly.
+And we cannot easily use it to loop from 1 to 2412 as the
+shell provides looping over words, not numbers.
+
+Bash and some other shells do provide some basic arithmetic.
+To add 1 and 2, we can use the command
+\begin{verbatim}
+ $((1 + 2))
+\end{verbatim}
+(You can use \exec{echo} to print the result.)
+So the syntax is
+math command inside two sets of parentheses
+and a dollar sign to dereference the value in the result.
+But note that this arithmetic is highly focused on integers
+and not real numbers!
+
+Our example above can be written  as
+\begin{verbatim}
+echo $((`find . -type f | wc -l` 
+   - `find . -type f -name 'spmsg*' | wc -l`))
+\end{verbatim}
+but this is only marginally better, if at all.
+
+
+A reasonable strategy to use is that if you are doing
+more than the most elementary amount of arithmetic
+in the shell for processing data, 
+use R or some other language instead and call the shell
+from these systems. 
+
+
+By the way, we can also do basic counting loops using \shellKey{while} and 
+\shellKey{until} and the \exec{test} operator to
+evaluate the condition of interest.
+
+\subsection{Cross-validation sample sizes}
+The lingspam data is organized into 10 parts for the purpose of
+cross-validation.  A question we might ask is whether there is an
+equal number of messages in each part. So we would like a count of the
+number of messages in each of the \dir{part} directories,
+and then we might like to look at the two-way table of
+SPAM and HAM messages by sub-directory.
+
+\begin{comment}
+\begin{verbatim}
+for i in part* ; do cd $i; echo "$i `ls -1 spmsg* | wc -l`  `find . -not -name 'spmsg*' | wc -l`" ; cd .. ; done
+\end{verbatim}
+\end{comment}
+
+
+
+
+
+To do this, we can use the following sequence of 3 commands
+to create the table.
+These are run from the top-level directory containing the
+different \dir{part} sub-directories.
+\begin{verbatim}
+find . -type f -name 'spmsg*' -printf "%h\n" | sort | uniq -c > spam
+find . -type f -not -name 'spmsg*' -printf "%h\n" | sort | uniq -c > ham
+join -1 2 -2 2 spam ham
+\end{verbatim}
+The idea is quite simple. We want to get a list of
+all the SPAM messages in each sub-directory
+and get the count.
+Similarly, we want to get a count for each of the HAM
+messages in those same sub-directories and then
+combine these two columns of numbers.
+
+The first two lines are quite similar in spirit.
+The first line searches for all the files with  spmsg
+as a prefix.  For each matching file, it prints only the directory name
+of each of those files. (See the man page for \exec{find} and its
+printf argument.)
+We only need the directory name, and not the file name,
+because we are not interested in the individual
+messages, but merely a count of the SPAM files in the different
+sub-directories. So we end up with a line for each SPAM message in
+each of the sub-directories and each line is merely the name of the
+directory. So we can now use \exec{sort} and \exec{uniq -c}
+to get a frequency table.
+This does the SPAM. To identify the HAM messages, we merely negate the
+criterion for the \exec{find} command, i.e. \verb+-not -name 'spmsg*'+.
+Again, we count the number in each sub-directory.
+
+The hard part comes in merging these two outputs together into
+the format we want.  We have put the results into temporary
+files (spam and ham) via the $\>$ operator.
+Each of these looks something like
+\begin{verbatim}
+     48 ./part1
+     49 ./part10
+     48 ./part2
+     48 ./part3
+     48 ./part4
+     48 ./part5
+     48 ./part6
+     48 ./part7
+     48 ./part8
+     48 ./part9
+\end{verbatim}
+But, we want to end up with something like
+\begin{verbatim}
+./part1 48 241
+./part10 49 242
+./part2 48 241
+./part3 48 241
+./part4 48 241
+./part5 48 242
+./part6 48 241
+./part7 48 241
+./part8 48 241
+./part9 48 241
+\end{verbatim}
+which combines each line in spam with the corresponding line in ham
+based on the directory name. 
+The \exec{join} command does precisely this 
+and we tell it to use the second field in each file
+as the column to use for matching lines. This is the
+directory name.  And the result is exactly as above.
+
+
+
+
+
+A different approach to doing this is to use 
+a shell loop to iterate over the different directories
+and create each line of ``directory spam ham count''.
+We can do this as 
+\begin{verbatim}
+for d `find . -name 'part*' -type d` ; do
+ echo "$d `find $d -name 'spmsg*' | wc -l` 
+          `find $d -not -name 'spmsg*' | wc -l`"
+done
+\end{verbatim}
+
+This is a lot to type. We can make this into a script
+that can be called using a simple name, e.g. \exec{messageTable}.
+We do this by putting the code into the file, e.g. messageTable.
+\begin{verbatim}
+#!/bin/sh
+
+for d in part* ; do 
+ echo "$d       `find $d -name 'spmsg*' | wc -l` \
+       `find $d -not -name 'spmsg*' | wc -l`"
+done
+\end{verbatim}
+The first line tells the operating system to use 
+the interpreter
+\exec{/bin/sh} to evaluate the code in the file.
+The remaining lines are exactly as we might use them
+interactively on the command line.
+Note that we have used tabs between the fields
+in the \exec{echo} command to help align the numbers in
+the column.
+
+The simplest way to use this is
+to treat it as a regular command that
+the shell will invoke, i.e.
+\begin{comment}
+  messageTable
+\end{comment}
+as a command to the shell.
+To do this, we need to tell the shell that it is 
+an executable command rather than a regular file.
+We do this by changing its \textit{permissions}.
+A file has 3 sets of 3 permission settings.
+The 3 groups are for the user, the group and
+everyone else (other).
+A file is created and owned at any moment in time
+by a user logged into the system. 
+That user may want to specify that the file is
+readable, writable or both and that it is executable,
+i.e. can be treated as a regular command by the shell.
+These are three permission settings within each category
+of permissions.
+We can control the settings using the command
+\exec{chmod}.
+To make a file executable for the user, we give the command
+\begin{comment}
+  chmod +x messageTable
+\end{comment}
+The \verb|+x| indicates that we want to add the executable
+permission. 
+We could remove it using \verb|-x|.
+Similarly, we can make the file non-writeable to ensure
+that we don't unintentionally modify its contents
+via
+\begin{comment}
+  chmod -w messageTable.
+\end{comment}
+
+We might also have confidential information
+in a file that we don't want others to read.
+We can make the file accessible to ourself
+(i.e. the author) but prohibit others on
+the system from reading it by changing the permissions
+for the ``other'' category.
+To do this, we would use a command such
+\begin{verbatim}
+ chmod o-rw privateFile
+\end{verbatim}
+This makes it neither readable or writeable by others.
+
+There are occasions where we want a file to be
+accessible to a few people, but not everyone else on the system.
+In other words, we want to set permissions for a select
+\textit{group}.
+UNIX allows for collections of users to be described by a
+group.  You can see what groups you are in using
+the \exec{groups} command.   Suppose, for 
+example, there was a group named 
+\textbf{stat141} and I wanted only the students in
+that group to be able to access the OmegahatWebLogs.tar.gz
+file in my account. Then, I could specify this as
+\begin{verbatim}
+ chgrp stat141 OmegahatWebLogs.tar.gz
+ chmod g+r OmegahatWebLogs.tar.gz
+\end{verbatim}
+This says that the file is now owned by the group stat141
+and that is readable by that group.
+
+For what we want, we need only set the executable permission
+for ourselves on messageTable:
+\begin{verbatim}
+ chmod +x messageTable
+\end{verbatim}
+but  it is useful to be able to understand and use groups
+effectively. It tends to make somethings easier
+to understand and fix, and groups and permissions can be used
+to increase security appropriately.
+
+
+
+Of course, this script is very specialized.
+It makes specific assumptions about the name of the directories,
+that we want to process all of them,  
+and the names of the HAM and SPAM files.
+Suppose we want the caller to be able to specify
+the directories of interest.
+We can do this using a while loop over the number of
+arguments.
+Alternatively,  in Bash, we can use
+the variable \verb+$@+ which gives us
+all the command line arguments as separate words
+in a single string.
+So, changing our script
+\begin{verbatim}
+#!/bin/bash
+
+for d in $@ ; do 
+ echo "$d       `find $d -name 'spmsg*' | wc -l` \
+         `find $d -not -name 'spmsg*' | wc -l`"
+done
+\end{verbatim}
+now allows one to call it as
+\begin{verbatim}
+count part*
+\end{verbatim}
+
+Notice that we also don't use knowledge of the working directory
+to change between the different sub-directories of interest.
+We could have written the code as
+\begin{verbatim}
+for d in $@ ; do
+  cd $d
+  echo "$d       `find . -name 'spmsg*' | wc -l` \
+       `find . -not -name 'spmsg*' | wc -l`"
+  cd ..
+done
+\end{verbatim}
+We would therefore be assuming that the original directory is
+the one just above  the sub-directories.
+But if we wanted to call this from within another directory,
+then we would be in trouble.
+Rather than using \dir{..}, we could also compute the current
+working directory and change back to it at the very end.
+It is not a big deal but we should think about these
+things when writing scripts.
+
+
+If we want to make our lives easier,
+we can use shell-specific constructs
+like the ``\$@'' in Bash.
+This makes the code less portable to other systems.
+Generally, there are ways to avoid shell-specific
+features, but they require more verbose code.
+The decision to use a general approach or a less-portable
+one depends on the expected use of the script.
+But beware, software often lives on much longer than
+we think and our environment changes.
+
+To work portably, we could write this loop as
+\begin{verbatim}
+while test -n "$1" ; do
+  echo "$1       `find $1 -name 'spmsg*' | wc -l` \
+       `find $1 -not -name 'spmsg*' | wc -l`" 
+  shift
+done
+\end{verbatim}
+Here we just keep removing elements from the array of command line
+arguments and eventually we will consume them all
+and \verb+$1+ will become the empty string.
+\shellKey{shift} is the thing operation that pops the current
+argument from the top of the array of arguments.
+
+Also note the use of \shellKey{test} in the condition.
+Read the man page for \shellKey{test} and the documentation
+for it in the shell.
+
+
+
+
+>>>>>>> 1.3
+
+
+\subsection{Word frequency tables.}
+Break a file into list of words,
+then sort and then  uniq -c
+First part is the only part that is in any way hard.
+
+\begin{verbatim}
+cat spmsg*.txt | tr -s ' ' '\n' | sort | uniq -c | sort -dr | tail -n 10
+\end{verbatim}
+
+What if we use head so we get the first 10 lines of the output?  Does
+this save us time since we terminate the command before it is all
+complete.  Actually, I get a write error: Broken pipe message.  But
+the use of tail avoids this as the sort completes!  Explain.
+
+\subsection{Distribution of the number of words in each Subject line}
+Let's try to compute the number of words in each subject line (which
+is the first line of each message file) and look at the distribution
+for SPAM and HAM messages.
+We'll do this in 
+
+%%% wc -w spmsga1*.txt  | sed -e 's/[0-9]+/XX/'
+
+
+There are various ways to think about this.
+\begin{verbatim}
+for i in `ls *.txt` ; do  \
+ grep 'Subject:' $i | wc -w | grep -v total \
+        | sed -re 's/^ +([0-9]+).*$/\1/g' ;\
+done \
+  | sort | uniq -c
+\end{verbatim}
+(All this can be put on one line or separated onto multiple lines via
+the
+\\ at the end).
+The output is
+\begin{verbatim}
+      8 1
+      7 10
+     13 11
+      5 12
+      8 13
+      7 14
+      5 15
+      2 17
+     14 2
+      1 20
+     35 3
+      1 31
+     28 4
+     29 5
+     35 6
+     41 7
+     33 8
+     17 9
+\end{verbatim}
+which gives us the counts (first column) of the different values
+of number of words in the Subject line (second column).
+
+This gives us what we want, but it would be nicer
+to sort this by the second field as these are the number
+of words.
+Suppose we had the two columns above in the file
+named \texttt{cc}.
+Then we could sort by the second column
+using the command
+\begin{verbatim}
+sort -bg --key=2 cc
+\end{verbatim}
+The b flag means to ignore blank spaces before
+columns.  The g flag means to treat the contents of the column
+on which we are sorting as numbers rather than simple strings.
+This means we get the correct sorting for our purposes.
+And finally, the key argument specifies the column by which
+we want to sort the lines.
+This sorts from smallest to largest.
+We could use the r flag to reverse this.
+
+
+
+Note also that on Mac OS X,  the version of \exec{sed} does not 
+support the -r argument and has a slightly different version of
+regular expressions.  This is an example of non-portability.
+
+There are 8 messages that have only one word. Since we
+are looking for lines with Subject:, that means they have
+no other words and so have an empty subject.
+Which files are they?  Are the more likely to be SPAM than HAM or
+vice versa?
+We can identify the names of these messages using
+\begin{verbatim}
+grep -n 'Subject: $' *.txt
+\end{verbatim}
+The -n argument says to print the name of the file in which a line is
+matched.
+The pattern we are looking for is the literal string ``Subject:''
+followed by a space and then the end of the line.
+This amounts to no additional words on the line other than ``Subject:''.
+We may want to look for an arbitrary number of spaces before the end
+of the line, but this works in our case, given the structure of the messages.
+The result in the \dir{part1} sub-directory is
+\begin{verbatim}
+3-380msg2.txt:1:Subject: 
+5-1263msg1.txt:1:Subject: 
+5-1274msg1.txt:1:Subject: 
+5-1275msg1.txt:1:Subject: 
+spmsga107.txt:1:Subject: 
+spmsga118.txt:1:Subject: 
+spmsga125.txt:1:Subject: 
+spmsga132.txt:1:Subject: 
+\end{verbatim}
+and this shows as many SPAM messages as HAM. So it doesn't seem to be
+a good predictor.
+
+
+
+
+\begin{comment}
+Another approach to the whole problem is to iterate over all the
+messages
+and append the name of the message file to a ``list'' containing other
+messages with that number of words in the subject line.
+\begin{verbatim}
+for i in `ls *.txt` ; do 
+  grep 'Subject:' $i | wc -w | grep -v total | sed -re 's/^ +([0-9]+).*$/\1/g' ; done | sort | uniq -c
+\end{verbatim}
+\end{comment}
+
+
+How would we find the messages which had 2 additional words?
+This is a subsetting problem and is not necessarily done easily or
+well in the shell. 
+To do this, we would need a richer pattern to match.
+We will cover this when discussing the regular expression
+language.
+For the moment, we will just explain how to do it, 
+and not worry about why or how to think about this.
+The following works:
+\begin{verbatim}
+grep  -E 'Subject:\W+\w+[ \t]+\w+$'  *.txt 
+\end{verbatim}
+
+
+
+
+\begin{comment}
+ 
+sort, uniq
+sed
+cut, paste, join
+perl
+\end{comment}

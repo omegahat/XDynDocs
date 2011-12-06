@@ -1,0 +1,917 @@
+<resultset statement="describe TCPConnections">
+  <row>
+	<Field>conn</Field>
+	<Type>bigint(20) unsigned</Type>
+	<Null></Null>
+	<Key>PRI</Key>
+	<Default>0</Default>
+	<Extra>Unique identifier for each connection in the relation.</Extra>
+  </row>
+
+  <row>
+	<Field>host_a</Field>
+	<Type>varchar(15)</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default></Default>
+	<Extra>The IP address of the a machine involved in the
+	connection. This is usually the machine that initiated the connection.
+        </Extra>
+  </row>
+
+  <row>
+	<Field>host_b</Field>
+	<Type>varchar(15)</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default></Default>
+	<Extra>The IP address of the 'b' machine in the connection.
+         This is usually the machine that was contacted by the 
+         host a machine.
+        </Extra>
+  </row>
+
+  <row>
+	<Field>port_a</Field>
+	<Type>int(11)</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0</Default>
+	<Extra>The port number used by the application on the a host
+	machine for this connection. Port numbers can be associated
+        with services and applications by relating them to the
+	Services table in the database.
+         If this is a low number (e.g. less than 1024), it corresponds
+        to a well-known service. This is more likely to be the case
+        for the port_b field below as clients connect to servers 
+        on their well known ports.
+          </Extra>
+  </row>
+
+  <row>
+	<Field>port_b</Field>
+	<Type>int(11)</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0</Default>
+	<Extra>The port number for the b host machine in the
+	connection. If this is a server machine, the port will
+        indicate what the application is that created the connection.
+        This is found by relating the port number to the Services table.
+       </Extra>
+  </row>
+
+  <row>
+	<Field>first_packet</Field>
+	<Type>double</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0</Default>
+	<Extra>The time of the first packet sent in the connection,
+	i.e. the  SYN packet establishing the connection.
+        This time is UNIX time, i.e. the number seconds since midnight on
+	January 1st, 1970. </Extra>
+  </row>
+
+  <row>
+	<Field>last_packet</Field>
+	<Type>double</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0</Default>
+	<Extra>The time of the last packet in the connection, again in
+	UNIX time.</Extra>
+  </row>
+
+  <row>
+	<Field>total_packets_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The total number of packets sent from host a to host b
+	in this connection.</Extra>
+  </row>
+
+  <row>
+	<Field>total_packets_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The total number of packets sent from host b to host a
+	in this connection.</Extra>
+  </row>
+
+  <row>
+	<Field>resets_sent_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of communications from host a to host b within the connection that
+	 requested that the connection be reset.  These are packets
+         with the RST flag set.</Extra>
+  </row>
+
+  <row>
+	<Field>resets_sent_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of packets with the RST flag set sent from
+	host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>ack_pkts_sent_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of packets that had the ACKnowledgement flag
+	set, i.e. providing feedback to host b from host a that it had
+ 	seen certain packets. </Extra>
+  </row>
+
+  <row>
+	<Field>ack_pkts_sent_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of ACKnowledgement packets sent from host b
+	to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>pure_acks_sent_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of packets from host a to host b that only had the ACKnowledgement
+	flag set and not any of the DATA, SYN, FIN or RST flags set.</Extra>
+  </row>
+
+  <row>
+	<Field>pure_acks_sent_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as the previous but for packets from host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>sack_pkts_sent_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of packets from host a to host b containing
+	an ACKnowlesgemet and a Selective ACKnowledgement flag. </Extra>
+  </row>
+
+  <row>
+	<Field>sack_pkts_sent_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous but for host b to host a packets.</Extra>
+  </row>
+
+  <row>
+	<Field>dsack_pkts_sent_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of packets containing a Delayed ACKnowledgement flag sent from
+	host a to host b. </Extra>
+  </row>
+
+  <row>
+	<Field>dsack_pkts_sent_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as above for host b to host a packets.</Extra>
+  </row>
+
+  <row>
+	<Field>max_sack_blks_ack_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Most SACKnowledgement blocks in a single
+	ACKnowledgement from host a to host b.</Extra>
+  </row>
+
+  <row>
+	<Field>max_sack_blks_ack_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for reverse direction.</Extra>
+  </row>
+
+  <row>
+	<Field>unique_bytes_sent_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The total number of non-retransmitted  bytes sent from host a to
+	host b.  This can be used along with the total number of
+	transmitted bytes to determine how many bytes were
+	re-transmitted and hence "lost". </Extra>
+  </row>
+
+  <row>
+	<Field>unique_bytes_sent_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as above for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>actual_data_pkts_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of segments of data sent from host a to host
+	b.</Extra>
+  </row>
+
+  <row>
+	<Field>actual_data_pkts_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>actual_data_bytes_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of bytes of data sent from host a to host b.</Extra>
+  </row>
+
+  <row>
+	<Field>actual_data_bytes_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>rexmt_data_pkts_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of retransmitted packets from host a to host b.</Extra>
+  </row>
+
+  <row>
+	<Field>rexmt_data_pkts_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>rexmt_data_bytes_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of retransmitted bytes from host a to host b.</Extra>
+  </row>
+
+  <row>
+	<Field>rexmt_data_bytes_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>zwnd_probe_pkts_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of zero window probe packets sent from host a to
+	host b.  These are packets inquiring about the buffer size on
+	the other machine.</Extra>
+  </row>
+
+  <row>
+	<Field>zwnd_probe_pkts_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null>Same as previous for host b to host a.</Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>zwnd_probe_bytes_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of zero window probe bytes sent from host a to
+	host b.  These are packets inquiring about the buffer size on
+	the other machine.</Extra>
+  </row>
+
+  <row>
+	<Field>zwnd_probe_bytes_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>outoforder_pkts_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of out of order packets that were sent from
+  	   host a to host b, i.e. received out of order by host b.</Extra>
+  </row>
+
+  <row>
+	<Field>outoforder_pkts_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>pushed_data_pkts_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of packets sent from host a to host b with
+	the  PUSH bit set, i.e. basic transfer of data rather than
+	transmission control.</Extra>
+  </row>
+
+  <row>
+	<Field>pushed_data_pkts_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>SYN_pkts_sent_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of SYNchronization packets sent from host a
+	to host b.</Extra>
+  </row>
+
+  <row>
+	<Field>FIN_pkts_sent_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of FINish packets sent from host a
+	to host b.</Extra>
+  </row>
+
+  <row>
+	<Field>SYN_pkts_sent_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as two previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>FIN_pkts_sent_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as above but for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>req_1323_ws_a2b</Field>
+	<Type>tinyint(1)</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0</Default>
+	<Extra>Logical value indicating whether the '1323' window
+	scaling was requested by host a.</Extra>
+  </row>
+
+  <row>
+	<Field>req_1323_ts_a2b</Field>
+	<Type>tinyint(1)</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0</Default>
+	<Extra>Logical value indicating whether the '1323' time stamp
+	was requested by host a.</Extra>
+  </row>
+
+  <row>
+	<Field>req_1323_ws_b2a</Field>
+	<Type>tinyint(1)</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0</Default>
+	<Extra>Logical value indicating whether the '1323' window
+	scaling was requested by host b.</Extra>
+  </row>
+
+  <row>
+	<Field>req_1323_ts_b2a</Field>
+	<Type>tinyint(1)</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0</Default>
+	<Extra>Logical value indicating whether the '1323' time stamp
+	was requested by host b.</Extra>
+  </row>
+
+  <row>
+	<Field>adv_wind_scale_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Window scale factor for host a to host b.</Extra>
+  </row>
+
+  <row>
+	<Field>adv_wind_scale_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Window scale factor for host b to host s.</Extra>
+  </row>
+
+  <row>
+	<Field>req_sack_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Logical value indicating whether host a requested
+	Synchronized Acknowledgements</Extra>
+  </row>
+
+  <row>
+	<Field>req_sack_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Logical value indicating whether host b requested
+	Synchronized Acknowledgements</Extra>
+  </row>
+
+  <row>
+	<Field>sacks_sent_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of SACKs sent from host a to host b.</Extra>
+  </row>
+
+  <row>
+	<Field>sacks_sent_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of SACKs sent from host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>urgent_data_pkts_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Number of packets sent from a to host b with the URGENT
+	bit set.</Extra>
+  </row>
+
+  <row>
+	<Field>urgent_data_pkts_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Number of packets sent from b to host a with the URGENT
+	bit set.</Extra>
+  </row>
+
+  <row>
+	<Field>urgent_data_bytes_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Number of bytes sent from a to host b in packets with the URGENT
+	bit set.</Extra>
+  </row>
+
+  <row>
+	<Field>urgent_data_bytes_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Number of bytes sent from b to host a in packets with the URGENT
+	bit set.</Extra>
+  </row>
+
+  <row>
+	<Field>mss_requested_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Maximum segment size in communication from host a to
+	host b.</Extra>
+  </row>
+
+  <row>
+	<Field>mss_requested_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Maximum segment size in communication from host b to
+	host a.</Extra>
+  </row>
+
+  <row>
+	<Field>max_segm_size_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Largest amount of data in a segment sent from host a to
+	host b.</Extra>
+  </row>
+
+  <row>
+	<Field>max_segm_size_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Largest amount of data in a segment sent from host b to
+	host a.</Extra>
+  </row>
+
+  <row>
+	<Field>min_segm_size_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Smallest amount of data in a segment sent from host a to
+	host b.</Extra>
+  </row>
+
+  <row>
+	<Field>min_segm_size_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Smallest amount of data in a segment sent from host b to
+	host a.</Extra>
+  </row>
+
+  <row>
+	<Field>avg_segm_size_a2b</Field>
+	<Type>double unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0000000000000000000000</Default>
+	<Extra>Average segment size sent from host a to host b, given
+	by the number of data bytes sent divided by the number of packets.</Extra>
+  </row>
+
+  <row>
+	<Field>avg_segm_size_b2a</Field>
+	<Type>double unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0000000000000000000000</Default>
+	<Extra>Average segment size sent from host b to host a, given
+	by the number of data bytes sent divided by the number of packets.</Extra>
+  </row>
+
+  <row>
+	<Field>max_win_adv_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The maximum window size advertized by host a to host b
+	in this connection.</Extra>
+  </row>
+
+  <row>
+	<Field>max_win_adv_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The maximum window size advertized by host b to host a
+	in this connection.</Extra>
+  </row>
+
+  <row>
+	<Field>min_win_adv_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The minimum window size advertized by host a to host b
+	in this connection.</Extra>
+  </row>
+
+  <row>
+	<Field>min_win_adv_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The minimum window size advertized by host b to host a
+	in this connection.</Extra>
+  </row>
+
+  <row>
+	<Field>zero_win_adv_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of ZERO windows advertized by host a to host
+	b.</Extra>
+  </row>
+
+  <row>
+	<Field>zero_win_adv_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of ZERO windows advertized by host b to host
+	a.</Extra>
+  </row>
+
+  <row>
+	<Field>avg_win_adv_a2b</Field>
+	<Type>double unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0000000000000000000000</Default>
+	<Extra>Average window advertisement by host a to host b,
+                </Extra>
+  </row>
+
+  <row>
+	<Field>avg_win_adv_b2a</Field>
+	<Type>double unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0000000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>initial_window_bytes_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of bytes in the initial window from host a to
+	host b.</Extra>
+  </row>
+
+  <row>
+	<Field>initial_window_bytes_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>initial_window_pkts_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of segments in intial window from host a to host
+	b.</Extra>
+  </row>
+
+  <row>
+	<Field>initial_window_pkts_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>ttl_stream_length_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra></Extra>
+  </row>
+
+  <row>
+	<Field>ttl_stream_length_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra></Extra>
+  </row>
+
+  <row>
+	<Field>missed_data_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The number of bytes that were dropped by host b.  This
+	is the total stream length from a to b - number of unique bytes sent.</Extra>
+  </row>
+
+  <row>
+	<Field>missed_data_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>truncated_data_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Not used.</Extra>
+  </row>
+
+  <row>
+	<Field>truncated_data_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Not used.</Extra>
+  </row>
+
+  <row>
+	<Field>truncated_packets_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Not used.</Extra>
+  </row>
+
+  <row>
+	<Field>truncated_packets_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Not used.</Extra>
+  </row>
+
+  <row>
+	<Field>data_xmit_time_a2b</Field>
+	<Type>double unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0000000000000000000000</Default>
+	<Extra>Number of seconds from from first to last transmission
+	from host a to host b.</Extra>
+  </row>
+
+  <row>
+	<Field>data_xmit_time_b2a</Field>
+	<Type>double unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0000000000000000000000</Default>
+	<Extra>Number of seconds from from first to last transmission
+	from host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>idletime_max_a2b</Field>
+	<Type>double unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0000000000000000000000</Default>
+	<Extra>Maximum idle time for host a in communicating with host
+	b on this connection.</Extra>
+  </row>
+
+  <row>
+	<Field>idletime_max_b2a</Field>
+	<Type>double unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>0000000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+
+  <row>
+	<Field>hardware_dups_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Not used.</Extra>
+  </row>
+
+  <row>
+	<Field>hardware_dups_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Not used.</Extra>
+  </row>
+
+  <row>
+	<Field>throughput_a2b</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>The throughput for this side of the connection. This is
+	the number of bytes divided by connection duration from
+	host a to host b.</Extra>
+  </row>
+
+  <row>
+	<Field>throughput_b2a</Field>
+	<Type>bigint(20) unsigned zerofill</Type>
+	<Null></Null>
+	<Key></Key>
+	<Default>00000000000000000000</Default>
+	<Extra>Same as previous for host b to host a.</Extra>
+  </row>
+</resultset>

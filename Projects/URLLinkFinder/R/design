@@ -1,0 +1,97 @@
+The goal is to end up with a list in which each element
+is a character vector containing the URLs of the links
+within that page. In other words, each element in the list
+corresponds to a URL and the element is the collection
+of forward links in that URL.
+To be specific, suppose we visit three URLs
+
+> 
+> x$links
+$"http://www.stat.berkeley.edu/users/nolan/test0.html"
+[1] "http://stat.berkeley.edu/users/nolan/test1.html"
+[2] "http://stat.berkeley.edu/users/nolan/test2.html"
+
+$"http://stat.berkeley.edu/users/nolan/test1.html"
+[1] "http://stat.berkeley.edu/users/nolan/test3.html"
+
+$"http://stat.berkeley.edu/users/nolan/test2.html"
+character(0)
+
+$"http://stat.berkeley.edu/users/nolan/test3.html"
+character(0)
+
+
+We can do this either recursively or iteratively.
+The current code implements a dynamically iterative
+approach.
+
+
+Iteratively is quite simple.  We start with the top-level URLs
+(e.g. A, B and C above).  We will assume that these are unique and
+fully-qualified (i.e. not relative links).  We add these to a vector
+named toBeProcessed. Then we enter a while{} loop which terminates
+only when the length of toBeProcessed is 0.  We process the first
+entry in this vector and that has the side effect of adding
+any new URLs that we encounter to the vector.
+
+  while(length(toBeProcessed)) {
+    u = toBeProcessed[1]
+    forwardLinks = processURL(u)
+
+    allLinks[[u]] = forwardLinks # add new URLs to result
+
+    # Find elements in forwardLinks which are 
+    # are not already in allLinks or toBeProcessed.
+
+    toBeProcessed <- toBeProcessed[-1] # pop
+  }
+(See traverseLinks.)
+
+The toBeProcessed vector is a classical FIFO (First-in-First-out) queue.
+
+The trick to this is to ensure that we don't get confused by having a
+single URL identified by two names. In other words, we must uniquely
+resolve a given URL and avoid relative links.
+The code in uri.S handles this.  By defining classes rather than 
+simple functions, we have a more flexible infrastructure to experiment
+with the special cases.
+
+
+
+A recursive approach can do away with the need to manage a queue.
+Recursion is used by processing links as we see them.
+Again, we start with a collection of URIs.
+We parse each of these in turn.
+
+
+  processedLinks = list()
+
+  for(i in in urls) {
+    recursiveProcessURL(i)
+  }
+
+The recursiveProcessLinks() function parses the URL and establishes a 
+link handler function for the <a href=...> elements.
+When it encounters such an element, it prepares to parse that link immediately.
+If first resolves the link into a fully-qualified URI.
+Thenk it checks whether that URI has already been processed by looking
+at the names of the elements in processedLinks.
+If the URI has not been processed, it then parses the link.
+It does this by calling the recursiveProcessURL() function.
+This needs to maintain a list of its own  links so that when
+we finish parsing this URI, we can store its collection of links.
+However, as we process each <a href=...> link, we need to check
+a global list of processed links.
+We also need to ensure that when we start to process a URI,
+we must register it in the processedLinks page.
+Otherwise, it is possible that we get into an infinite loop.
+For instance, supposed we start processing a URI A which has a link
+to B and that B has a link to A. 
+Then, as we process A, we will move down a level and process B which will
+in turn cause us to process A again. 
+So we need to ensure that we detect such cycles.
+
+
+Whether this simplifies matters or not is a matter of personal taste.
+There is a chance of exceeding the stack depth. There are two levels to
+manage: the file-level links, and the collection of previously processed URIs 

@@ -1,0 +1,867 @@
+# Classes to represent the code blocks and associated computations.
+setClass("CodeBlock",
+          representation(id = "character",
+                         text = "character",
+                         attributes = "character",
+                         output = "character",
+                         display = "ANY",
+                         result = "ANY"
+                         ))
+
+setClassUnion("Code", c("expression", "call"))
+
+setClass("RGeneralCodeBlock",
+          representation(code = "Code",
+                         environment = "environment"),
+          contains = "CodeBlock")
+
+setClass("RCodeBlock",
+            contains = "RGeneralCodeBlock")
+
+
+setClass("RExprCodeBlock",
+            contains = "RGeneralCodeBlock")
+
+setClass("RPlotCodeBlock",
+          representation(device = "integer"),
+          contains = "RGeneralCodeBlock")
+
+##########
+setClassUnion("CodeEnvironment",  c("environment", "NULL"))
+setClass("VariableID",
+          representation(name = "character",
+                         environment = "CodeEnvironment"))
+
+
+
+useHTMLForCode = TRUE
+
+######################################################################################
+
+nullDevice =
+  #
+  #  Used when we evaluate the code nodes in the codeDictionary
+  #  but don't want plots to appear as we have not created the 
+  #  inlined graphics devices at this point.
+  
+function(...)
+{
+  filename = if(file.exists("/dev/null"))
+                "/dev/null"
+             else
+                tempfile()
+  
+  pdf(filename)
+}  
+
+viewIDoc =
+  #
+  # top-level function that the reader calls to transform and display the 
+  # XML document.
+  # It applies the XSL stylesheet to the XML document and then creates an HTML
+  # window to display it, registering the handler functions with the HTML parser
+  # to perform the computations and create the interactive components.
+  #
+function(doc = system.file("examples", "isim.xml", package = "IDynDocs"),
+         xsl = system.file("XSL", "ihtml.xsl", package = "IDynDocs"),
+         title = NA,
+         env = new.env(),  # The master environment for this document which will act as the initial ancestor for all r:code environments.
+         parserHandlers = createIDocHandlers(..., .env = env,
+                                             .basicHandlers = .DefaultIHandlers[ if(.useXML) -(1) else integer() ]), #XXX this should be -2, not -1 at this point????
+         .useXML = TRUE,  # if TRUE, we are going to process the codeDictionary via XML before we get to the wxHTML parsing.
+         ...,
+         .htmlFile = xsltApplyStyleSheet(doc, xsl)
+        )
+{
+
+    # Set the device option for this call so that graphics created when evaluating the
+    # codeDictionary nodes are not displayed. We write them to /dev/null or a temporary
+    # file.
+  opts = options()
+  on.exit(options(opts))
+  options(device = "nullDevice")
+  
+
+#  if(! ("package:RwxWidgets" %in% search())) {
+       # Load RwxWidgets, if necessary
+    library(RwxWidgets)  
+    wxInit()  # Make certain the event handler is registered.
+#  }
+
+  
+    # Run the XML through XSL to get the HTML with the interactive components and the code.
+  library(Sxslt)
+  pdoc = .htmlFile
+
+
+  #
+  #  Can process the codeDictionary using the XML nodes and then remove that node
+  # from the body of the HTML document so wxHTML will never see it.
+  #
+  if(.useXML) {
+    dict = getNodeSet(pdoc$doc, "//r:codeDictionary", c(r = "http://www.r-project.org"))
+    #XXX Can remove this since we remove the node.
+    # parserHandlers[["r:codeDictionary"]] = function(handler, tag, parser) {}  # handler$ParseInner(tag)
+    readCodeDictionary(dict[[1]], env)
+
+    # We can read the i:interactiveVariables or get the i:* nodes ourselves and then do some code analysis
+    # to remove the assignment to these variables.
+    
+    removeNodes(dict[[1]])
+  }
+
+     # Get the title from the document so we can use this for the
+     # title of the window showing the HTML.
+  if(is.na(title)) {
+   for(i in c("//ns:title", "//ns:h1|//ns:h2")) {
+    tmp = getNodeSet(pdoc$doc, "//title", c("ns"= "http://www.w3.org/1999/xhtml"))
+    if(length(tmp) > 0) {
+      title = xmlValue(tmp[[1]])
+      break
+    }
+   }
+  }
+  
+    # get the HTML document as a string, not a node or document reference.
+  html = saveXML(pdoc$doc)
+
+                
+    # Display the HTML viewer
+  invisible(
+    htmlViewer(html,
+               tagHandlers = parserHandlers,
+               title = title, # "Dynamic & Interactive HTML Document",
+               size = c(700, 850),
+               app = NULL)  )
+}   
+
+
+
+
+createIDocHandlers =
+     #
+     # Get a collection of functions that implement the tag handlers
+     # and OBJECT handlers for the HTML we expect.
+
+     # XXX deal with object nodes.
+     #
+function(..., .object = list(), .env = new.env(), .setEnv = TRUE, .basicHandlers = .DefaultIHandlers)
+{
+     # 
+  .env$.codeDictionary = list()
+
+     # Keep all the environments we create.
+  .env$.environments = list()
+
+    # Stack of interactive environments.
+  .env$.interactiveEnvironments = list()
+
+  .env$.doc = "...."  # name of the file.
+  .env$.docEnvironment = .env
+  
+#  environment(getValue) = .env
+#  .env$getValue = getValue
+ 
+  tmp = c(..., .basicHandlers)
+  funs = lapply(names(tmp),
+                   function(id) {
+                      if(!inherits(tmp[[id]], "AsIs"))
+                        environment(tmp[[id]]) = .env
+
+                      if(!inherits(tmp[[id]], "HTMLTagHandler")) {
+                        assign(id, tmp[[id]], .env)
+                        NULL  # drop this.
+                      } else
+                        tmp[[id]]
+                   })
+  names(funs) = names(tmp)
+
+
+  x = htmlParserTagHandlers(.funs = funs, .addDefaults = TRUE)
+
+  return(x)
+  
+
+  # clean up....
+  objectHandlers = defaultObjectHandlers(code = code ,
+                                         plot = code,
+                                         'i-combo-box' = i.combo.box,
+                                         'i-checkbox' = i.checkbox,
+                                         'i-slider' = i.slider)
+  x = htmlTagHandlers(funs, objectHandlers,  envir = .env)
+
+  x
+}  
+
+
+#########
+
+readCodeDictionary =
+function(nodes, docEnv)
+{
+  environment(processDictNode) <- docEnv # Do it properly later on.
+  for(i in xmlChildren(nodes) )
+      processDictNode(i, docEnv)
+  
+}
+
+processDictNode =
+function(node, env)
+{
+  code = xmlValue(node) # strip the r:output...
+
+    # The the attributes from this node.
+  parms = xmlAttrs(node)
+    # And the id is special.
+  id = if("id" %in% names(parms)) parms["id"] else as.character(NA)
+
+    # Create a new RCodeBlock object to represent this node.
+    # If it is an r:plot, use RPlotCodeCallback.
+    # If this grows to be any more complex, use a table for name -> class.
+  klass = if(xmlName(node) == "plot")
+            "RPlotCodeBlock"
+          else if(xmlName(node) == "expr")
+            "RExprCodeBlock"
+          else
+            "RCodeBlock"
+
+
+    # We will put the representation of this node into the codeDictionary variable
+    # so we need to know at which position.  If we are growing the codeDictionary
+    # ourselves, then get the current length and we will add 1 to it. If we
+    # have pre-allocated a list (using the count attribute of the r:codeDictionary node,
+    # we need to keep the current position or find the first NULL position.
+  n = length (env$.codeDictionary ) 
+  curEnv = if(n > 0)  .codeDictionary[[ n ]]@environment else .docEnvironment
+
+  env = new.env(parent = curEnv)
+  .environments[[ id ]] <<- env
+  env$.id = id
+
+  if(is.null(parms)) parms = character()
+  
+     # Parse the code and create a new environment and populate this object.
+  b = new(klass, code = parse(text = code),
+                 text = code,
+                 id = id,
+                 attributes = parms,
+                 environment = env)
+
+  if(!is(b, "RPlotCodeBlock"))
+    b@result = eval(b@code, env)
+
+    # Put this node into the code dictionary.
+  .codeDictionary[[ n + 1 ]] <<- b
+  names(.codeDictionary)[ n + 1] <<- b@id
+
+  invisible(b)
+}  
+
+
+
+##################################################################
+#
+# handler for r:code, r:plot, etc. nodes BUT only used if we are
+# not procesising the r:codeDictionary node directly from within R
+# via XML/XPath rather than via the wxHtml parser
+#
+
+r.code =
+  #
+  # Handler for r:code, r:init, r:plot within a  r:codeDictionary "HTML" node.
+  #
+function(handler, tag, parser)
+{
+    # Read the code.
+    # XXX  Need to discard any r:output, etc.  Need a utility function.
+  el = wxHtmlTag_GetChildren(tag, FALSE)
+     # Make smarter to avoid r:output.
+  code = el$GetContent(parser)  
+
+    # The the attributes from this node.
+  parms = getHtmlTagParams(tag)
+    # And the id is special.
+  id = if("id" %in% names(parms)) parms[id] else as.character(NA)
+
+ 
+    # Create a new RCodeBlock object to represent this node.
+    # If it is an r:plot, use RPlotCodeCallback.
+    # If this grows to be any more complex, use a table for name -> class.
+  #XXX FIXME
+  klass = if(tag$GetName() == "r:plot") "RPlotCodeBlock" else "RCodeBlock"
+
+  
+    # We will put the representation of this node into the codeDictionary variable
+    # so we need to know at which position.  If we are growing the codeDictionary
+    # ourselves, then get the current length and we will add 1 to it. If we
+    # have pre-allocated a list (using the count attribute of the r:codeDictionary node,
+    # we need to keep the current position or find the first NULL position.
+  n = length ( .codeDictionary ) 
+  curEnv = if(n > 0)  .codeDictionary[[ n ]]@environment else .docEnvironment
+
+  env = new.env(parent = curEnv)
+  .environments[[ id ]] <<- env
+  env$.id = id
+
+     # Parse the code and create a new environment and populate this object.
+  b = new(klass, code = parse(text = code),
+                 text = code,
+                 id = id,
+                 attributes = parms,
+                 environment = env)
+
+
+  b@result = eval(b@code, env)
+
+    # Put this node into the code dictionary.
+  .codeDictionary[[ n + 1 ]] <<- b
+  names(.codeDictionary)[ n + 1] <<- b@id
+
+  invisible(b)
+}  
+
+
+################################################################################
+#Taken from the dynamic example and not necessarily relevant here.
+# For displaying the content
+R.code =
+  #
+  # Evaluate an r:code, r:plot, r:... block  
+  # Take a node of the form
+  #      <r:function xmlns:r="http://www.r-project.org" xmlns:c="http://www.C.org">
+  #      g =
+  #      function(n, B = 10)
+  #      {
+  #       ans = c()
+  #       for(i in 1:B) {
+  #           m = matrix(rnorm(n*n), n, n)      
+  #           ans = c(ans, sum(m[sample(1:n, 1),]))
+  #       }
+  #      
+  #       ans
+  #      }
+  #      </r:function>  
+  #
+  #
+  # We will present the code to the user in a text editor
+  # and also run the code and display the output 
+function(html, tag, parser, envir = globalenv())
+{
+     # if there is an attribute i:display set to false, then
+     # don't do anything. We can also kill this off in the XSL
+     # so this is not used.
+   if(!tag$GetAttr("i:display", TRUE, as.logical)) 
+     return(TRUE)
+
+   block = .getCodeBlock(tag)      
+
+    # create the notebook to show the code and the "output".
+   sz = tag$GetAttr(c("i:width", "i:height"), tag$GetAttr(c("width", "height"), c(400, 200), as.integer), as.integer)
+
+   notebook = wxNotebook(parser$GetWindow(), wxID_ANY, size = sz)
+
+   if(useHTMLForCode) {
+     outputDisplay = wxHtmlWindow(notebook, wxID_ANY, size = sz)
+     outputDisplay$SetPage(printResult(block@result))          
+   } else {
+     outputDisplay = wxTextCtrl(notebook, style = c(wxHSCROLL, wxTE_MULTILINE))
+     outputDisplay$SetValue(printResult(block@result, useHTML = FALSE))     
+   }
+   notebook$AddPage(outputDisplay, "Output")
+
+
+   code = wxTextCtrl(notebook, block@text, style = c(wxHSCROLL, wxTE_MULTILINE))       
+   notebook$AddPage(code,  "Code")
+   code$SetEditable(TRUE)
+
+   if(!tag$GetAttr("showOutput", TRUE, as.logical))
+     notebook$SetSelection(1L)
+   
+   .codeDictionary[[ tag$GetParam("id") ]]@display <<- list(output = outputDisplay, code = code)
+   
+   notebook
+}
+
+
+printResult =
+function(obj, ..., addHTML = TRUE)
+{  
+  con = textConnection(".dynOutput", "w", local = TRUE)
+  sink(con)
+  on.exit({sink(); close(con)})
+  print(obj, ...)
+  ans = paste(.dynOutput, sep = "", collapse = "\r\n")
+  if(addHTML)
+    ans = paste("<HTML><BODY><PRE>", ans, "</PRE></BODY></HTML>", collapse = "\n", sep = "")
+
+  ans
+}
+
+getEnvironment =
+function(id)
+{
+   .environments[[id]]
+}
+
+evalCode =
+function(code, id, envir = getEnvironment(id))
+{
+   con = textConnection(".ihtmlOutput", "w", local = TRUE)
+   on.exit({sink(); close(con)})
+   sink(con)
+   ans = eval(parse(text = code), envir)
+   print(ans)
+   .ihtmlOutput
+}  
+
+
+
+interactive =
+  #
+  # Creates the environment for this group of interactive components.
+  #
+  #
+function(handler, tag, parser)  
+{
+  id = tag$GetParam("id")
+  if(id != "" && !is.null(e <- .getEnvironment(id))) {
+    #FIXME: Got to keep going.
+
+  } else {
+  
+  refSep = tag$GetParam("refSep")
+  if(refSep == "") refSep = ","
+
+  ref = strsplit(tag$GetParam("ref"), refSep)[[1]]
+
+   # Think about? Don't think this is relevant.
+  e = NULL
+#XXX  e = getInteractiveEnvironment(ref)
+  
+   if(is.null(e)) {
+     codeEnv = .getEnvironment(ref)     
+     e = new.env(parent = codeEnv)
+     class(e) = c("interactive", "environment")
+     if(id == "")
+        id = length(.environments) + 1
+     .environments[[id]] <<- e
+     # .interactiveEnvironments[[id]] <<- e     
+   }
+ }
+  
+   # Push this environment on to the top of the stack
+  .interactiveEnvironments <<- c(e, .interactiveEnvironments)
+  
+    # recursively process all the nodes
+  handler$ParseInner(tag)
+
+    # Pop the environment.
+  .interactiveEnvironments <<- .interactiveEnvironments[-1]
+  
+  e
+}
+
+####################################################################################
+
+getVarName = 
+function(tag, obj = new("VariableID"))
+{
+ obj@name = tag$GetParam("var")
+ tmp = tag$GetParam("r:envir")  # code chunk id.
+ if(tmp == "") # fix on just one.
+    tmp = tag$GetParam("ref")
+
+ if(tmp != "")
+   obj@environment = .getEnvironment(tmp)
+
+ obj
+}
+
+getValue =
+  #
+  # We have to set the environment of this to be the document's top-level environment
+  # before we use it.
+  #
+function(var)
+{
+  get(var@name,  var@environment)
+}  
+
+saveIWidget =
+function(w, tag, varId, envir)
+{
+ id = tag$GetParam("name")
+ if(id == "")
+    id = paste(varId@name, gsub("^i:", "", tag$GetName()), sep = ".")
+
+ assign(id, w, envir)
+}  
+
+####################################################################################
+
+# If there is no interactive environment because there is no <interactive>
+# node, then create a new environment or use a share doc environment
+# or a special doc-level interactive environment.
+
+
+
+# See defaultObjectHandler in htmlTagHandlers.R
+iObjectHandler =
+function(handler, tag, parser)
+{
+   type <- wxHtmlTag_GetParam(obj, "type")  
+
+   if(type %in% names(typeHandlers)) 
+      f = typeHandlers[[type]]
+   else
+      f = typeHandlers[["app/x-R-command"]]
+
+   if(is.null(f)) {
+     warning("no OBJECT handler for ", type)
+     return(FALSE)
+   }
+
+     # Now call the handler function
+  
+   if(inherits(f, "iHTMLObjectHandler")) {
+      val = f(tag, parser, .getVarName(tag),  value = .getValue(varName),
+              .interactiveEnvironments[[1]], win = parser$GetWindow(), handler)
+      saveIWidget(val, tag, varName, envir)      
+   }         
+   else
+      val = f(handler, tag, parser)
+
+
+  if(!inherits(val, "AsIs") && isWxWidget(val)) 
+       insertEmbeddedComponent(val, parser)
+
+   
+  if(is.logical(val))
+      return(val)
+  else
+      return(TRUE)
+}  
+
+i.slider =
+function(handler, tag, parser, envir = .interactiveEnvironments[[1]],
+         varName = .getVarName(tag),  value = .getValue(varName),
+         win = parser$GetWindow())
+{
+ min = as.integer(tag$GetParam("min"))
+ max = as.integer(tag$GetParam("max"))
+ by = tag$GetAttr("by", 1, as.numeric)
+  # adjust for real values using the "by" attribute and the r:type....
+
+  #XXX Add the origin/offset/min to these calculations
+ toSlider = function(val)  (val - min)/by
+ fromSlider = function(val)  val*by  + min
+
+ slider = wxSlider(win, wxID_ANY, toSlider(value), min, toSlider(max),
+                    size = tag$GetAttr(c("width", "height"), c(200, 50), as.integer))
+
+ if(is.null(varName@environment))  # only happen when the i:* is tied to one code chunk.
+     varName@environment = parent(envir)
+
+
+ slider$AddCallback(wxEVT_SCROLL_THUMBRELEASE, # wxEVT_SCROLL_CHANGED,
+                      function(ev) {
+	     	          sl = ev$GetEventObject()
+                          val= sl$GetValue()
+                          assign(varName@name, fromSlider(val), varName@environment)
+                          .recalculateNodes(varName@environment) # get the .id and do everything below
+                        })
+
+ slider
+}
+
+
+
+i.combo.box =
+function(handler, tag, parser, envir = .interactiveEnvironments[[1]],
+         varName = .getVarName(tag),  value = .getValue(varName),
+         win = parser$GetWindow())
+{
+ els = strsplit(tag$GetParam("choices"), ",")[[1]]
+ 
+ combo = wxComboBox(win, wxID_ANY, value, size = tag$GetAttr(c("width", "height"), c(200, 50), as.integer),
+                     choices = els)
+
+ if(is.null(varName@environment))  # only happen when the i:* is tied to one code chunk.
+     varName@environment = parent(envir)
+
+ type = tag$GetParam("r:type")
+ if(is.na(type) || type == "")
+   type = "character"
+
+ initialValue = tag$GetParam("value")
+ if(is.na(initialValue) || initialValue == "")
+   initialValue= els[1]
+
+ 
+ combo$AddCallback(wxEVT_COMMAND_COMBOBOX_SELECTED,
+                      function(ev) {
+	     	          sl = ev$GetEventObject()
+                          value = as(sl$GetValue(), type)
+                          assign(varName@name, value, varName@environment)
+                          .recalculateNodes(varName@environment) # get the .id and do everything below
+                        })
+
+  combo
+}  
+
+i.checkbox =
+function(handler, tag, parser, envir = .interactiveEnvironments[[1]],
+         varName = .getVarName(tag),  value = .getValue(varName),
+         win = parser$GetWindow())
+{
+ label = tag$GetParam("label")
+ 
+ checkbox = wxCheckBox(win, wxID_ANY, label = label, 
+            size = tag$GetAttr(c("width", "height"), c(200, 50), as.integer))
+
+ if(is.null(varName@environment))  # only happen when the i:* is tied to one code chunk.
+     varName@environment = parent(envir)
+
+ type = tag$GetParam("r:type")
+ if(is.na(type) || type == "")
+   type = "logical"
+
+ 
+ checkbox$AddCallback(wxEVT_COMMAND_CHECKBOX_CLICKED,
+                      function(ev) {
+	     	          cb = ev$GetEventObject()
+                          value = as(cb$IsChecked(), type)
+                          assign(varName@name, value, varName@environment)
+                          .recalculateNodes(varName@environment) # get the .id and do everything below
+                        })
+
+  checkbox
+}  
+
+# Method to convert a string to a function object.
+# Not actually needed in some of our examples where we use an apply
+# and so the match.fun() is performed and we can hand in a string.
+setAs("character", "function",
+        function(from)
+            get(from, mode = "function"))
+
+
+
+i.data.grid =
+function(handler, tag, parser, envir = .interactiveEnvironments[[1]],
+         varName = .getVarName(tag),  value = .getValue(varName),
+         win = parser$GetWindow())
+{
+   grid = wxGrid(win, pos = as.integer(c(0, 0)),
+                   size = tag$GetAttr(c("width", "height"), c(200, 50), as.integer))
+
+     # If there is a transform attribute get it or else us the variable name as is.
+   tfm = parse(text = tag$GetAttr("r:transform", varName@name))
+   value = eval(tfm, varName@environment)
+
+     # Now convert the value to a data frame using methods for the different types
+     # we know about to get a data frame.
+   d = as(value, "data.frame")
+   wxCreateGrid(grid, nrow(d), ncol(d))
+   setData(grid, d)
+
+     # Need to get the parent correct so it can see the relevant variable. Okay now.
+     # Create a piece of code that uses the transform.
+   e = new.env(parent = varName@environment)
+   assign("grid", grid, e)
+   expr = parse(text = "setData(grid, x)")
+   expr[[1]][[3]] = tfm[[1]]
+
+   code = new("RCodeBlock", code = expr[[1]], # substitute(setData(grid, x), list(x = as.name(varName@name))),
+                            environment = e,
+                            id = "duncan")
+   addCodeBlock(code, varName@environment)
+
+   grid
+}
+
+addCodeBlock =
+function(code, env)
+{
+  dict = get(".codeDictionary", env, inherits = TRUE)
+  dict[[length(dict)+1]] = code
+  assign(".codeDictionary", dict, env, inherits = TRUE)
+}
+
+
+tmp = 
+  function(from) {
+    as.data.frame(matrix(from, ncol = length(from), byrow = TRUE, dimnames = list(NULL, names(from)))) 
+  }
+setAs("table", "data.frame", tmp)
+setAs("vector", "data.frame", tmp)
+
+
+recalculateNode = 
+function(x) # a CodeBlock.
+{
+     # The author can "lock" this block with i:update='false'
+    if("i:update" %in% names(x@attributes)
+         && !as.logical(x@attributes["i:update"]))  
+       return(FALSE)
+
+    if(is(x, "RPlotCodeBlock")) {
+      orig = dev.cur()
+      on.exit(dev.set(orig))
+      dev.set(x@device)
+    }
+
+
+    ans = eval(x@code, x@environment)
+if(length(x@id) && !is.na(x@id) && x@id == "duncan") {
+  print(x@code)
+  print(ans)
+}
+        # insert the new result into the widget for the OBJECT type=app/x-R-?
+    showOutput(ans, x)
+
+    return(TRUE)
+}
+
+recalculateNodes =
+function(env)
+{
+  i = match(env$.id, names(.codeDictionary))
+  if(is.na(i)) {
+    stop("can't happen")
+  }
+
+  if(i == length(.codeDictionary))
+     stop("last code node")
+  
+  w = seq(i + 1, to = length(.codeDictionary), along = .codeDictionary)
+
+  lapply(.codeDictionary[w],  recalculateNode)
+}
+
+setGeneric("showOutput", function(ans, block) standardGeneric("showOutput"))
+
+setMethod("showOutput", c(block = "RGeneralCodeBlock"),
+            function(ans, block) {})
+
+setMethod("showOutput", c(block = "RCodeBlock"),
+            function(ans, block) {
+               w = block@display[["output"]]
+               if(!is.null(w))
+                 w$SetPage(printResult(ans))
+            })
+
+         
+
+########################
+
+
+   # Our simple OBJECT handler for now.
+r.object.handler =
+function(handler, tag, parser, envir) {
+     wxButton(parser$GetWindow(), wxID_ANY, tag$GetParam("id"))
+}
+
+r.plot.handler =
+function(handler, tag, parser, envir)
+{
+  block = .getCodeBlock(tag)
+
+  orig.dev = dev.cur()
+  if(orig.dev != 1 && !tag$GetAttr("add", FALSE, as.logical))
+    on.exit(dev.set(orig.dev))
+
+  library(RwxDevice)
+
+  outputDisplay = RwxCanvas(parser$GetWindow(), size = tag$GetAttr(c("width", "height"), c(400, 400), as.integer))
+  asWxDevice(outputDisplay)
+     # update in the .codeDictionary itself, not just our local copy of the block.
+  .codeDictionary[[tag$GetParam("id")]]@device <<- dev.cur()
+  tname = tag$GetParam("name")
+  if ( tname != "" )
+     assign(tname, dev.cur(), block@environment)
+
+  ans = eval(block@code, block@environment)
+
+  if(inherits(ans, "trellis"))
+    print(ans)
+
+  outputDisplay
+}  
+
+
+r.expr =
+function(handler, tag, parser, envir)
+{
+   block = .getCodeBlock(tag)
+   ans = eval(block@code, block@environment)
+   txt = format(ans, trim = TRUE, tag$GetAttr("digits", options()$digits, as.integer))
+
+     # Insert the text...
+     # Deal with each word separately?
+   container = wxHtmlParser_GetContainer(parser)
+   container$InsertCell(wxHtmlWordCell(txt, parser$GetDC()))
+
+   TRUE
+}
+
+
+getCodeBlock =
+function(tag)
+{
+   id = tag$GetParam("id")
+   .codeDictionary[[ id ]]
+}
+
+.DefaultIHandlers =
+if(@HAVE_WXWIDGETS@)  {
+  list('r:code,r:plot,r:init' = R.code, # was r.code # Not needed if we use XML to read r:codeDictionary but excluded there.
+        interactive = tagHandler(interactive),
+       'app/x-i-slider' = objectTagHandler(i.slider),   #
+       'app/x-i-combo-box' = objectTagHandler(i.combo.box),   #
+       'app/x-i-checkbox' = objectTagHandler(i.checkbox),   #
+       'app/x-i-data-grid' = objectTagHandler(i.data.grid),   #       
+       "app/x-R-code,app/x-R-init" = objectTagHandler(R.code),
+       'app/x-R-plot' = objectTagHandler(r.plot.handler),
+       'app/x-R-expr' = objectTagHandler(r.expr),
+
+         # We discard these or explicitly remove them.
+       'r:codeDictionary' = ignoreTag,
+       'i:interactiveVariables' = ignoreTag,
+
+# these are not handlers, just functions that we want re-environmented and
+# assigned to the given names (i.e. hidden using a . prefix) in the environment
+# for the doc. These are utility functions.
+       
+       '.getValue' = getValue,
+       '.getVarName' = getVarName,
+       '.recalculateNodes' = recalculateNodes,
+       '.getEnvironment' = getEnvironment,
+       '.getCodeBlock' = getCodeBlock
+       )
+} else
+    NULL
+
+###################################################################################################################
+# 
+# Utility functions
+
+#
+# Not needed as we are using XML directly to process the document.
+#
+
+getHtmlTagParams =
+  # Given an HTML tag,  get its parameters/attributes as a character vector.
+  #
+  # e.g.
+  #  getHtmlTagParams(parms = 'size=+2 width="400" name="a space" end="some at end"')
+function(tag, parms = tag$GetAllParams())
+{  
+  tmp = strsplit(parms, "=")[[1]]
+
+  ids = c(tmp[1], sapply(tmp[-c(1, length(tmp))], function(x) gsub(".* ([^ ]+)$", "\\1", x)))
+  vals = c(sapply(tmp[-c(1, length(tmp))], function(x) gsub("(.*) [^ ]+$", "\\1", x)), tmp [ length(tmp) ])
+  names(vals) = ids
+  vals
+}
+

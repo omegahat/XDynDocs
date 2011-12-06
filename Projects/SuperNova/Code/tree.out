@@ -1,0 +1,769 @@
+
+R version 2.4.0 (2006-10-03)
+Copyright (C) 2006 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> invisible(options(echo = TRUE))
+> nova = read.table("scaled.csv", sep=",")
+> dim(nova)
+[1] 10000    20
+> nova$V1 = as.factor(nova$V1)
+> 
+> #Split into training and test sets
+> set.seed(19848492)
+> test.samp = c(sample(5000, size = 500), 5000 + sample(5000, size = 500))
+> nova.train = nova[-test.samp,]
+> nova.test = nova[test.samp,]
+> 
+> library(rpart)
+> fit <- rpart(V1 ~ ., nova.train, cp = 0.001)
+> pdf("cp.pdf", width = 8, height = 8)
+> plotcp(fit)
+> dev.off()
+null device 
+          1 
+> printcp(fit)
+
+Classification tree:
+rpart(formula = V1 ~ ., data = nova.train, cp = 0.001)
+
+Variables actually used in tree construction:
+ [1] V10 V14 V15 V16 V17 V18 V19 V2  V20 V3  V4  V7  V8 
+
+Root node error: 4500/9000 = 0.5
+
+n= 9000 
+
+          CP nsplit rel error  xerror      xstd
+1  0.6553333      0  1.000000 1.03244 0.0105354
+2  0.1206667      1  0.344667 0.34733 0.0079863
+3  0.0280000      2  0.224000 0.22667 0.0066829
+4  0.0211111      3  0.196000 0.20200 0.0063526
+5  0.0073333      4  0.174889 0.17778 0.0059995
+6  0.0066667      5  0.167556 0.17422 0.0059450
+7  0.0060000      6  0.160889 0.17133 0.0059002
+8  0.0046667      8  0.148889 0.15756 0.0056793
+9  0.0042222      9  0.144222 0.15733 0.0056756
+10 0.0035556     10  0.140000 0.14733 0.0055072
+11 0.0024444     14  0.123111 0.13289 0.0052506
+12 0.0020000     15  0.120667 0.13022 0.0052014
+13 0.0017778     17  0.116667 0.13022 0.0052014
+14 0.0015556     18  0.114889 0.12844 0.0051682
+15 0.0013333     19  0.113333 0.13200 0.0052342
+16 0.0012778     21  0.110667 0.13289 0.0052506
+17 0.0011111     26  0.103778 0.13000 0.0051972
+18 0.0010000     30  0.099333 0.13111 0.0052178
+> summary(fit)
+Call:
+rpart(formula = V1 ~ ., data = nova.train, cp = 0.001)
+  n= 9000 
+
+            CP nsplit  rel error    xerror        xstd
+1  0.655333333      0 1.00000000 1.0324444 0.010535376
+2  0.120666667      1 0.34466667 0.3473333 0.007986281
+3  0.028000000      2 0.22400000 0.2266667 0.006682943
+4  0.021111111      3 0.19600000 0.2020000 0.006352567
+5  0.007333333      4 0.17488889 0.1777778 0.005999543
+6  0.006666667      5 0.16755556 0.1742222 0.005945036
+7  0.006000000      6 0.16088889 0.1713333 0.005900203
+8  0.004666667      8 0.14888889 0.1575556 0.005679274
+9  0.004222222      9 0.14422222 0.1573333 0.005675610
+10 0.003555556     10 0.14000000 0.1473333 0.005507163
+11 0.002444444     14 0.12311111 0.1328889 0.005250591
+12 0.002000000     15 0.12066667 0.1302222 0.005201353
+13 0.001777778     17 0.11666667 0.1302222 0.005201353
+14 0.001555556     18 0.11488889 0.1284444 0.005168182
+15 0.001333333     19 0.11333333 0.1320000 0.005234246
+16 0.001277778     21 0.11066667 0.1328889 0.005250591
+17 0.001111111     26 0.10377778 0.1300000 0.005197221
+18 0.001000000     30 0.09933333 0.1311111 0.005217834
+
+Node number 1: 9000 observations,    complexity param=0.6553333
+  predicted class=0  expected loss=0.5
+    class counts:  4500  4500
+   probabilities: 0.500 0.500 
+  left son=2 (3463 obs) right son=3 (5537 obs)
+  Primary splits:
+      V3  < -0.656696    to the left,  improve=2040.9630, (0 missing)
+      V8  < -0.310722    to the left,  improve=1847.0140, (0 missing)
+      V15 < 0.3404025    to the right, improve=1648.9080, (0 missing)
+      V4  < -0.007802715 to the left,  improve=1230.2100, (0 missing)
+      V18 < -0.05365305  to the left,  improve= 923.2706, (0 missing)
+  Surrogate splits:
+      V15 < 0.286748     to the right, agree=0.901, adj=0.743, (0 split)
+      V8  < -0.3415325   to the left,  agree=0.901, adj=0.742, (0 split)
+      V4  < -0.0815011   to the left,  agree=0.830, adj=0.559, (0 split)
+      V10 < 0.370472     to the right, agree=0.754, adj=0.360, (0 split)
+      V9  < 0.4180835    to the right, agree=0.750, adj=0.350, (0 split)
+
+Node number 2: 3463 observations,    complexity param=0.006
+  predicted class=0  expected loss=0.07421311
+    class counts:  3206   257
+   probabilities: 0.926 0.074 
+  left son=4 (3200 obs) right son=5 (263 obs)
+  Primary splits:
+      V8  < -0.274348    to the left,  improve=84.75286, (0 missing)
+      V3  < -0.7176335   to the left,  improve=50.81959, (0 missing)
+      V15 < 0.4552845    to the right, improve=22.54270, (0 missing)
+      V4  < -0.1241435   to the left,  improve=13.04579, (0 missing)
+      V10 < 0.525903     to the right, improve=12.71350, (0 missing)
+  Surrogate splits:
+      V5 < -0.1728795   to the right, agree=0.925, adj=0.008, (0 split)
+
+Node number 3: 5537 observations,    complexity param=0.1206667
+  predicted class=1  expected loss=0.2337006
+    class counts:  1294  4243
+   probabilities: 0.234 0.766 
+  left son=6 (945 obs) right son=7 (4592 obs)
+  Primary splits:
+      V14 < -0.788382    to the right, improve=698.4386, (0 missing)
+      V19 < -0.9691425   to the right, improve=525.2173, (0 missing)
+      V17 < -0.446626    to the right, improve=485.4897, (0 missing)
+      V18 < -0.0637126   to the left,  improve=456.4856, (0 missing)
+      V6  < -0.1219215   to the right, improve=420.8644, (0 missing)
+  Surrogate splits:
+      V12 < -0.0763713   to the left,  agree=0.885, adj=0.327, (0 split)
+      V10 < -0.01853485  to the left,  agree=0.877, adj=0.278, (0 split)
+      V11 < 0.01293955   to the left,  agree=0.862, adj=0.189, (0 split)
+      V9  < 0.054258     to the left,  agree=0.859, adj=0.171, (0 split)
+      V18 < -0.0755183   to the left,  agree=0.856, adj=0.154, (0 split)
+
+Node number 4: 3200 observations,    complexity param=0.001277778
+  predicted class=0  expected loss=0.0425
+    class counts:  3064   136
+   probabilities: 0.958 0.043 
+  left son=8 (2908 obs) right son=9 (292 obs)
+  Primary splits:
+      V3  < -0.7161155   to the left,  improve=13.037090, (0 missing)
+      V8  < -0.387418    to the left,  improve= 9.377843, (0 missing)
+      V4  < -0.123319    to the left,  improve= 6.484956, (0 missing)
+      V15 < 0.5349225    to the right, improve= 5.735640, (0 missing)
+      V7  < 0.0915351    to the left,  improve= 4.154433, (0 missing)
+  Surrogate splits:
+      V11 < 0.5867765    to the left,  agree=0.923, adj=0.158, (0 split)
+      V2  < 0.652476     to the left,  agree=0.921, adj=0.137, (0 split)
+      V12 < 0.5387115    to the left,  agree=0.921, adj=0.130, (0 split)
+      V4  < 0.3610425    to the left,  agree=0.912, adj=0.038, (0 split)
+      V13 < -0.6232505   to the right, agree=0.910, adj=0.017, (0 split)
+
+Node number 5: 263 observations,    complexity param=0.006
+  predicted class=0  expected loss=0.460076
+    class counts:   142   121
+   probabilities: 0.540 0.460 
+  left son=10 (155 obs) right son=11 (108 obs)
+  Primary splits:
+      V3  < -0.7388235   to the left,  improve=30.80676, (0 missing)
+      V15 < 0.464731     to the right, improve=22.18666, (0 missing)
+      V19 < -0.9905045   to the right, improve=17.42360, (0 missing)
+      V7  < 0.07514165   to the left,  improve=13.72912, (0 missing)
+      V20 < -0.76418     to the right, improve=13.24401, (0 missing)
+  Surrogate splits:
+      V15 < 0.380094     to the right, agree=0.745, adj=0.380, (0 split)
+      V10 < 0.324821     to the right, agree=0.703, adj=0.278, (0 split)
+      V9  < 0.382024     to the right, agree=0.681, adj=0.222, (0 split)
+      V8  < -0.167668    to the right, agree=0.650, adj=0.148, (0 split)
+      V14 < -0.8964515   to the right, agree=0.646, adj=0.139, (0 split)
+
+Node number 6: 945 observations,    complexity param=0.003555556
+  predicted class=0  expected loss=0.2126984
+    class counts:   744   201
+   probabilities: 0.787 0.213 
+  left son=12 (534 obs) right son=13 (411 obs)
+  Primary splits:
+      V19 < -0.9810945   to the right, improve=42.89965, (0 missing)
+      V17 < -0.4521955   to the right, improve=29.70244, (0 missing)
+      V16 < -0.722632    to the left,  improve=29.32117, (0 missing)
+      V4  < -0.2605975   to the right, improve=26.27627, (0 missing)
+      V6  < -0.0869612   to the right, improve=24.52121, (0 missing)
+  Surrogate splits:
+      V17 < -0.4982535   to the right, agree=0.699, adj=0.309, (0 split)
+      V6  < -0.1856565   to the right, agree=0.693, adj=0.294, (0 split)
+      V4  < -0.00176701  to the right, agree=0.650, adj=0.195, (0 split)
+      V16 < -0.722632    to the left,  agree=0.602, adj=0.085, (0 split)
+      V3  < -0.5062915   to the right, agree=0.592, adj=0.061, (0 split)
+
+Node number 7: 4592 observations,    complexity param=0.028
+  predicted class=1  expected loss=0.1197735
+    class counts:   550  4042
+   probabilities: 0.120 0.880 
+  left son=14 (266 obs) right son=15 (4326 obs)
+  Primary splits:
+      V17 < -0.4365355   to the right, improve=215.0274, (0 missing)
+      V15 < 0.4472055    to the right, improve=204.6130, (0 missing)
+      V6  < -0.0990675   to the right, improve=179.0785, (0 missing)
+      V9  < 0.781154     to the right, improve=173.0414, (0 missing)
+      V10 < 0.7669995    to the right, improve=172.1148, (0 missing)
+  Surrogate splits:
+      V6  < -0.0955523   to the right, agree=0.985, adj=0.748, (0 split)
+      V7  < 0.256093     to the right, agree=0.948, adj=0.109, (0 split)
+      V18 < 0.07713365   to the right, agree=0.948, adj=0.109, (0 split)
+      V4  < 0.685606     to the right, agree=0.948, adj=0.098, (0 split)
+      V2  < 0.891751     to the right, agree=0.946, adj=0.068, (0 split)
+
+Node number 8: 2908 observations
+  predicted class=0  expected loss=0.02819807
+    class counts:  2826    82
+   probabilities: 0.972 0.028 
+
+Node number 9: 292 observations,    complexity param=0.001277778
+  predicted class=0  expected loss=0.1849315
+    class counts:   238    54
+   probabilities: 0.815 0.185 
+  left son=18 (172 obs) right son=19 (120 obs)
+  Primary splits:
+      V8  < -0.5297195   to the left,  improve=13.456850, (0 missing)
+      V15 < 0.534934     to the right, improve=11.430570, (0 missing)
+      V12 < 0.2635055    to the right, improve= 9.814410, (0 missing)
+      V11 < 0.402467     to the right, improve= 9.782499, (0 missing)
+      V2  < 0.523657     to the right, improve= 9.631458, (0 missing)
+  Surrogate splits:
+      V15 < 0.3869265    to the right, agree=0.795, adj=0.500, (0 split)
+      V14 < -0.8825395   to the left,  agree=0.692, adj=0.250, (0 split)
+      V2  < 0.4308345    to the right, agree=0.671, adj=0.200, (0 split)
+      V10 < 0.521136     to the right, agree=0.671, adj=0.200, (0 split)
+      V11 < 0.3275765    to the right, agree=0.668, adj=0.192, (0 split)
+
+Node number 10: 155 observations,    complexity param=0.001111111
+  predicted class=0  expected loss=0.2580645
+    class counts:   115    40
+   probabilities: 0.742 0.258 
+  left son=20 (117 obs) right son=21 (38 obs)
+  Primary splits:
+      V8  < -0.142449    to the right, improve=7.245077, (0 missing)
+      V19 < -0.9905045   to the right, improve=7.212733, (0 missing)
+      V15 < 0.510769     to the right, improve=6.365222, (0 missing)
+      V7  < 0.07846355   to the left,  improve=5.630259, (0 missing)
+      V6  < -0.2610005   to the left,  improve=4.905367, (0 missing)
+  Surrogate splits:
+      V4  < 0.13265      to the left,  agree=0.768, adj=0.053, (0 split)
+      V5  < -0.0400565   to the right, agree=0.768, adj=0.053, (0 split)
+      V7  < 0.00368701   to the right, agree=0.768, adj=0.053, (0 split)
+      V12 < -0.217898    to the right, agree=0.761, adj=0.026, (0 split)
+      V13 < 0.123152     to the left,  agree=0.761, adj=0.026, (0 split)
+
+Node number 11: 108 observations,    complexity param=0.001777778
+  predicted class=1  expected loss=0.25
+    class counts:    27    81
+   probabilities: 0.250 0.750 
+  left son=22 (16 obs) right son=23 (92 obs)
+  Primary splits:
+      V17 < -0.476344    to the right, improve=9.391304, (0 missing)
+      V14 < -0.7861435   to the right, improve=6.722222, (0 missing)
+      V15 < 0.1886095    to the left,  improve=6.667347, (0 missing)
+      V16 < -0.758356    to the left,  improve=5.282609, (0 missing)
+      V6  < -0.135461    to the right, improve=4.267742, (0 missing)
+  Surrogate splits:
+      V6  < -0.135461    to the right, agree=0.954, adj=0.688, (0 split)
+      V16 < -0.822718    to the left,  agree=0.889, adj=0.250, (0 split)
+      V19 < -0.92833     to the right, agree=0.880, adj=0.188, (0 split)
+      V7  < 0.19313      to the right, agree=0.870, adj=0.125, (0 split)
+      V9  < 0.193225     to the left,  agree=0.870, adj=0.125, (0 split)
+
+Node number 12: 534 observations
+  predicted class=0  expected loss=0.08052434
+    class counts:   491    43
+   probabilities: 0.919 0.081 
+
+Node number 13: 411 observations,    complexity param=0.003555556
+  predicted class=0  expected loss=0.3844282
+    class counts:   253   158
+   probabilities: 0.616 0.384 
+  left son=26 (215 obs) right son=27 (196 obs)
+  Primary splits:
+      V16 < -0.722632    to the left,  improve=29.14223, (0 missing)
+      V18 < -0.07078285  to the left,  improve=24.90045, (0 missing)
+      V17 < -0.577547    to the left,  improve=24.30208, (0 missing)
+      V6  < -0.29274     to the left,  improve=20.95241, (0 missing)
+      V7  < 0.07912875   to the left,  improve=19.74459, (0 missing)
+  Surrogate splits:
+      V4  < -0.0199237   to the right, agree=0.752, adj=0.480, (0 split)
+      V8  < 0.3165975    to the right, agree=0.628, adj=0.219, (0 split)
+      V3  < -0.414073    to the right, agree=0.613, adj=0.189, (0 split)
+      V2  < 0.218856     to the right, agree=0.603, adj=0.168, (0 split)
+      V14 < -0.5506785   to the left,  agree=0.599, adj=0.158, (0 split)
+
+Node number 14: 266 observations,    complexity param=0.006666667
+  predicted class=0  expected loss=0.2631579
+    class counts:   196    70
+   probabilities: 0.737 0.263 
+  left son=28 (230 obs) right son=29 (36 obs)
+  Primary splits:
+      V19 < -0.9974685   to the right, improve=35.56224, (0 missing)
+      V20 < -0.9761765   to the right, improve=27.33896, (0 missing)
+      V18 < -0.02319135  to the left,  improve=18.47445, (0 missing)
+      V7  < 0.141492     to the left,  improve=18.03564, (0 missing)
+      V10 < 0.4568905    to the right, improve=11.67275, (0 missing)
+  Surrogate splits:
+      V20 < -0.9761765   to the right, agree=0.951, adj=0.639, (0 split)
+      V7  < 0.3918095    to the left,  agree=0.876, adj=0.083, (0 split)
+      V6  < 0.142129     to the left,  agree=0.872, adj=0.056, (0 split)
+      V18 < 0.235125     to the left,  agree=0.872, adj=0.056, (0 split)
+
+Node number 15: 4326 observations,    complexity param=0.02111111
+  predicted class=1  expected loss=0.08183079
+    class counts:   354  3972
+   probabilities: 0.082 0.918 
+  left son=30 (113 obs) right son=31 (4213 obs)
+  Primary splits:
+      V15 < 0.532731     to the right, improve=163.1675, (0 missing)
+      V8  < -0.6960255   to the left,  improve=139.7448, (0 missing)
+      V18 < -0.06244875  to the left,  improve=127.3718, (0 missing)
+      V7  < 0.07324155   to the left,  improve=109.9158, (0 missing)
+      V9  < 0.781154     to the right, improve=103.1776, (0 missing)
+  Surrogate splits:
+      V9  < 0.821192     to the right, agree=0.984, adj=0.398, (0 split)
+      V10 < 0.844505     to the right, agree=0.984, adj=0.381, (0 split)
+      V8  < -0.7722585   to the left,  agree=0.982, adj=0.301, (0 split)
+      V4  < -0.7020115   to the left,  agree=0.978, adj=0.150, (0 split)
+      V2  < 0.9156685    to the right, agree=0.974, adj=0.009, (0 split)
+
+Node number 18: 172 observations
+  predicted class=0  expected loss=0.05813953
+    class counts:   162    10
+   probabilities: 0.942 0.058 
+
+Node number 19: 120 observations,    complexity param=0.001277778
+  predicted class=0  expected loss=0.3666667
+    class counts:    76    44
+   probabilities: 0.633 0.367 
+  left son=38 (42 obs) right son=39 (78 obs)
+  Primary splits:
+      V15 < 0.2526155    to the left,  improve=9.520879, (0 missing)
+      V19 < -0.994001    to the right, improve=9.432948, (0 missing)
+      V4  < -0.04642385  to the left,  improve=8.447138, (0 missing)
+      V7  < 0.103279     to the left,  improve=7.599829, (0 missing)
+      V18 < -0.06003535  to the left,  improve=6.366874, (0 missing)
+  Surrogate splits:
+      V12 < 0.03584195   to the left,  agree=0.850, adj=0.571, (0 split)
+      V2  < 0.2372085    to the left,  agree=0.842, adj=0.548, (0 split)
+      V11 < 0.1050325    to the left,  agree=0.825, adj=0.500, (0 split)
+      V10 < 0.343618     to the left,  agree=0.800, adj=0.429, (0 split)
+      V9  < 0.3435705    to the left,  agree=0.783, adj=0.381, (0 split)
+
+Node number 20: 117 observations
+  predicted class=0  expected loss=0.1709402
+    class counts:    97    20
+   probabilities: 0.829 0.171 
+
+Node number 21: 38 observations,    complexity param=0.001111111
+  predicted class=1  expected loss=0.4736842
+    class counts:    18    20
+   probabilities: 0.474 0.526 
+  left son=42 (12 obs) right son=43 (26 obs)
+  Primary splits:
+      V2  < 0.2091175    to the left,  improve=4.537112, (0 missing)
+      V9  < 0.452409     to the left,  improve=4.537112, (0 missing)
+      V5  < 0.03817265   to the right, improve=4.526914, (0 missing)
+      V16 < -0.6850035   to the right, improve=4.526914, (0 missing)
+      V15 < 0.388675     to the left,  improve=3.451984, (0 missing)
+  Surrogate splits:
+      V9  < 0.452409     to the left,  agree=0.895, adj=0.667, (0 split)
+      V10 < 0.357559     to the left,  agree=0.868, adj=0.583, (0 split)
+      V11 < 0.037489     to the left,  agree=0.842, adj=0.500, (0 split)
+      V7  < 0.0742063    to the left,  agree=0.789, adj=0.333, (0 split)
+      V18 < -0.0718767   to the left,  agree=0.789, adj=0.333, (0 split)
+
+Node number 22: 16 observations
+  predicted class=0  expected loss=0.25
+    class counts:    12     4
+   probabilities: 0.750 0.250 
+
+Node number 23: 92 observations
+  predicted class=1  expected loss=0.1630435
+    class counts:    15    77
+   probabilities: 0.163 0.837 
+
+Node number 26: 215 observations,    complexity param=0.001333333
+  predicted class=0  expected loss=0.2046512
+    class counts:   171    44
+   probabilities: 0.795 0.205 
+  left son=52 (185 obs) right son=53 (30 obs)
+  Primary splits:
+      V14 < -0.7634665   to the right, improve=9.138445, (0 missing)
+      V7  < 0.109105     to the left,  improve=7.551184, (0 missing)
+      V18 < -0.0649257   to the left,  improve=7.348450, (0 missing)
+      V17 < -0.5773415   to the left,  improve=7.297887, (0 missing)
+      V6  < -0.2288855   to the left,  improve=6.799131, (0 missing)
+  Surrogate splits:
+      V19 < -0.982033    to the left,  agree=0.865, adj=0.033, (0 split)
+
+Node number 27: 196 observations,    complexity param=0.003555556
+  predicted class=1  expected loss=0.4183673
+    class counts:    82   114
+   probabilities: 0.418 0.582 
+  left son=54 (29 obs) right son=55 (167 obs)
+  Primary splits:
+      V18 < -0.0905478   to the left,  improve=20.37888, (0 missing)
+      V17 < -0.5776705   to the left,  improve=15.79429, (0 missing)
+      V7  < 0.0610843    to the left,  improve=14.68205, (0 missing)
+      V6  < -0.29274     to the left,  improve=12.75292, (0 missing)
+      V8  < -0.2636495   to the left,  improve=11.76821, (0 missing)
+  Surrogate splits:
+      V7  < 0.04258035   to the left,  agree=0.964, adj=0.759, (0 split)
+      V6  < -0.3274805   to the left,  agree=0.883, adj=0.207, (0 split)
+      V17 < -0.640336    to the left,  agree=0.883, adj=0.207, (0 split)
+      V2  < 0.0551276    to the left,  agree=0.862, adj=0.069, (0 split)
+      V11 < -0.174066    to the left,  agree=0.862, adj=0.069, (0 split)
+
+Node number 28: 230 observations
+  predicted class=0  expected loss=0.1608696
+    class counts:   193    37
+   probabilities: 0.839 0.161 
+
+Node number 29: 36 observations
+  predicted class=1  expected loss=0.08333333
+    class counts:     3    33
+   probabilities: 0.083 0.917 
+
+Node number 30: 113 observations
+  predicted class=0  expected loss=0.07964602
+    class counts:   104     9
+   probabilities: 0.920 0.080 
+
+Node number 31: 4213 observations,    complexity param=0.007333333
+  predicted class=1  expected loss=0.05934014
+    class counts:   250  3963
+   probabilities: 0.059 0.941 
+  left son=62 (101 obs) right son=63 (4112 obs)
+  Primary splits:
+      V2  < 0.165538     to the left,  improve=75.50944, (0 missing)
+      V7  < 0.0547449    to the left,  improve=74.16781, (0 missing)
+      V18 < -0.0745248   to the left,  improve=73.65313, (0 missing)
+      V10 < -0.0544763   to the left,  improve=64.21336, (0 missing)
+      V9  < 0.0295838    to the left,  improve=64.18034, (0 missing)
+  Surrogate splits:
+      V9  < 0.0348997    to the left,  agree=0.981, adj=0.188, (0 split)
+      V11 < 0.00374932   to the left,  agree=0.979, adj=0.129, (0 split)
+      V10 < -0.1639845   to the left,  agree=0.977, adj=0.050, (0 split)
+      V6  < -0.4140735   to the left,  agree=0.977, adj=0.020, (0 split)
+      V12 < -0.1571735   to the left,  agree=0.977, adj=0.020, (0 split)
+
+Node number 38: 42 observations
+  predicted class=0  expected loss=0.0952381
+    class counts:    38     4
+   probabilities: 0.905 0.095 
+
+Node number 39: 78 observations,    complexity param=0.001277778
+  predicted class=1  expected loss=0.4871795
+    class counts:    38    40
+   probabilities: 0.487 0.513 
+  left son=78 (25 obs) right son=79 (53 obs)
+  Primary splits:
+      V7  < 0.1023354    to the left,  improve=13.78493, (0 missing)
+      V4  < -0.459029    to the left,  improve=13.21165, (0 missing)
+      V12 < 0.213595     to the right, improve=12.78917, (0 missing)
+      V10 < 0.5065975    to the right, improve=12.32051, (0 missing)
+      V18 < -0.05523     to the left,  improve=11.52263, (0 missing)
+  Surrogate splits:
+      V18 < -0.05523     to the left,  agree=0.936, adj=0.80, (0 split)
+      V2  < 0.4484125    to the right, agree=0.872, adj=0.60, (0 split)
+      V12 < 0.2822515    to the right, agree=0.872, adj=0.60, (0 split)
+      V10 < 0.527493     to the right, agree=0.859, adj=0.56, (0 split)
+      V11 < 0.3741615    to the right, agree=0.846, adj=0.52, (0 split)
+
+Node number 42: 12 observations
+  predicted class=0  expected loss=0.1666667
+    class counts:    10     2
+   probabilities: 0.833 0.167 
+
+Node number 43: 26 observations
+  predicted class=1  expected loss=0.3076923
+    class counts:     8    18
+   probabilities: 0.308 0.692 
+
+Node number 52: 185 observations
+  predicted class=0  expected loss=0.1459459
+    class counts:   158    27
+   probabilities: 0.854 0.146 
+
+Node number 53: 30 observations,    complexity param=0.001333333
+  predicted class=1  expected loss=0.4333333
+    class counts:    13    17
+   probabilities: 0.433 0.567 
+  left son=106 (10 obs) right son=107 (20 obs)
+  Primary splits:
+      V18 < -0.04368645  to the left,  improve=6.533333, (0 missing)
+      V7  < 0.11984      to the left,  improve=5.336508, (0 missing)
+      V2  < 0.245356     to the left,  improve=4.429762, (0 missing)
+      V9  < 0.1823195    to the left,  improve=4.429762, (0 missing)
+      V11 < 0.09556755   to the left,  improve=4.429762, (0 missing)
+  Surrogate splits:
+      V7  < 0.11984      to the left,  agree=0.967, adj=0.9, (0 split)
+      V6  < -0.246096    to the left,  agree=0.900, adj=0.7, (0 split)
+      V4  < 0.05073595   to the left,  agree=0.867, adj=0.6, (0 split)
+      V17 < -0.5893785   to the left,  agree=0.867, adj=0.6, (0 split)
+      V2  < 0.1929435    to the left,  agree=0.833, adj=0.5, (0 split)
+
+Node number 54: 29 observations
+  predicted class=0  expected loss=0.03448276
+    class counts:    28     1
+   probabilities: 0.966 0.034 
+
+Node number 55: 167 observations,    complexity param=0.003555556
+  predicted class=1  expected loss=0.3233533
+    class counts:    54   113
+   probabilities: 0.323 0.677 
+  left son=110 (25 obs) right son=111 (142 obs)
+  Primary splits:
+      V8  < -0.2636495   to the left,  improve=15.695870, (0 missing)
+      V9  < 0.3512055    to the right, improve= 7.706216, (0 missing)
+      V16 < -0.677072    to the right, improve= 7.447122, (0 missing)
+      V17 < -0.607394    to the left,  improve= 7.074023, (0 missing)
+      V20 < -0.719863    to the right, improve= 6.511700, (0 missing)
+  Surrogate splits:
+      V9  < 0.3296965    to the right, agree=0.892, adj=0.28, (0 split)
+      V15 < 0.3036405    to the right, agree=0.892, adj=0.28, (0 split)
+      V3  < -0.5885225   to the left,  agree=0.880, adj=0.20, (0 split)
+      V13 < -0.420322    to the left,  agree=0.880, adj=0.20, (0 split)
+      V2  < 0.4492435    to the right, agree=0.874, adj=0.16, (0 split)
+
+Node number 62: 101 observations,    complexity param=0.002444444
+  predicted class=0  expected loss=0.3366337
+    class counts:    67    34
+   probabilities: 0.663 0.337 
+  left son=124 (78 obs) right son=125 (23 obs)
+  Primary splits:
+      V19 < -0.991241    to the right, improve=9.649602, (0 missing)
+      V2  < 0.0859341    to the left,  improve=7.935578, (0 missing)
+      V3  < -0.1728415   to the left,  improve=7.496587, (0 missing)
+      V10 < -0.0544763   to the left,  improve=7.134885, (0 missing)
+      V20 < -0.744112    to the right, improve=6.324890, (0 missing)
+  Surrogate splits:
+      V3  < -0.06674365  to the left,  agree=0.802, adj=0.130, (0 split)
+      V10 < 0.257779     to the left,  agree=0.792, adj=0.087, (0 split)
+      V4  < -0.3998285   to the right, agree=0.782, adj=0.043, (0 split)
+      V9  < 0.186854     to the left,  agree=0.782, adj=0.043, (0 split)
+      V14 < -0.9734365   to the right, agree=0.782, adj=0.043, (0 split)
+
+Node number 63: 4112 observations,    complexity param=0.004666667
+  predicted class=1  expected loss=0.04450389
+    class counts:   183  3929
+   probabilities: 0.045 0.955 
+  left son=126 (45 obs) right son=127 (4067 obs)
+  Primary splits:
+      V7  < 0.05580125   to the left,  improve=43.17624, (0 missing)
+      V8  < -0.7514395   to the left,  improve=41.61196, (0 missing)
+      V18 < -0.07268375  to the left,  improve=40.51967, (0 missing)
+      V19 < -0.9532155   to the right, improve=32.39577, (0 missing)
+      V10 < -0.0774318   to the left,  improve=27.45022, (0 missing)
+  Surrogate splits:
+      V18 < -0.09932955  to the left,  agree=0.995, adj=0.511, (0 split)
+      V12 < -0.1543375   to the left,  agree=0.990, adj=0.067, (0 split)
+      V10 < -0.09066685  to the left,  agree=0.990, adj=0.044, (0 split)
+      V6  < -0.353966    to the left,  agree=0.989, adj=0.022, (0 split)
+      V11 < -0.1025273   to the left,  agree=0.989, adj=0.022, (0 split)
+
+Node number 78: 25 observations
+  predicted class=0  expected loss=0.08
+    class counts:    23     2
+   probabilities: 0.920 0.080 
+
+Node number 79: 53 observations,    complexity param=0.001277778
+  predicted class=1  expected loss=0.2830189
+    class counts:    15    38
+   probabilities: 0.283 0.717 
+  left son=158 (8 obs) right son=159 (45 obs)
+  Primary splits:
+      V4  < -0.459029    to the left,  improve=9.687212, (0 missing)
+      V18 < -0.02799535  to the right, improve=5.145798, (0 missing)
+      V10 < 0.5065975    to the right, improve=4.109434, (0 missing)
+      V12 < 0.195937     to the right, improve=3.191252, (0 missing)
+      V3  < -0.7068165   to the left,  improve=2.798052, (0 missing)
+  Surrogate splits:
+      V10 < 0.5065975    to the right, agree=0.887, adj=0.250, (0 split)
+      V12 < 0.2226945    to the right, agree=0.887, adj=0.250, (0 split)
+      V16 < -0.493475    to the right, agree=0.887, adj=0.250, (0 split)
+      V6  < -0.246099    to the left,  agree=0.868, adj=0.125, (0 split)
+      V17 < -0.572125    to the left,  agree=0.868, adj=0.125, (0 split)
+
+Node number 106: 10 observations
+  predicted class=0  expected loss=0.1
+    class counts:     9     1
+   probabilities: 0.900 0.100 
+
+Node number 107: 20 observations
+  predicted class=1  expected loss=0.2
+    class counts:     4    16
+   probabilities: 0.200 0.800 
+
+Node number 110: 25 observations
+  predicted class=0  expected loss=0.16
+    class counts:    21     4
+   probabilities: 0.840 0.160 
+
+Node number 111: 142 observations,    complexity param=0.001555556
+  predicted class=1  expected loss=0.2323944
+    class counts:    33   109
+   probabilities: 0.232 0.768 
+  left son=222 (21 obs) right son=223 (121 obs)
+  Primary splits:
+      V20 < -0.719863    to the right, improve=9.295581, (0 missing)
+      V17 < -0.614691    to the left,  improve=8.676787, (0 missing)
+      V9  < -0.02167695  to the left,  improve=7.213311, (0 missing)
+      V15 < 0.0254984    to the left,  improve=7.179276, (0 missing)
+      V6  < -0.29274     to the left,  improve=6.931669, (0 missing)
+  Surrogate splits:
+      V2  < 0.1184375    to the left,  agree=0.901, adj=0.333, (0 split)
+      V7  < 0.2008265    to the right, agree=0.887, adj=0.238, (0 split)
+      V18 < 0.0244758    to the right, agree=0.887, adj=0.238, (0 split)
+      V6  < -0.3104805   to the left,  agree=0.866, adj=0.095, (0 split)
+      V9  < -0.1215645   to the left,  agree=0.866, adj=0.095, (0 split)
+
+Node number 124: 78 observations
+  predicted class=0  expected loss=0.2179487
+    class counts:    61    17
+   probabilities: 0.782 0.218 
+
+Node number 125: 23 observations
+  predicted class=1  expected loss=0.2608696
+    class counts:     6    17
+   probabilities: 0.261 0.739 
+
+Node number 126: 45 observations
+  predicted class=0  expected loss=0.2666667
+    class counts:    33    12
+   probabilities: 0.733 0.267 
+
+Node number 127: 4067 observations,    complexity param=0.004222222
+  predicted class=1  expected loss=0.03688222
+    class counts:   150  3917
+   probabilities: 0.037 0.963 
+  left son=254 (31 obs) right son=255 (4036 obs)
+  Primary splits:
+      V8  < -0.7514395   to the left,  improve=37.00073, (0 missing)
+      V19 < -0.9532155   to the right, improve=23.32630, (0 missing)
+      V9  < 0.02505275   to the left,  improve=18.90425, (0 missing)
+      V7  < 0.2785575    to the right, improve=17.53514, (0 missing)
+      V4  < -0.576105    to the left,  improve=16.33746, (0 missing)
+
+Node number 158: 8 observations
+  predicted class=0  expected loss=0
+    class counts:     8     0
+   probabilities: 1.000 0.000 
+
+Node number 159: 45 observations
+  predicted class=1  expected loss=0.1555556
+    class counts:     7    38
+   probabilities: 0.156 0.844 
+
+Node number 222: 21 observations
+  predicted class=0  expected loss=0.3333333
+    class counts:    14     7
+   probabilities: 0.667 0.333 
+
+Node number 223: 121 observations
+  predicted class=1  expected loss=0.1570248
+    class counts:    19   102
+   probabilities: 0.157 0.843 
+
+Node number 254: 31 observations
+  predicted class=0  expected loss=0.1935484
+    class counts:    25     6
+   probabilities: 0.806 0.194 
+
+Node number 255: 4036 observations,    complexity param=0.002
+  predicted class=1  expected loss=0.03097126
+    class counts:   125  3911
+   probabilities: 0.031 0.969 
+  left son=510 (107 obs) right son=511 (3929 obs)
+  Primary splits:
+      V19 < -0.9532155   to the right, improve=23.10073, (0 missing)
+      V9  < 0.02505275   to the left,  improve=19.17819, (0 missing)
+      V7  < 0.2785575    to the right, improve=17.80834, (0 missing)
+      V4  < -0.576105    to the left,  improve=16.60992, (0 missing)
+      V18 < 0.0728775    to the right, improve=15.59997, (0 missing)
+  Surrogate splits:
+      V18 < 0.147194     to the right, agree=0.975, adj=0.065, (0 split)
+      V7  < 0.29509      to the right, agree=0.975, adj=0.047, (0 split)
+      V5  < 0.3172535    to the right, agree=0.974, adj=0.028, (0 split)
+      V20 < 0.08409085   to the right, agree=0.974, adj=0.028, (0 split)
+      V4  < -0.9167875   to the left,  agree=0.974, adj=0.009, (0 split)
+
+Node number 510: 107 observations,    complexity param=0.002
+  predicted class=1  expected loss=0.3551402
+    class counts:    38    69
+   probabilities: 0.355 0.645 
+  left son=1020 (36 obs) right son=1021 (71 obs)
+  Primary splits:
+      V2  < 0.274265     to the left,  improve=16.91780, (0 missing)
+      V11 < 0.15658      to the left,  improve=14.28355, (0 missing)
+      V8  < 0.142615     to the right, improve=10.83340, (0 missing)
+      V18 < 0.0174424    to the right, improve=10.83340, (0 missing)
+      V9  < 0.176895     to the left,  improve=10.78897, (0 missing)
+  Surrogate splits:
+      V11 < 0.15781      to the left,  agree=0.925, adj=0.778, (0 split)
+      V12 < 0.0688814    to the left,  agree=0.888, adj=0.667, (0 split)
+      V9  < 0.214195     to the left,  agree=0.860, adj=0.583, (0 split)
+      V10 < 0.1555845    to the left,  agree=0.832, adj=0.500, (0 split)
+      V4  < 0.138935     to the left,  agree=0.794, adj=0.389, (0 split)
+
+Node number 511: 3929 observations,    complexity param=0.001111111
+  predicted class=1  expected loss=0.02214304
+    class counts:    87  3842
+   probabilities: 0.022 0.978 
+  left son=1022 (11 obs) right son=1023 (3918 obs)
+  Primary splits:
+      V4  < -0.5994945   to the left,  improve=10.969280, (0 missing)
+      V10 < -0.0774318   to the left,  improve= 9.778567, (0 missing)
+      V9  < 0.0239559    to the left,  improve= 8.493706, (0 missing)
+      V11 < -0.01517745  to the left,  improve= 7.581585, (0 missing)
+      V7  < 0.221942     to the right, improve= 5.167541, (0 missing)
+
+Node number 1020: 36 observations
+  predicted class=0  expected loss=0.25
+    class counts:    27     9
+   probabilities: 0.750 0.250 
+
+Node number 1021: 71 observations
+  predicted class=1  expected loss=0.1549296
+    class counts:    11    60
+   probabilities: 0.155 0.845 
+
+Node number 1022: 11 observations
+  predicted class=0  expected loss=0.2727273
+    class counts:     8     3
+   probabilities: 0.727 0.273 
+
+Node number 1023: 3918 observations,    complexity param=0.001111111
+  predicted class=1  expected loss=0.02016335
+    class counts:    79  3839
+   probabilities: 0.020 0.980 
+  left son=2046 (7 obs) right son=2047 (3911 obs)
+  Primary splits:
+      V10 < -0.0774318   to the left,  improve=9.825039, (0 missing)
+      V9  < 0.0239559    to the left,  improve=8.540022, (0 missing)
+      V11 < -0.01517745  to the left,  improve=7.635235, (0 missing)
+      V7  < 0.221942     to the right, improve=5.248925, (0 missing)
+      V18 < 0.0728775    to the right, improve=5.220155, (0 missing)
+  Surrogate splits:
+      V12 < -0.1268015   to the left,  agree=0.999, adj=0.571, (0 split)
+
+Node number 2046: 7 observations
+  predicted class=0  expected loss=0.1428571
+    class counts:     6     1
+   probabilities: 0.857 0.143 
+
+Node number 2047: 3911 observations
+  predicted class=1  expected loss=0.0186653
+    class counts:    73  3838
+   probabilities: 0.019 0.981 
+
+> save(fit, file = "fit.Rdat")
+> 
+> proc.time()
+[1] 17.453  0.108 17.813  0.000  0.000
+> 

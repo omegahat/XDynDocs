@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<motivation>
+
+ The idea in this topic is to introduce the basic data types that we
+encounter in data and in computing with data.  Basically we want to
+introduce the simple or fundamental types such as strings, numbers,
+enumerated sets/factors.  Then we want to move to talk about records
+and then data frames/tables.  We want to mention longitudinal data and
+ragged observations and how this complicates the model.  We then want
+to move to representing these in the computer.  This works at two
+levels: the raw format and then the higher level data structures in
+statistical computing systems. This involves talking about precision,
+accuracy, memory usage and words.
+
+</motivation>

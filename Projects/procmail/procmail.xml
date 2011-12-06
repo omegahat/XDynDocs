@@ -1,0 +1,372 @@
+<article xmlns:r="http://www.r-project.org"
+         xmlns:omg="http://www.omegahat.org">
+<section>
+<title>Procmail</title>
+<para>
+I use <ulink url="http:www.procmail.org">procmail</ulink> to filter
+the email that arrives in my mail box to different "folders" or mail
+boxes.  One of the primary purposes of this is to discard SPAM to
+/dev/null.  But I also use it to direct mail about specific topics to
+different folders in order to make it easier to read the mail when it
+arrives in Thunderbird, mutt and other mail programs.  When each
+message arrives in my mail box, it is passed to my procmail filters
+and it is either put in a specific mailbox, discarded or passes
+through to my top-level regular mailbox.
+Each message generates 3 lines in a log file.
+This looks like
+<programlisting>
+From duncan@franz.stat.wisc.edu  Wed Jan 14 16:12:12 2004
+ Subject: No .forward
+  Folder: /var/spool/mail/duncan					    672
+</programlisting>
+So how do we read this into R.
+We can RSPerl and the fm package.
+Alternatively, we can write some code in R with regular expressions.
+</para>
+<para>
+The structure of the log seems quite straightforward.  Each record
+consists of three lines.  The first line starts with the word "From".
+The next "word" (i.e. no spaces) is the e-mail address from which the
+mail was sent. (Is this from a forwarding account).  The rest of the
+text on this line is the date and time of the message.  The next line
+contains the subject of the email as "Subject: " actual text.  The
+third line indicates which folder/mailbox the message was filtered to.
+This does not capture the actions of the procmail filter which can
+look at the body of the message and many other aspects.  However, the
+data is still interesting.
+</para>
+<para>
+Unfortunately, not all records have 3 lines!!
+How do we know this. We can read the lines and find the indices
+of the lines starting with "From".
+So we need to actually find the start of each record
+and the start of each next one. It is the lines in between
+(inclusive) that we need to process for each record.
+For example, find the break in the pattern.
+</para>
+<para>
+Let's find all the lines starting with "From"
+<r:code>
+ll = readLines("log.1")
+start = grep("^From", ll)
+</r:code>
+With this, we can extract each record
+with
+<r:code>
+ctnt = lapply(1:(length(start)-1),
+                function(i) {
+                      ll[ start[i]:(start[i+1] - 1) ]
+                 })
+</r:code>
+We can define a function which processes each record
+in the following way.
+</para>
+<para>
+How do we read these records.  Let's write a function that takes the lines for each
+record and creates the record details.  But this might not be the
+best way.  Before we do this, let's think about the data structure we
+want to end up with.  We have identified the different elements of the
+three lines within each record.  These are the sender, the date,
+subject text and the resulting folder.  So we might
+want to end up with a data frame that has 
+columns named "sender", "date", "subject" and "folder".
+We can process each set of  lines or we can 
+process the different lines within each record.
+</para>
+<para>
+<r:function>
+sender =
+function(x)
+{
+  gsub("From ([^[:space:]]+) .*", "\\1", x)
+}
+</r:function>
+<r:function>
+when = 
+ function(x) {
+      str = gsub("From [^[:space:]]+  (.*)", "\\1", x)
+      as.POSIXct(strptime(str, "%a %b %d %H:%M:%S %Y"))
+ }
+</r:function>
+<r:function>
+subject = 
+function(x, field = "Subject") {
+  ff = paste(field, ": ", sep = "")
+  pos = regexpr(ff, x)
+  ans = rep(as.character(NA), length(x))
+  i = pos > -1
+  ans[i] = substring(x[i], pos[i] + nchar(ff))  # , attr(pos, "match.length")[i])
+  ans
+}
+</r:function>
+</para>
+<para>
+So here is a function that puts it all together.
+Given a file, it reads the lines, finds those
+starting with "From" and then creates the variables
+by calling the functions we have defined above.
+<r:function>
+readProcmail =
+function(file)
+{
+  ll = readLines(file)
+  start = grep("^From ", ll)
+  invisible(
+     data.frame(sender = sender(ll[start]),
+                when = when(ll[start]),
+                subject = subject(ll[start + 1]),
+		folder = gsub("[[:space:]]+[0-9]+$", "", subject(ll[start + 2], "Folder"))))
+}
+</r:function>
+</para>
+<para>
+But it turns out that the file format is slightly different for the other files.
+The large files are not just lots more records.
+Instead, they contain a lot more details about the run-time behaviour
+of procmail. 
+procmail emits a line for each rule it tries.
+For example, the first message processed in the file "log" yields the following lines
+<programlisting><![CDATA[
+procmail: No match on "^X-Spam-Status: Yes"
+procmail: No match on "^Subject: Cron <ggobi@eeyore"
+procmail: No match on "^Subject: SkyFi"
+procmail: No match on "^From: admin@wald.ucdavis.edu"
+procmail: No match on "^Subject: Your Account is Suspended For Security Reasons"
+procmail: No match on "octave-maintainers"
+procmail: No match on "^From big@boss.com"
+procmail: No match on "^From.*ChemBioNews@cambridgesoftmail1.com"
+procmail: No match on "^From owner-r-core@stat.math.ethz.ch"
+procmail: No match on "^From.* [rR]-core@stat.math.ethz.ch"
+procmail: No match on "^To.* [rR]-core@stat.math.ethz.ch"
+procmail: No match on "^Cc:.* [rR]-core@r-project.org"
+procmail: No match on "^From.*duncan@franz.stat.wisc.edu"
+procmail: No match on "^From: [rR]-core@r-project.org"
+procmail: No match on "[rR]-core@stat.math.ethz.edu"
+procmail: No match on "[rR]-core@r-project.org"
+procmail: No match on "[rR]-core@stat.math.ethz.ch"
+procmail: No match on "s-news@lists.biostat.wustl.edu"
+procmail: No match on "s-news@wubios.wustl.edu"
+procmail: No match on "s-news@biostat.wustl.edu"
+procmail: No match on "r-graph@research.att.com"
+procmail: No match on "[Rr]-devel@stat.math.ethz.ch"
+procmail: No match on "[Rr]-devel@r-project.org"
+procmail: No match on "[Rr]-help@stat.math.ethz.ch"
+procmail: No match on "[Rr]-help@r-project.org"
+procmail: No match on "^Subject: .*\[BioC\]"
+procmail: No match on "R-SIG-Mac"
+procmail: No match on "R-sig-gui"
+procmail: No match on "RXLisp"
+procmail: No match on "[Rr]-devel@stat.math.ethz.ch"
+procmail: No match on "[Rr]-devel@r-project.org"
+procmail: No match on "^Subject: Cron <omega@franz>"
+procmail: No match on "^From duncan@jessie.research.bell-labs.com"
+procmail: No match on "^From duncan@stat.berkeley.edu"
+procmail: No match on "^To: ggobi-help-owner@"
+procmail: No match on "^(From|Cc): ggobi-core@"
+procmail: No match on "^Subject:.*\[Ggobi-core\]"
+procmail: No match on "^From: "JDC Tech Tips""
+procmail: No match on "^From: "JDC Editorial Staff""
+procmail: No match on "^To: GGobi Core Developers List <ggobi-core@"
+procmail: No match on "^Cc: GGobi Core Developers List <ggobi-core@ggobi.org>"
+procmail: No match on "^To: ggobi-core@"
+procmail: No match on "^Cc: ggobi-core@"
+procmail: No match on "^To:.*ggobi-help@lists.ggobi.org"
+procmail: No match on "^Cc:.*ggobi-help@lists.ggobi.org"
+procmail: No match on "^(To|Cc):.*omega-devel@"
+procmail: No match on "^(To|Cc):.*omega-bugs@"
+procmail: No match on "^From: raissa@"
+procmail: No match on "^From:.* rdsouza@"
+procmail: No match on "^From:.* <caneff@gmail.com>"
+procmail: No match on "^From: bellis@"
+procmail: No match on "^From:.*bellis@hsph.harvard.ed"
+procmail: No match on "grads@stat.berkeley.edu"
+procmail: No match on "^From:*@statdocs.org"
+procmail: No match on "^To:.*<staff@statdocs.org>"
+procmail: No match on "staff@statdocs.org"
+procmail: No match on "^Cc:.*staff@statdocs.org"
+procmail: No match on "^From: ConsumerDirect"
+procmail: No match on "^From: jc@brooklyngoclub.org"
+procmail: No match on "^From: .*-admin@.*omegahat.org"
+procmail: No match on "^From: .*-admin@.*ggobi.org"
+procmail: No match on "^From: support@microsoft.com"
+procmail: No match on "^From: info@thelikosletter.com"
+procmail: No match on "(dist-list1|faculty[0-9]*)@wald.ucdavis.edu"
+procmail: No match on "everybody@wald.ucdavis.edu"
+procmail: No match on "stat-lists@wald.ucdavis.edu"
+procmail: No match on "^Subject.*\[stat133\]"
+procmail: No match on "statdocs@wald.ucdavis.edu"
+procmail: No match on "s13304@stat"
+procmail: No match on "^Subject.*\[JSS\]"
+procmail: No match on "\+\+\+ X-Attachment-Type"
+procmail: No match on "This email contained a file name .*\.(pif|scr)"
+procmail: No match on "^To.*duncan@gandalf.berkeley.edu"
+procmail: No match on "^Cc.*duncan@gandalf.berkeley.edu"
+procmail: No match on "@gandalf.berkeley.edu"
+procmail: No match on "WORM_MYDOOM.M"
+procmail: No match on "^From ggobi@eeyore.ucdavis.edu"
+procmail: No match on "Here is a casino giving away"
+procmail: No match on "De Greko Inc\."
+procmail: No match on "maintainers@octave.org"
+procmail: No match on "ReSent-To: Computer Support <support@wald.ucdavis.edu"
+procmail: No match on "nosy@wald.ucdavis.edu"
+procmail: Locking "/home/duncan/.procmail/lockmbox"
+procmail: Assigning "LASTFOLDER=/var/spool/mail/duncan"
+procmail: Opening "/var/spool/mail/duncan"
+procmail: Acquiring kernel-lock
+procmail: Unlocking "/home/duncan/.procmail/lockmbox"
+From stefano.iacus@unimi.it  Wed Nov 15 07:26:42 2006
+ Subject: Re: [Rd] dyn.load (PR#9364)
+  Folder: /var/spool/mail/duncan	
+]]></programlisting>
+At the end, we see the familiar three lines.
+So how do we deal with the other lines?
+</para>
+<para>
+It turns out that these are not an issue with the code we have.
+When we search for the line starting with "From", 
+that merely skips over all the "procmail: ..." lines.
+</para>
+<para>
+So let's read the three files.
+<r:code r:time="37.212   0.644  37.870">
+system.time({logs = lapply(list.files(pattern = "log"), readProcmail)})
+</r:code>
+We combine these into a single data frame
+and also, for convenience, order the records
+by time.
+<r:code>
+procmail = do.call("rbind", logs)
+procmail = procmail[order(procmail$when), ]
+procmail$subject = as.character(procmail$subject)
+</r:code>
+</para>
+<para>
+Now we can look at the number of messages over time,
+<r:plot>
+hist(procmail$when, "days", freq = TRUE)
+hist(procmail$when, "months", freq = TRUE)
+</r:plot>
+</para>
+<para>
+Let's look at how the messages are grouped, i.e. the folders.
+<r:code>
+sort(table(procmail$folder), dec = TRUE)
+<r:plot>
+barplot(sort(table(procmail$folder), dec = TRUE))
+</r:plot>
+
+<r:plot>
+tt = table(procmail$folder)
+tt = tt[tt > 10]
+barplot(sort(tt, dec = TRUE))
+</r:plot>
+</r:code>
+</para>
+<para>
+How many messages are spam?
+/dev/null and any folder with spam in the name are likely
+spam folders!
+<r:code>
+isSpam = grep("(/dev/null|spam)", as.character(procmail$folder))
+</r:code>
+What proportion of the messages are going to the spam folders
+<r:code>
+length(isSpam)/nrow(procmail)
+</r:code>
+Is this changing over time, e.g. with better up-stream spam filters in place before
+the mail reaches my procmail filters?
+</para>
+
+
+<para>
+Let's look at the subject strings. We can do some word/text analysis 
+to see what topics were common at what periods of time.
+<r:code>
+isRe = grep("[[:space:]]*Re:", procmail$subject)
+</r:code>
+
+Let's first look at the number of words in the subject.
+We break the subject lines into words
+<r:code>
+subjectWords = strsplit(procmail$subject, "[[:space:]]+")
+</r:code>
+<r:code>
+table(sapply(subjectWords, length))
+</r:code>
+<r:plot>
+barplot(table(sapply(subjectWords, length)))
+</r:plot>
+We might look at this by folder and even by sender 
+for the collection of senders who sent the most mail.
+</para>
+<para>
+We would remove the stop words and perhaps use
+<omg:pkg>Rstem</omg:pkg> to stem the words.
+<r:code>
+stop.words = c("a", "the", "if", "and", "but", "not")
+subjectWords = lapply(subjectWords, function(x) wordStem(x[ !( x %in% stop.words) ]))
+</r:code>
+After this, we again look at the distribution of the number of words
+<r:plot>
+barplot(table(sapply(subjectWords, length)))
+</r:plot>
+</para>
+
+<para>
+Let's look at how many messages were in reply to a message.
+This is hard to tell from these logs. We would need to have the
+actual email messages as if I send an initial message
+you reply, then I reply, and finally you reply, the
+Subject for your two arriving messages will have a Re.
+<r:code>
+isRe = grep("[[:space:]]*Re:", procmail$subject)
+</r:code>
+This is 50% of the messages.
+</para>
+</section>
+<section>
+<title>Rules</title>
+<para>
+Let's return to the more detailed logs.  It would be useful to be able
+to determine which rules in the .procmailrc file were used and which
+were no longer relevant.  To do this, we would like to read the lines
+of the form "procmail: ...."  For the moment, let's just focus on the
+rule that actually matched.  We'll come back to the rules that didn't
+match as these change over time and it might be interesting to see
+which ones were involved.
+</para>
+<para>
+To find the matching rule, we look for lines of the form
+'procmail: Match on "...."'. So the effective rules are
+retrieved with
+<r:code>
+ll = readLines("log")
+i = grep("procmail: Match on \"", ll)
+rules = substring(ll[i], nchar("procmail: Match on \"") +1, nchar(ll[i])-1)
+</r:code>
+Now, which folder did this go to.
+We have already computed the folder for each message in the code above.
+So we could add the rule to the variable. But we have
+to associate it with the correct record.
+For each "Match on" line, we expect a line starting with "procmail: Opening".
+But there are messages for which no rule matched and no "Match on".
+So this means the message goes to the default mailbox.
+So we have an "Opening"  line, but no "Match on" preceeding it.
+So we could look for these lines and then go back 3 lines
+to see if there is a "Match on".
+<r:code>
+i = grep("procmail: Opening \"", ll)
+folder = substring(ll[i], nchar("procmail: Opening \"") + 1L, nchar(ll[i]) - 1L)
+rules = as.character(rep(NA, length(folder)))
+j = grep("Match on", ll[i-3])
+rules[j] = substring(ll[i-3][j], nchar("procmail: Match on \"") + 1L, nchar(ll[i-3][j]) - 1L)
+dd = data.frame(rules = rules, folder = folder)
+</r:code>
+This needs to be done when we read the individual log files so that we
+associate the rule with the correct message (before we re-order them).
+This also could cause a problem if we have an additional variable in
+each data frame because some log files have this extra information and
+some do not. So we should add it to all of them.
+</para>
+</section>
+</article>

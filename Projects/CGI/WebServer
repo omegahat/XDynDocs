@@ -1,0 +1,19 @@
+#!/bin/sh
+
+ORIG_DIR=`pwd`
+
+for g in 1 4 5 6 7 ; do
+ port=`grep "^group${g}," ${ORIG_DIR}/Ports | cut -f 2 -d ','`
+ echo "group ${g} on port ${port}" 
+
+ cd /home/s133group${g}
+ if test -d WebServer ; then
+   rm -fr WebServer
+ fi
+
+ tar zxf ~duncan/httpd-2.0.55.tar.gz 
+ cd httpd-2.0.55
+ ./configure --prefix=/home/s133group${g}/WebServer --with-port=${port}
+  make
+  make install
+done

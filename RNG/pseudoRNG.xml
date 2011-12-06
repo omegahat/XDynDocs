@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!DOCTYPE book SYSTEM "file:///usr/share/sgml/docbook/xml-dtd-4.1.2-1.0-8/docbookx.dtd">
+
+<section>
+<title> Pseudo-random number generation</title>
+
+<para/>
+The computer can generate pseudo-random numbers using numerical algorithms.
+This means that when you start the algorithm at a particular initial value, 
+then the generator produces the same deterministic sequence of numbers. 
+Although these numbers are deterministic, in many ways these generated 
+numbers look very much like random numbers.
+
+<para/>
+One such algorithm is the <emphasis>congruential generator</emphasis>.  
+For this algorithm two numbers 
+are used, <math>a</math> and <math>b</math>. Then from an intitial value, 
+<math>x <subscript>0</subscript> </math>, also called the <emphasis>seed</emphasis>,
+the next value is determined by the following equation:
+
+<equation>
+ x<subscript>1</subscript> = a x<subscript>0</subscript> mod b
+</equation>
+
+<para/>
+So, for example if 
+<equation>a = 3</equation>, 
+<equation> b = 64 </equation>
+and we start with an initial value 
+<equation> x <subscript>0</subscript> = 17</equation>
+then the congruential method produces the sequence of numbers,
+17, 51, 25, 11, 33, 35, 41, 59, 49, 19, 57, 43, 1, 3, 9, 27, 17.
+It repeats after 16 values, which does not look much like a sequence
+of random numbers.  However, with proper choice of the constants 
+<math:variable>a</math:variable> and <math:variable>b</math:variable>, 
+it takes longer for the numbers to repeat.  
+ 
+<para/>
+Several random number generators are offered in <s:code>R<s:code>. 
+One is based on the "Super-Duper" package of Marsaglia.
+The generator produces two 32-bit integer pseudo-random numbers. 
+One uses the congruential method with
+<equation>a = 69069</equation>, 
+<equation> b = 2<superscript>32</superscript></equation>, which
+produces 2<superscript>30</superscript> unique numbers before repeating. 
+The second uses the 32-bit Tauswirthe generator. These two numbers are combined
+using the exclusive-or operation on their 32 bits, and the resulting number is then
+divided by 2<superscript>31</superscript> to produce a number 
+between 0 and 1.  For most seeds, the resulting numbers have a period of
+<equation> 2<superscript>31</superscript> * 4,292,868,097</equation>.
+
+<para/>
+In R, the seed for the random number generator is stored as an integer vector
+in <s:code>.Random.seed</s:code>.  This vector also contains
+information on which random number generator to use.  
+The seed can be specified through the <s:code>set.seed</s:code> function.
+
+<exercise>
+<question>
+Is there a way to make this more interesting???
+<itemizedllist>
+<listitem>
+Use the set.seed to slect a seed and generate 100 pseudo-random uniform numbers.
+</listitem>
+<listitem>
+Reset the seed to the default, and generate 100 pseudo-random uniform numbers.
+Compare the two sets of 100 numbers.  What's the average and SD of the two
+sets of numbers?  Make a q-q plot of them.
+Save the seed.
+</listitem>
+<listitem>
+Reset the seed, to the same value that generated the first set of 100
+numbers, and generate another 100. Do the same for the second set
+of random numbers. 
+</listitem>
+</itemizedlist>
+</question>
+</exercise>
+
+<para/>
+The internal random number generator in R generates pseudo-random numbers 
+according to the uniform distribution on [0,1). 
+There are several R functions that use this internal generator 
+to generate independent random samples from other probability distributions.  
+These functions all have the prefix <s:code>r</s:code>
+and the first argument, <s:code>n</s:code>, is the size of the sample.
+For example, the normal random number generator is 
+<s:code>rnorm</s:code>, and its parameters are 
+<s:code>n</s:code>, <s:code>mean</s:code>, and <s:code>sd</s:code>.
+The default values for <s:code>mean</s:code> and <s:code>sd</s:code> are
+0 and 1, respectively.
+The table below contains a list of the other random generators and their
+associated parameters.
+
+Disribution  funtion name parameters
+beta	beta	shape1, shape2
+binomial 	binom	size, prob
+Cauchy	cauchy	location, scale
+chisquared	chisq	df
+
+
+</section>
+

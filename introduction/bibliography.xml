@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<bibliogrpahy>
+<title>Bibliography</title>
+<biblioentry xreflabel="Gentle:StatComp">
+ <abbrev>Gentle:Elements of Statistical Computing</abbrev>
+ <author>
+ <firstname>James</firstname>
+ <surname>Gentle</surname>
+ <publisher>Springer Verlag</publisher>
+ <series>Statistics and Computing</series>
+ <year>2002</year>
+</author>
+</biblioentry>
+</bibliogrpahy>

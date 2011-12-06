@@ -1,0 +1,27 @@
+
+make outline.pdf
+
+
+
+
+We are currently using bibunits to handle multiple bibliographies
+within the document, e.g. within each chapter.  We may use chapterbib
+in the future if we don't need all the flexibility.
+
+To use bibunits, you need to install bibunits.sty.
+This is generated from the bibunits.dtx and bibunits.ins
+files via the command
+
+   latex bibunits.ins
+
+
+
+
+----------------------------------------------------------------
+
+
+References for tables, figures, etc.
+  \label{fig:name}
+  \label{tab:name}
+and reference them as
+  \ref{tab:name}

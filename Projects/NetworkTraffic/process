@@ -1,0 +1,35 @@
+#!/bin/sh
+
+WHICH=${WHICH-inside}
+
+WEEKS=${WEEKS-week1 week2 week3 week4 week5}
+DAYS=${DAYS-monday tuesday wednesday thursday friday}
+
+TCPTRACE=$HOME/tcptrace-6.6.1/tcptrace
+TCPTRACE_ARGS="-lnt --tsv"
+
+echo "0" > conId
+echo "# Auto-generated from process shell script" > process.sql
+
+for w in $WEEKS ; do
+ for d in $DAYS ; do
+   echo "$w-$d-${WHICH}.tcpdump.gz"
+   if test -r $w-$d-${WHICH}.tcpdump.gz ; then
+
+    if test -z "${JUST_PROCESS}" ; then
+      conId=`cat conId`
+      echo "$TCPTRACE ${TCPTRACE_ARGS} -k$conId $w-$d-${WHICH}.tcpdump.gz > $w-$d.sql"
+      $TCPTRACE ${TCPTRACE_ARGS} -k$conId $w-$d-${WHICH}.tcpdump.gz > $w-$d.sql
+      if test -s $w-$d.sql ; then
+         TMP=`tail -n 1 $w-$d.sql | perl -ne 'm/^([0-9]+)/ ; print $1,"\n";'`
+         echo "${TMP}" > conId;
+         echo "Next starting point: ${TMP}"; cat conId
+      fi
+    fi
+    echo "load data infile \"$PWD/$w-$d.sql\"  into table TCPConnections2 IGNORE 11 LINES;" >> process.sql
+
+   else
+     echo "**** Skipping $w-$d-${WHICH}.tcpdump.gz"
+   fi
+ done
+done

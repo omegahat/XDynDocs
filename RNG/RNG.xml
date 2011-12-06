@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE book SYSTEM "file:///usr/share/sgml/docbook/xml-dtd-4.1.2-1.0-8/docbookx.dtd">
+
+<chapter id="RNG" xreflabel="Random Number Generation">
+<title> Random Number Generation</title>
+
+
+<section id="RNGIntro" xreflabel="Introduction">
+<title> Introduction</title>
+</section>
+
+<section>
+<title> Pseudo-random number generation</title>
+</section>
+
+<section>
+<title> Random number generators based on the uniform </title>
+</section>
+
+<section>
+<title> Acceptance/Rejection Sampling</title>
+</section>
+
+<section>
+<title> Simulation Studies </title>
+</section>
+
+<section>
+<title> Resampling </title>
+</section>
+
+</chapter>

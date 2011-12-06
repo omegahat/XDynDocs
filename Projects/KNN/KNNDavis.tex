@@ -1,0 +1,297 @@
+\documentclass{article}
+\input{SMacros}
+\usepackage{times}
+\usepackage{fullpage}
+\def\SFunctionRef#1{\textbf{#1}}
+\def\Rpackage#1{\textit{#1}}
+\def\SFunc#1{\textbf{#1()}}
+\def\Svar#1{\textsl{#1}}
+
+%\usepackage{html}
+
+\newcommand{\Href}[2]{\htmladdnormallinkfoot{#2}{#1}}
+\title{Cross Validation and the $k^{th}$-Nearest Neighbor 
+Classifier of SPAM}
+\date{DUE: Monday, February 28th, 2005 at Midnight}
+\begin{document}
+\maketitle
+
+In this project, we focus on the problem of classifying email messages
+as Spam or Ham.  We will consider two aspects of this problem: nearest
+neighbor based classification methods and statistical
+cross-validation.  The data we use are derived from the mail messages
+from the Spam Assassin website
+\texttt{http://spamassassin.apache.org/}.  The data frame is available
+as an R data frame, with one record for each email and one column for
+each derived variable. In fact there are two data frames, the one
+called \Svar{derivedEmails} will be used to determine the
+classification method and other called \Svar{\Svar{NewEmails}} will be
+used to test the classifier developed on the \Svar{derivedEmails}
+data.  The data frames are available on the class website in the data
+directory:
+\texttt{http://eeyore.ucdavis.edu/stat141/data/DerivedSpam.rda}.  A
+description of the variables is included at the end of this document.
+
+Our goal is to create a classifier to predict whether a new mail
+message is spam or ham.  We will use what is called a $k^{th}$-nearest 
+neighbor classifier, which finds the $k$ emails from a training
+set that are closest to the new email and classifies the email as 
+ham or spam according to whether the majority of the neighboring
+emails are ham or spam.  That is, the $k$ nearest neighbors to the 
+new email message vote for the message being ham or spam, according
+to whether they are ham or spam. The majority wins. (What should
+be done if there is a tie?)
+
+To find the $k$ nearest neighbors to an email message, we need to
+be able to compute the distance between any pair of emails.
+How do we do that? 
+This is where the variables come into play.
+For each email in the training set
+we find the distance between the value of the variables for the 
+email in the training set and the new email.
+To compute distances, we need a metric.
+One well known metric is Euclidean distance, which may
+be appropriate for continuous valued variables, but not
+for logical variables. (Why?)
+A binary metric may be more appropriate for  variables that
+take on one of two possible values.  The R function
+\SFunctionRef{dist} computes such distances for various metrics.
+
+To determine the value of $k$, we want to compare the
+performance of the $k^{th}$-nearest neighbor classifier for various values
+of $k$.  At one extreme, we have nearest neighbor classification,
+which takes $k$ to be $1$. 
+That is, the new email is classified as spam or ham depending on
+whether its nearest neighbor is spam or ham, respectively.
+At the other extreme, we could use all the data in the training
+set to classify the new email. In this case, the classification
+would be the same for any email, i.e. it would be ham if the 
+majority of the emails in the training set are ham.
+
+To choose a value for $k$, we 
+compare how well the method does when we know the truth,
+i.e. when we know whether the new email is spam or ham.
+We can compute the probability that a mistake is made.
+There are two types of mistakes: a Type I error is when
+an actual ham message is classified as spam, and a Type II
+error occurs when a spam message is misclassified as ham.
+We use cross-validation to determine the value of $k$ so that we
+can control these errors. 
+
+
+\section{Instructions}
+
+\begin{enumerate}
+\item Working with the \Svar{derivedEmails} data frame, consider the
+  non-categorical data first.  Find the appropriate metric to use for
+  these variables by themselves (i.e. without the categorical variables).
+  The \SFunc{dist} function in R
+  provides support for computing distances with six different metrics:
+   euclidean, maximum, Manhattan, Canberra, binary
+  and Minkowski.  The binary distance is not relevant here.
+  The Minkowski metric requires that one specify a value for the power
+  (p).  In order to determine which metric is good or ``best'', you
+  can use k-nearest neighbors for different values of k such as k = 1,
+  5, 10, 20.  If the same metric proves best for each of these, use
+  that.  Alternatively, you can perform full-blown cross-validation
+  and determine the best metric.
+
+
+  The first issue you face is how to compute the distance between any
+  two emails.  For continuous variables, such as the number of lines
+  in the body of the email, the percentage of capital letters in the
+  subject of the email, and the number of recipients, all but the
+  binary metrics may be appropriate.  For example, for the  three variables
+  \Svar{numLinesInBody}, \Svar{percentCapitals}, and \Svar{numRecipients}, we would compute
+  the Euclidean distance between email message $i$ and email message $j$ as follows:
+
+\begin{eqnarray*}
+ [(numLinesInBody_i &-& numLinesInBody_j)^2 \\
+   &+& (percentCapitals_i - percentCapitals_j)^2\\
+     &+& (numRecipients_i - numRecipients_j)^2 ]^{1/2} 
+\end{eqnarray*}
+
+and the Manhattan distance between them is:
+ 
+\begin{eqnarray*}
+  |numLinesInBody_i &-& numLinesInBody_j|\\
+    &+& |percentCapitals_i - percentCapitals_j|\\
+      &+& |numRecipients_i - numRecipients_j|
+\end{eqnarray*}
+
+But the percentage of capitals in the subject
+will always be between 0 and 1,
+whereas the number of lines in the body of an
+email can get quite large.
+Should you standardize the continuous variables before
+computing the distance between two records?
+One way to do this is center the variable on
+the median value and to scale it by the median
+absolute deviation, i.e.
+$$
+\frac{(numLinesInBody - median(numLinesInBody))}
+{mad(numLinesInBody)} .$$
+Alternatively, the mean and mean absolute deviation could
+be used to standardize a variable.
+The Canberra distance includes a standardization.
+ 
+
+
+
+\item Next, we will utilize the categorical data in our calculations.
+  For logical variables, even if they are converted to 0-1 values, the
+  Euclidean norm seems inappropriate to measure distance.  Instead,
+  either the asymmetric binary or the symmetric binary metrics are
+  more appropriate.  The \textit{binary} method for \SFunc{dist}
+  implements the asymmetric distance.  For a given pair of records, it
+  looks only at those variables for which at least one record has a 1,
+  and then measures the proportion of these variables that are
+  different for the records.  
+%The rule for the asymetric distance is as follows:
+%  compute the number of elements in the vectors for which at least one
+%  of the two records has a non-zero value; count the number of these
+%  elements for which the two records are different (i.e. one is a 1
+%  and the other is a 0).  When neither record has any 1s, the distance
+%  is 0.
+An example may help. Suppose we look the three variables
+\Svar{isRe}, \Svar{replyUnderline} and \Svar{multipartText}
+and we have email records $i$ and $j$ as
+\begin{verbatim}
+derivedEmail[c(i, j), 
+             c("isRe", "replyUnderline", "multipartText")]
+      isRe replyUnderline multipartText
+10    TRUE          FALSE         FALSE
+1213 FALSE          FALSE         FALSE
+\end{verbatim}
+The distance is 1 (or 1/1) since there is only one
+entry for which there is at least one 1 (i.e. TRUE).
+And in this position (the first), the values are different so we count 1.
+For two records of the form
+\begin{verbatim}
+   TRUE          TRUE         FALSE  TRUE
+   FALSE         FALSE        FALSE  TRUE
+\end{verbatim}
+the distance would be 2/3.
+
+Those interested might also explore the function \SFunc{daisy} in the
+cluster package for R to use additional metrics such as the symmetric
+binary distance.
+
+
+Whichever metric you use, you then have to combine the distance values, $D$,
+for the categorical and non-categorical variables (using the
+non-categorical metric we determined earlier).  An obvious way to
+combine them is
+\[ D_{\textrm{non-categorical}}(i) + w D_{\textrm{categorical}}\]
+Of course, we need to determine $w$, and we use cross-validation 
+obtain values for both $w$ and $k$ in the k-nearest neighbors at the same
+time.
+
+
+\item Write an R function that uses $v$-fold cross-validation on 
+the \Svar{derivedEmails} data frame to compare the predictive ability of the
+nearest neighbor method for various values of $k$. 
+It should take a distance matrix and $v$ as arguments
+and return the $2\times 2$ classification table:
+\begin{table}[htbp]
+  \begin{center}
+    \leavevmode
+    \begin{tabular}{cc|cc|}
+     & &  \multispan{2}{\hfil Predicted\hfil }\\
+     & &  Ham  & Spam \\
+      & Ham & Correct  & (Type I error) \\
+     Truth & & &\\
+      & Spam & (Type II error) & Correct \\
+    \end{tabular}
+  \end{center}
+\end{table}
+The Type I error rate is the rate at which ham messages are
+mis-categorized as spam, and the Type II error rate is the rate at
+which the spam is misclassified as ham. The logical vector that
+contains the indicator for spam and a logical that contains an
+indicator for whether the classification is correct or not can be used
+to find these two types of errors.
+
+R has several functions related to $k^{th}$ nearest neighbor in the
+\Rpackage{class} package, but they use euclidean distance only.  Also,
+some of the functions compute the $k^{th}$ nearest neighbor
+classification for one $k$ at a time, but the distance between two
+observations only needs to be computed once to figure out the $k^{th}$
+nearest neighbor for values of $k$ from 1 to the size of the training
+set.
+
+
+
+\item Consider alternative metrics (i.e. values of $w$ or even choices
+  of metric for the non-categorical variables), and use cross-validation to
+  choose both the best $k$ and metric.  Plot the Type I and Type II
+  error rates for the different values of $k$ and different metrics.
+  Select a value for $k$ and a metric that defines a classifier with a
+  ``suitable'' error rate.
+
+
+Be sure to plot these two error rates (on the same plot) 
+for various values of $k$ and various metrics.
+
+In addition, you may consider exploring the behavior of choosing 
+different values for $v$ in $v$-fold cross validation.
+
+
+\item How well does your choice of $k$ and $w$ do in classifying the
+  emails in the new set called \Svar{NewEmails}? Here you want to use the entire
+  set of emails in the \Svar{derivedEmails} data frame as the training set
+  and NewSet as an external validation set. (This is not
+  cross-validation, but actual validation with new data.) Explain your
+  findings using graphical and numerical analyses.  To do this, you
+  might want to first examine the prediction made by the
+  classification tree method in the next question, as it can give you
+  an idea about which variables may be important.
+
+\item Compare your optimal nearest neighbor procedure with the method
+  of classification trees available in the \Rpackage{rpart} library.
+  Use \Svar{derivedEmails} to settle on a tree (cross-validation is built
+  into the rpart procedure) and then evaluate the tree's predictive
+  abililty on NewSet.  Does the classification tree approach
+  outperform the nearest neighbor approach?
+
+  A classification tree is an intuitively simple classification
+  method. Beginning at the root node of the tree, the data split or
+  branch into two groups according to the value of a variable in the
+  data frame. For example, the split may be according to the value of
+  percentCapitals, where the data are divided into two groups
+  according to whether the value of percentCapitals is above 0.11 or
+  not.  Subsequent splits are made along the resulting two branches in
+  a similar fashion, that is, each split considers the value of a
+  single variable and subdivides the subset of data at that node into
+  two subgroups.  The variables must all be either factors or numeric.
+  The splits are made to make the resulting subgroups as similar as
+  possible, i.e. to reduce the prediction error as much as possible.
+
+  The \SFunctionRef{rpart} returns an object of class
+  \SFunctionRef{rpart}. This means that many functions know how to
+  handle this object. For example, if you use the \SFunctionRef{plot}
+  with an rpart object, it will plot the subdivisions of the data as a
+  tree.  Also, the \SFunctionRef{predict} function (see help on
+  \SFunctionRef{predict.rpart} allows you to classify records using an
+  rpart object.  To find out more about the \Rpackage{rpart} library,
+  read the documentation at
+  \texttt{http://cran.r-project.org/doc/packages/rpart.pdf}, or other
+  documentation that you may find in a Google search.
+
+\item Write up your findings in a 5-10 page paper, including plots and
+  tables.  The focus is on the statistics, not the code. But provide
+  an outline of your implementation of the algorithms you used.  The
+  paper must be submitted in PDF.  In addition, submit your R code in
+  a plain text file.
+
+\end{enumerate}
+
+NOTE: You are to work in groups of 2 for this project.
+Only one report and set of code needs to be turned in.
+Be sure to include in the report the name and SID number 
+of each group member.
+
+
+\include{variables}
+
+\end{document}

@@ -1,0 +1,103 @@
+<html><head></head>
+<body>
+<h2> Examples of Regular Expressions </h2>
+
+Create regular expressions for matching the following three examples.  
+<p/>
+Time -- in the format 12:30 pm or 9:15 am or 08:20 am 
+<ul>
+<p/>
+<li>  [0-9][0-9]:[0-9][0-9] (am|pm|AM|PM)
+<br/> This regular expression will match with strings such as
+"37:80 pm".  We need to restrict the allowable digits before the
+: to be 12 and under and those after the colon must be 59 and under.
+<p/>
+<li>  [00-12]:[00-60] (am|pm)
+<br/> This regular expression does not correct the above problem.
+The square brackets [ ] denote character sets, i.e. equivalent literals. So for example,
+[00-60] is the same as [001234560] which considers the single literals
+0 1 2 3 4 5 6 to be equivalent.  The extra 0s are simply redundant information.
+<p/>
+<li> (10|11|12|0?[1-9]):[0-5][0-9] (am|pm)
+<br/> The problem with matching the digits before and after the colon
+has now been corrected. This regular expression looks
+for two digits after the colon where the first must be 0 or 1 or 2 or 3 
+or 4 or 5 and the second digit may range from 0 to 9.
+Notice that to avoid times such at 19:20, we create four possible
+groups of literals to match on before the colon.  That is, the pattern 
+before the colon may be 10 or 11 or 12 or 0?[1-9]. 
+This latter expression has an optional 0 followed by any one of the equivalent
+digits 1 through 9.
+<p/>
+<li> (1[0-2]|0?[1-9]):[0-5][0-9]( a| p)m
+<br/> This regular expression is an alternative to the one above.
+They both have the problem of matching with "1:00 american"
+and with "312:23 pm". The regular expression below adds beginning
+and end of word requirements to the expression to avoid these problems.
+<p/>
+<li> \\&lt;(1[012]|0?[1-9]):[0-5][0-9] (am|pm)\\&gt;
+</ul>
+
+<p/>
+Dollars and cents where the cents are optional.
+<ul>
+<p/>
+<li> \\$[0-9]*\\.[0-9]{2}
+<br/> Here we find matches with dollar figures such as "$.99" and 
+"$0.99" and "$12.01" but unfortunately this regular expression
+also matches in $0006.20$ and does not find a match in "$16". 
+<p/>
+<li> \\$[0-9]*(\\.[0-9]{2})?
+This regular expression attempts to correct the problem with
+not matching "$16" by making the cents optional. Unfortunately
+it creates another problem, the regular expression matches with "$"
+because both the dollar and cents are now optional!
+<p/>
+<li> \\$[0-9]+(\\.[0-9][0-9])?
+<br/> Now at least one digit is required for the dollar amount and
+the cents are optional.  We still have the problem of leading zeroes
+and we also have the problem of no longer matching "$.25".
+<p/>
+<li> \\$([1-9][0-9]*|0)(\\.[0-9]{2})?
+<br/> This regular expression does not find a match where there
+are leading zeroes such as in "$0006.20", but it still doesn't match "$.25".
+<p/>
+<li> \\$[1-9][0-9]*(\\.[0-9]{2})?|\\$0?\\.[0-9][0-9] 
+<br/> This regular expression seems to do the trick, finding matches
+in "$16", "$12.23", "$0.75", and "$.25" and not in other strings
+such as "$001". To avoid a match with "$1.234" requires an end of
+word metacharacter.
+</ul>
+
+<p/>
+Double words
+<ul>
+<p/>
+<li> (\\&lt;[a-z]+\\&gt; ){2}
+<br/> This regular expression will match any two words
+such as "two words".
+<p/>
+<li> ([a-z]+) \\1
+<br/> The use of the variable \\1 requires a match with
+the first grouped literal ([a-z]). This expression
+gets closer to what we want, but
+it finds a match in "Blythe the great" and in "What is the theme?".
+To correct these, we need to indicate that each of these
+subexpressions needs to be a word.
+<p/>
+<li> .*(\\&lt;[a-z]+\\&gt;) \\1.*
+<br/> Now the first subexpression must be a word, but surprisingly
+no such restriction is placed on the second subexpression \\1.
+This means that it no longer finds a match in "Blythe the great" 
+but it does finds a match in "What is the theme?".
+In addition, the use of ".*" allows any characters before and after
+the two identical expressions, which leads to a match consisting
+of the entire expression from the "W" to the "?".
+<p/>
+<li> (\\&lt;[a-z]+\\&gt;)[[:blank:]]+\\&lt;\\1\\&gt;
+<br/> This expression requires both subexpressions to be words.
+</ul>
+
+</body>
+</html>
+

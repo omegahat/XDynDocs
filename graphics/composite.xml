@@ -1,0 +1,28 @@
+
+
+	Dot chart
+
+
+Juxtaposition
+	Panels
+		units per cm
+		marker/reference lines
+		color
+
+	Scatterplot Matrices
+
+	Two-way dot chart
+
+Superposition
+	Plot symbols
+	Lines and curves
+
+	grouped dot chart
+
+   On the same plot, draw two graphics objects: e.g. histograms, boxplots.
+   If shared axis for multiple grobs, compute the range of the union of the
+   supports. Then draw the graphics objects. Different than drawing one
+   and the superimposing the other.
+
+
+	

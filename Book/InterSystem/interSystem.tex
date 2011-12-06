@@ -1,0 +1,45 @@
+
+\section{Connecting R with different Systems}
+
+When we perform a complete analysis by fetching the data, cleaning it,
+exploring it, ``modeling'' it and presenting the results in a highly
+iterative cycle, we typically do not use just R.  Rather, we download
+data from repositories often hosted on Web sites, we use the shell to
+manipulate an archive of files and filter and transform some of the
+content into more managable form. Often we will use richer programming
+languages than the shell such as Perl or Python to do further
+manipulation and exploration.  And then we get the data into R.  It is
+very, very useful to know multiple programming languages so that you
+can chose the most appropriate language for a particular task. Trying
+to use R to do complex text manipulation, for example, can actually be
+a waste of your time relative to doing it in Perl, if only you knew
+enough Perl to get started. There are lots of issues about working
+with two languages.  It is a context switch and one often ends up
+using syntax from one language while programming in the other. And the
+art of debugging, while general to programming, is context-specific
+and one gets familiar with common errors and error messages.  Ideally,
+we would be able to mix programming languages at a high-level and
+learn just one.  In this chapter, we illustrate some approaches that
+get us someways towards that goal.
+
+We look at how we can use Perl code from within R. Specifically, we
+will look accessing Bioinformatics data using Perl's BioPerl modules
+without leaving the comfort of our familiar R session.  We also
+illustrate how we can do this the other way around, i.e.  allow Perl
+programmers to call R functions from within their Perl scripts.
+
+R has several facilities for accessing data and code over the web,
+e.g. \verb+source(url("http://www.omegahat.org/..."))+
+Sometimes our Web requests or queries are more complex and we need to
+send more inputs in the query such as criteria to identify the data of
+interest, or provide our login and password or use a secure
+connection. We'll see how we can do this with RCurl from within R
+rather than 
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

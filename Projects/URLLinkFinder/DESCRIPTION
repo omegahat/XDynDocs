@@ -1,0 +1,7 @@
+Package: URLLinkFinder
+Version: 0.1-0
+Title: Link gatherer for URLs
+Author: Duncan Temple Lang <duncan@wald.ucdavis.edu>
+Maintainer: Duncan Temple Lang <duncan@wald.ucdavis.edu>
+Description:  A package to gather and process links in URLs.
+License: BSD

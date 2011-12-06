@@ -1,0 +1,257 @@
+(pts/3)duncan[RegularExpressions-51]>/usr/duncan/R/bin/R
+
+R : Copyright 2004, The R Foundation for Statistical Computing
+Version 1.9.0 Under development (unstable) (2004-02-03), ISBN 3-900051-00-3
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for a HTML browser interface to help.
+Type 'q()' to quit R.
+
+> grep("From", "this is From bob")
+[1] 1
+> grep("From", "this is from bob")
+numeric(0)
+> grep("^From", "this is from bob")
+numeric(0)
+> grep("^From", c("this is from bob", "From bob"))
+[1] 2
+> grep("^From", c("this is from bob", "From bob", "^From"))
+[1] 2
+> x  = "220.73.165.205 - - [29/Dec/2003:06:33:01 -0600] "HEAD /src/contrib/xtable_1.1-2.tar.gz HTTP/1.0" 404 0"
+Error: syntax error
+No suitable frames for recover()
+> x  = '220.73.165.205 - - [29/Dec/2003:06:33:01 -0600] "HEAD /src/contrib/xtable_1.1-2.tar.gz HTTP/1.0" 404 0'
+> regexpr("0$", x)
+[1] 102
+attr(,"match.length")
+[1] 1
+> x  = '220.73.165.205 - - [29/Dec/2003:06:33:01 -0600] "HEAD /src/contrib/xtable_1.1-2.tar.gz HTTP/1.0" 404 100'
+> regexpr("0$", x)
+[1] 104
+attr(,"match.length")
+[1] 1
+> regexpr(" 0$", x)
+[1] -1
+attr(,"match.length")
+[1] -1
+> x  = '220.73.165.205 - - [29/Dec/2003:06:33:01 -0600] "HEAD /src/contrib/xtable_1.1-2.tar.gz HTTP/1.0" 404	0'
+> regexpr(" 0$", x)
+[1] -1
+attr(,"match.length")
+[1] -1
+> grep("0$", x)
+[1] 1
+> grep("0$", c(x, "Bobo", "ABC"))
+[1] 1
+> regexpr("0$", c(x, "Bobo", "ABC"))
+[1] 101  -1  -1
+attr(,"match.length")
+[1]  1 -1 -1
+> grep("^$")
+Error in grep("^$") : Argument "x" is missing, with no default
+
+Enter a frame number, or 0 to exit   
+1:grep("^$") 
+Selection: 0
+> z = "x^2"
+> regexpr("^", z)
+[1] 1
+attr(,"match.length")
+[1] 0
+> regexpr("\\^", z)
+[1] 2
+attr(,"match.length")
+[1] 1
+> grep("\", "abc \")
+Error: syntax error
+No suitable frames for recover()
+> grep("\\", "abc \")
+Error: syntax error
+No suitable frames for recover()
+> grep("\\", "abc \\")
+Error in grep(pattern, x, ignore.case, extended, value, fixed) : 
+	invalid regular expression
+
+Enter a frame number, or 0 to exit   
+1:grep("\\", "abc \\") 
+Selection: 0
+> grep("\\\", "abc \\")
+Error: syntax error
+No suitable frames for recover()
+> grep("\\\\", "abc \\")
+[1] 1
+> example(grep)
+
+grep> grep("[a-z]", letters)
+ [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+[26] 26
+
+grep> txt <- c("arm", "foot", "lefroo", "bafoobar")
+
+grep> if (any(i <- grep("foo", txt))) cat("'foo' appears at least once in\n\t", 
+    txt, "\n")
+'foo' appears at least once in
+	 arm foot lefroo bafoobar 
+
+grep> i
+[1] 2 4
+
+grep> txt[i]
+[1] "foot"     "bafoobar"
+
+grep> gsub("([ab])", "\\1_\\1_", "abc and ABC")
+[1] "a_a_b_b_c a_a_nd ABC"
+
+grep> txt <- c("The", "licenses", "for", "most", "software", 
+    "are", "designed", "to", "take", "away", "your", "freedom", 
+    "to", "share", "and", "change", "it.", "", "By", "contrast,", 
+    "the", "GNU", "General", "Public", "License", "is", "inten ..." ... [TRUNCATED] 
+
+grep> (i <- grep("[gu]", txt))
+[1]  7 11 16 24 29 30 35 41 49
+
+grep> stopifnot(txt[i] == grep("[gu]", txt, value = TRUE))
+
+grep> (ot <- sub("[b-e]", ".", txt))
+ [1] "Th."       "li.enses"  "for"       "most"      "softwar."  "ar."      
+ [7] ".esigned"  "to"        "tak."      "away"      "your"      "fr.edom"  
+[13] "to"        "shar."     "an."       ".hange"    "it."       ""         
+[19] ".y"        ".ontrast," "th."       "GNU"       "G.neral"   "Pu.lic"   
+[25] "Li.ense"   "is"        "int.nded"  "to"        "guarant.e" "your"     
+[31] "fr.edom"   "to"        "shar."     "an."       ".hange"    "fr.e"     
+[37] "softwar."  "--"        "to"        "mak."      "sur."      "th."      
+[43] "softwar."  "is"        "fr.e"      "for"       "all"       "its"      
+[49] "us.rs"    
+
+grep> txt[ot != gsub("[b-e]", ".", txt)]
+ [1] "licenses"  "designed"  "freedom"   "change"    "General"   "Public"   
+ [7] "License"   "intended"  "guarantee" "freedom"   "change"    "free"     
+[13] "free"     
+
+grep> txt[gsub("g", "#", txt) != gsub("g", "#", txt, ignore.case = TRUE)]
+[1] "GNU"     "General"
+
+grep> regexpr("en", txt)
+ [1] -1  4 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1  2 -1  4
+[26] -1  4 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+attr(,"match.length")
+ [1] -1  2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1  2 -1  2
+[26] -1  2 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+
+grep> str = "Now is the time      "
+
+grep> sub(" +$", "", str)
+[1] "Now is the time"
+
+grep> sub("[[:space:]]+$", "", str)
+[1] "Now is the time"
+
+grep> sub("\\s+$", "", str, perl = TRUE)
+[1] "Now is the time"
+> regexpr("(To|From|Cc):", c("Received:  ...", "From: duncan@wald", "Cc:  duncan@wald", "To: bob"))
+[1] -1  1  1  1
+attr(,"match.length")
+[1] -1  5  3  3
+> regexpr("(To|From|Cc):", c("Received:  ...", "From: duncan@wald", "Cc:  duncan@wald", "To: bob", "Date:  Cc:"))
+[1] -1  1  1  1  8
+attr(,"match.length")
+[1] -1  5  3  3  3
+> regexpr("^(To|From|Cc):", c("Received:  ...", "From: duncan@wald", "Cc:  duncan@wald", "To: bob", "Date:  Cc:"))
+[1] -1  1  1  1 -1
+attr(,"match.length")
+[1] -1  5  3  3 -1
+> regexpr("\\("), c("abc", "(1 + 2)"))
+Error: syntax error
+No suitable frames for recover()
+> regexpr("\\\("), c("abc", "(1 + 2)"))
+Error: syntax error
+No suitable frames for recover()
+> regexpr("\\(", c("abc", "(1 + 2)")
++ )
+[1] -1  1
+attr(,"match.length")
+[1] -1  1
+> regexpr("^To|From|Cc:", c("Received:  ...", "From: duncan@wald", "Cc:  duncan@wald", "To: bob", "Date:  Cc:", " This is From"))
+[1] -1  1  1  1  8 10
+attr(,"match.length")
+[1] -1  4  3  2  3  4
+> 1:2 + 3
+[1] 4 5
+> 1:(2 + 3)
+[1] 1 2 3 4 5
+> grep("^To|From|Cc:", c("Received:  ...", "From: duncan@wald", "Cc:  duncan@wald", "To: bob", "Date:  Cc:", " This is From"))
+[1] 2 3 4 5 6
+> l = c("abcd","1234", "abc 132")
+> regexpr("(0|1|2|3|4|5|6|7|8|9)", l)
+[1] -1  1  5
+attr(,"match.length")
+[1] -1  1  1
+> letters
+ [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
+[20] "t" "u" "v" "w" "x" "y" "z"
+> ?grep
+WARNING: terminal is not fully functional
+-  (press RETURN)
+grep                  package:base                  R Documentation
+
+Pattern Matching and Replacement
+
+Description:
+
+     'grep' searches for matches to 'pattern' (its first argument)
+     within the character vector 'x' (second argument).  'regexpr' does
+     too, but returns more detail in a different format.
+
+     'sub' and 'gsub' perform replacement of matches determined by
+     regular expression matching.
+
+Usage:
+
+     grep(pattern, x, ignore.case = FALSE, extended = TRUE, perl = FALSE,
+          value = FALSE, fixed = FALSE)
+     sub(pattern, replacement, x,
+         ignore.case = FALSE, extended = TRUE, perl = FALSE)
+     gsub(pattern, replacement, x,
+          ignore.case = FALSE, extended = TRUE, perl = FALSE)
+     regexpr(pattern, text,  extended = TRUE, perl = FALSE, fixed = FALSE)
+
+: 
+Arguments:
+
+ pattern: character string containing a regular expression (or
+          character string for 'fixed = TRUE') to be matched in the
+          given character vector.
+
+ x, text: a character vector where matches are sought.
+
+ignore.case: if 'FALSE', the pattern matching is _case sensitive_ and
+          if 'TRUE', case is ignored during matching.
+
+extended: if 'TRUE', extended regular expression matching is used, and
+          if 'FALSE' basic regular expressions are used.
+
+    perl: logical. Should perl-compatible regexps be used if available?
+           Has priority over 'extended'.
+
+   value: if 'FALSE', a vector containing the ('integer') indices of
+          the matches determined by 'grep' is returned, and if 'TRUE',
+          a vector containing the matching elements themselves is
+          returned.
+
+   fixed: logical.  If 'TRUE', 'pattern' is a string to be matched as
+          is.  Overrides all other arguments.
+:q
+> > regexpr("(T|o)(a|b|c|d|e|f)", 
++  c("ABC", "Td"))
+[1] -1  1
+attr(,"match.length")
+[1] -1  2
+> grep("^[ \t]", 

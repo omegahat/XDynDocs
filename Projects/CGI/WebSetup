@@ -1,0 +1,38 @@
+#!/bin/sh
+
+CGI_WITH_R_DIR=${CGI_WITH_R_DIR-/home/s133-http/htdocs/cgi-bin}
+CGI_HTML_EXAMPLES_DIR=${CGI_HTML_EXAMPLES_DIR-/home/s133-http/htdocs/htdocs/Rtest}
+
+if test -z "${CGI_WITH_R_DIR}" ; then
+  echo "Need to tell me where CGIwithR files are located"
+  exit 1
+fi
+
+for g in  1 2 3 4 5 6 7; do
+  echo "Group ${g}"
+  cd /home/s133group${g}/WebServer
+  mkdir htdocs/RImages
+  chgrp nogroup htdocs/RImages
+  chmod g+wr htdocs/RImages
+
+  chgrp s133group${g} cgi-bin
+  chmod g+wr cgi-bin
+
+  cp ${CGI_WITH_R_DIR}/R.cgi ${CGI_WITH_R_DIR}/.Rprofile cgi-bin
+  cp ${CGI_WITH_R_DIR}/bootstrap.R ${CGI_WITH_R_DIR}/simulation.R  ${CGI_WITH_R_DIR}/simulate.S cgi-bin
+  cp ${CGI_HTML_EXAMPLES_DIR}/bootstrap.html ${CGI_HTML_EXAMPLES_DIR}/bootstrapFile.html ${CGI_HTML_EXAMPLES_DIR}/simulation.html htdocs
+
+#  chown s133group${g}.s133group${g} ${CGI_WITH_R_DIR}/bootstrap.R ${CGI_WITH_R_DIR}/simulation.R  ${CGI_WITH_R_DIR}/simulate.S 
+#  chmod g+w  ${CGI_WITH_R_DIR}/bootstrap.R ${CGI_WITH_R_DIR}/simulation.R  ${CGI_WITH_R_DIR}/simulate.S 
+
+  for f in printenv test-cgi .Rprofile simulate.S simulation.R bootstrap.R ; do
+     chown s133group${g}.s133group${g} cgi-bin/${f}
+     chmod g+w cgi-bin/$f
+  done
+
+      # Do not allow them to change this.
+  chown root cgi-bin/R.cgi
+
+  chown -R s133group${g}.s133group${g} htdocs
+  chmod -R g+w htdocs
+done  

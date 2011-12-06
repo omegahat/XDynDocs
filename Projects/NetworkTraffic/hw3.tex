@@ -1,0 +1,180 @@
+\documentclass[11pt]{article}
+\usepackage{times}
+\usepackage{fullpage}
+\usepackage{hyperref}
+
+\title{Relational Databases, Exploratory Data Analysis and Graphics}
+\author{Duncan Temple Lang}
+\begin{document}
+\maketitle{}
+
+There will be two parts to this assignment.  Neither of them should be
+very hard.  The challenge is to interface to the database and, again,
+think about how to map what you want into a form the computer can work
+with.  This will involve interacting with both R and SQL and
+determining where to do which computation.  And then you will want to
+think of interesting and expressive ways to present the data.
+
+Essentially, the task is to explore the data and pose and answer
+questions you think might be interesting.  There is extra credit for
+considering different problems and answering them using the data.  And
+also, there is extra credit for thinking about different displays that
+present the data in clear, meaningful and rich ways.
+
+
+The databases are available on winnie.ucdavis.edu.  To access these
+from R, you will need either the
+\href{http://cran.r-project.org/src/contrib/RMySQL_0.5-3.tar.gz}{RMySQL}
+package or the RODBC package.  On Windows, you can use either although
+the RODBC package is preferred to simplify installation and minimize
+problems in differences between the software components (i.e. MySQL
+and RMySQL).  If you need an account on my machine, come by my office.
+That will simplify installation procedures. However, you are
+encouraged to install the RMySQL or RODBC package on your own machine.
+It is a valuable experience.
+
+
+\section{Network Traffic Data}
+This data is taken from the
+\href{http://www.ll.mit.edu/IST/ideval/data/1999/1999_data_index.html}{Lincoln
+  Labs network intrusion detection experiment}.  They ``simulated'' a
+running network for several weeks and gathered information about it
+including all the TCP (Transmission Control Protocol) data that
+identifies which machines and applications were communicating.  There
+are many different interesting aspects to look at with TCP/IP data.
+We will look at some relatively obvious aspects.  The focus here is to
+deal with somewhat large volumes of data and to do some exploratory
+analysis on the data by interacting with R and the database.
+
+\section{Background: Transmission Control Protocol}
+When an application like your mail agent or Web browser need to do
+something with the outside world, they do so using TCP/IP.  When the
+Web browser wants to download a page, say http://www.nytimes.com, it
+connects to the host www.nytimes.com and goes directly to the ``Web
+page'' department. Each department has its own door or \textit{port}.
+This is port 80 for HTTP - the HyperText Transfer Protocol - used for
+accessing Web pages.  The browser establishes a 2-way (bi-directional)
+connection with the www.nytimes.com machine on this port.
+And it uses this to send and receive information.  
+The browser sends information such as 
+\begin{verbatim}
+ GET /index.html HTTP/1.1
+\end{verbatim}
+The Web server sends the resulting page back along this connection.
+
+Each of these TCP connections is used to transfer the data that makes
+up a dialog between the two applications.  Rather than sending files,
+etc. TCP breaks the communications into smaller segments and sends
+them in separate packets.  It is possible that a) some of these
+packets may get lost on their travels from one application to the
+other, and b) that they may arrive out of order.  Both of these are
+problematic, but TCP corrects for them.
+
+More information is available about the data on the course Web site.
+And chapter 13 of Douglas Comer's book named Internetworking with
+TCP/IP, Volume I: Principles, Protocols and Architecture (Prentice
+Hall) provides more details about TCP and some of the characteristics
+that might be interesting.
+
+
+\section{Analysis}
+
+Here are some questions to consider.  Do some exploratory data
+analysis and present some thoughts about each.  You should provide
+evidence including summary statistics, fitted models or graphical
+displays.  Think about how to describe the characteristics
+effectively, especially using graphics.  Think about displaying this
+quantity of information on a single plot, or several plots.  Is there
+too much? How can we present the different aspects clearly?  Consider
+using color, different plotting characters (glyphs), line types,
+marginal plots, conditional plots (e.g. lattice) and so on.  Hexagonal
+binning is another option for dealing with large amounts of data.
+These are meant as suggestions for those interested to investigate.
+
+\begin{enumerate}
+
+\item Look at the different types of connections (ftp, http, ssh,
+  etc.)  over the different times of the day for each day.
+  Are these characterized by ``bursty'' or sporadic behavior
+  or are they reasonably stable?
+  Is there a day-of-week effect? time-of-day effect?
+  You might consider smoothing the data using something
+  like the loess() function.
+
+\item Are there any identifying characteristics of connections that 
+  either last a long time or that involve a lot of data transfer?
+
+\item Display the number of bytes sent in each connection.
+    Does this vary by connection/application type.
+
+ \item We are interested in packets that are lost and need to be
+    re-transmitted.  Does this happen more at different times of the
+    day?  When the overall ``load'' is high?
+
+ \item Are certain applications more susceptible to idle times?
+   Can we look at aggregate statistics for latency or idle times
+   between packets or do we need to look at individual packets?
+\end{enumerate}
+
+These 5 questions are merely suggestions. Please (!) pose other
+questions that you think might be interesting and discuss those in the
+same manner as outlined for the 5 above.  There is extra credit for
+making an effort in this direction and you can substitute some other
+questions for the ones above.  You might think about looking at the
+characteristics of the the connections on a machine when it has a high
+and a light load, or similarly for the network as a whole being under
+a heavy or light load.  You might look at different characteristics of
+the TCP connections for different operating systems.  Lost packets
+that needed to be retransmitted, duration of the connection, number of
+bytes sent during the connection, idle time, etc. are characteristics
+that can be explored either for the connection as a whole or for each
+host involved in the connection.
+
+Feel free to talk with me about details concerning TCP, or use the Web
+to find information.  And you can look on the Web or in journals for
+suggestions for plots, etc.  Please cite any works that you draw on.
+TCP is an interesting topic as it is the infrastructure on which the
+internet and networks in general are based.
+
+Since there are over 1.3 million connection records and each tuple has
+93 variables, dealing with this in R may be problematic.  You should
+consider how to do the analysis by combining computations done in the
+database and intermediate results transferred to R.
+
+Your report should describe the data and discuss questions that you
+explore, providing statistical support for any comments you make.
+Also, explain how you did the computations, providing a high-level
+view of the steps with details of the more complicated operations.
+Reference any supporting functions you wrote and put these in an
+appendix.  Make certain to provide numbers and captions for any tables
+and figures.
+
+
+\end{document}
+
+\section{Baseball Data}
+
+The purpose of thi
+\begin{enumerate}
+\item Check whether the data are correct.
+ Ensure that the team payrolls match 
+ the sum of the individual player salaries for
+ each year.
+
+\item Look at the relationship between 
+  total payroll and the proportion allocated
+  to the different roles
+  such as specialized batters, pitchers, catchers and
+  fielders.
+  
+\item Look at total payroll over time.
+  Is there a relationship between going
+  to the playoffs and total payroll?
+  
+
+\item What players played on a large number
+  of teams and got paid more than the median?
+
+\end{enumerate}
+
+\end{document}

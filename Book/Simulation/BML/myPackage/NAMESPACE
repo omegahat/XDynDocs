@@ -1,0 +1,4 @@
+useDynLib(myPackage)
+importFrom(graphics, plot)
+export(createGrid)
+

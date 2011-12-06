@@ -1,0 +1,80 @@
+
+\chapter{Data Ready to Analyze}
+
+A series of examples that introduce I/O,
+data manipulation within R, EDA through plotting,
+and how to use intuitive statistical methods (clustering, support vector machines,
+smoothing splines) in packages/functions.
+
+\section{Rainfall: Colorado front range}
+
+\paragraph{Data}
+These data form a list of daily precipitation data from a network of 56 stations 
+from the Front Range (Nychka).  List components for FRobs:
+
+\begin{itemize}
+\item precip: a list where the kth element is the time series of daily precipitation observations (100th of an inch) for the kth station
+\item time: a list where the kth element are times of daily precipitation observations (in years with decimal fraction) for the kth station.
+\item     loc: 56X2 Longitude and latitude matrix of the station locations
+\item  lat: vector of station latitudes
+\item lon: vector of station longitudes
+\item  info: a 56X10 matrix of different quantities related to each station
+\item Stot: Mean total summer precipitation estimated for each station
+\item  elev: Station elevation 
+\end{itemize}
+
+\section{Traffic: Flow and Occupancy on California freeways} 
+
+\paragraph{Data}
+These data have been collected by loop detectors at one particular
+location of eastbound Interstate 80 in Sacramento, California.
+There are six columns and 1740 rows in the data set.
+The rows correspond to successive five minute intervals from March 14 to 20,
+2003, 
+where the data values in a row report the flow (number of cars) and occupancy
+(the proportion of time there was a car over the loop) in each
+of three lanes on the freeway. 
+Lane 1 is the leftmost lane, lane 2 is in the center,
+and lane 3 is the rightmost.
+The original data are from the Freeway Performance Measurement System (PEMS)
+website
+\begin{verbatim}
+ http://pems.eecs.berkeley.edu/Public/
+\end{verbatim}
+
+In addition there is incident data taken at the time of 
+an accident on a section of the freeway.
+
+
+\section{Super Nova} 
+
+\paragraph{Data}
+Collection of 5000 supernova and 5000 other objects, each with
+ 19 features transformed (Romano). 
+Split into balanced training and test sets.  9000 in training set, 1000 in test set.
+
+\section{NASA satellite}
+
+\paragraph{Data} 
+The data are geographic and atmospheric
+measurements on a 24 by 24 grid covering Central America.
+They are monthly averages from January, 1995 to December 2000 obtained 
+from the NASA Langley Research Center Atmospheric Sciences Data Center
+\texttt{eosweb.larc.nasa.gov/} 
+and available on the American Statistical Association
+website.
+More details about the data, including descriptions of the variables,
+are available at \\
+\texttt{www.amstat-online.org/sections/graphics/dataexpo/2006data.php}
+
+\section{Wireless network data from Mannheim}
+
+\paragraph{Data}
+The data are collected from 6 wireless base stations within a 
+university building in Mannheim (CRAWDAD). 
+Person walks through the building and measures the 
+signal from a hand-held wireless device to each of the 
+base stations. 
+Persons orientation is included, measurements of signal strength
+are take ad they turn through 360 degrees. 
+

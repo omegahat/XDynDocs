@@ -1,0 +1,128 @@
+
+\section{Working with Files in R}
+
+There are two basic R functions that allow us to get information about
+files and directories within the file system.  These are
+\Sfunction{list.files} and \Sfunction{file.info}.  Using these, we can
+do most of the same computations that we can do in the shell with
+\executable{ls} and \executable{find}.
+The function
+\Sfunction{list.files} is used
+to find the names of the files within
+a folder or recursively through all of the sub-folders
+that match a particular pattern, or just all of the file
+names.
+This includes both files and directories/folders.
+We can use this to work with files that have a particular
+pattern to their name in the same way that we can use
+the shell ``globbing'' to identify files of interest there.
+Unlike the shell globbin, this uses a regular expression
+as the pattern matching mechanism.
+
+We will first work with the NASA data.
+All the files are in the same directory,
+say \dir{NASA/Files}.
+We can find the names of all the files in the directory
+with the R command
+<r:code>
+fileNames = list.files("NASA/Files")
+</r:code>
+
+For interactive use, this is fine.
+However, if this is code that we might want to run on Windows, the 
+use of / in the directory path could cause problems.
+Instead, we could use
+<r:code>
+fileNames = list.files(paste("NASA", "Files", sep = .Platform$file.sep))
+</r:code>
+and this will be correct for the system on which it is run.
+Regardless of which way we approach this,
+<r:var>fileNames</r:var> should be
+a character vector giving the names of the files in
+that directory.
+
+There are two aspects to consider.
+Firstly, there may be some hidden files, e.g
+those starting with a '.' which are not displayed
+in the directory listing by default.
+We can include these in are results using
+the parameter <r:arg>all.files</r:arg> and passing it the
+value <s:true/>.
+
+The other aspect is that the results only give the names of the 
+files and not their paths. So we end up with values
+such as
+"cloudhigh1.txt"  and "cloudhigh10.txt" 
+and not
+"NASA/Files/cloudhigh1.txt".
+In many cases, this is exactly what we want.
+The files may be in the current working
+directory and so directly accessible to us
+via their simple, unqualified names.
+Or we may just want to work with the names
+and not the paths for various reasons, 
+e.g. to count the number of files.
+If, however, we do want the fully qualified names of the
+files, we can have these included in the results using the parameter
+<r:arg>full.names</r:arg> and again passing the value
+<r:true/>.
+
+When we we look at the NASA data, we see that there
+are 506 files.
+We can compute their extensions using regular expressions
+<r:code>
+unique(gsub(".*\\.([^.]+)$", "\\1", fileNames) )
+</r:code>
+And with this, we see we have two "types" of files:
+txt and dat files.
+How many are there of each?
+<r:code>
+table(gsub(".*\\.([^.]+)$", "\\1", fileNames) )
+<r:output>
+dat txt 
+  2 504 
+</r:output>
+</r:code>
+So we see that the bulk of the data are in the .txt files,
+and we must be careful to treat the .dat files separately.
+
+We can find the names of these .dat files
+by specifying a pattern for the files of interest
+in a call to  <r:func>list.files</r:func>.
+<r:code>
+list.files("NASA/Files", pattern = "\\.dat$")
+<r:output>
+[1] "elevation.dat" "intlvtn.dat"  
+</r:output>
+</r:code>
+
+The values in elevation.dat are for the entire
+grid and not our 24x24 subset.
+So we will ignore those
+and we will read the values from
+intlvtn.dat, standing for "internal elevations".
+This can be done easily with
+<r:func>read.table</r:func>
+<r:code>
+elevations = read.table("NASA/Files/intlvtn.dat")
+</r:code>
+These do not have identifiers for the latitude and longitude for
+the locations/cells.
+
+Now we turn to the .txt files.
+Again, we need to list just those files.
+But having done so, we need to find
+the different variables and identify the patterns in the file names.
+This is quite easy here, and generally as the files are usually organized
+by a human and given names according to some rule.
+In this case, each file has the pattern
+variable name followed by a number between 1 and 72 and
+then the extension .txt.
+We need to verify that this is true,
+and this illustrates the way that we write code for a particular dataset
+empirically rather than from some external, formal specification of the possible contents.
+
+
+
+
+%%% Local Variables: %%% mode: latex %%% TeX-master: t %%% End:

@@ -1,0 +1,22 @@
+<article>
+<section>
+<title>Overview</title>
+
+</section>
+<section>
+<title>Starplots</title>
+<para>
+What do we need.  We'll draw a star plot at each (x, y) location with
+axes for each orientation and signal scaled from -99 being 0 and -25
+being the maximum.  We want to scale the starplots so as to be able to
+differentiate aggregate signal for that. Perhaps we want to use the
+top 2 or 3 orientation - base station signals.  Then we want to pick a
+maximum and minimum radius and use the aggregate signal scaled
+between these. We can do all these computations in R
+and then export information that Javascript can use to draw the
+starplot as the mouse moves over the points.
+
+
+</para>
+</section>
+</article>

@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+
+<article>
+
+<title>Email and Statistics</title> Email is being used increasingly
+by a large number of people, at least in the Western world.  It is
+changing the way we communicate and interact, replacing regular mail
+and even the telephone.  Along with instant messaging, it is altering
+our interactions and our work and play behavior, defining new language
+and "phrases".  It is interesting to look at email use and understand
+its patterns of usage and the social networks it defines.  Looking at
+who corresponds with who, when and how frequently tells us about
+interactions. Do people send mail backward and forward to each other
+or are some interactions unidirectional?  Are some people connected
+only by receiving mail from a shared sender?  Without looking at
+message contents, we can infer whether attachments, regular or
+one-line messages are being sent.  And how does this change over time,
+and at what timescales?
+
+
+<section>
+<title>An Overview of email delivery</title>
+
+
+The way email messages are delivered is quite interesting.  It is a
+complex task, as exhibited by the delivery of physical mail by Post
+Offices around the world, and yet this complex task is performed
+within seconds for electronic mail.  When we send mail, it is
+transported from our mail composer to a mail server.  From there, it
+is directed to the target domain.  This relay uses TCP/IP and the
+internet to jump across intermediate nodes to reach the target
+destination.  The mail server on that machine is listening on a port
+and the two servers have a short dialog while exchanging the mail.
+When that server accepts the mail, it can then send it on to another
+machine to deliver it internally. This is like the mail room in large
+institutions that then handle delivering it to local departments, etc.
+And so the relaying continues within this sub hierarchy of machines
+and user logins until it ends at the desired recipient or the message
+is rejected by some server. In that case, a message is returned to the
+original sender using the same mechanism. 
+
+<para/>
+
+ The situation is slightly complicated by the presence of aliases.
+These allow us to refer to one or more people by a single address.  We
+use these in our address books to refer to things like our families, a
+lunch group, a subgroup of colleagues or students involved in a
+project.  When the mail is sent, the alias is expanded by the sender
+to include the individual recipients before the mail server is
+contacted.  So there is no complexity here. Where aliases are more
+interesting is when they are expanded on the server.  A message can be
+received by a server addressed to bob and StatDepartment. The server
+can then send the message to everyone listed in that alias for
+StatDepartment.  So it is not always sufficient to look at the set of
+recipients on the original message to know precisely who will recive
+it. Instead, we must consider dynamically expanded aliases at
+different relay points.
+
+<section>
+<title>Mail Logs and Queues</title>
+Now that we have a very basic understanding of how mail delivery
+works, we can consider how we can access information about who sends
+mail to who, when, the size of the message, etc.
+
+Essentially, when we send the mail, we put the message into our local
+server's queue. Each entry in the queue is assigned a unique
+identifier (a qid). The message goes into the queue as being accepted.
+A message is written to the log file identifying this action.
+<literal>
+
+</literal>
+Shortly after this, the server will process the message and figure out
+what to do with it. It may deliver it to the local recipients
+directly.
+It does this and records the fact by putby inserting 
+
+</article>

@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+
+<slides>
+<title>Introduction to R</title>
+
+       <!-- look into Rcmdr -->
+<ul>
+
+<li>
+  <ul>
+   <li><windows>Start R:  double click  on the Rgui icon.</windows></li>
+   <li><unix>Type R at the Unix prompt.</unix></li>
+  </ul>
+</li>
+
+<li>
+  Quit: q()
+</li>
+
+<li>
+  Help: <s:cmd>help("<i>topic</i>")</i>
+      apropos("<i>keyword</i>")
+</li>
+</ul>
+where <i>topic</i> and <i>keyword</i> are 
+the values <i>you</i> substitute.
+</slide>
+
+
+<slide>
+<title>Simple R Commands</title>
+<ul>
+ <li> Sequence of numbers:  <s:cmd>1:10</s:cmd></li>
+ <li> Assign to a variable: <s:cmd>x = 1:10</s:cmd></li>
+ <li> Make a histogram:  <s:cmd>hist(x)</s:cmd></li>
+ <li> Histogram of Normal sample:  <s:cmd>hist(rnorm(100, pi, exp(1))</s:cmd></li>
+</ul>
+</slide>
+
+<slide>
+<title>The R session model</title>
+
+<ul>
+<li>Graphics Devices</li>
+  <ul>
+     <li>Start one when needed</li>
+     <li>Reuse the current active one</li>
+     <li>Create your own as desired</li>
+  </ul>
+  <ul>
+   <li>Variables held in memory</li>
+   <li>Option to save these to disk when you quit</li>
+   <li>Can restore when restart R</li>
+  </ul>
+</ul>
+</slide>
+
+<slide>
+<title></title>
+<ul>
+ <li>Large collection of functions in R</li>
+ <li>groups of related functions in packages</li>
+ <li>Different packages in search path</li>
+ <li>Many packages available publically: <link href="http://cran.r-project.org">CRAN</link></li>
+ <li> Can write your own, and contribute them.</li>
+</ul>
+<exercise>
+ <question>Load R and find out how to do a test?</question>
+ <answer><s:function>t.test</s:function> in the package <r:package>ctest</r:package></answer>
+</exercise>
+</slide>
+
+
+
+For those users who want to run R on a different computer (i.e. not
+the ones in the labs here), you can download an entirely free version
+from
+
+<slide>
+<title>Downloading R</title>
+
+
+
+</slide>
+
+<slide>
+<title>Installing R</title>
+</slide>
+
+<slide>
+<title>
+</title>
+</slide>
+
+</slides>
+
+
+

@@ -1,0 +1,53 @@
+<?xml version='1.0'?>
+
+<article xmlns:r="http://www.r-project.org"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+<comment>Showing/Hiding Code: It would be nice to be able to hide all of the code, but have a
+button at the top of the document that says "Show All Code" to show all the code in 
+the document.  In addition, it would be nice to have a "See Code" button after all plots, 
+functions, or data that you see so you could look only at individual chunks of code you
+choose while you're reading.</comment>
+
+<comment>Making a Table: The summary statistics matrix that is commented out would be a nice way to 
+see the data, but I'd like to be able to put it in a table with grid lines instead of just a
+matrix as it is.</comment>
+
+<comment>Digits Attribute: I want to run the file using the summary statistics matrix way just 
+once to make sure it works with the digits attribute that I've recently added.</comment>
+
+<comment>Last para of section should hyperlink at "here"...is that really a figure?  First of all, 
+the webpage itself is messed up.</comment>
+
+<comment>How do I do the materials page? Is a hyperlink to the table best?  I don't think so
+since eventually the point is not to copy other people's work.</comment>
+
+<comment>What's the difference between Sect and Section? How to layer them?  Only 5 sects. 
+Can I put sections inside sections as I did? I need a better way to organize sections mostly 
+because of the size of titles and organizational look.</comment>
+
+<comment>Add section5 on Inferential Statistics</comment>
+
+<comment>I could get a picture of a gun on there by a hyperlink.  Is there a better way?</comment>
+
+
+<comment>This was my original way of showing the summary statistics because it is more
+similar to what can be seen on Rice's website.  The was chosen to be seen below, however,
+is just as good and simpler.</comment>
+
+
+<r:code id="SummaryStats" digits="3" eval="false">
+SummaryStats =
+matrix(c(min(words[,1]),max(words[,1]),mean(words[,1]),sd(words[,1]),min(words[,2]),
+max(words[,2]),mean(words[,2]),sd(words[,2]),min(words[,3]),max(words[,3]),mean(words[,3]),sd(words[,3]),
+min(words[,4]),max(words[,4]),mean(words[,4]),sd(words[,4])),4,4,byrow=T)
+colnames(SummaryStats) = c("Min","Max","Mean","SD")
+rownames(SummaryStats) =
+c("WeaponAggressive","NonWeaponAggressive","WeaponNonAggressive",
+"NonWeaponNonAggressive")
+SummaryStats
+</r:code>
+
+
+</article>

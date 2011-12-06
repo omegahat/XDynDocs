@@ -1,0 +1,80 @@
+* introduction
+Motivating examples that are suited to exploration using the computer
+because of complexity, rapid reorganization, interactive/direct
+manipulation, integration with spatial maps, customized presentations.
+   
+   Co-/trellis plots for interesting examples where 
+   scatterplot matrices with brushing - i.e. ggobi
+   maps - GIS systems (GRASS, ArcInfo) and statistics.
+   customized plots - Napoleonic march, SARS.
+   Colors for maps - gradients, divergent, heat maps. 
+   graphs - nodes and edges
+
+
+<lookup>Use graph or graphics or plots</lookup>
+   
+ Show them interesting examples and how good graphics really
+are illuminating. And how using all of the potential of the computer
+for iterating to get good plots with glyphs, colors, plot types.
+
+Then, in the absence of determining a ``killer plot'', they 
+need to know likely candidate plot types. 
+
+Data - plot - incrementally improving a plot.
+Understanding how a plot is ``deficient''.
+  Grossly deficient - wrong type for representing information.
+  Improve the attributes of the plot.
+
+What's in a plot.
+* terminology  - 15 minutes
+
+* graphicsModels
+What are graphics devices.
+  format: postscript, PDF, screen.  
+      WYSYWIG != print 
+        aspect ratio, resizing, etc.
+        color
+  coordinate systems: pixels, data coordinates
+  plot layout in composite plots
+    par(mfrow=c( , )), layout and insets.
+  GRZ model - S model for graphics.
+    par()
+  
+Matlab, SAS graphics models.
+
+GUI created builts
+  Interactively updated
+
+  Excel,
+  GGobi.
+ 
+
+Plot types
+  * univariate
+    rug, histogram, boxplot, ...
+  
+  * bivariate
+     scatterplot, parallel coords, mosaic plots,
+
+  * composite plots 
+     scattermatrix
+     co-plots
+
+
+Rules for constructing ``standard'' graphs
+ * rules
+
+
+* custom
+Customized plots
+  details of par
+  drawing on the plotting region  manually.
+    Napoleonic march.
+  greek symbols - plotmath
+
+Post-processing graphics using XFig, Visio, PhotoShop.
+
+Rgraphics - threaded through enumeration
+            of plot types.
+
+

@@ -1,0 +1,146 @@
+
+What is a database?
+	supports shared data
+	not tied to particular application
+	avoids ambiguity, inconsistency, redundancy, wasted space, effort,
+	and time
+
+	share and integrate data from different applications
+	support multiple views of the same data
+	remove redundancy, null values, etc.
+	control concurrent access to data
+	ensure security and integrity of data
+
+Components of a database
+	Users, applications, DBMS -software, Data, host system
+	Layering - 
+		external layer (map between user/application view and 
+		   conceptual schema)
+		Conceptual layer - schema/design
+		Internal layer (map from schema to how the data are stored)
+
+What is a Relational database?
+	data conceptually represented in 2-dimensional tables
+	use columns to associate data from different tables
+	simple to build, understand, and program applications for use
+
+Relational concepts
+	Assertions
+	Convertibility - subject, predicate
+	Relatability - link between tow types of object
+	Object relativity - 
+		generalizability and specialization - secretary IS-A employee
+	 	aggregation - engine, body, wheel-set IS_PART_OF car
+		grouping - egine IS-A-TYPE-OF engine-type
+
+
+Modeling a database with Semantic objects
+
+Vocabulary
+
+	Relation, table, entity
+
+		tuple, row, occurrence
+
+		characteristic, attribute, column
+
+		domain, range of values, NULL
+
+	View 
+
+	Integrity
+
+		keys: candidate, primary, foreign
+
+		entity integrity
+
+		referential integrity
+
+Algebra
+
+	restrict
+	project
+	times
+	join
+	union
+	minus
+	intersect
+	divide
+
+Translation of a semantic model inta a relational database
+
+	entity = table
+	weak entity = table with composite key
+	one-to-one relations  = foregin key in one of the tables
+	many-to-one relations = foreign key in the many table
+	many-to-many relations = need a table with composite keys
+	ragged arrays = need to create a table for the array
+	sub-type = a table with those attributes unique to the subtype
+
+Normalization
+	avoid redundancy -- data appears once
+	few NULL values -- use sub-types
+	prevent loss of information -- rules for following changes through
+	   database - restrict, cascade, delete
+
+	normal forms -- skip?
+	   	1st - all domains/attributes are simple
+		2nd - 1st plus all non-key attributes must be fully functionaly 		dependent on the primary key
+		3rd - 2nd plus remove all transistive relations
+		BC - all determinates must be candidate keys
+
+Structure Query Language
+
+	Data retrieval
+	SELECT columns  (or '*')
+	FROM relation(s)
+	[WHERE constraint(s)];
+		SELECT * FROM Customer WHERE Refno > 1000 OR Name = 'P Abdul';
+
+	Join
+		SELECT Name, Status, Accno
+		FROM Customer, Customer_Acct
+		WHERE Customer.Refno = Customer_Acct.Refno;
+
+		SELECT C.Refno, Name, A.Accno
+		FROM Customer C, Customer_Acct CA, Account A
+		WHERE C.Refno = CA.Refno
+		   AND CA.Accno = A. Accno;
+
+	Subqueries
+		SELECT Refno
+		FROM Customer_Acct
+		WHERE Accno IN 
+			(SELECT Accno FROM Account WHERE Branchname = "Crawley');  
+
+	Processing data: COUNT, MIN, MAX, SUM, AVG
+		SELECT Branchname, SUM(Balance)
+		FROM Account
+		GROUP BY Branchname;
+
+		SELECT Refno, Name, SUM(Balance)
+		FROM Cusotmer C, CustomerAcct CA, Account A
+		WHERE CA.Accno = A.Accno
+		GROUP BY Refno, Name
+		Having Count(*) > 1;
+
+	Set operators: UNION, INSTERSECT, EXCEPT, EXISTS
+
+	Data definition
+		CREATE TABLE - declaration, keys, referential integrity
+		CREATE VIEW
+		DROP TABLE, VIEW, DOMAIN
+
+	Edit features
+		INSERT INTO
+		DELETE FROM
+		UPDATE
+
+	Security -- GRANT, REVOKE
+
+
+
+
+
+
+

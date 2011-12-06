@@ -1,0 +1,86 @@
+\documentclass[12pt]{article}
+
+\usepackage{fullpage}
+\usepackage{times}
+
+\def\TA{Yu Chuan}
+\def\SA{Sandy and Erica}
+\def\InstructorMail{\texttt{nolan@stat.berkeley.edu}}
+\def\TAMail{\texttt{yuchuan@stat.berkeley.edu}}
+
+\def\SFunctionRef#1{\textbf{#1}}
+\def\Rpackage#1{\textit{#1}}
+\usepackage{hyperref}
+
+
+\begin{document}
+
+\parindent=0pt
+
+\textbf{
+Stat 133, Fall 04 \\
+Homework 2: Handling Vectors, Arrays, Data Frames, and Lists\\
+Due:  Monday, 20 Sep}
+
+\medskip
+
+For this homework, you are given a set of small tasks related to
+manipulating lists and vectors and multi-dimensional arrays.
+For each task, provide the R code to accomplish
+the task, and give a one to two sentence explanation of your approach.
+For example, if you are subsetting a vector, describe which of the
+five methods of subsetting that you are using. 
+
+\begin{enumerate}
+
+\item Create a numeric vector of length 100 where the first twelve
+elements are all 0 and the remaining cycle through the values 1, 2, 210. 
+
+\item Create a numeric vector corresponding to the following population.
+That is, there is one element in the vector for each unit in the population
+and the value of the element corresponds to the value in the table below.
+
+\begin{tabular}{rrrrrrrrr|r}
+Value & 0 & 0.5 & 1 & 1.5& 2 & 4 & 7 & 30 & Total\\
+Count & 83 & 15 & 23 & 17 & 12 & 2 & 5 & 1 & 158\\
+\end{tabular}
+
+\item Create a $3 \times 4$ matrix where the first row contains all 1s,
+the second 2s, and the third 3s.
+
+\item  Remove the last row from a data frame $x$ with an unknown number
+of rows.
+
+\item Set to zero all elements in a numeric vector $y$ that exceed 200.
+
+\item Assign the first $n$ elements in the vector $y$ to the vector 
+$tmp$.
+
+\item Assign to the second element in list $z$ the character vector
+$letters$.
+
+\item Assign the second element in list $z$ to the variable 
+$tmp$. Be sure to preserve the mode of the second element.
+
+\item The data frame $chips$ contains variables $Transistors, MIPS,
+Microns, Clock,$ and $speed$. Replace each value in $Clock$ by 1000
+times its original value for only those cases that have a value of GHz
+for $speed$.
+
+\item  For list $w$ of length $m$ where each element is a numeric
+vector (of varying lengths), find the maximum value for each of 
+the $m$ vectors.
+
+\item Create a three-dimensional array filled with uniformly distributed
+random numbers. Find the sum of each ``page" of numbers. 
+(See the \SFunctionRef{runif} function).
+
+\item Simulate the distribution of the mean of a sample of size $n$
+from a hypergeometric distribution. To do this, generate $N$ samples
+of size $n$ from the hypergeometric distribution and compute the
+$N$ means.
+(See the \SFunctionRef{rhyper} function).
+
+\end{enumerate}
+
+\end{document}

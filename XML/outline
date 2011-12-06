@@ -1,0 +1,54 @@
+
+structured, self-describing data.
+  Compare with regular expressions
+    implicit format
+      each reader must recognize the patterns.
+      no formal definition.
+    difficult to extend without breaking the regular expressions
+
+
+  special characters non-ASCII in files mess up the reading of data.
+     XML handles internationalization.
+
+
+XML provides 
+  self-describing data structure
+  language for schema
+   allows for constraints, etc.
+  common structure that makes generic parsing tools possible.
+  dialects of XML provide data-specific details
+
+  Focus on content not presentation
+    XML versus HTML
+     e.g. bold versus date that should be displayed as bold.
+
+  Basic structure of XML
+   elements
+   attributes
+   nested/hierarchical structure
+   DTDs
+
+  Different dialects
+    XHTML - structured HTML
+    OIM - dataset exchange (SAS)
+    PMML - 
+    GXL - 
+    GML - geographic systems
+    Office documents - the entire MS suite, Gnumeric, AbiWord, etc.
+    Web Services - SOAP (Google as an example, eBay)
+    SVG - graphics
+   
+ www.oasis-open.org
+
+
+ Way to parse XML in R
+   XML package
+   read HTML documents 
+   two basic parsing models
+     DOM and SAX
+     
+ SOAP
+
+ DTDs and Schema
+ XSLT
+

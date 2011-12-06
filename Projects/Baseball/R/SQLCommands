@@ -1,0 +1,85 @@
+describe TEAMS;
+describe Batting;
+
+select CONCAT(nameFirst, " ", nameLast), playerID FROM Master;
+select nameFirst,  nameLast, playerID FROM Master;
+
+# Get a count by the number of individuals in Master from the
+# different colleges.
+# This is an aggregate function - COUNT - applied to the subgroups
+# of tuples arranged by the different values for college in the 
+# table master.
+
+select college, COUNT(*) FROM Master GROUP BY college;
+select college, COUNT(*) as Number FROM Master GROUP BY college ORDER BY Number;
+
+select college, COUNT(*) as Number FROM Master GROUP BY college ORDER BY Number DESC;
+
+Is there are geographical effect? 
+Cumulate by state or city or county and plot on a map.
+
+
+How many colleges are there in our database?
+select DISTINCT COUNT(college) FROM Master;
+
+
+How many records have no college entry. 
+
+select COUNT(college) FROM Master WHERE college IS NULL;
+select COUNT(college) FROM Master WHERE college = "";
+
+
+
+SELECT DISTINCT yearID from Teams;
+
+SELECT yearID FROM Batting UNION SELECT yearID FROM Pitching;
+
+SELECT yearID FROM Batting UNION DISTINCT SELECT yearID FROM Pitching;
+
+SELECT yearID FROM Batting UNION SELECT yearID FROM Pitching ORDER BY
+yearID;
+
+
+SELECT yearID AS year FROM Batting 
+ UNION DISTINCT 
+SELECT yearID AS year FROM Pitching
+ ORDER BY year;
+
+
+select nameLast, nameFirst From Master WHERE nameLast LIKE "%onds%"
+
+
+Extended regular expressions, use RLIKE:
+select nameLast, nameFirst From Master WHERE nameLast RLIKE "%onds%"
+
+
+
+Out of memory problems
+
+SET SQL_BIG_SELECTS=1;
+
+SELECT nameFirst, nameLast, Salaries.yearID, Salaries.salary
+   FROM Master, Teams, Salaries 
+   WHERE Salaries.yearID > 2000 AND Salaries.yearID = Teams.yearID;
+
+
+
+
+SELECT * FROM 
+
+
+
+
+rs = dbSendQuery(con, 
+                  "select Salaries.yearID AS year, Teams.name AS team,     SUM(Salaries.salary) AS Payroll
+                  FROM Master, Teams, Salaries 
+                  WHERE Salaries.yearID = Teams.yearID 
+                      AND Master.playerID = Salaries.playerID 
+                      AND Teams.teamID = Salaries.teamID GROUP BY team, year 
+                  ORDER BY Team, Year;")
+
+
+payrolls = fetch(rs, n = -1)
+dbClearResults(rs)
+by(d, d[,2], function(x) x)
+

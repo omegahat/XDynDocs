@@ -1,0 +1,205 @@
+<?xml version="1.0"?>
+
+<topics>
+<topic>
+<title>Introduction</title>
+<hours>1</hours>
+Why Stat Computing is important?
+
+How computers work?
+
+Systems for computing with data:
+   Matlab, SAS, S-Plus/R, Excel, SPSS. 
+   Compiled versus interpreted.
+     C, Java, versus S
+     Scripting versus interactive
+       Perl versus S
+
+Structure of the course
+  What we'll cover. 
+  Philosophy and big picture and practical details.
+</topic>
+
+<topic>
+<title>Introduction</title>
+
+</topic>
+
+<topic>
+<title>Data Types</title>
+<hours>2</hours>
+    Basics of representing numbers in the computer and 
+    
+
+
+    factors, integers, reals, strings, enumerations
+      Representation of numbers, etc. in the computer.
+    
+    Mapping raw data into computer data structures
+        suitable for computations we want to perform.
+
+    examples:  
+      1 1.2 ABC
+      4 1.7 CDF
+          reals or integers, constraints on values/ranges, enumerated
+          set
+          Unknown without schema.
+
+       time series, longitudinal, ragged arrays
+       spatial data
+
+
+     Memory usage: efficiency, size computations
+       
+     Multiple files, one or more per record transformed into records
+     in the computational system 
+
+     Processing with regular expressions, etc. into records.
+</topic>      
+ 
+<topic>
+<title>R</title>
+<hours>3</hours>
+    starting quitting
+    session and data 
+       garbage collection
+    help, data
+    vectors, lists: logicals, numeric, integer, character
+    named and unnamed:     associative arrays
+    Subsetting: [, integers, names, [[
+    I/O: read.table, read.csv, scan, readLines 
+    plot, hist, etc.
+</topic>
+
+<topic>
+<title>Graphics</title>
+<hours>3</hours>
+  EDA
+    data cleaning/verification
+    data exploration
+
+  Plot types
+      barchart, box-whisker plots, pie charts
+      scatterplots, 3D/surface, plots, dot-plots,
+      time series, stem-leaf plots
+
+      parallel coordinat plots, mosaic plots
+      co-plots, trellis
+
+  "Graph construction" or analysis of components/elements.
+
+  Controlling attributes
+    legends      
+    Annotations
+    axes ticks
+    overlays.
+
+
+   Dynamic linking
+   Direct manipulation
+   
+
+   Formats: PDF, JPG, 
+
+   Perception
+
+   Maps &amp; GIS
+</topic>
+
+
+<topic>
+<title>Data Processing</title>
+<hours></hours>
+
+    Mapping non-standard data into data structures.
+     connections in R: zip, URIs, binary data
+     readLines and transformations
+
+    external transformations via pre-processing
+     Perl, Python, sed, awk, gsub/grep in R.
+
+    Regular expressions
+      the language of regular expressions
+      examples
+      connection to parsing.
+     
+
+    Writing intermediate files,
+    Using pipes
+    RSPerl
+</topic>
+
+<topic>
+<title>XML</title>
+<hours></hours>
+    self-describing, structured data
+    Motivation: underlies Web services, SOAP. Office suites,
+       databases, .
+    
+    OIM, PMML, SVG, StatDataML, GGobi. Oasis for other formats.
+
+    DOM and SAX parsing.
+    The XML package in R.
+
+    XSL
+</topic>
+
+<topic>
+<title>Relational Databases.</title>
+<hours></hours>
+
+  Relational Model.
+    Tables, joins, keys, indices
+
+  SQL
+  Database connectivity: R, Java, Perl, Python
+  Where to perform computations: client or database.   
+</topic>
+
+<topic>
+<title>Spreadsheets</title>
+<hours></hours>
+
+  Editing and presenting data
+  Limited computational model.
+  Exchanging data with R.
+    via CSV files
+    DCOM
+</topic>
+
+<topic>
+<title>Simulation &amp; Re-sampling</title>
+<hours></hours>
+  Motivation: Cross-validation, bootstrapping, Monte Carlo, MCMC
+
+  Random number generation.
+   Inverse CDF, 
+   Acceptance/Rejection sampling
+   Permutations
+</topic>
+
+<topic>
+<title>Report Generation</title>
+<hours></hours>
+
+   HTML.
+   Publishing Technologies.
+      JavaScript
+      Flash
+      Graphics - 
+          Formats
+            SVG
+            PDF
+            PNG, GIF, JPG 
+          Image Maps
+
+   Cascading Style Sheets.
+   Dynamic Pages: PHP, ASP, mod_perl. 
+   Java applets.
+   Inputs: HTML forms.
+   Browser standards, etc.
+</topic>
+     
+
+</topics>
+  

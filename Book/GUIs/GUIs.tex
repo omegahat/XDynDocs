@@ -1,0 +1,117 @@
+A vital part of applied statistics is making the results and even the
+tools available to scientists in a form that they can conveniently
+use.  In this chapter, we will discuss some of the technologies that
+we can use to make statistical analyses and results available to
+people who do not know how to use the software in which the
+calculations are done.  We'll outline several approaches which have
+different advantages.  And, as usual, which one you might use depends
+on different factors such as the nature of the computations, the
+``users'' or audience, ease of deployment and installation, the time
+available for the project, and how likely the project is to grow into
+something more sophisticated.  But regardless of all these concerns,
+the need for conveying the resultsis immense and unfortunately rarely
+taught in statistics classes.  But an available, simple answer is
+often better than an excellent, inaccessible answer.
+
+In this chapter, we are interested in the idea of providing a
+graphical user interface to a user so that she can input her data,
+specify different parameters to control the calculations (e.g. the
+value for $k$ in a k nearest neighbors model), and then see the
+results as numerical and graphical output.  Of course, in R, we would
+just provide them with a function and ask them to invoke that
+function.  However, that assumes that they know how to install and
+start R and find the function and then invoke it.  If you think about
+whether you could do that with another language, e.g. ruby, then you
+might have au nderstanding of why others would be averse to using your
+function in R.  Unless she knows that the results are so important or
+spectacular, there is a large disincentive to both to go through the
+steps just to look.
+
+A more natural reaction from a scientist might be to ask you to give
+them a plot with the results.  And then after they have seen that and
+think the approach is worthwhile, they ask you to do the same thing
+for several datasets.  And, as is often the case, the choice of
+particular tuning parameters is important and different across
+datasets.  So would take you a non-trivial amount of time.  At this
+point, you might feel that it is their responsibility and so you might
+suggest that they learn R and install the relevant packages and your
+code and fiddle with things themselves.  Often this is a viable
+solution as the scientist might have a lab member do this for them.
+However, that is not always feasible and teaching them how to use R
+can, also, be time consuming for you.  So let's look at other
+approaches.
+
+We can assume that almost everyone you might be working with will have
+used a Web browser. % blind people may not
+And most will be familiar with using a search engine and specifying
+the words to look for and getting the result back in a different page.
+This is essentially the same thing that we want to do -- take inputs
+and compute results and display them to the user.  So a Web browser is
+often a good approach.  We need to be able to create controls for
+specifying inputs and then we need to have these inputs be sent to a
+Web server and processed by R to do the computations, and finally
+generate the results as an HTML page.  This involves a client-server
+style of computing in which the web browser is the client and we have
+to have a Web server and R to act as the server.
+
+The Web form and server approach is very useful as the user does not
+have to install anything on her machine.  She just points the web
+browser at a URL and fills in the form and clicks a button.
+Unfortunately, that means that you have to setup the Web server. But
+that may still save your time overall.  But a more problematic issue
+with this approach is that the HTML forms are very limited.  We are
+used to have sliders, spinboxes, data grids in spreadsheets and
+hierarchical trees to select files within folders, yet the controls we
+can have in HTML are much more limited and primitive.  We can have
+radio buttons, check boxes, text areas and basic buttons for
+submitting or clearing/resetting the form.  We have to use JavaScript
+to do more interesting things with forms, and even then we still are
+stuck with the basic controls.  If we want to build a richer GUI for
+the users, we need a richer toolkit.  How are applications like MS
+Word, Firefox, Thunderbird, OpenOffice, Gnumeric, etc. created? They
+use one or more GUI toolkits to create the displays.  And there are at
+least three such toolkits available to us in R which allow us to
+create professional quality GUIs using only R code.
+
+Of course, creating a GUI is not entirely trivial, especially from a
+design perspective. And as it becomes more complex, users will have to
+become familiar with the layout of the controls.  Some users on a
+Windows machine might ask why can't you provide the functionality in
+Excel. Of course, there are many reasons you might present such as a
+desire to get the correct answers, or produce plots that aren't
+egregiously offensive.  But there is a real issue here.  Many users
+are very comfortable with Excel and they may want to bring their data
+into a spreadsheet and transform and manipulate it before handing it
+to our function(s).  Why should they have to save it to another file
+and then load this into another GUI. Isn't there someway that the two
+GUIs can be integrated?  And of course there is, and in fact, we can
+actually build the GUI in Excel itself and still have R respond to the
+user actions to update the results.
+
+So we will see three or four different approaches:
+\begin{enumerate}
+\item HTML forms and an CGI script on a Web server,
+\item an problem-specific GUI running within an R session,
+\item GUI within Excel connected to R to handle the actions and computations using DCOM.
+\item Google Earth (or GIS) to display points or plots on a map,
+  potentially over time.
+\end{enumerate}
+Within each of these, there are lots of details
+and different techinques that we can use.
+And of course, there are many other languages we could use.
+
+
+% Need to pick a case study and work through it for each of these different
+% approaches.
+
+
+\section{Web Servers}
+mod_R
+AJAX 
+
+Web Services - R to  Java to TOMCAT to Globus
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

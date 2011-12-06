@@ -1,0 +1,38 @@
+Web Server setup
+----------------
+
+Generate random numbers between 4000 and 9999
+for the ports, one for each group and create a file
+in the format of Ports, i.e. 
+ groupi,port
+
+Create users for s133group<i>.
+Add user nobody to each of the new groups.
+
+WebServer installs the HTTP server for each group into ~s133group<i>.
+
+WebSetup installs the CGIwithR files into the cgi-bin/ area for each
+group, creates an directory for creating images and and changes
+permissions for the files.
+
+
+
+
+User-level accounts
+----------------------
+
+Create a file named WebGroup.txt containing information
+about which student is in which group. Each line in the file
+should be of the form
+          i,login,name
+where i is the group number (without the group prefix, i.e. just 3)
+and login is the same login they are to use to log into the machine.
+This is the same as their account on the central machines.
+
+
+
+HTPPPort is used to put a file .HTTPPort in each students
+account identifying the port on which their server resides.
+
+MakeGroupAccounts creates accounts for each student
+in each group.

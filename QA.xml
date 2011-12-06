@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+
+<questions>
+<question>
+Why don't we use SAS?
+<answer>
+SAS is a very powerful system, especially for dealing with very large
+datasets.  It is a very important tool in statistical practice and it
+is very useful for statisticians to familiarize themselves with it
+as it is a de facto standard in data analysis for numerous
+application areas such as clinical trials.
+<para/>
+
+Unfortunately, when one the S in SAS stood for Statistics, this is no
+longer the case. Instead, the focus of the SAS people is data
+management and the introduction of statistical methodology is less
+important. The reason that SAS is so efficient for large datasets is
+also problematic. Data cannot be stored in SAS and so is printed out
+rather than available for future computations.  And this makes SAS
+less useful for <glossary>EDA</glossary>.  Instead, one tends to write
+SAS scripts to perform particular tasks and digest the entire output
+before returning to do other computations based on those results.  SAS
+JMP helps in this area, but is more GUI/mouse based.  But most
+importantly, we want a language that allows us to experiment with new
+methodology, new data sources and which allows us to create data
+structures that best represent our concepts of records, etc.
+Essentially, we need a flexible environment in which to explore ideas.
+
+<para/>
+
+As with most things, we don't want to be one thing or the other.  We
+want to combine the power of different software platforms and use each
+for the tasks at which it excels.  We can transfer data between SAS
+and R using the foreign package or using XML and the XML package.
+
+
+</answer>
+</question>
+
+<question>
+Why don't we use Excel?
+<answer>
+Spreadsheets are ubiquitous and intuitive.  Almost everybody has dealt
+with a spreadsheet in some way and understands the basic concept: rows
+and columns of data.  They provide a convenient way to edit, format
+and display data.  They combine both textual and graphical displays of
+data and allow dynamic updating of both tables and graphics when cells
+change. This facilitates users in both creating presentations and
+performing EDA.  And they have very powerful advanced facilities such
+as pivot tables, etc.
+
+<para/> But spreadsheets do not deal well with non-rectangular data.
+They also don't easily support procedural programs such as
+bootstrapping, cross-validation, etc.  And worst of all, spreasheets,
+and Excel specifically, are notorious for bad implementations of
+standard numerical functionality: inversion of  matrices is one example.
+
+
+</answer>
+</question>
+
+<question>
+Why don't we use Java? or C? or C++?
+<answer>
+The simple reason is that high-level languages such as S, Matlab, and
+systems like Excel are interpreted and don't require users to first
+create all of their code, then compile and then run. Also, we don't
+have to <i>declare</i> information about the types of variables when
+writing our program.  These two things allow us to incrementally and
+quickly perform individual computations and then decide what to do
+next without preparing an overall plan or wait between writing and
+running code.  This is good for exploring data or the behavior of
+algorithms.  It is less good when developing software.
+For that, we typically want to have the compiler perform many
+more checks and correct our assumptions.
+</answer>
+</question>
+
+
+<question>
+What do databases offer that simple files don't?
+<answer>
+</answer>
+</question>
+
+</questions>

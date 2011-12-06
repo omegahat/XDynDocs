@@ -1,0 +1,58 @@
+We might think about starting out this way.
+
+Let's suppose that you are working with some other people and
+collecting data by asking questions to people around town,
+i.e. polling.  As you collect the information, you enter the results
+into a spreadsheet for simplicity.  Then, when you are finished an
+interview or just periodically, you email your results to your
+colleagues.  Somebody, say Mary, is in charge of collecting the
+worksheets from everyone and merging them into one and then sending
+the unified sheet out to everyone.  This is a lot of work.  If
+everyone is well-behaved and organized, this is simply just a lot of
+tedious work for that person merging the sheets.  To make her job
+slightly easier, she may require that you send only new data so that
+she doesn't have to filter out repeats from previous submissions.  But
+if somebody sends an old sheet, then problems may arise and a lot more
+work may be needed to be done to recover from the error.  Ideally, the
+data would be validated before being merged into the ``master''
+sheet. And of course, before attempting the merge, a copy of the
+original master sheet would be stored so that any errors could be
+reversed and we could start over again from the last known correct
+state.
+
+Mary must also check that the mail came from people she knows and
+not from somebody who happened to know she was gather this data
+and who decided to send her some ``fake'' data.
+So she must validate the submission.
+
+Spreadsheets are quite simple to use, but it is also very easy to
+enter a number as a string or vice-verse. Or perhaps somebody misses a
+question and puts the answer from question 7 into column 6. So, Mary
+now needs to check the types of the values in each column.  And not
+necessarily just the type, but also whether the value is realistic or
+at least sensible.  For example, if we get a value for age that is
+less than $18$ when polling voters, we might be concerned.
+
+
+
+Generally, we have issues of synchronization when merging across the
+different data sources, validation of the data ``providers'', and
+verification of the data types and values.
+If one person cannot send or receive the updated spreadsheet, there is
+an issue. 
+
+Electronic voting
+
+Manufacturing process with data being send to a centralized database
+from many different devices.
+
+Randomized clinical trial at many different hospitals.
+Must coordinate the UUIDs for a patient
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

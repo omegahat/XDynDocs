@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+
+<chapter>
+<title>Text Pattern Matching and Regular Expressions</title>
+<section>
+<title>Motivation</title> 
+We 
+Fixed column file formats are convenient to work with because we can
+jump directly to a variable on a given line.  But of course the format
+is rather strict and inflexible.  We need to know how long the longest
+entry is for each variable before we start writing the data.  So it
+puts constraints on how we generate the data but somewhat simplifies
+the reading of the data.  Using delimiter-separated values (e.g. csv)
+is also fine but we have to determine the delimiter so that it doesn't
+conflict with values in any of the values, e.g. a comma in a string
+value.
+
+
+There are three possible things we may want to do with matching patterns
+in text:
+<itemizedlist>
+<listitem>
+ check if the text contains a match for the pattern,
+  e.g. text has a date of the format day/month/year
+</listitem>
+<listitem>
+ replace the matching text with another value, e.g. 999 to NA
+</listitem>
+<listitem>
+ extract the matching elements in 
+</listitem>
+</itemizedlist>
+
+Suppose we want to look through a large number of complicated records
+and read only the ones which have a particular substring.  For
+example, in a list of all gene sequences consisting of A, C, G, T, we
+want to find those that have the subsequence GAATTC which is a
+restriction site for the EcoR1 enzyme.  Or we might have look through
+all articles in the NY Times for a month to find information those
+that contain the phrase "data mining".  And computer-generated data
+such as email, web and network trace logs are easily processed by
+looking for patterns to ignore certain records and extract relevant
+pieces from others.head
+
+Note that we cannot use regular expressions or patterns to search
+images and graphics.  That would be a fabulous break through for
+searching the Web and other data warehouses.
+
+
+</section>
+
+<section>
+<title>The Regular Expression Language</title> While we are
+programming in R, Matlab Perl, or whatever, we may want to identify a
+string in some text.  To do this using the power of regular
+expressions, we need to be able to specify the pattern for which we
+are looking.  So we need a language to describe patterns.  That is
+what the regular expression language gives us.  It is remarkably
+straightforward to do standard things, and by combining simple
+expressions one can identify much more complicated strings.  So let's
+look at the basic elements that make up the language.
+
+Firstly, there are literal characters and metacharacters.  Literals
+are matched verbatim. So if we look for a "b", then we will match a
+"b" in the target text.  We can combine characters to get different
+expressions that match multipl characters.  For example, the regular
+expression "Duncan" will match any substring "Duncan" in a bigger
+string. So literals are rather obvious and uninteresting.  But of
+course, when we are looking for text, we will almost always use some
+collection of literals in our search pattern.  What makes the literals
+more interesting is how we can combine them to look for more general
+patterns. For example, suppose we want to look for the appearance of
+the name of the 6 month June in some text.  This may be written as
+June, june or JUNE, i.e. with different cases for some of the letters.
+Suppose we are only interested in finding JUNE or June.
+Then we can specify the pattern to find either of these
+using the | operator.
+So the following regular expression
+<literallayout>
+ June|JUNE
+</literallayout>
+will match two elements in the 
+following document:
+<literallayout>
+ Month  Sales
+ MAY      10
+ JUNE     20
+ JULY     17
+
+ Figures for June use a different accounting scheme.
+</literallayout>
+First, we will match the JUNE in "JUNE 20"
+and secondly, the "Figures for June".
+
+How would also match "june"?
+Well, one approach is 
+<literallayout>
+ June|JUNE|june
+</literallayout>
+That looks good and it will work in the same way.
+We can be slightly more terse
+if we recognize that June and june are only different
+in the first character. So we could use the | operator
+again to match June or june using
+<literallayout>
+ (j|J)une
+</literallayout>
+And we can put all this together to match June, june or JUNE
+using the regular expression
+<literallayout>
+ (j|J)une|JUNE
+</literallayout>
+
+
+
+</section>
+
+<section>
+<title>HTML</title> We might think that we can use regular expressions
+to parse HTML content.  For example, suppose we wanted to remove all
+the HTML markup and extract just the regular text. We may want to do
+this to look at the words in an HTML mail message.  One approach is to
+match all values between &lt; and &gt;.
+A simple regular expression like
+<regex>
+<![CDATA[
+gsub("(<.*>|</.*>", "", txt)
+]]>
+</regex>
+might seem reasonable.
+If we apply this to a line something like
+<s:code>
+<![CDATA[
+ Search using <a href="http://www.google.com">Google</a>.
+]]>
+</s:code>
+we won't get exactly what we expected.
+Instead we get
+<s:output>
+ "Search using ."
+</s:output>
+The text within the link element is missing.
+We need to understand why?
+</section>
+
+</chapter>

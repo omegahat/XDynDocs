@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<article>
+<title>Course Outline - Stat 141</title>
+
+<note>
+Please note that the order in which the topics below will be covered
+is likely to change. They are presented here as separate
+concepts that evolve from one to 
+the next where possible. In the lectures, the topics will be covered in an order that will
+facilitate completing the project in a timely manner.
+</note>
+
+<section>
+<title>Course Topics</title>
+
+<section>
+<title>Computers and Statistical Computing Environments</title> We
+will start the course with a very high-level understanding of
+computers and how they work.  We will consider the basic aspects of
+how data are represented in the computer and the resulting limitations
+and implications for arithmetic, etc. We will compare different
+programming environments ranging from low-level assembly code to
+Fortran and C/C++ to Java to Perl and Python to higher-level languages
+such as S (as in R and S-Plus) and Matlab and then to spreadsheets and point-and-click
+interfaces.
+
+<section>
+ <title>Computer basics</title>
+</section>
+<section>
+ <title>Representation of Numbers</title>
+</section>
+<section>
+ <title>Programming Environments and Tools</title>
+</section>
+</section>
+
+<section>
+<title>Overview of R</section> A description of the philosophy of the
+S language and system.  This will cover the concept of a session,
+getting help, vectorized computations, functional language, search
+path, defining functions, R packages, graphics device management,
+graphics model (briefly with more information in the Visualization),
+using R with the desktop (e.g. writing R code using editors and
+importing it, ...), and advanced facilities R offers.
+</section>
+
+
+<section>
+<title>Data in Statistical Computing</title>
+<section>
+<title>Data Types</title>
+Next, we will focus on data, specifically how we access it from within
+our statistical software.  We will start by looking at the basic data
+types and structures used in statistical computing such as records,
+variables data frames, factors, boolean values, time series, etc.  and
+how these correspond to computational entities.  Then we will look at
+how to read basic data given as text in rectangular and non-rectangular
+tables.
+</section>
+
+<section>
+<title>Basics of Import/Exporting R data</title>
+</section>
+
+<section>
+<title>Regular Expressions and Patterns</title>
+  We will move on to more complex data formats that require pre-processing.
+Here we will look at the language of regular expressions as a way to
+extract substrings from text with appropriate patterns.  Using regular
+expressions on raw data is a common step in transforming the data for
+work within the statistical software.  We will briefly discuss Perl
+and Python as tools for developing filters, but students will not be
+expected to master either of these languages. Instead, we will use
+regular expressions in S (or Matlab).  We will look at connections in
+S as how to process data streams.
+</section>
+
+<section>
+<title>XML and Structured Data</title>
+
+From regular expressions, we move to more structured data that
+provide meta-information about the contents and nature of the
+data values (e.g. integers, factors, minima and maxima).  We will
+first look at XML, the eXtensible Markup Language, and study its form
+and how it can and is being used in different domains to exchange
+data.  <para/> We will learn about the different ways that we can
+process XML documents to extract data they contain, covering both the
+DOM (Document Object Model) and SAX (Simple API for XML) in general,
+and how we can read such documents in S.  We will also look at how XML
+is used in Web Services, and specifically SOAP - the Simple Object
+Access Protocol.  And finally, we will look at transforming XML
+documents using XSL, the eXtensible Stylesheet Language.
+</section>
+
+<section>
+<title>Relational Database Management Systems</title>
+After this, we will study relational database management
+systems which provide not only structured meta-information but also
+distributed, centralized access to data management via a client-server
+approach.  We will understand the basic model for representing and
+organizing data in databases and then look at SQL, the Structured
+Query Language, for accessing data within a database.
+</section>
+
+</section>
+
+<section>
+<title>Visualization</title>
+Having covered different types of data and how to access these, we will
+provide a reasonably brief overview of data visualization.  We will
+study the basic display types (e.g. histograms, boxplots,
+scatterplots) and understand when they are appropriate. We will also
+discuss concepts in creating good displays and briefly consider
+aspects of perception. Throughout this section, we will use the
+computer to create both standard and customized plots by understanding
+the basic graphical model for both exploratory and presentation
+graphics.
+
+<section><title>Plot Types</title></section>
+<section><title>Graphics Models and Construction</title></section>
+</section>
+
+
+<section>
+<title>Resampling Techniques</title>
+We will change our focus from external data technologies
+to thinking about statistical methodology, and specifically
+a form of simulation used widely in modern data analysis.
+We will introduce the basic ideas of cross-validation, the jacknife
+and bootstrapping
+and explore ways to use the computer to estimate error.
+<section><title>Cross Validation</title></section>
+<section><title>Bootstrap</title></section>
+</section>
+
+
+<section>
+<title>Simulation and Random Number Generation</title>
+
+We will then look at the subject of Monte Carlo simulation and how we
+can use the computer to mimic random processes and understand their
+characteristics.  We introduce this early on so that we can get
+started without having to consider data from different sources and of
+different types.  Essentially this is how statisticians can use the
+computer for their own purposes.  While simulation is a very general
+area, we will focus on the more specific aspect of generating random
+numbers and examine high-level ways to generate random numbers from
+general probability distributions.  We will use S (or Matlab) to
+generate the numbers and we will look at graphical techniques for
+validating the distribution of the generated numbers and comparing the
+values with the target distribution.
+
+<section><title>Uniform random number generation</title></section>
+<section><title>Inverse CDF method</title></section>
+<section><title>Rejection/Acceptance sampling</title></section>
+
+<keywordset>
+ <keyword>Uniform random number generation</keyword>
+ <keyword>Inverse CDF</keyword>
+ <keyword>Rejection/Acceptance sampling</keyword>
+</keywordset>
+</section>
+
+
+
+<section>
+<title>Additional Topics</title>
+Depending on whether we have any time left, we
+will discuss one or more of the following topics:
+<variablelist>
+<varlistentry>
+<term>Spreadsheets
+</term>
+<listitem>
+ The basic spreadsheet model; its advantages and disadvantages
+and general warnings about the accuracy of computations done in 
+spreadsheets.
+We might also briefly illustrate how to connect R and Excel
+to best exploit the advantages of both systems.
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>
+Technologies for Reporting
+</term>
+<listitem>
+Reporting the results of data analysis to non-statisticians or even in
+an interesting or automated fashion can benefit from using
+technologies such as dynamic documents, HTML and HTML forms or XForms,
+Java and JavaScript and animations using tools such as Flash.
+If time permits, we will survey these and emerging technologies
+and focus on the machine-generated creation of reports.
+</listitem>
+</varlistentry>
+</variablelist>
+
+</section>
+
+
+We will use R as the basic computational engine for the course. This
+is a general programming language with a very large collection of built-in
+statistical and graphical facilities. We will introduce
+the different R concepts and techniques throughout the course
+as they are needed.
+
+</section>
+</article>

@@ -1,0 +1,262 @@
+<?xml version='1.0'?>
+
+<article xmlns:r="http://www.r-project.org"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<invisible>
+<r:code id="words">
+words = matrix(c(44.6667,44,43.2409,45.1564,
+42.7083,43.7273,46.8628,45.1278,
+41.6957,41.8182,44.4939,43.3712,
+34.7778,37.1364,35.2715,34.4035,
+47.0833,44.3478,46.2482,46.3137,
+39.7727,41.7647,42.9762,42.1587,
+44.125,44.6667,43.5898,43.6742,
+41.1667,42.2917,41.5536,39.4447,
+41.619,45.1304,41.803,43.173,
+38.7083,32.2083,38.7615,39.4606,
+38.5833,37.5417,38.22,38.214,
+38.125,38.875,38.6709,39.4718,
+42.8333,43.0417,42.7684,42.6061,
+35.7917,38.3333,36.8816,37.8219,
+33.3158,34.3125,30.0319,29.4278,
+43.7826,43.7619,43.5041,43.6543,
+49.7727,54.0952,50.7373,55.4451,
+28.5556,31.1176,28.8856,26.8333,
+33.7059,34.1765,34.6903,31.7301,
+38.6667,39.0435,37.7833,38.4417,
+41.1364,40.2609,38.3768,40.0405,
+52.9545,54.3913,54.9234,53.7414,
+44.125,42.6364,43.0367,42.6009,
+44.125,42.6364,43.0367,42.6009,
+44.625,42.7727,44.5337,43.3814,
+39.8261,41.875,42.2875,42.6104,
+40.2174,41.125,42.7546,42.9607,
+30.1176,34.4118,33.6941,31.9481,
+43.25,42.625,44.6222,44.6203,
+47.9048,49.1739,49.8551,49.8009,
+39.1304,38.0833,39.9209,39.7252,
+42.5217,46.0833,42.6268,42.7801),32,4,byrow=T)
+words = as.data.frame(words)
+names(words) =
+c("WeaponAggressive","NonWeaponAggressive",
+  "WeaponNonAggressive", "NonWeaponNonAggressive")
+</r:code>
+</invisible>
+
+<artheader>
+ <title>Weapons and Agression
+  <footnote>
+   <para>Adapted from the Rice Virtual Lab on
+    <ulink href="http://www.ruf.rice.edu/%7Elane/case_studies/guns/index.html">
+    Weapons and Agression</ulink>.  Originally written by David Lane.
+    Adapted as a dynamic document by Jamie Julin.
+   </para>
+  </footnote>
+ </title>
+
+</artheader>
+
+
+<section><title>Background</title>
+<figure id="pdf">
+<graphic fileref="gun.JPG">
+</graphic>
+</figure>
+
+<para>
+The <quote>weapons effect</quote> is the finding that the presence of
+a weapon or even a picture of a weapon can cause people to behave more
+aggressively. Although once a controversial finding, the weapons
+effect is now a well-established phenomenon. One explanation of the
+weapons effect is that because guns have been associated with
+aggression, seeing a gun increases the accessibility of associated
+aggressive thoughts which in turn facilitate aggressive behavior. The
+idea that activation of a concept in semantic memory increases
+activation and therefore accessibility of related concepts is called
+spreading activation and has been demonstrated in numerous
+experimental studies. If this spreading activation explanation of the
+weapons effect is correct, then the presence of a weapon word (such as
+<quote>dagger</quote> or <quote>bullet</quote>) should increase the
+accessibility of an aggressive word (such as <quote>destroy</quote> or
+<quote>wound</quote>). The accessibility of a word can be measured by
+the time it takes to name a word presented on computer screen. The
+current study <citation><biblioref
+linkend="bib:Anderson98"/></citation> tested this hypothesis.
+</para>
+
+</section>
+
+
+
+<section><title>Experimental Design</title>
+<para>
+The hypothesis is that a person can name an aggressive word more
+quickly if it is preceded by a weapon word than if it word is preceded
+by a neutral word. Each subject named both aggressive and
+non-agressive words following both weapon and non-weapon
+<quote>primes.</quote> The design, therefore, was a 2 (prime type:
+weapon vs. nonweapon) x 2 (target type: aggressive vs. nonagressive)
+within-subjects factorial design. Each subject was given a total of
+192 trials, 48 in each of the four prime type x target type
+combinations. The means of the times in each of these four conditions
+were used as the dependent variables. Therefore, each subject provided
+four scores to the analysis.
+</para>
+
+<para>
+The <r:expr>dim(words)[2]</r:expr> subjects were undergraduate
+students ranging in age between 18 and 24 years. They were told that
+the purpose of this study was to test reading ability of various
+words.  On each of the 192 trials, a computer presented a priming
+stimulus word (either a weapon or non-weapon word) for 1.25 seconds, a
+blank screen for 0.5 seconds, and then a target word (agressive or
+nonagressive word). The experimenter instructed the subjects to read
+the first word to themselves and then to read the second word out loud
+as quickly as they could. The computer recorded reaction times.
+</para>
+</section>
+
+
+
+<section><title>Materials</title>
+
+</section>
+
+
+
+<section><title>Descriptive Statistics</title>
+<section><title>Box Plots</title>
+
+
+<para>
+When comparing experimental conditions, it is always a good idea to
+construct parallel box plots as shown below.
+</para>
+
+<r:plot id="boxplots">
+boxplot(words)
+</r:plot>
+
+<para>
+Generally speaking, the time it took to name an aggressive word was
+faster when the target word was preceded by a weapon word.  A
+comparison of the non-aggressive target words reveals no evidence of a
+weapon prime versus non-weapon prime having an effect.
+</para>
+
+</section>
+
+
+<section><title>Histogram</title>
+
+<para>
+The presence of outside values (dots in the box plots) suggests that
+the distributions have slightly more scores in their tails than would
+be expected in a normal distribution.  A histogram of the
+weapon-nonaggressive combination is shown below.
+</para>
+
+<r:plot id="histogram">
+hist(words$WeaponNonAggressive, 10, xlab="Reponse Time", ylab="Frequency",
+ main="Histogram of Weapon NonAggressive")
+</r:plot>
+
+</section>
+
+
+<section><title>Summary Statistics</title>
+
+<para>
+The mean and standard deviations of the four conditions are shown below.
+</para>
+
+
+<r:code>
+summary(words, digits =3)
+</r:code>
+
+</section>
+
+
+<section><title>QQ-Plots</title>
+
+<para>
+Since many inferential statistical procedures assume the data are
+normally distributed, Normal probability plots (also called Q-Q plots
+or Normal Quantile plots) are helpful tools to determine if the data
+is normally distributed. Basically these plots plot the sample
+quantiles from the data set against the quantiles of the normal
+distribution.  If the data are from the same normal distribution, the
+data should fall along the line y=x.  Even though the data do not fall
+exactly on this line, the deviations are not extreme.
+</para>
+
+<r:plot id="QQ">
+par(mfrow=c(2,2))
+qqnorm(words[,1],main="Weapon Aggressive")
+qqline(words[,1])
+qqnorm(words[,2],main="NonWeapon Aggressive")
+qqline(words[,2])
+qqnorm(words[,3],main="Weapon NonAggressive")
+qqline(words[,3])
+qqnorm(words[,4],main="NonWeapon NonAggressive")
+qqline(words[,4])
+</r:plot>
+
+</section>
+
+</section>
+
+
+<section><title>Experiment 2</title>
+<para>
+Experiment 2 replicated the effect using pictures rather than words as
+primes. Weapon pictures primed aggressive words more than they primed
+non-aggressive words and this difference was significantly greater
+than it was for the neutral picture primes.
+</para>
+</section>
+
+
+
+<section><title>Conclusion</title>
+
+<para>
+Both experiments showed that the mere identification of a weapon
+primes aggression-related thoughts. These findings support the
+hypothesized explanation of the weapons effect.
+</para>
+
+</section>
+
+
+<bibliography  xmlns:r="http://www.r-project.org"
+         xmlns:omg="http://www.omegahat.org"
+         xmlns:bioc="http://www.bioconductor.org"
+         xmlns:js="http://www.r-project.org"
+         xmlns:jsx="http://www.ecmascript.org">
+
+<biblioentry id="bib:Anderson98">
+<title>Does the gun pull the trigger?  Automatic priming effects of
+weapon pictures and weapon names.</title>
+<authorgroup>
+<author><firstname>C</firstname><othername
+role="mi">A</othername><surname>Anderson</surname></author>
+
+<author><firstname>A</firstname><othername
+role="mi">J</othername><surname>Benjamin</surname></author>
+
+<author><firstname>B</firstname><othername
+role="mi">D</othername><surname>Bartholow</surname></author>
+
+</authorgroup>
+<publisher><publishername>Psychological Science</publishername></publisher>
+<pubdate>1998</pubdate>
+
+<!--  9, 308-314. -->
+</biblioentry>
+
+</bibliography>
+
+</article>

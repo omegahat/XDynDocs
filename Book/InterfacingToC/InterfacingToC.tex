@@ -1,0 +1,115 @@
+\chapter{Integrating Other Languages: C, Python, Perl, ...}
+
+\begin{summary}
+The primary focus in this chapter is on using C code within R (or
+MATLAB, potentially also).  We start by discussing why we might want
+to use existing C code within R.  We describe the different steps and
+components in compiling, linking and loading compiled code into R,
+contrasting this with the interpreted model that R and many other languages
+use. We also present some of the tools that we can use to explore and
+perform diagnostics on compiled code, e.g. ldd, otool and depends.exe
+(on Windows) for examining dependencies on other DLLs,
+nm for looking at symbols.
+
+We look at both the \Rfunc{.C} and \Rfunc{.Call} interfaces.
+We illustrate the standard marshalling techniques for .C().
+
+We also discuss debugging using a debugger such as gdb
+and work through a case study of finding a bug in C code.
+We contrast this with using print statements.
+
+
+We also talk about interfaces with other
+systems and languages such as 
+\begin{itemize}
+\item the Unix Shell (via the \Rfunc{system} function which we have discussed in chapter~\ref{chap:Shells}),
+\item Python (\Rpkg{RSPython} and \Rpkg{RPy})
+\item Perl (\Rpkg{RSPerl}), 
+\item MATLAB (\Rpkg{R.matlab} and \Rpkg{RMatlab})
+\item Java (\Rpkg{rJava} and \Rpkg{RSJava})
+\item DCOM  (\Rpkg{RDCOMClient} \& friends and \Rpkg{rcom})
+\end{itemize}
+We illustrate these by example. We won't go into all the details of
+all the languages, but discuss the steps of 
+\begin{itemize}
+\item initializing the Virtual Machine
+\item calling a foreign function from R
+\item marshalling data between the systems
+\item dealing with different computational models, e.g. R's generic
+  functions and methods  and Python's objects and methods
+\end{itemize}
+We also show that most of these are actually simpler in many ways than
+working with C/C++ code because of run-time reflection.
+We'll also illustrate how we can use this to have code that writes
+code -- \textit{meta-programming}.
+
+We'll connect these inter-system intefaces back to Web Services via
+SOAP, REST, XML-RPC.
+\end{summary}
+
+\section{Why use Compiled Code in R?}
+The primary motivations are 
+\begin{itemize}
+\item  reusing existing code to avoid having to reimplement it
+ourselves
+\item speed/efficiency
+\item writing code in a common language so that it can be used 
+\end{itemize}
+
+\section{An overview of Compiled Code: C/C++}
+This covers the difference between
+compiling, linking and loading DLLS.
+Within compiling, we discuss the preprocessor and the compiler proper.
+We also talk about different arguments that control the compilation
+such as -I, -O2 and -g.
+It talks about make files and dependencies.
+It talks about linking to other libraries and the use of \verb+(DY)LD_LIBRARY_PATH+.
+
+\section{The Basics of calling C from R : .C()}
+
+
+\section{The Standard Marshalling of Data}
+
+
+\section{Debugging Compiled Code}
+
+\section{Automating the interface to routines and data structures}
+Here we talk about SWIG and RGCCTranslationUnit.
+
+\section{Writing C code ourselves}
+Here we cover the basics of the C language so that 
+readers can 
+
+\section{The .Call interface}
+
+We talk about the more advanced and flexible
+way to call C code from R and how we can manipulate 
+R objects.
+
+We outline external pointers and how they can be used to handle
+complex data that don't map to R objects and for dealing with large
+data. We describe how this changes the semantics of R ``pass-by-copy''.
+
+
+
+We'll also mention the \Rfunc{.External} function
+and its \textit{raison d'etre}.
+
+\section{General Interlanguage Interfaces: Combining systems and
+  languages}
+We talk about the general model.
+Here we talk about calling Python or Perl from R.
+For example, we can read the email data using Perl modules
+and then deal with 
+
+
+\section{Debugging C Code}
+GDB
+
+Break points
+Conditional break points.
+
+Attaching to existing/running processes.
+
+Examing core dumps
+

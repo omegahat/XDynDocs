@@ -1,0 +1,197 @@
+
+In this lab, we explore a simple classification mechanism.  We will
+look at email messages and the problem of identifying SPAM messages.
+Given an email message, our job is to classify it as either HAM (good
+mail) or SPAM (unsolicited mail).  There are many different approaches
+to classification, some of which are rule-based and other which are
+more statistical that use information gathered from previous mails.
+The basic idea is to identify useful characteristics of the message
+such as the number of recipients, whether there is an excessive amount
+of punctuation characters (e.g. !) in the subject, whether the message
+is HTML or plain text, the presence of included mail, etc. that help
+us classify the message.  We can combine these characteristics to come
+up with a decision that classifies the message as SPAM or HAM.  In
+statistical classifiers, we use data (i.e. mail messages) for which we
+know the true classification.  Then we build up a machine or rule that
+takes the characteristics and compares them to this test data and
+assigns the message to the SPAM or HAM category based on how similar
+the characteristics are to the test data of these different types. 
+
+In this lab, we will use a very simple classification rule - K-nearest
+neighbors.  The idea is quite intuitive and simple.
+We have a collection of records, one for each email message
+and we have many variables for each record.
+In other words, each record is a vector in a $p$ dimensional 
+space. When we get a new record and want to classify it,
+suppose we find the $k$ nearest records to it from within our training
+set (i.e. for which we know the actual classification of SPAM or HAM).
+We then classify our new record by combining the classes
+of these $k$ records that are closest to it.  This might be done
+simply by taking the class of the majority or by some more elaborate
+mechanism.  The result is that we classify our new record
+by borrowing information from records/points that are near/simiilar 
+to it.
+
+Let's suppose that we set $k$ to be $1$. This means that we classify
+the new record by finding the single closest point to it in our
+training set.  We compute the distance from our new record to each of
+the points in the training set and find the record with the smallest
+distance.  Then, we use its known class (SPAM or HAM) as the value we
+ascribe to the new record, whose class is unknown.
+
+There are several aspects of the $k$-nearest neighbors (KNN)
+algorithm.  We need a training set.  We need to specify the measure of
+"distance" or closeness.  Euclidean distance might come to mind, but
+there are others and some may make more sense in different contexts.
+And we need to specify the value for $k$ telling us how many neighbors
+to poll when classifying the new record.  And finally, we need a
+mechanism for combining the classes of the $k$ neighbors to come up
+with a class for the new record.  Majority vote is one mechanism, but
+this means that the nearest neighbor counts just as much as the $k$-th
+closest neighbor.  If one is very close to the new record of interest,
+and the other is relatively far way, why should we count their
+"suggestions" equally.  Perhaps weighting their suggestions would be
+more appropriate.
+
+The choice of distance metric can influence the importance of
+different variables, can help to clarify the impact of scaling for
+categorical and continuous variables, and so on.  There are various
+diffrent metrics used in statistics for measuring distance between two
+$p$-dimensional vectors and they have different characteristics. See
+the \SFunction{dist} function.  There are also simple, but important,
+modifications of Euclidean distance which uses weights for the
+different components.
+
+Hopefully, it is clear that choosing the value of $k$ to be large or
+small has very different intuitive properties.  Suppose we take $k$ to
+be very large, i.e. the number of records in the training set.  In
+that case, we would count all of the records in the training set as
+neighbors of every new record and we our classification/prediction
+would be the same for every new record.  It would simply be the
+aggregated value, e.g. the majority, for the training set.  At the
+other extreme, if $k$ is $1$, then we take only the nearest point and
+unequivocally use its class as the prediction for our new record.  If
+there are a lot of other points in the training set very close to our
+new record, but these have different values for SPAM or HAM, then the
+answer we get will be very sensitive to small differences in distance.
+In other words, using $k = 1$, we don't borrow information from many
+points, but just the closest neighbor and are subject to its random
+fluctuations. In statistics, we like to smooth the random deviations
+by combining information from different records.  So we would want $k$
+to be somewhere between $1$ and $n$. But the variability in the
+training dataset, in both the distances and the classifications,
+influence what the appropriate value of $k$ should be.  The larger it
+is, the more smoothing we do. But we can oversmooth and let far away
+records have too much influence on our classification in local
+regions.  So we need to determine the ``best'' value for $k$.
+
+We also need to determine the most appopriate distance metric. And
+also the best way to combine the classes of the $k$-nearest neighbors
+to obtain a prediction, and an associated standard error.
+We could decide on these without looking at the data.
+That however is not as good as using the data to 
+tune the algorithm by selecting the appropriate
+value of $k$, the metric and the voting rule. 
+
+In standard cross-validation, there is a basic approach.  We split our
+dataset into $v$ different groups, usually by randomizing.  Group $i$
+consists of a subset of the records from the original set, and there
+is a corresponding other set which consists of all the records from
+the dataset that are not in group $i$.  We ``fit'' our model using the
+complement of $i$, i.e. all the records that aren't in group $i$.
+Then, we use this ``fit'' to predict/classify the records in group
+$i$.  Since we know that actual classifications for the records in our
+dataset, we can compare the classifications from our fit with the
+actual values and see how well we did.  By repeating this for each of
+the $v$ groups, we can aggregate our prediction errors. We can then
+look at this measure as a function $k$ (the number of nearest
+neighbors), the choice of metric/distance, and the choice of voting
+procedure.
+
+
+There is a little ambiguity in the terminology used for
+cross-validation. We often talk about the test set and the training
+set as being group $i$ and its complement respectively.  But of
+course, we have the original dataset and we are referring to that as
+the training set.
+
+
+Let's start with what might be the simplest cross validation,
+conceptually, of this collection, namely selecting the value of $k$.
+The idea is simple.
+We break the data into $v$ groups.
+\begin{verbatim}
+ perm = sample(1:nrow(data))
+\end{verbatim}
+We will do $10$-fold cross validation and so have $576$ entries in
+each validation set (with $578$ in the final one).  Ordinarily, we
+would perform the basic procedure for each training set, i.e. for each
+of the $5762-576$ records and fit the validation data
+and compute the total error.
+\begin{verbatim}
+  # compute the distance matrix for the test and training records
+  # along with the between test records and between training records.
+  
+ D = as.matrix(dist(rbind(d[testIndex, ], d[trainingIndex, ]))
+
+  # We only want the test-training distances, so the 
+  # top right block of the distance matrix. 
+ D = D[1:nrow(testIndex), (nrow(testIndex) + 1):ncol(D)] 
+
+  # Now we have a row for each test record with the 
+  # distance to each training record.  We compute
+  # the order of these from smallest to largest
+  # and this gives us the index of the training set
+  # of the closest neighbors.  Note that we transpose 
+  # the result to keep the  
+ nn = t(apply(D, 1, order))
+\end{verbatim}
+
+Each row in the matrix \SVar{nn} is the index of the record in the
+training set that is next closest to the test record.  This allows us
+to compute the class for different values of $k$ merely by using the
+first $k$ elements of the row in \SVar{nn}.  At its simplest, we
+merely want
+\begin{verbatim}
+odist = data$isSpam[ nn[i, ] ]
+n = length(odist)
+ans <- logical(n)
+for(i in 1:n) {
+  tt = table(odist[1:i])
+  ans[i] = names(tt)[tt == max(tt)]
+}
+\end{verbatim}
+
+We can try to determine ways to vectorize this computation.
+\begin{verbatim}
+odist = data$isSpam[ nn[i, ] ]
+percents = cumsum(odist)/(1:length(odist))
+classify = percents >= .5
+classify[percents == .5] <- NA
+\end{verbatim}
+
+We do have to worry about ties.
+Ties can be detected by doing a diff on the sorted
+distances
+and if any of the differences are the same
+then we have ties.
+\begin{verbatim}
+any(diff(sort(D)) == 0)
+\end{verbatim}
+
+
+
+
+In this case however, we can be a little more efficient.  Consider
+what we need when we perform the first validation, i.e. on group $1$.
+We compute the distances from each record in that group to each of the
+records in the training set.  That is, for each of the records
+$r_\pi(1), r_\pi(2), \ldots, r_\pi(576)$, we have a corresponding
+sequence of $5762-576$ distance values.
+
+
+
+
+We can compute
+
+

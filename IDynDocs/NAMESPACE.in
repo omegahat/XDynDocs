@@ -1,0 +1,9 @@
+import(XDynDocs)
+import(methods)
+import(XML)
+
+if(@HAVE_WXWIDGETS@)
+  import(RwxWidgets)
+
+export(viewIDoc, createIDocHandlers)
+# createGraphicsDevice is in XDynDocs for now.

@@ -1,0 +1,196 @@
+This serves as a case-study style introduction to R.  The idea is that
+we will go through the process of stating a problem, interactively
+exploring approaches to solving it, consider different data structures
+we might use, develop one or more functions to process the data
+generally and then read them into R.  Along the way, we will see how
+to use built-in functions, think about different data types, cumulate
+commands/expressions into functions, debug functions.
+
+
+We will work with the spam data from SpamAssassin.  This is organized
+in 5 directories, with each message contained in a separate file.  We
+are interested in finding out if there are any characteristics of the
+header of the message that identify it as SPAM or HAM.
+This is exploratory data analysis, but before we can do anything
+we need the data. These are the headers from the mail messages.
+
+
+Want to get a list of all the available messages and extract their
+headers.  For each header, we want the name-value pairs.
+
+
+dirs = list.files(system.file("messages", package = "RSPamData"), full.names = TRUE)
+for(i in dirs) {
+  list.files(i, full.names = TRUE)
+}
+
+Have to store these somewhere. 
+Needt construct either a flat vector for all messages or a list
+with elements for each directory. Each element would be a character
+vector for the names of the files within that directory. 
+
+msgs <- character()
+for(i in dirs) {
+  msgs <- c(msgs, list.files(i, full.names = TRUE))
+}
+
+
+msgs <= list()
+for(i in dirs) {
+  msgs[[i]] <- list.files(i, full.names = TRUE)
+}
+
+
+Alternatively, list.files( , full.names = TRUE, recursive = TRUE)
+to get an entire list of all the message files.
+
+Which approach is better (flat or hierarchical) depends on what we
+want to do. We need to know if the message is spam or not.
+That is encoded in the name of the (full) file from the directory 
+part, so we can hold that around.  In that case, either works, 
+but we can compute for all the messages in one go whether each is
+SPAM or not, but cannot do this as easily for hierarchical.
+But if we want to work on the different directories separately
+obviously the hierarchy works well.
+
+Start with just one message.  Working from the flat view,
+get the first message
+
+ m = msgs[1]  
+
+Read the text as lines. Why? because we want to split the header and body based
+on the first blank line. So the line is the unit of interest.
+
+ txt = readLines(m)   # want full path name hence the full.names = TRUE in list.files.
+
+
+ match("", txt)
+
+ header = txt[1:62]
+
+Need to generalize this when we process programmatically, i.e. parameterize the manual 
+computations done here.
+
+  Need to break these into name-value pairs.
+  Builtin function read.dcf works well here. But that needs to read from  a stream of bytes
+typically a file.  A conneciton is the general idea, and we have the header as a vector of strings.
+  A text connection is our solution here rather than writing to a file and reading back in again.
+
+  hd = read.dcf(textConnection(header))
+
+  class(hd)  gives a matrix.
+  Look at the dimensions 
+
+   dim(hd)   # 1 x 26
+
+   dimnames(hd)   # NULL and variable names from the header.
+
+  We could turn this into character vector if we want as
+
+    hd = hd[1,]
+
+   If we do this for a different message, we may end up with different names in the name-value pairs
+because not all messages have the same header elements. 
+  So how do we want to store this information for many messages? A list, a matrix, a data frame?
+
+
+  Start readin all messages. Compute the union of the variable names from the header
+and create a data frame with each row being a message and the values 
+  Write a function to read the header
+
+
+   readMessageHeader = 
+    function(fileName) {
+ 
+       txt = readLines(fileName)
+       n = match("", txt) 
+
+#       if(is.na(
+
+       h = txt[1:(n-1)]   # 1:n-1
+       ans = read.dcf(textConnection(h))[1,]
+#       con = textConnection(h)
+#       close(con)
+       ans
+    }
+
+
+
+    headers = list()
+    for(i in msgs) {
+         headers[[i]] = readMessageHeader(i)
+    }
+
+
+   Might think of looping by number and indexing
+     for(i in 1:lentgh(msgs)) {
+           readMessageHeader(msgs[i])
+     }
+
+    Not as good.
+    Also seq(length = length(msgs)) to handle 0 length case.
+
+
+    headerNames = unique(sapply(headers, names))   # do separately for illustration.
+
+    headers = list()
+    headerNames = character()
+    for(i in msgs) {
+         headers[[i]] = readMessageHeader(i)
+	 headerNames = union(names(headers[[i]]), headerNames)
+    }
+
+    Tradeoff simplicity and atomicity of concepts with efficiency.
+    Which is more efficient? try it and see. Use measurements from
+    running comparing memory and time (system.time? and gc)
+    and look at the results.  This is a statistics environment - take statistics.
+
+    Create a data frame with as many columns as there are fields
+    and rows as there are messages.  Means we have to loop  again.
+    We could do this on the fly as we loop over reading the messages
+    but then we have to grow the data.frame each time which means
+    we have to reallocate space often and think about adding a column
+    for the last message.
+
+    headerData = matrix(NA, length(headers), length(headerNames), dimnames = list(names(headers), headerNames))
+    for(i in names(headers)) {
+       h = headers[i]
+       headerData[i, names(h)] = h
+    }
+
+
+   What if we want the body - don't want to write the whole thing again.   Not a big deal here.
+
+
+    With the matrix, everything  is a string. So if we reuse columns a lot, we have
+   to repeat the same computations each time, e.g. date sent into a date object (POSIXct).
+   Similarly, we may have derived variables such as the number of recipients, etc. 
+   which we want to compute once and add to our data but keep as numbers. Then we need a data frame.
+
+    headerData = as.data.frame(headerData)
+
+    headerData$numRecipients = sapply(headerData$To, function() {})
+
+
+   
+Turn the overall processing into a function.
+Allow the user to specify the messages/directories to read.
+Make this a default argument.
+
+
+  
+ 
+
+
+  
+
+EDA on the data.
+  Factors from categories of, e.g., mail agent.
+  ordered categories for hour mail was sent.
+  
+  Look at SPAM versus non-SPAM and see if there is discrimination. 
+  Consider modelling this.  Use CART.
+
+
+
+  apply(matrix(r*(N*n,...), N, n), 1, T)

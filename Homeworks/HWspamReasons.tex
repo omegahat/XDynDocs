@@ -1,0 +1,150 @@
+\documentclass[12pt]{article}
+\usepackage{fullpage}
+\usepackage{times}
+
+\def\TA{Yu Chuan}
+\def\SA{Sandy and Erica}
+\def\InstructorMail{\texttt{nolan@stat.berkeley.edu}}
+\def\TAMail{\texttt{yuchuan@stat.berkeley.edu}}
+
+\def\SFunctionRef#1{\textbf{#1}}
+\def\Rpackage#1{\textit{#1}}
+\usepackage{hyperref}
+
+
+\begin{document}
+
+\parindent=0pt
+\parskip=15pt
+
+\textbf{
+Stat 133, Fall 04 \\
+Homework 3: Text Manipulation: Creating Spam-related Variables  \\
+Due:  Monday, 4 Oct}
+
+\medskip
+
+For this homework, you need to create three variables from the 
+email messages. These messages are available in an R dataset in
+the rda file, located at 
+\\
+http://www.stat.berkeley.edu/users/nolan/stat133/data/Emails.rda.
+
+Descriptions of thrity variables appear below.
+They are split into three groups: A, B, C.
+You are to transform the email data into three of these variables,
+one from each group. 
+The list found at the end of the homework determines
+which three you will write code to create. 
+For at least one of the three your code must be in an R function.
+
+Email the code you use to create these three variables, as 
+plain text in the body of your email. In addition, turn in
+a graphical comparison of spam and ham for each of these
+three variables.  Discuss whether or not you think this 
+variable will be useful in predicting if an email message
+is ham or spam.
+
+
+GROUP A:
+\begin{enumerate}
+\item The subject is "Re: something or other."
+\item The number of lines in the body of the email.
+\item The number of characters in the body of the email.
+\item The Reply-To has an underline and numbers/letters.
+\item The number of exclamation marks in the subject.
+\item The number of question marks in the subject.
+\item  The number of attachments.
+\item The X-priority or X-Msmail-Priority set to high.
+\item The number of recipients.
+\end{enumerate}
+
+GROUP B:
+\begin{enumerate}
+%\item The number of words in the body of the email.
+\item[averageWordLength] The average length of words in the body.
+% Some very large values because we get URIs, etc.
+% Really want to parse and tokenize.
+\item The Received time in the current time zone.
+\item[fromNumericEnd]  The From: ends in numbers, e.g. 
+\begin{verbatim}
+david gezi <davidgezi12@hotmail.com>
+\end{verbatim}
+\item The subject is all capitals (excluding punctuation and numbers)
+\item The body of the email contains another email. 
+\item[subjectSpamWords] The subject contains one of the following words:
+viagra, pounds, free, weight, guarantee, millions, dollars,
+credit, risk, prescription, generic, drug, money back, credit card.
+\item[messageIdHasNoHostname] The Message-Id has no hostname.
+% 1 message has no Message-Id field.
+\ite The message is HTML-only but contains no HTML tag.
+\itemm[percentSubjectBlanks] The percentage of blanks in the subject.
+\item The font color and background color are the same.
+\end{enumerate}
+
+GROUP C:
+\begin{enumerate}
+\item The email contains the recipient's email address. 
+\item[sortedRecipients] The recipient list is sorted by address
+\item[sibjectPunctuationCheck] The subject has punctuation or digits surrounded by characters,
+e.g. V?agra and pay1ng, but not New!
+\item  The difference between the Date and the Received date (be
+careful with time differences.
+\item The header states that the message is multipart,
+but it is mostly text or html.
+\item[containsImages] The email contains images.
+\item[hasRedHTMLFont] The body has an HTML font tag with the color red.
+\item The body contains Dear something, such as DEAR SIR, or Dear Madam
+\item[] The Message-Id has a hostname that does not match the senders hostname,
+but does match a host name at a relay point.
+\item[hasClickLink] The body has an HTML link with text
+that has the word "click" or "push" in it (upper or lower case).
+\item The percentage of the characters in the body of the email that
+are upper case (excluding blanks, numbers, and punctuation).
+\end{enumerate}
+
+The emails you will use for this assignment are in the list Emails, 
+where each element of the list contains one email message.
+Each email is itself a list consisting of three elements:
+\begin{itemize}
+\item The element named ``header" is a named character vector,
+where each name corresponds to a key in the email header
+and the value of the element corresponds to the text following the
+: in the key:value of the header.
+\item The element named ``body" is itself a list, the first element
+of which is named "text" and contains the body of the email message.
+This element is a character vector, with one string per line in the
+email message.
+A second element, if it exists, is named ``attachments." This
+element is a list containing one element per attachment.
+The individual attachment element is a list of two elements --
+one containing information about the format of the attachment and the
+other containing and the contents of the attachment.
+\item The element named spam is a logical vector of length 1 
+that indicates whether the message is spam (TRUE) or ham (FALSE).
+\end{itemize}
+
+To determine which three variable you are to write the code to create,
+look up the last letter in your SCF login, i.e. if your login is 
+s133bu then your assignment is \#8 in group A, \#1 in group B,
+and \#4 in group C.
+
+\begin{tabular}{lllc|lllc}
+A & B & C & SCF login & A & B & C & SCF login\\
+\hline
+1 & 1 & 1 & a  & 2 & 2 & 2 & b\\
+3 & 3 & 3 & c & 4 & 4 & 4 & d\\
+5 & 5 & 5 & e & 6 & 6 & 6 & f\\
+7 & 7 & 7 & g & 8 & 8 & 8 & h\\
+9 & 9 & 9 & i & 9 & 10 & 10 & j\\
+5 & 3 & 4 & k & 9 & 2 & 6 & l\\
+8 & 2 & 7 & m & 7 & 4 & 8 & n\\
+6 & 5 & 9 & o & 5 & 6 & 10 & p\\
+4 & 7 & 3 & q & 3 & 8 & 1 & r\\
+2 & 9 & 2 & s & 1 & 10 & 3 & t\\
+8 & 1 & 4 & u & 7 & 2 & 5 & v\\
+6 & 3 & 7 & w & 5 & 4 & 6 & x\\
+1 & 7 & 2 & y & 4 & 5 & 9 & z \\
+\end{tabular}
+
+\end{document}

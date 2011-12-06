@@ -1,0 +1,52 @@
+<foilgroup>
+<title>Network Intrusion Detection</title>
+
+<foil>
+<title>Detecting Break-ins on a Computer Network</title>
+
+<itemizedlist>
+ <listitem>Hackers try to gain access to other people's machines</listitem>
+ <listitem>Detect this in several ways
+  <itemizedlist>
+   <listitem>watch for unusual user patterns - a login doing unusual
+       things for that person
+   </listitem>
+   <listitem> see if any system files have been changed - e.g. login command
+   </listitem>
+   <listitem>
+       watch network activity for "port scanning/probing"
+   </listitem>
+   <listitem>
+       connections to and from unusual machines
+   </listitem>
+   <listitem>
+      unusual network traffic.
+   </listitem>
+  </itemizedlist>
+ </listitem>
+
+Key is definining "unusual".
+</itemizedlist>
+</foil>
+
+<foil>
+ <title>Data sources</title>
+ <itemizedlist>
+   <listitem><ulink href="intrusion.bsm">Basic Security Monitor of user's commands</ulink>
+   </listitem>
+   <listitem><ulink href="tcpdump.dat">"sniff" TCP/IP packets</ulink> on network</listitem> 
+   <listitem>difference the <ulink href="filesys.dat">file system lists</ulink></listitem>
+   <listitem>Multiple machines, operating systems, platforms</listitem>
+ </itemizedlist>
+</foil>
+
+<foil>
+<title>Steps</title>
+ <itemizedlist>
+  <listitem> Merge data sources into relevant information</listitem>
+  <listitem> Establish baseline "signatures" for normal operations.</listitem>
+  <listitem> Develop classifiers for detecting abnormalities</listitem>
+  <listitem> Run classifiers in "real time"</listitem>
+ </itemizedlist>
+</foil>
+</foilgroup>

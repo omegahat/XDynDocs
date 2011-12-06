@@ -1,0 +1,12 @@
+#!/bin/sh
+
+for g in 1 2 3 4 5 6 7; do
+  port=`grep "^group${g}," Ports | cut -f 2 -d ','`
+  echo "Group ${g} port = ${port}"
+  for u in `grep "^${g}," WebGroup.txt | cut -f 2 -d ',' ` ; do
+      echo "Writing port ${port} for $u"
+      echo "${port}" > /home/${u}/.HTTPPort
+      chmod go-r /home/${u}/.HTTPPort
+  done
+done
+

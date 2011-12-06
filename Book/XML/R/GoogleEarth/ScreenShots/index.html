@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<link rel=stylesheet href="http://www.omegahat.org/OmegaTech.css" >
+<link rel=stylesheet href="layout.css" >
+<title>R and Google Earth</title>
+</head>
+
+<body>
+<div id="navigation">
+Table of Contents
+<ul>
+  <li> <a href="CityTemperatures.kmz">KMZ file</a>
+  <li> <a href="doc.kml">KML file</a>      
+  <li> <a href="ScreenShots">Screen shots</a>
+  <li> <a href="cityTemperatures.xml">annotated R code</a>      
+  <li> <a href="cityTemperatures.R">raw R code</a>
+  <li> <a href="http://code.google.com/apis/kml/documentation/">Google
+      Earth Documentation</a>
+</ul>  
+</div>
+
+<div id="main">
+<h1>R and Google Earth</h1>
+
+This is a simple example of using R to create input for Google Earth.
+We are not concerning ourselves here with the best way to display the
+data at this point. Rather we are exercising the mechanism for
+generating KML from data in R so that we can display information on
+Google Earth.
+
+<p/>
+You can load this into Google Earth by clicking on
+<a href="CityTemperatures.kmz">this link</a>.
+Alternatively, you can look at <a href="ScreenShots/">some screen shots</a>
+
+
+<p/>
+
+The data are temperature measurements for each of 100 cities in the US
+taken in each of January, April, July and October.  So, for each city
+we have a time series, and for any of these 4 times, we have a picture
+of the distribution of temperature across the US geographically.
+
+<p/>
+By displaying the information in Google Earth, we get
+different forms of interactivity relatively easily.
+A user can click on a point and get an HTML document to appear in a
+popup "bubble" window.
+The user can zoom in and out and see the big picture or individual
+cities.
+We could setup an animation so that we can see how the temperature
+varies over time dynamically rather than looking at the different
+time series.
+
+<p/>
+For better or worse, we will do something reasonably obvious
+but not necessarily visually effective.
+<ul class="list">
+  <li> At each city, we will display a small picture of the time series
+of the temperature for that city.
+  <li>We color the lines connecting the points to illustrate
+whether it was cold, warm, hot or very hot.
+  <li> A legend in the lower-left corner of the screen maps the colors to
+values.
+  <li> Each city has a thumb-tac which a user can click on to
+       pull up a window giving a more detailed display of the
+       time series with an axis and also a table listing the actual
+      values.
+  <li> If the Google Earth time window is widened to include two or
+      more months, clicking on the thumb-tac illustrates all of the
+      points within that time period for that city by placing
+      them on spokes eminating from the thumb-tac.
+</ul>
+
+<p/>
+
+We can see 
+<ul class="list">
+  <li> there is little variation in weather, e.g. California (especially San Francisco), Hawaii
+        but that Hawaii is very warm all year round, whereas
+      California   is cooler in the early part of the year;
+     
+  <li> that the mid-west is very cold in the winter and hot in the summer;
+  <li> Alaska has quite a bit of variation, but is cooler than the
+     rest of the country;
+  <li> the south-east part of the country is noticeably warmer;
+  <li> the Rocky mountains don't seem to be very different from the
+   flat mid-west. Is this because the cities in the Rockies are not at
+   very high elevations;
+  <li> Lake Superior keeps Duluth cooler in the hot periods than other cities nearby,
+    but this is not true for Lake Michigan's effect on Milwakee and Chicago on the other lake.
+</ul>
+
+We also notice that Grand Rapids, Michigan is mis-located,
+especially if we have the borders displayed on Google Earth.
+The latitude was intentionally altered in this data.
+
+<p/>
+
+A <a href="xyplot.jpg">lattice/trellis plot</a> of couse shows this information also,
+but we don't get the  layout of the panels corresponding
+to the geographical positions of the cities.
+Of course, we should improve it to use the same coloring scheme for
+the lines as we use in our plots, and arrange the panels by
+latitude to show the effect of the increasingly northern latitude.
+
+<p/>
+
+<h2>The Code</h2>
+<dl>
+  <dt>
+  <li> <a href="cityTemperatures.R">Code to generate XML</a>
+  <dd> This creates the KML document in R and the serializes it to a file.
+
+  <dt>
+  <li> <a href="images.R">Code to generate images</a>
+  <dd>
+      This is done once, not each time we generate the XML,
+      so
+<pre>
+createHist(temperature); createHist(temperature, mini = TRUE); createLegend(temperature)      
+</pre>
+      is the command.
+</dl>
+
+There are lots of things to cleanup
+including the legend, the plots, comments in the code, etc.
+
+
+<p/>
+Information about how to create the KML files
+is available at <a href="http://code.google.com/apis/kml/documentation/">http://code.google.com/apis/kml/documentation/</a>.
+
+<h2>Future work</h2>
+
+There are lots more interesting things
+to do with this interface.
+
+<dl>
+  <dt>
+  <li> On Windows, we can control Google Earth directly using a DCOM
+  client interface.
+  <dd>
+  <dt>
+  <li> We can work with different example data
+  <dd> For instance, earthquake information,
+      animal migration.
+
+  <dt>
+  <li> Have interactive controls in R (e.g. via RGtk, RwxWidgets, RQt,
+  tcltk) and have queries in R select points in a dataset and
+  highlight those in Google Earth
+      
+  <dd>
+
+  <dt>
+  <li> Interpolate the temperatures for time and space over all the US
+      and superimpose a surface. And then allow the user to transition
+      between these over time via the Google Earth time control.
+  <dd>
+      
+</dl>
+
+<h2>Notes</h2>
+This is a fresh start, but relates to the work that Motoki
+Wu did in an "Advanced Computing Topics" class in Davis in 2007.
+
+<hr>
+<address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@wald.ucdavis.edu>&lt;duncan@wald.ucdavis.edu&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Tue May 15 10:39:05 PDT 2007
+<!-- hhmts end -->
+</div>
+</body> </html>

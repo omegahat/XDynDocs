@@ -1,0 +1,139 @@
+<?xml version="1.0" ?>
+<article>
+<title>Project: Classifying Spam</title>
+This project comes in two disjoint but related parts.  The first step
+is to create a classifier for detecting <spam /> - unsolicited email
+messages.  While many have used procedural, deterministic rules for
+guessing whether a mail message is <spam /> or not, the most successful
+schemes have used statistical approaches.  And this makes a great deal
+of sense for a variety of reasons.  Firstly, while a message is either
+<spam /> or not, the classifier has to estimate the chance of it being
+<spam /> and must worry about getting it wrong - either allowing <spam /> to
+be delivered as a regular message, or discarding a legitimate message
+believing it is <spam />. This is statistical hypothesis testing, so a
+statistical approach would seem natural.  Secondly, we gain
+information by pooling across different messages that we see, so an
+updating classifier that learns from previous messages should be
+better.
+
+<para/> There are a variety of different statistical classification
+techniques we might employ. Of course, we want the best classifier we
+can achieve. Another consideration however is simplicity and speed. We
+want to be able to classify a new message without having to either
+wait to long, or having to write a whole new application or perform
+tedious manual tasks.  It turns out that the naieve Bayes classifier
+does a remarkably good job, simply and efficiently.
+And that is what we will use here.
+
+<para/> The first stage of the project is to develop the classifier.
+We do this by using <emphasis>training data</emphasis>.  In this
+context, these are mail messages that have been collected and also
+have been (manually) classified as either <spam /> or not <spam />.
+The steps in building the classifier are as follows.
+<variablelist>
+<varlistentry>
+<term>
+Remove stop words.
+</term>
+<listitem>
+
+For each message, remove any words that are in the list of given stop
+words.  These stop words are listed in the file stop.txt, one per
+line.  They consist of common words such as "and", "if" and "but" that
+tell us very little about the content.  Removing these words, gives us
+a transformed version of each message.
+
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>
+Stem words.
+</term>
+<listitem>
+Convert gerunds and present particples (i.e. words ending in "ing") to
+their stems. So reading becomes read, running becomes run, and so on.
+We can also map words ending in 'ed' to their correpsonding verb
+stems, e.g. stopped to stop, halted to halt.
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>
+Compute the dictionary of all words.
+</term>
+<listitem>
+Get a list of all the words in all the messages.
+This is our collection of predictors.
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>
+Compute word frequencies.
+</term>
+<listitem>
+For each message and for each word in the table of seen words,
+compute the frequency of those words.
+In other words, take the message and all of the  remaining
+words  after removing the stop words and stemming
+and count how often each word in the in the training dictionary 
+occurs.
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>
+Identify whether the message is spam or not spam.
+</term>
+<listitem>
+This information is in the name of the file itself.
+Files whose name starts with "spmsg" have been identified
+as <SPAM />. All other messages are regular mail.
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term>
+
+Create the dat
+</term>
+<listitem>
+</listitem>
+</varlistentry>
+
+
+<varlistentry>
+<term>
+Compute probabilities.
+</term>
+<listitem>
+
+</listitem>
+</varlistentry>
+</variablelist>
+
+The instructions have been intentionally split into small, independent
+steps. You should think about how you can do them as efficiently as
+possible before starting.  Also, the code you write will benefit from
+having ability to 
+<itemizedlist>
+<listitem>
+incorporating additional training messages,
+</listitem>
+<listitem>
+specify a way to look at the message before using
+the classifier and determining it as <spam />
+without using this classifier. This is a hybrid or multi-step
+classifier.
+</listitem>
+</itemizedlist>
+
+</article>
+
+
+ 
+
+
+

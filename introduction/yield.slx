@@ -1,0 +1,76 @@
+<foilgroup>
+<title>Yield Analysis</title>
+
+<foil>
+<title>Yield Analysis</title>
+
+<itemizedlist>
+  <listitem>
+    Improve yield of manufacturing processes
+      <itemizedlist>
+       <listitem>
+         Silicon wafer production.
+       </listitem>
+       <listitem>
+         Fiber-Optic boards in routers.
+       </listitem>
+      </itemizedlist>
+   </listitem>
+   <listitem>
+     Packs made up different components 
+   </listitem>
+   <listitem>
+     4-step production/test process
+   </listitem>
+   <listitem>
+     Calibrate power levels at each step
+   </listitem>
+   <listitem>
+     If test fails at step i, return to step 1.
+   </listitem>
+   <listitem>
+     Different wavelengths, power levels, operators, ...
+   </listitem>
+</itemizedlist>
+
+</foil>
+
+<foil>
+<title>Data Sources</title>
+<itemizedlist>
+  <listitem>Test machines collect data automatically</listitem>
+  <listitem>Operator enters serial number of component</listitem>
+  <listitem>Calibration measurements made with different measuring devices</listitem>
+  <listitem>Measurements recorded in user-defined fields of database</listitem>
+  <listitem>Multiple measurements for different calibration inputs</listitem>
+  </itemizedlist>
+</foil>
+
+<foil>
+<title>Goal</title>
+<itemizedlist>
+ <listitem>Provide statistical methods for predicting &amp; improving yield</listitem>
+ <listitem>Methods accessible to engineers in Excel or PowerPoint</listitem>
+ <listitem>No statistician to perform the analyses routinely</listitem>
+ <listitem>Make methods accessible, not just powerful</listitem>
+</itemizedlist>
+</foil>
+
+<foil>
+ <title>Data</title>
+ <itemizedlist>
+  <listitem>Connect R to Excel</listitem>
+  <itemizedlist>
+   <listitem>Initial parameters from engineers: product, period, .. </listitem>
+   <listitem>Sent to R</listitem>
+   <listitem>R requests relevant data from Database</listitem>
+   <listitem>R fits complex statistical model with simulations for errors</listitem>
+   <listitem>Outputs results using Business Objects</listitem>
+  </itemizedlist>
+  <listitem>Enabling technology is DCOM - Distributed Common Object Model
+  </listitem>
+  <listitem>Make R a DCOM-aware facility with extensions to R</listitem>
+  <listitem>Oracle database on remote Unix machine</listitem>
+ </itemizedlist>
+</foil>
+</foilgroup>

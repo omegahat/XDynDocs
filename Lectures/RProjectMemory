@@ -1,0 +1,108 @@
+Where are you working -
+  Home or on university (SCF, CS) computers?
+
+How much RAM do you have?
+  free, 
+  look for idle machines.
+
+How much RAM do you need for diffferent computations?
+  object.size()
+     > object.size(Emails)
+     [1] 61839140
+     > object.size(Emails)/1024
+     [1] 60389.79  # (MBs)
+
+  Different from disk space, but probably same order of magnitude.
+  And some values are shared across objects, e.g. names.
+
+
+Start R with as much memory as you think you might need (--vsize, --nsize).
+It isn't necessary but may help avoid unnecessary garbage collection.
+
+
+How can we conserve RAM?
+<item>
+ Clean up after yourself. If you don't need an object,
+ remove it. If it is big, this is important. If not,
+ probably won't make any difference. Use object.size()
+</item>
+
+<item>
+One of the most important tricks is pre-allocate space
+and write into that rather than concatenating objects.
+
+ans = matrix(NA, n, c)
+
+for(i in 1:c) {
+   ans[, i] <- foo(....)
+}
+
+ 
+Very different from 
+  for(i in 1:c) {
+    cbind(ans, foo(...))
+  }
+
+We hold around the current version of ans and the new version of ans
+at the same time.  Why? Because that is the way the language works and
+it makes it easier to reason about code as a result. It is a
+functional programming language.
+</item>
+
+<item status="marginal">
+
+In loops, make the last line of the body of the loop
+NULL so that it "returns" that empty value.
+Using apply can help.
+</item>
+
+<item>
+Use built-in functions where possible.
+They are more likely to have been scrutinized
+and improved.
+The outer function is a funky function.
+</item>
+
+Batch jobs and job control.
+
+
+As nice as it would be if the system handled things
+for you, in many cases, you have to think about 
+the particular characteristics of the task at hand
+and see how to write this in a more efficient way.
+We often write the vanilla, no-tricks version first.
+We debug this and get the right answer.
+
+Then, we figure out where the bottlenecks are 
+and we "optimize" these. We can use the first version
+to ensure we still get the same, correct answer in
+the new version.  For this, we need good test data
+that test the code and the search space reasonably
+comprehensively.
+
+
+Let's think about the project we are working on currently.  This is
+cross-validation of the k-Nearest Neighbors method.
+Think about the following.
+
+
+
+There is typically a trade-off between memory usage and speed.  By
+storing intermediate results, we can improve speed by avoiding the
+need to re-compute values that we do once and store.
+
+Speed.
+
+Avoid recomputing things.
+
+Move computations that don't depend on the iteration of
+the loop outside of the loop
+
+for(i in 1:n) {
+ 2 * pi
+}
+
+
+
+
+Debugging.

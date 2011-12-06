@@ -1,0 +1,27 @@
+<article>
+<r:code>
+z = readTrace("~/NetworkData/mannheim/offline.final.trace.txt")
+dim(z)
+[1] 146080      8
+</r:code>
+
+unique(z$id)
+Just one.
+
+The other macs
+  unique(unlist(lapply(z[["macs"]], function(x) x[,1])))
+
+We get 21, corresponding to the maximum number of responders
+in z.  So at least one of the observations had all the potential responders
+reply.
+
+table(z$numResp)
+
+    0     1     2     3     4     5     6     7     8     9    10    11    12 
+    6    33    11    65   657  3873 13633 30655 42520 33138 14563  5066  1294 
+   13    14    15    16    17    18    21 
+  348   133    49    23    10     2     1 
+
+And so there was exactly one.
+
+</article>

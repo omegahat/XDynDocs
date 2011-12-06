@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+
+<body>
+<h1></h1>
+
+These are examples of some slightly more complicated plots. They are
+not necessarily "good" plots, just examples to help give you a sense
+of what you might do and how you might do it.
+
+<h2>Team Payroll for Years</h2>
+
+Data:
+<pre>
+ d = dbGetQuery(con,
+       "SELECT Salaries.yearID AS Year,
+               Teams.name AS Team,
+               SUM(Salaries.salary) AS Payroll,
+               Teams.lgID AS League
+        FROM Master, Teams, Salaries
+        WHERE
+             Salaries.yearID = Teams.yearID
+           AND
+             Master.playerID = Salaries.playerID
+           AND Teams.teamID = Salaries.teamID
+        GROUP BY Team, Year
+        ORDER BY Team, Year;")
+</pre>
+
+Time series plot for payroll for each team
+witht a  boxplot for each year showing the distribution
+of the total payrolls for the collection of
+teams.
+<p/>
+<img src="PayrollYear.jpg">
+
+<p/>
+S code (approximately)
+<pre>
+boxplot(Payroll ~ Year, data = d,at = 1985:2003, add = TRUE, col="red", lwd=2, notch = TRUE)
+plot(0, xlim = range(d[,"Year"]), ylim = range(d[,"Payroll"]), type = "n", ..., xlab = xlab, ylab = ylab)
+
+sapply(1:length(dd), function(i) {
+                        lines(dd[[i]][,"Year"], dd[[i]][,"Payroll"], col = i, lty = i)
+                        TRUE
+                     })
+
+legend(min(d[,"Year"]), max(d[,"Payroll"]), names(dd), col = 1:length(dd), lty = 1:length(dd), cex = .90)
+</pre>
+
+<p/>
+
+A trellis/lattice-based boxplot of payroll versus year for each
+division with each of the two leagues (American and National)
+
+<p/>
+<img src="PayrollPlotBW.png">
+
+<p/>
+<pre>
+trellis.device("png", file = "PayrollPlotBW.png")
+bwplot(Year ~ Payroll |  Division * League , data = d, allow.multiple = TRUE)
+dev.off()
+</pre>
+
+
+
+<hr>
+<address><a href="http://cm.bell-labs.com/stat/duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@research.bell-labs.com>&lt;duncan@research.bell-labs.com&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Fri Mar 12 17:40:24 PST 2004
+<!-- hhmts end -->
+</body> </html>

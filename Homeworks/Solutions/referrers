@@ -1,0 +1,11 @@
+#!/bin/sh
+
+cat omegahat.log* | cut -d ' ' -f 8 | sort | uniq -c | sort | tail -n 10 > RefferalPages
+
+for f in `cat RefferalPages` ; do
+
+  filename=`echo $f | sed -e '|/|_|'`
+  echo $f > filename
+
+done
+  

@@ -1,0 +1,1015 @@
+\documentclass{article}
+\usepackage{times}
+\usepackage{moreverb}
+
+\newenvironment{codeListing}
+  {\begin{listing*}[5]{1}}
+  {\end{listing*}}
+
+
+\def\SFunction#1{\textbf{#1()}}
+\def\SVariable#1{\textsl{#1}}
+\def\SArg#1{\textsl{#1}}
+\def\Sexpression#1{\texttt{#1}}
+\def\executable#1{\texttt{#1}}
+\def\file#1{\HREF{http://winnie.ucdavis.edu/stat141/Winter04/Homework/NaieveBayes/Solutions/#1}{\textbf{#1}}}
+%\input{WebMacros}
+%\input{SMacros}
+
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{fullpage}
+\usepackage{amsmath}
+
+\def\HREF#1#2{\href{#1}{#2}}
+
+
+\title{Cross-validating the Naive Bayes Spam Classifier: one solution}
+\author{Duncan Temple Lang}
+\begin{document}
+\maketitle
+
+The following is a discussion of implementing the Naive Bayes
+classifier for the "lingspam" dataset in R.  There are a variety of
+different approaches at both the overall and individual detail levels.
+This attempts to discuss and compare these.
+
+
+The overall goal is build a classifier the identifiers Spam mail
+messages.  We will use a simple one in which we compute a value for a
+given message and classify the message as Spam if the value exceeds
+$\tau$.
+$$
+  classifier(m) = 
+  \begin{cases}
+    SPAM & \hbox{if } T(m) > \tau \\
+    HAM & \hbox{if } T(m) \le \tau
+  \end{cases}
+  $$ The statistic we are interested in is the likelihood ratio of the
+  message being SPAM to HAM, i.e. $\Pr(SPAM \vert
+  message)/\Pr(HAM\vert message)$.  Since we can't compute these two
+  probabilities directly because we don't have the form of the
+  probability distributions concerned, we rewrite this using Bayes'
+  theorem and then estimate the components.  See the
+  \HREF{../naiveBayes.pdf}{Na\"ive Bayes handout} discussing this and
+  the functions \SFunction{computeFrequencies} and
+  \SFunction{computeMessageProbability} for computing the terms.
+
+The task for us is
+two-fold:
+\begin{enumerate}
+\item read in the messages from the lingspam
+dataset and clean them up so that we can use
+the contents of each message in computing the
+probabilities of interest; and
+\item determine a value for $\tau$
+  for our classifier so that we have a
+  suitable Type I error rate for
+  classifying Ham mail messages as Spam --
+  the most serious type of error and
+  so the one we want to control.
+\end{enumerate}
+
+Let's start with the first step - bring the messages into R.  We first
+need to identify what sorts of data structures we want to have after
+we have read the messages.  This requires that we know what we want to
+do with the messages after we have them and so relies on our
+understanding the second step.  Looking at the help pages for the
+\SFunction{computeFrequencies} and
+\SFunction{computeMessageProbability} functions, we might think that
+having a list whose elements are simple character vectors of the
+(unique) words for the particular message would be good for
+representing the messages.  This comes from the fact that this is the
+form expected for the first parameter of the
+\SFunction{computeFrequencies} function.  (See the help page.)
+Similarly, the second parameter is a logical vector indicating which
+for each message whether it is Spam or not.  Here we have two parallel
+data structures - a list containing message information and a logical
+vector indicating whether the corresponding message is Spam or not.
+In this case, we do not combine them into a single object for each
+message. There is no particular reason for this except that this is
+how the \SFunction{computeFrequencies} function expects its inputs.
+And so it is easiest and most efficient to create these data
+structures when processing the messages.
+
+
+
+\section{Processing the Lingspam Mail Messages}
+
+Now that we know what we are trying to create in R when reading the
+messages in the lingspam corpus, we can focus on the details of how to
+do this.  In comparison with the Spam Assassin messages in
+\HREF{}{assignment I}, we have much simpler messages.  There are is a
+very simple header consisting simply of the Subject field.  And there
+are no attachments.  Our task here is to slightly different from
+assignment I in that we have not just break the message into its
+different parts, but get the collection of words from the message.  So
+we have to process the contents of the message.
+However, this is relatively simple.
+
+There are several steps involved:
+\begin{itemize}
+\item read the lines of the message,
+\item break the message into words
+\item remove punctuation,
+\item remove words that are numbers,
+\item discard the simple, common words (called ``stop words''), 
+\item remove the first "Subject:"
+\item convert the words to lower case,
+\item return only the unique words in the message
+\end{itemize}
+
+The function \SFunction{getMessageWords} in figure
+\ref{fig:getMessageWords} below does this for a given message.  It
+starts by using \SFunction{readLines} to bring the text of a message
+into R.  It reads the text from the file given as input to the
+function.  When processing the different messages, we will have to
+call this function with each of the file names of the messages in the
+lingspam data.
+
+It is not absolutely necessary, but it is somewhat conceptually
+simpler to think of the message as being a single string.  So we
+combine the lines back into a single string using \SFunction{paste}.
+This consumes some memory and cycles and is not strictly necessary.
+However, since we will be doing string manipulation with regular
+expressions, we may yield some benefit from having the regular
+expression applied to a single string rather than multiple strings.
+This is marginal.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \leavevmode
+\begin{listing}[5]{1}
+getMessageWords =
+function(filename)
+{
+  txt = tolower(paste(readLines(filename), collapse="\n"))
+   
+    # remove punctuation, numbers and change to lower case.
+    # Try to do this in one regular expression and hope that
+    # it is not excessively complex so that we gain by avoiding
+    # multiple calls to gsub(). Is it worth timing?
+  txt = gsub('[[:punct:]]+|([[:punct:][:space:]]*[0-9]+[[:space:][:punct:]]*)',
+             " ", txt))
+
+    # In this context, we can break the results into words
+    # by splitting on any amount of white space.
+    # This is better than a single space or TAB
+    # as it discards " " or "  ", etc. that might result.
+
+    # In our version, we are only interested in the presence
+    # or absence of a word, not the number of times it occurs.
+    # So we compute the unique words.
+  words = unique(strsplit(txt, "[[:space:]]+")[[1]])
+
+   # All messages start with Subject: so we
+   # get rid of this in the first position
+   # as subject (since we have removed : and moved
+   # to lower case earlier.)
+  if(words[1] == "subject")
+    words = words[-1]
+
+    # Remove the stop words
+  words = words[!(words %in% StopWords)]
+
+    # throw away single letter words.
+  words[is.na(match(words, letters))]
+}
+\end{listing}
+    \caption{getMessageWords}
+    \label{fig:getMessageWords}
+  \end{center}
+\end{figure}
+
+The next step is to remove the punctuation characters.  Why do we need
+to do this?  The reason is that we want to get access to the different
+regular words in the text.  Our classifier doesn't take into account
+punctuation and other characteristics of the message.
+And if we are to work on words, we potentially need to 
+be able to identify words
+inside quotes such as vinyar and tengwar in the line
+\begin{verbatim}
+ know about " vinyar tengwar " ( issn 1054-7606 )
+\end{verbatim}
+If we were to use the 
+\SFunction{scan} function to read the words
+(e.g.
+\begin{verbatim}
+  scan(textConnection(txt), what = "", sep = " ")
+\end{verbatim}
+) we would end up with elements containing multiple words such as
+'vinyar tengwar' in R.  This is not what we want, but removing the
+punctuation characters would suffice.  It turns out that the approach
+we will take in this very specific context (using
+\SFunction{strsplit}) means we don't have to worry about the problem
+with \SFunction{scan}.
+
+The simples way to remove the punctuation characters in the string
+\SVariable{txt} is to use a regular expression and \SFunction{gsub}.
+We want to replace characters such as ',', ';', '.', '!', ':', '?'.
+We can enumerate these in a regular expression such as
+",|;|\\.|!|:|\\?", taking care to escape the \textit{meta-characters}.
+We have to ensure to identify all the punctuation characters.  A
+simpler way to do this is to use the concept of character sets, and
+specifically named character sets.
+We use the regular expression
+\begin{verbatim}
+ "[[:punct:]]"
+\end{verbatim}
+to refer to the set (indicated by the outer []) of all punctuation
+characters (indicated by the \verb+[:punct:]+).
+
+We would apply this regular expression to the text and replace any
+such characters that matched the pattern with a space, " ".
+We do this using the command
+\begin{verbatim}
+ txt = gsub("[[:punct:]]", " ", txt)
+\end{verbatim}
+and assigning the value back to the variable we will
+use in the subsequent computations.
+
+Since we also want to get rid of words that are numbers, i.e. pure
+digits, we will use another regular expression.  We identify a number
+with the regular expression \verb|"[0-9]+"|.  However, in general, we
+should be careful that it is a separate word and not a sequence of
+numbers in the word ``\texttt{xc6216}''. (See message 8-1144msg1.txt).
+And we would also like catch numbers in the strings like
+``\texttt{650-723}'' and ``\texttt{july 13-16}''.  If we first remove
+punctuation characters, we will discard the '-' characters and so our
+job will be easier.  However, we will then end up with two calls to
+\SFunction{gsub}. In this particular context, this is not a serious
+problem. On the other hand, if we had many strings in each message
+(rather than a single string), this could be quite inefficient.
+Instead, we might want to combine the two regular expressions in a
+single call to \SFunction{gsub}.  To do this, we don't get to assume
+the punctuation characters have already been removed.  So we need to
+handle patterns such as \texttt{650-723} and \texttt{13-16}.  The
+pattern in the \SFunction{getMessageWords} does this.  \textit{Make
+  certain that you understand how it does this. Verify that it works
+  by applying it to different input strings.}
+
+We can convert the text to lower case at this point also.  When we do this
+is largely irrelevant, and we did it when we combined the
+lines into a single string.  At this point, we have a single string
+made up of words and white space in our message text.  We want just
+the words and to discard the white space.  And we would like a
+character vector giving us these words.  We have used
+\SFunction{strsplit} in assignment I to do something like this --
+breaking a line of the form \texttt{name: value} into its name and
+value elements.  We can use \SFunction{strsplit} here also.  In this
+context, we want to split by white space.  This could be either a
+space or a TAB, in general.  And rather than splitting at each space,
+we really want to split on one or more spaces or TAB characters.  We
+could specify this as a regular expression -- "\verb|[[:space:]]|".
+And fortunately, \SFunction{strsplit} accepts the delimiter as a
+regular expression.
+So the expression
+\begin{verbatim}
+  words = unique(strsplit(txt, "[[:space:]]+")[[1]])
+\end{verbatim}
+gives us back the unique words in our message text.  By using this
+\textit{sequence} of white space characters to split words, we discard
+any empty words (i.e. \verb+""+) or spaces (i.e. \verb+" "+) in our
+vector of words.
+
+At this point, we want to discard the first word if it is
+\texttt{subject} corresponding to the \texttt{Subject:} in our
+original text for the message.  (Since we have removed punctuation and
+changed to lower case, we are looking for the pattern
+\texttt{subject}.)
+
+And finally, we need to discard any common words in our message that
+are contained in the \SVariable{StopWords}.  We can do this using the
+\SFunction{match} function.  We are already dealing with unique words.
+And all we need to do is determine which elements in this vector of
+words are also in the \SVariable{StopWords} vector.  \SFunction{match}
+does this for us, as does its simpler form \SFunction{\%in\%}.
+
+
+\section{Cross-Validation}
+At this point, we have the messages and whether each one is SPAM or
+HAM.  We are now ready to estimate our tuning or nuisance parameter,
+$\tau$, for our classifier.  We use cross-validation to do this since
+there is no explicit probability model from which we can estimate it
+using maximum likelihood or some other estimation approach.  The idea
+here is that we will find a value of $\tau$ which classifies messages
+well when given new or independent data.  To do this in the absence of
+independent test data, we break our original sample into
+non-overlapping blocks that constitute different test sets.  Then we
+``train'' the classifier on each of the training sets created by
+treating every observation except those in the test set as our sample.
+We use 10-fold cross validation, meaning that we divide the original
+sample into 10 distinct blocks of observations (messages in this
+case). 
+
+We compute our probabilities of words being in a message for both SPAM
+and HAM messages in our training set.  We can use these probabilities
+to compute the log-odds ratio for each of the messages in the test
+set.  We have two choices about how we do our cross-validation.  One
+approach is to determine the value of $\tau$ for the classifier for
+each of the $K$ test sets such that the error rate for the test set is
+$\alpha$.  The result is $K = 10$ different values of $\tau$.  Then,
+we ``combine'' these to come up with a value of $\tau$ for our overall
+classifier.  Exactly how we combine these values is a matter for
+debate.  We could take the mean, the median, the mode, some weighted
+combination, and so on.  What is clear is that the aggregated value
+for $\tau$ will not yield an error rate of exactly $\alpha$ for the
+entire collection of messages in our overall sample. 
+
+
+
+Another issue about which we have a choice to make is how we partition
+our original sample into the $K$ test sets.  Firstly, we have to
+randomize the messages. If we didn't, we would be subject to the order
+in which they were read into R. And in this case, the spam messages
+are the last 481 messages.  So if we were to divide the original
+messages into $K = 10$ groups using the original ordering, our first
+$8$ test sets would have no spam messages.  And this is not a good,
+representative sample of new data.  So we certainly must randomize our
+messages.  The other issue is whether we should create our test sets
+so that the proportion of SPAM messages each contains is approximately
+the same as our original sample.  By random sampling, this will be
+true on average.  But with only $10$ test sets, the variability in
+this proportion may be high. And if we feel our classifier is
+sensitive to the overall proportion of SPAM messages, we may want to
+condition on this level.
+
+In the simple case of randomizing our observations
+into $K$ groups to act as test sets, we can use
+the \SFunction{sample} function in R.
+\begin{verbatim}
+ n = length(messageWords) # The number of ling spam messages.
+ S = matrix(sample(1:n, n, replace = FALSE), , K)
+\end{verbatim}
+Here we arrange the test set indices into $K$ columns of a matrix so
+we can use these each column to easily subset the messages in that
+test set and corresponding training set.  We don't worry here about
+the fact that we have 2893 indices and this needs to be extended to
+fit into a full matrix with $10$ columns containing $2900$ entries.
+The last 7 entries in our matrix are recycled from the sample and so
+will be the first $7$ entries again.  This is not a serious issue. If
+it were a problem, we could extend the sample with $0$ values and
+leave the last test $7$ elements shorter than the others, or we could
+divide the $K$ test sets differently.  In practice in this context,
+the results will not differ significantly.
+
+
+To do the cross validation, we follow the general algorithm
+discussed in class:
+\begin{verbatim}
+ for(i in 1:ncol(testSets)) {
+   trainingData = Data[-testSets[,i]]
+   model = fit(trainingData) 
+   values = predict(Data[testSets[, i]], model)
+ }
+\end{verbatim}
+The fit and predict steps here are given by the functions
+\SFunction{computeFrequencies} and applying
+\SFunction{computeMessageProbability} to each message in the test set.
+We must scale the log-odds ratios in each test set by adding
+$log(\Pr(SPAM)/\Pr(HAM))$ for the particular training set.  See
+\SFunction{doCVSet} in \file{cv.R}.
+
+
+\section{Computing $\tau$}
+
+When we have the 2893 log-odds ratio values, we need to find the value
+of $\tau$ which gives us a Type I error of $\alpha = 0.01 = 1\%$.  For
+a given value of $\tau$, say $\tau_0$, we can classify each message as
+SPAM or HAM using our simple classifier.  Then we can use or
+\SVariable{isSpam} variable in R to compare our prediction with what
+was actually true.  So we have all the information we need to compute
+the Type I error rate for a given $\tau$. We just need to solve the
+problem of finding the $\tau$ that yields a Type I error rate of
+$\alpha$.
+Let's denote the Type I error  rate for a given 
+$\alpha$ and $\tau$ by
+$$ e_\alpha^I(\tau).$$
+
+In theory, we need to search over all possible value of $\tau \in
+[-\infty, \infty]$.  However, it should be clear after a little
+thought that we can at least restrict the interval.  Any value of
+$\tau$ less than the minimum of the log-odds ratio values will mean
+that we classify all messages as SPAM. The Type I error rate then is
+the number of HAM messages that we classify as SPAM divided by the
+number of HAM messages.  (It is important to divide by the right
+number here which is the total number of HAM messages as these are the
+only ones that can contribute to a Type I error.  Dividing by the
+total number of messages is not correct.)  Similarly, any value of
+$\tau$ greater than the maximum of the log-odds ratio values will mean
+that we classify every message in our sample as HAM. So our Type I
+error rate will be $0$.  So if we denote the $i$-th log-odds ratio
+value as $l_{i}$ and the $i$-th order statistic (i.e. of the sorted
+values) as $l_{(i)}$, we have $\tau \in (l_{(1)}, l_{(2893)})$
+and we have limited our search.
+
+We first note that the Type I error rate for these 2893 messages is
+monotonically non-increasing.  By this we mean that for
+$$
+  e_\alpha^I(\tau') \ge 
+  e_\alpha^I(\tau),
+\forall \tau' < \tau.
+$$ Why is this true? 
+
+Consider a message with the log-odds ratio value $l$.  We classify the
+message as SPAM if $l$ is greater than our threshold, $\tau$.  Since a
+Type I error only deals with the number of HAM messages that we
+classify as SPAM, if we have fewer messages that we classify as SPAM,
+our error rate must decrease. (The number of potential HAM messages to
+classify as SPAM is fixed.)  So suppose we have two possible values
+for our threshold, $\tau$ and $\tau'$ with $\tau' < \tau$.  If $\tau'
+< l < \tau$, we will classify the message as SPAM if we use $\tau'$ as
+our threshold, but we will not classify it as SPAM if we use $\tau$ as
+our threshold.  The count of misclassified HAM messages can only stay
+the same or decrease for larger values of $\tau$.  As a result, the
+number of messages classified as SPAM is smaller (no larger) for
+larger values of $\tau$ and so our type I error rate is
+non-increasing.
+
+
+We can write a simple R function to compute the Type I error rate.  It
+takes a value of $\tau$, the vector of log-odds ratios and the actual
+type of each message: SPAM or HAM.  All that it does is use the
+classifier to predict the status of each message (SPAM or HAM) and
+then count the number of messages that were classified as SPAM
+\textit{and} that were in fact HAM (i.e. \verb+!spam+).  And finally,
+we divide by the number of HAM messages.
+\begin{listing}[5]{1}
+typeIErrorRate =
+  #
+  # For a given threshold value, tau, 
+  # classify all the messages with a value
+  # for logOdds > tau as SPAM.
+  # Then count up all the HAM messages that
+  # we incorrectly classified as SPAM
+  # using this classification rule.
+  # We count the number of HAM messages that
+  # are classified as SPAM which is 
+  # !spam
+  #
+function(tau, logOdds, spam)
+{
+  classify = logOdds > tau
+  sum(classify & !spam)/sum(!spam)
+}
+\end{listing}
+This function is included in the file
+\HREF{NaiveBayes.R}{NaieveBayes.R}.  Note that we use the element-wise
+AND operator (\texttt{\&}) and not \texttt{\&\&}.
+
+This is equivalent to the more explicit form which first computes the
+indices of the HAM messages.  Then it classifies only these ones and
+\begin{verbatim}
+  idx = which(!spam)
+  sum(logOdds[idx] > tau)/length(idx)
+\end{verbatim}
+Which is faster depends on how long the vectors are. However, both
+will be quite quick and it is not worth considering any optimization.
+
+Note that this function (in either form) is not vectorized in the
+argument \SArg{tau}.  We evaluate it for a single scalar value.  If we
+want to evaluate it for a vector of values of $\tau$, we need a loop
+in the form of an \SFunction{sapply}.
+
+
+Now that we can compute the Type I error rate for a given $\tau$, we
+need to try to find our value of $\tau$ that yields a Type I error
+rate of $\alpha$.  We could compute the value of $\tau$ for a large
+number of values within this interval and successively refine the
+interval so that we find the value of $\tau$ that yields a $1\%$ Type
+I error rate for these 2893 messages.  We might take a regularly-space
+sequence of values within this starting interval $(l_{(1)},
+l_{(2893)})$ and evaluate the Type I error at these points.  Then, we
+would find out which two values of $\tau$ bounded the Type I error of
+$\alpha$.  Then we would take these two values of $\tau$ as our new
+interval and evaluate the Type I error on a more fine-grained sequence
+of values of $\tau$ from within this interval.  When we get close
+enough to a Type I error of $\alpha$, we would stop and use the value
+of $\tau$ that gave us the closest value.  This is just successive
+refinement and is a typical approach for finding a particular quantile
+of a monotonic function, i.e. $\tau$ such that $f(\tau) = \alpha$.
+This is computationally expensive and we don't need to do it in this
+context.  We have additional information.
+
+
+In discussing that the Type I error rate is monotonic, we noted that
+the number of mis-classified messages changed when $\tau' > l_{(i)} >
+\tau$.  Looking at this slightly differently,
+the Type I error rate computed on our
+2893 messages can only change at each value
+of $l_{(i)}$.
+Suppose we take
+$l_{(1)} = l_{\hbox{min}}$ and
+$l_{(2)}$ and we have 
+$l_{(1)} < \tau_1 < \tau_2 < l_{(2)}$.
+Then our estimate of the Type I errors
+are equal for $\tau_1$ and $\tau_2$,
+i.e.
+$$e_\alpha^I(\tau_1) = e^I_\alpha(\tau_2)$$ as there are not
+additional messages that will be classified as SPAM for $\tau_2$ that
+were not already classified as SPAM for $\tau_1$.  For each of these
+value of $\tau$, we will have 1 message classified as SPAM - the one
+corresponding to the minimum log-odds ratio value.
+
+This fact helps us to narrow down the values of $\tau$ that we look at
+to determine $e^I_\alpha(\tau^\ast) = \alpha$.  We need only look at
+the $2893$ values of our log-odds ratios, $l_{(i)}$, from our
+messages.  Our \textit{estimate} of the Type I error rate is a step
+function and only changes at each of these points.  We can do even
+better than this to reduce the set of possible $\tau$s that we search
+over.  It is not all values of $l_{(i)}$ that potentially cause a
+change in the Type I error.  It is the values of $l_{(i)}$
+corresponding to actual HAM messages.  For messages that are actually
+SPAM, classifying them as SPAM is correct and contributes nothing to
+the Type I error rate; and classifying them as HAM contributes to the
+Type II error rate, not the Type I error.
+
+So now we can determine the Type I error rate for different values of
+$\tau$ more conveniently and efficiently.  The following function does
+it by looking only at HAM messages and recognizing that the number of
+Type I errors decreases by $1$ at each $l_{(i)}$ and so is $i/N$,
+where $N$ is the total number of actual HAM messages.  Note that the
+function ignores ties for the log-odds ratios, but these are very,
+very unlikely since they are real valued numbers.
+\begin{verbatim}
+typeIErrorRates =
+  #
+  # We are interested in computing the type I
+  # and II error rates for different values of
+  # tau, the threshold at which we classify a message.
+  # as spam.
+  # vals is the vector of log-odds
+function(logOdds, isSpam) {
+  idx = which(!isSpam)
+  N = length(idx)
+  list(error = (N:1)/N, values = logOdds[idx])
+}
+\end{verbatim}
+The function assumes that the log-odds ratio
+values and corresponding spam indicator vector
+have already been sorted (in ascending order).
+
+Note that this function doesn't take an arbitrary value of $\tau$ and
+return the Type I error rate based on our messages.  It does however
+return a vector of Type I error rates for different values of $\tau$,
+namely the set of $l_{(i)}$.  As this is what we want, we have found a
+vectorized way to compute the Type I errors.
+
+We can compute the Type II errors similarly.  See the
+\SFunction{typeIIErrorRates} in the file
+\file{NaiveBayes.R}.
+
+
+
+\section{Plotting Type I and II Errors}
+
+We can now solve for our value of
+$\tau$  - $\tau^\ast$ - that gives
+$$e^I_\alpha(\tau^\ast) = \alpha$$ Rather than doing this immediately
+and obtaining a single number, it is good to look at the behavior of
+the classifier for the different values of $\tau$ of interest.  We
+want to look at Type I and Type II errors and see how they vary over
+the relevant range of $\tau$.  We have created a function
+\SFunction{plotErrors} to put these two errors on the same plot as a
+function of $\tau$.  We use \SFunction{points} and \SFunction{lines}
+to draw the two collection of points.  We draw each error type with
+its own color (red and green) and plotting character ('+' and 'o') to
+make them visually separate.  Since we are drawing to collections of
+points and lines, it is relatively easy to first create an empty plot
+(using \Sexpression{type = "n"}) and then super-impose the data
+contents of our plot.  To do this, we need to ensure that we have the
+right range of values on both axes that enclose the values for both
+curves.  We could also use \SFunction{matplot} and
+\SFunction{matlines} if we wanted to do this in a single call for both
+error curves and this would handle the ranges for us.
+
+
+We use \SFunction{legend} to label which curve is which (although it
+should be obvious from the context).  Note that we use the same
+plotting characters and colors in the legend to label the groups and
+curves.
+
+Other things to note about this plot are that we use ``plotmath'' to
+put mathematical (Greek, subscripts, superscripts, etc.)  annotations
+on the plot such as in an axis label, the title, etc.
+These are done in commands like
+\begin{verbatim}
+plot(....., xlab=expression(tau), ylab= "Error Rate")
+\end{verbatim}
+and
+\begin{verbatim}
+ text(tau.star + 1, .9*max(elim),
+      substitute(tau == val, list(val = round(tau.star, 2))),
+\end{verbatim}
+See the help page for ``plotmath'' for more information.
+
+
+The outer plot gives us the macroscopic view of the classifier
+behavior for different values of $\tau$.  We are interested in what
+happens in the region where the Type I error is close to $1\%$.  The
+resolution on the outer plot does not allow us to see that.
+Essentially, it appears that the Type I and Type II errors are the
+same.  In order to be able to better display this, we need to draw a
+second plot that ``zooms in'' on this region of interest. We can put
+this plot in a different figure.  We have chosen to put it as in inset
+both to illustrate that this is possible using R's base graphics
+capabilities and also since the larger or outer plot has a lot of
+available space containing no data.  We use \SFunction{layout} to
+partition the graphics area into a grid of rows and columns and
+specify which rows and columns each of the 2 plots should occupy.  See
+the comments and the help page for \SFunction{layout} for more
+information.
+
+
+Note that we could use the \SFunction{typeIErrorRate} and
+\SFunction{typeIIErrorRate} in calls to \SFunction{curve} to draw
+these curves smoothly.  However, it is more instructive to draw the
+step functions and emphasize that these are estimated from the
+messages.  The discreteness reinforces that these are data-dependent
+estimates and not true curves.
+
+
+
+
+\section{Running the Task}
+
+Now that we have written all the supporting functions,
+we are finally ready to run the cross-validation
+and find the value of $\tau$.
+First, we load these supporting functions
+using \SFunction{source}
+\begin{listing}[5]{1}
+source("getMessageWords.R")
+source("cv.R")
+source("cvSample.R")
+source("lingspam.R")
+source("plot.R")
+\end{listing}
+
+The next step is to load the NaieveBayes package and the make the
+StopWords vector available in the R session.
+
+\begin{verbatim}
+library(NaieveBayes)
+data(StopWords)
+\end{verbatim}
+
+And now, we are ready to read the messages and perform the
+cross-validation and find $\tau$.
+\begin{listing}[5]{1}
+ff = list.files(system.file("messages", package = "NaieveBayes"), full.names = TRUE)
+messageWords = lapply(ff, getMessageWords)
+names(messageWords) = ff
+
+vfull = NaiveBayes(messageWords = messageWords)
+pdf("TypeI-IIErrors.pdf")
+errs = plotErrors(vfull[[1]], vfull[[2]], elim=c(.025, .005),
+                    widths=c(1,3,3,3), heights = c(2,2,2,1),
+                     legendPos = c(-800, .85))
+dev.off()
+\end{listing}
+
+These commands are provided in the single file
+\file{LingSpam.R}.
+
+
+
+Since these commands take a long time to run in R, we would like to be
+able to leave them running in the ``background'' without us having to
+wait while they are being processed.  We don't want to log into a
+machine and occupy it while the commands are being evaluated.  And we
+don't want to leave the machine open for others to use when we are
+logged into that or a remote machine. That makes the machines
+vulnerable and is a very bad idea!
+
+The Linux/Unix and Macintosh operating systems allow us to start a
+process and leave it running after we log out of the machine.  The
+task continues to run and writes its output to one or more files.
+This is ideal for what we want to do in this problem.  Instead of
+issuing the R commands interactively in an R session to do the lengthy
+cross-validation, we put them into a file, say \file{LingSpam.R}.  Then, we
+start an instance of R and tell it to process the commands in that
+file.  We want to save the results from the session and can use
+\SFunction{save.image} for this.  Alternatively, we can tell R to save
+the session when we quit using the --save flag on the R command line
+when we invoke it.  And if we want to produce plots within the
+commands, we can explicitly create our own graphics devices (e.g. PDF,
+JPEG, Postscript).  And any output that would go to the screen can be
+gathered into a regular text file.
+
+
+We have put the commands to run the different steps in a file and then
+we have R read that file.
+To run these commands, we could use
+the shell command
+\begin{verbatim}
+R --vanilla --save < LingSpam.R >& R.out
+\end{verbatim}
+This reads the commands from the \file{LingSpam.R} file and puts all the
+output (regular and error messages) into a file named R.out.  The
+\verb+>& R.out+ is what is called redirection and
+filters both standard output and standard error
+to the file R.out.
+(This is a C shell (csh or tcsh) specific form.
+For the Bourne shell (sh or bash), 
+we use
+\begin{verbatim}
+R --vanilla --save < LingSpam.R 2>1 > R.out
+\end{verbatim}
+)
+
+We need to add a little bit more to this command to make it do things.
+First, we need to put the job in the background so that we get the
+prompt back so that we can logout.  We do this by ending the command
+with the ampersand - \&.  Additionally, it is sociable and good
+practice to instruct the operating system that this job can be done
+when other people are not using the machine intensively.  Since we can
+wait a little bit, we can wait a little bit longer.  We do this using
+the \executable{nice} command and tell it to use the lowest scheduling
+priority for this task: \texttt{nice +18}.  And finally, we prepend
+the entire command with \executable{nohup} to make it impervious to
+logging out and other calamities.
+So our final form is:
+\begin{verbatim}
+nohup nice +18 R --vanilla --save < LingSpam.R >& R.out &
+\end{verbatim}
+and this will run to completion and
+we can come back and get the results when it has completed.
+
+It is a good idea to either i) remember the process identifier (pid)
+of the R session so that you can check whether it has completed or is
+still running, or ii) have the commands write progress information so
+that you can check the contents of the file (R.out in our example
+command).
+
+
+\section{Results}
+
+The value I got for $\tau$ in my cross-validation was $-33.51$.  This
+is displayed in the Type I and Type II error plot given in figure
+\ref{fig:TypeIError.pdf}
+\begin{figure}[htbp]
+  \begin{center}
+    \leavevmode
+    \includegraphics{TypeI-IIErrors.pdf}
+    \caption{Type I and II errors.
+     The large plot shows the Type I and II errors for all values
+     of $\tau$. The inset within this figure shows
+     more detail for the relevant values of $\tau$ at which
+     we observe the 1\% Type I error rate.}
+    \label{fig:TypeIError.pdf}
+  \end{center}
+\end{figure}
+The Type II error rate is $1.04\%$.
+
+These values will vary slightly based on different cross-validation
+permutations of the original sample.  How can we determine the
+variability of our choice of $\tau$? of the Type I error rate?
+
+
+Our function \SFunction{NaiveBayes} returns the matrix identifying the
+test sets used in the cross validation.  This allows us to look at the
+test sets separately.  We can compute $\tau$ for each of these.  The
+function \SFunction{tauVar} in \file{tauVar.R} does this.
+
+\begin{verbatim}
+> tauVar(vfull)
+ [1] -25.300107 -29.920658 -33.596843 -39.852459 -29.556674 -28.948764
+ [7] -33.513556 -24.819002  -7.337884 -37.022185
+\end{verbatim}
+The mean and standard deviation of these values are $-28.9$ and $9.0$
+respectively.  This gives us some information about the robustness of
+our estimate of $\tau$.  We might look at a plot of the Type I error
+curves against $\tau$ for each test set on a single plot.  Figure
+\ref{tab:cvtaus} make these look stable when looking at the
+entire range of $\tau$s.  When we look at the range of interest in
+the second figure in \ref{tab:cvtaus}, we obviously have greater resolution and
+see more apparent variablility due to the change in scale,
+but things are pretty stable.  The error curves
+are very flat indicating that there is a great deal of variation in
+selecting the $\tau$ in this region with very little change in the
+type I error.
+\begin{table}[htbp]
+  \begin{center}
+    \leavevmode
+    \begin{tabular}{cc}
+    \includegraphics[width=3in]{TestSetErrors.pdf}
+&
+    \includegraphics[width=3in]{TestSetTaus.pdf}
+    \end{tabular}
+    \caption{Type I error curves and values for $\tau$s for each cross-validation test set.}
+    \label{tab:cvtaus}
+  \end{center}
+\end{table}
+
+
+\section{The Spam Assassin data}
+
+
+Now that we have a value of $\tau$, we have a classifier.  And we can
+use that to classify new messages.  We can get an understanding of how
+well our classifier does by applying it to the Spam Assassin data from
+assignment I.  If we can process each message in that corpus to get
+the unique words, then we can easily use
+\SFunction{computeMessageProbability} to compute its log-odds ratio
+and then classify it as SPAM or HAM by comparing this log-odds ratio
+to $\tau$.  We can compare the predicted classifications with the
+actual values since we know these for the SpamAssassin messages and
+see how well we actually do.
+
+To simplify things, we will first start by using only regular text
+messages and ignore HTML formatted messages and messages whose content
+is in an attachment.  Remember that the Spam Assassin messages (in the
+serialized R object \SVariable{MailAttachments.rda} on the Web site)
+have fields for the header, body and spam attributes of the message.
+We can use the header information to determine whether the message is
+HTML or not by simply looking of the existence of the string 'html' in
+the 'Content-Type' field in the header, if it is present.  The
+function \SFunction{isHTML} in \file{isHTML.R} does this for us.  We
+can also start by discardings messages which have attachments simply
+by checking whether the length of the \Sexpression{body\$attachments}
+field in the message object is greater than $0$.  Discarding HTML
+messages and message with attachments leaves us with $7426$ messages,
+or $80\%$ of the original Spam Assassin dataset.
+
+The function \SFunction{classifySpamAssassin} in \file{SpamAssassin.R}
+does all this and collects the Type I and Type II errors and the
+collection of message words, the log-odds ratios, etc.
+
+The Type I error rate we get using this classifier with the the $\tau$
+from the Ling Spam data on the Spam Assassin data is $97\%$.  This is
+very, very high.  It is worse than guessing in which we would expect a
+$50\%$ error rate.  This is almost as if the classifier is accurately
+identifying HAM, but classifying those messages as SPAM, i.e. doing
+the opposite of what it should.
+
+
+Why does the classifier behave so differently on this data?  If we are
+to improve the classifier or chose an alternative method, it is
+important to understand why it fails and look at diagnostics for the
+classification of the two sets of mail messages.  This is like looking
+at residuals for a linear model, but there are a lot more components
+to examine in this context.
+
+Cross-validation gives us essentially independent training and test
+sets, so why do we get very different error rates when we use a
+different independent data set.  There are several possible
+explanations.  Firstly, the classifier is not guaranteed to give us a
+Type I error rate of $\alpha$. This is just the probability of a Type
+I error, and in our case just an estimate of the actual Type I error.
+The estimate is due to the cross-validation mechanism we use and the
+complete sample used to train our classifier and determine $\tau$.  So
+there is variation from message to message in both the test set (Spam
+Assassin in this case) and the training data (the lingspam data) that
+causes us to estimate the Type I error rate.
+
+An important potential explanation for the different Type I error rate
+when using the Spam Assassin data is that the messages are not from
+the same population of messages.  And this is quite likely. These
+collections of messages are quite different and were not randomly
+sampled.  Instead, they were collected manually by the people who
+created the two datasets and they, more than likley, selected messages
+using diffrent criterion and from a different group of potential
+messages.  As with all statistical inference, we need to make
+inference about the correct population to be useful.
+
+The classifier depends on the ``bag of words'' in the training set
+(our original lingspam data).  If this set of words is quite different
+or has different characteristics than our test set (the Spam Assassin
+data), this would give some explanation for the poor performance on
+the test data messages.  The words that are used in SPAM messages
+changes over time.  People used to sell printer cartridges, while now
+viagra and prescription drugs are more common sales items, and recent
+spates of SPAM contain random words.
+
+If there is a large overlap/intersection between the bag of words for
+each of the two datasets, we might expect the classifier to behave
+well. If there two sets have a small intersection, the classifier is
+likely to be challenged as it was trained on very different
+data/messages.  For the Spam Assassin and Lingspam data, 
+
+\begin{table}[htbp]
+  \begin{center}
+    \leavevmode
+\begin{tabular}{lll}
+   & & Total  \\
+Spam Assassin  & 46,885  & 61,201 \\
+Ling Spam &  34,587 & 48,903 \\
+In both &   14,316 & \\
+\end{tabular}
+\caption{number of unique words}
+  \end{center}
+\end{table}
+(Use \SFunction{intersect} \& \SFunction{setdiff} to compute these conveniently.)
+So only $14, 316$ words are shared by the two datasets.
+
+
+
+Even if the set of words in the messages are similar,
+we may want see if they have similar ``expressiveness'' in indicating
+SPAM or HAM.  For this, we can look at two scatterplots of the
+log-odds-present and log-odds-absent returned from
+\SFunction{computeFrequencies} for the words in the intersection of
+the two word collections.  If there are words with low values for
+SpamAssassin and high values for LingSpam or vice-versa, this means
+that those words indicate different characteristics of the messages in
+the two datasets.  We can compute this information 
+by calling \SFunction{computeFrequencies}
+on each collection of message words and identifying
+which messages are spam.
+\begin{verbatim}
+logOddsLingSpam = computeFrequencies(messageWords, isSpam),
+logOddsSpamAssassin = computeFrequencies(spamAssassinResults$messageWords,
+                                           spamAssassinResults$actualSpam)
+\end{verbatim}
+
+
+
+We can display the 
+using the following code:
+\begin{listing}[5]{1}
+compareLogOdds =
+function(tb.lingSpam, tb.SpamAss)
+{
+ par(mfrow=c(1,2))
+ commonWords = intersect(colnames(tb.lingSpam), colnames(tb.SpamAss))
+ 
+ plot(tb.lingSpam[3,commonWords], tb.SpamAss[3,commonWords],
+       xlab = "Lingspam", ylab = "Spam Assassin", main = "Log-odds Word Present")
+ plot(tb.lingSpam[4,commonWords], tb.SpamAss[4,commonWords],
+        xlab = "Lingspam", ylab = "Spam Assassin", main = "Log-odds Word Absent")
+
+ invisible(commonWords)
+}
+\end{listing}
+
+The resulting plot is given in figure
+\ref{fig:SpamWordLogOdds.pdf}.
+\begin{figure}[htbp]
+  \begin{center}
+    \leavevmode
+    \includegraphics{SpamWordLogOdds.pdf}
+    \caption{Comparison of log-odds of a word in SPAM versus HAM messages for all the words in both the LingSpam and SpamAssassin message corpi.}
+    \label{fig:SpamWordLogOdds.pdf}
+  \end{center}
+\end{figure}
+See \file{logodds.R} for more details.
+
+We can also look at the influential words for the two different
+datasets.  These are the words that give the strongest indication,
+relative to other words, whether a message is SPAM or HAM.  If we look
+at the extreme values (both small and large) for the log-odds for the
+word being present and the log-odds for the word being absent for each
+dataset, these are the words that are most influential or have highest
+leverage.  If these words are not in both datasets, then again this
+indicates a problem with using different word sets for the training
+and test data.  Table \ref{tab:CommonWordCounts} shows the number of
+words from the biggest $1000$ elements in each of the log-odds vectors
+for both the Lingspam and Spam Assassin datasets for words being both
+present and absent.
+\begin{table}[htbp]
+  \begin{center}
+    \leavevmode
+    \begin{tabular}{lll}
+&  Log-odds Present & Log-odds Absent \\
+Ling Spam     & 677 &  896 \\
+Spam Assassin & 191 &  740 \\
+    \end{tabular}
+    \caption{    Number of words in common set for the 1000 extreme values.}
+    \label{tab:CommonWordCounts}
+  \end{center}
+\end{table}
+The very small number -- $19\%$ -- of words in the Spam Assassin data
+for the log-odds ratio of the word being present that are in the
+shared set suggests that we are having difficulty there.
+
+\textit{Think of ways to display this information graphically.}
+
+What this investigation suggests is that the classifier is not
+necessarily bad (the Type II error for the lingspam data as
+approximately $1\%$) but that the dictionary of words is critical. For
+this classifier to be effective, we must use it in a dynamic way where
+we update its collection of words and log-odds ratios and keep it
+current with the messages it is working on.  This is how we use such
+classifiers in practice.
+
+\section{Files}
+The following files contain all the R code needed to do the analysis
+above, along with the NaieveBayes package provided as part of the
+assignment.
+\begin{tabular}{ll}
+\file{cv.R}  &  \\
+\file{cvSample.R}  &  \\
+\file{getMessageWords.R}  &  \\
+\file{isHTML.R}  &  \\
+\file{LingSpam.R}  &  \\
+\file{logodds.R}  &  \\
+\file{NaiveBayes.R}  &  \\
+\file{plot.R}  &  \\
+\file{SpamAssassin.R}  &  \\
+\file{tauVar.R}  &  \\
+\end{tabular}
+
+
+
+\end{document}

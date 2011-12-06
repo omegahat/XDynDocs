@@ -1,0 +1,395 @@
+<?xml version="1.0"?>
+<!DOCTYPE slides>
+<!-- $Id $ -->
+
+<slides xmlns:xi='http://www.w3.org/2003/XInclude'>
+<slidesinfo>
+<title>Course Outline</title>
+  <author><firstname>Duncan</firstname><surname>Temple  Lang</surname></author>
+  <copyright><year>2004</year><holder>Duncan Temple Lang</holder></copyright>
+</slidesinfo>
+
+<!--
+
+  Introduce new syllabus
+  Sort out office hours
+  Ask students about their characteristics:
+    majors, 
+    year,
+    computing experience
+-->
+
+<foil>
+<title>General Information</title>
+<variablelist>
+ <varlistentry>
+ <term>
+  Instructor
+ </term>
+ <listitem>
+ <informaltable frame='none'>
+ <tgroup cols='2'>
+ <tbody>
+  <row><entry>Duncan Temple Lang</entry></row>
+  <row>
+   <entry>Office</entry>  <entry>371 Kerr Hall</entry>
+  </row>
+  <row>
+   <entry>email</entry>  <entry>duncan@wald.ucdavis.edu</entry>
+  </row>
+  <row>
+   <entry>Office Hours</entry> <entry>?</entry>
+  </row>
+  </tbody>
+  </tgroup>
+  </informaltable>
+  </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>TA</term>
+   <listitem>
+ <informaltable frame='none'>
+ <tgroup cols='2'>
+ <tbody>
+  <row><entry>Bitao Liu</entry></row>
+  <row>
+   <entry>Office</entry>  <entry> Kerr Hall</entry>
+  </row>
+  <row>
+   <entry>email</entry>  <entry>btliu@wald.ucdavis.edu</entry>
+  </row>
+  <row>
+   <entry>Office Hours</entry> <entry>?</entry>
+  </row>
+  </tbody>
+  </tgroup>
+  </informaltable>
+
+    Lab meets on Tuesdays, 12:10 to 1pm
+   </listitem>   
+  </varlistentry>
+
+</variablelist>
+
+</foil>
+
+<foil>
+<title>Textbook/Course Notes</title>
+
+<itemizedlist>
+ <listitem>
+   There is NO textbook for the class.
+    <?line-break?>
+   No single book covers it all!
+ </listitem>
+
+ <listitem>
+  I'll prepare "chapters" going into more details
+  than in class.
+ </listitem>
+ <listitem>
+  Distributed via the Web.
+ </listitem>
+
+ <listitem>
+   Many links to resources on the Web as you need them.
+ </listitem>
+
+ <listitem>
+   We will use R as the primary computational environment
+ </listitem>
+
+ <listitem>
+   <itemizedlist>
+     <listitem>
+       R manuals
+        <itemizedlist>
+         <listitem><ulink url="http://cran.r-project.org/doc/manuals/R-intro.pdf">An Introduction to R, </ulink></listitem>
+         <listitem><ulink url="http://cran.r-project.org/doc/manuals/R-data.pdf">R Data Import/Export,</ulink></listitem>
+         <listitem><ulink url="http://cran.r-project.org/doc/manuals/R-lang.pdf">R Language Definition.</ulink></listitem>
+        </itemizedlist>
+     </listitem>
+     <listitem>
+       On-line user guides to R, on-line help
+     </listitem>
+     <listitem>
+      Chapters/notes from classes
+     </listitem>
+     <listitem>
+       Books to consult
+       <itemizedlist>
+         <listitem>Modern Applied Statistics in S (MASS), Venables &amp; Ripley</listitem>
+         <listitem>S Programming, Venables &amp; Ripley</listitem>
+       </itemizedlist>
+     </listitem>
+    </itemizedlist> 
+ </listitem>
+ <listitem>
+  Mailing lists: archive, post.
+   <itemizedlist>
+     <listitem>Class mailing list</listitem>
+     <listitem>R-help, S-news</listitem>
+   </itemizedlist>
+ </listitem>
+ </itemizedlist>
+</foil>
+
+<foil>
+<title>Grading</title>
+  <itemizedlist>
+   <listitem>
+      <informaltable>
+      <tgroup cols='2'>
+      <tbody>
+        <row><entry>Participation</entry><entry>10% <para/> Class mailing list and in class.</entry></row>
+        <row><entry>Labs/Homeworks</entry><entry>30%</entry></row>
+        <row><entry>Project</entry><entry>60% overall<para>3 parts
+        each worth 20%</para>
+                 <para>Groups of 2</para>
+                 <para>Topic is classification of SPAM</para>
+                 </entry></row>
+      </tbody>
+      </tgroup>
+      </informaltable>   
+   </listitem>
+  <listitem>No mid-term or final.  Replaced by stages of the project.</listitem>
+  <listitem>4 or 5 homeworks.</listitem>
+
+  </itemizedlist>
+</foil>
+
+
+<foil>
+<title>Computing Resources</title>
+<itemizedlist>
+<listitem>
+ Windows or Linux (or Mac)
+</listitem>
+<listitem>
+  Resources
+  <itemizedlist>
+    <listitem>Home PC or Laptop</listitem>
+    <listitem>University machines</listitem>
+    <listitem>Linux account from instructor</listitem>
+   </itemizedlist>
+  </listitem>
+</itemizedlist>
+</foil>
+
+<foilgroup>
+<title>Motivation</title>
+
+<foil>
+<title>Computational Statistics</title>
+<itemizedlist>
+<listitem>
+ Regression
+  <itemizedlist>
+   <listitem>fit line to points: Y = a + b X</listitem>
+   <listitem> (a b)' = (X'X)<superscript>-1</superscript> X'Y</listitem>
+   <listitem> QR Decomposition: X = QR</listitem>
+   <listitem> Simpler calculation: Rb = Q'Y 
+     <itemizedlist>
+      <listitem> System of linear equations</listitem>
+      <listitem> Computationally less expensive - number of operations</listitem>
+      <listitem> Greater numerical stability in common, but odd cases</listitem>
+     </itemizedlist>
+    </listitem>
+  </itemizedlist>
+</listitem>
+  <listitem>Mathematical Statistics</listitem>
+  <listitem>Computational Statistics</listitem>
+  <listitem>Statistical Computing
+   <itemizedlist>
+     <listitem>where do the data come from?</listitem>
+     <listitem>how are the outputs used?</listitem>
+     <listitem>part of the <emphasis>data process</emphasis></listitem>
+   </itemizedlist>
+  </listitem>
+</itemizedlist>
+</foil>
+
+
+<foil>
+<title>Statistical Computing</title>
+
+ <itemizedlist>
+  <listitem>
+    Aspects of computing for statistics (Statistical Computing)
+  </listitem>
+  <listitem>
+    Different from computational aspects of statistics. (Computational Statistics)
+  </listitem>
+  <listitem>
+   Example scenarios:
+    <itemizedlist>
+      <listitem>Manufacturing: wafers, fiber-optic network packs
+      </listitem>
+      <listitem>Fraud detection: cell phones
+      </listitem>
+      <listitem>Network Intrustion detection</listitem>
+      <listitem>Web site access</listitem>
+      <listitem>Social Networks: email connectivity graphs</listitem>
+    </itemizedlist>
+  </listitem>
+</itemizedlist>
+
+<!-- 
+  Manufacturing process
+    Optical network packs
+    Wafers
+
+  Network intrusion
+  Protocol simulation and refinement
+  Web logs
+-->
+
+</foil>
+
+
+<xi:include href="spam.slx" />
+<xi:include href="networkIntrusion.slx" />
+<xi:include href="weblogs.slx" />
+<xi:include href="yield.slx" />
+<xi:include href="email.slx" />
+
+
+<foil>
+<title>Common Elements</title>
+ <itemizedlist>
+  <listitem>
+   <itemizedlist>
+    <listitem>Data acquisition</listitem>
+    <listitem>Data cleaning, verification</listitem>
+    <listitem>Exploratory Data Analysis - visualization, summaries
+    </listitem>
+    <listitem>Meta-information
+        <para/>
+           Different sources of related data.
+    </listitem>
+   </itemizedlist>
+  </listitem>
+
+  <listitem>
+   <emphasis>Have to work to get and with the data and its "owners"</emphasis>
+  </listitem>
+ </itemizedlist>
+</foil>
+
+
+<foil>
+<title>Goals</title>
+ <itemizedlist>
+  <listitem>Familiarity with statistical computing tools for
+    <itemizedlist>
+      <listitem> data acquisition</listitem>
+      <listitem> data processing</listitem>
+      <listitem> data visualization</listitem>
+      <listitem> simulation </listitem>
+      <listitem> resampling </listitem>
+      <listitem> creating new methods</listitem>
+    </itemizedlist>
+  </listitem>
+  <listitem>Learn how to think about approaching problems related to
+          computing on data</listitem>
+  <listitem>Learn about currently emerging technologies</listitem>
+  <listitem>Be able to intelligently discuss different 
+     technologies and tools, knowing when to use them and what are
+     the trade-offs</listitem>
+  <listitem>Be able to find out about and learn other technologies</listitem>
+ </itemizedlist>
+</foil>
+
+
+<foil>
+ <title>Goals of the Course</title>
+ <itemizedlist> 
+  <listitem>
+   Focus is to be able to use existing software and functionality
+   for context-specific analyses.
+  </listitem>
+  <listitem>Learning about a box of tools and how to use them
+   to create things, and even build new tools.
+  </listitem>
+  <listitem>
+   Much less on understanding the existing algorithms.
+  </listitem>
+  <listitem>
+    Understanding fundamental algorithms is important 
+    if you need to
+   <itemizedlist>
+    <listitem> recreate them in a new language
+    </listitem>
+    <listitem> use them in new ways when developing new algorithms.
+    </listitem>
+   </itemizedlist>
+  </listitem>
+    <listitem><ulink url="CourseOutline.html">Course Outline </ulink></listitem>
+  </itemizedlist>
+</foil>
+
+<foil>
+<title>Expectations</title>
+<itemizedlist>
+ <listitem> Curiosity, Initiative and motivation</listitem>
+ <listitem> Exploration of tools</listitem>
+ </itemizedlist>
+</foil>
+
+<foil>
+<title>Motivation</title>
+
+<itemizedlist>
+<listitem>
+Practical Statistics
+ <para/>
+  The practicalities of how statistical methodology 
+  is used.
+  <itemizedlist>
+    <listitem> Industrial </listitem>
+    <listitem> Laboratory </listitem>
+    <listitem> Research </listitem>
+  </itemizedlist>
+</listitem>
+
+<listitem>
+<emphasis>Computational Statistics</emphasis> versus <emphasis> Statistical Computing</emphasis>
+</listitem>
+
+<listitem>
+  Leave general, detailed, numerical computations to existing software
+  <itemizedlist>
+   <listitem>Tried and tested</listitem>
+   <listitem>Difficult special cases</listitem>
+  </itemizedlist>
+</listitem>
+<listitem>
+  Focus on overall task
+<para/>
+   not 
+</listitem>
+</itemizedlist>
+
+</foil>
+
+</foilgroup>
+
+<foil>
+<title>Next lecture(s)</title>
+<itemizedlist>
+ <listitem>Basics of computers</listitem>
+ <listitem>Representing data in a computer</listitem>
+ <listitem>Taxonomy of statistical computing systems</listitem>
+
+<para/>
+ <listitem><ulink url="http://cran.r-project.org/doc/manuals/R-intro.pdf">Read "An Introduction to R manual</ulink></listitem>
+ <listitem> Run R and do some things with</listitem>
+ <listitem> Talk with Bitao or myself</listitem>
+</itemizedlist>
+
+ 
+</foil>
+
+</slides>
+
+

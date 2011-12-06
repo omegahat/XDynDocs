@@ -1,0 +1,4 @@
+\beamer@endinputifotherversion {3.01pt}
+\beamer@sectionintoc {2}{Growing trees}{6}{0}{1}
+\beamer@sectionintoc {3}{Pruning trees}{11}{0}{2}
+\beamer@sectionintoc {4}{Supernova}{13}{0}{3}

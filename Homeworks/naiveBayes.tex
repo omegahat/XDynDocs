@@ -1,0 +1,182 @@
+\documentclass{article}
+
+\begin{document}
+
+\section{Naive Bayes}
+
+When we read an e-mail message, it is often immediately obvious to
+us whether the message is spam or not.  Most of the time we 
+need only look at the subject of the message to determine
+that it is spam.
+But what is not immediately obvious is 
+how to design an automatic procedure to save us the 
+hassle, time, and irritation of having to delete ``by hand'' 
+unwanted e-mail messages.
+
+One probability-based approach finds the chance an e-mail is
+spam by looking at which words are found in the message and 
+which words are absent from it.
+This approach begins by studying the content of a large collection of 
+e-mail which have already been read and classified as spam or ham. 
+Then when a new message comes to us, we use the information gleaned 
+from our ``training" set to compute the probability that the
+message is spam given the words appearing in the message.
+
+For example, suppose we receive an e-mail that says, ``Are your taxes
+too high?" 
+First, we clean up the message by eliminating all punctuation and 
+capitalization,
+then we remove \textit{stop words} such as ``are", ``too" and ``your" because 
+they occur with great frequency in both spam and ham.  The final cleaning
+stage reduces ``taxes" to its root ``tax," which we call \textit{stemming}.
+After the message is cleaned, we compute the following probability, 
+\begin{eqnarray*}
+ & ~ & {\cal P}(\textrm{message is spam given it contains the words}\\
+ &~&    ~~~~~~~ \{ \textit{tax, high}\}
+  \textrm{ and no other words} ).
+\end{eqnarray*}
+Or, more simply denoted,
+$$ {\cal P}(\textrm{ spam } | \textrm{ content} ),$$
+where the symbol $|$ stands for ``given'' and the term
+``content" refers to the words in the message.
+
+If after cleaning, the original training set contains say $1000$ unique 
+words (we call this set of unique set the \textit{bag of words}) then
+there are $2^{1000}$ possible distinct messages for which we need to be able 
+to find the chance of occurrence.  
+That is, each of the $1000$ words may be present
+or absent in a message. (Note that we ignore the extra complication
+of words appearing more than once in a message). 
+Recall that a gigabyte is only $2^{30}$!
+There are too many possibilities and not enough data for us to 
+make these computations.  We must simplify the problem.
+To explain the simplification, we first need to introduce
+another way to express the probability the message is spam
+given its contents. We use Bayes Rule.
+
+\subsection*{Bayes Rule}
+
+According to Bayes Rule,
+
+\begin{eqnarray*}
+{\cal P}(\textrm{ spam } | \textrm{ content} ) & = &
+    \frac {{\cal P}(\textrm{ spam } and  \textrm{ content} )}
+        {{\cal P}(\textrm{ content} )} \\
+ & = & \frac {{\cal P}(\textrm{ content }|\textrm{ spam} )\times {\cal P}(\textrm{ spam })}
+   {{\cal P}(\textrm{ content} )} 
+\end{eqnarray*}
+
+At first glance, it doesn't look as though we have simplified the
+probability at all. Now we have three probabilities to compute instead
+of one. 
+But, the ${\cal P}(\textrm{ spam })$ is estimated by the proportion
+of spam messages in the total set of messages.
+That was easy.
+Now look at the other probability in the numerator of Bayes Rule,
+the chance that a spam message has these words in it,
+$${\cal P}(\textrm{ content }|\textrm{ spam} ).$$
+Here is where the simplification comes in to play.
+We assume that the chance a particular word is in the message
+is independent of all other words in the message.
+That is, the chance that ``high" appears in a spam message
+is independent of the chance that ``tax" appears in the 
+message.
+Clearly this is not true!
+But making this naive assumption greatly simplifies the 
+computations and turns out to still be effective in identifying spam.
+
+\subsection*{Naive Bayes}
+
+This naive assumption says that 
+\begin{eqnarray*}
+{\cal P}(\textrm{ content } &|& \textrm{ spam} ) = \\
+ & ~ & {\cal P}(\textit{ high }|\textrm{ spam} ) \times
+   {\cal P}(\textit{ tax }|\textrm{ spam} ) \times \\
+ &~&  {\cal P}(\textrm{ not }\textit{apple}|\textrm{ spam} ) \times \cdots \times
+   {\cal P}(\textrm{ not }\textit{zebra}|\textrm{ spam}).
+\end{eqnarray*}
+We have a product of probabilities, 
+where the product runs over all words in the bag of words formed from
+the training data. 
+Each probability in the product is either the chance that an individual
+word is present given the message is spam or the chance that it is absent 
+given the message is spam.
+To compute these probabilities we have only to find the frequencies of these
+words in the spam part of the training set.
+That is we approximate 
+${\cal P}(\textit{ high }|\textrm{ spam} )$ by 
+\begin{equation}
+\frac {\# \textrm{ spam messages with }\textit{high}}
+   {\# \textrm{ spam messages}}
+\end{equation}
+
+Now that we have a naive way of computing 
+${\cal P}(\textrm{ content }|\textrm{ spam} )$,
+that leaves the third probability in Bayes rule,
+the one in the denominator,
+${\cal P}(\textrm{ content })$.
+Fortunately, we do not need to compute it.
+Instead, we resort to computing ratios of probabilities.
+
+\subsection*{Ratios}
+The ratio,
+$$\frac {{\cal P}(\textrm{ spam } | \textrm{ content} )}
+ {{\cal P}(\textrm{ ham } | \textrm{ content} )}$$
+is often easier to work with than the probability in the
+numerator alone. 
+The possible values of the ratio range between 0 and $\infty$.
+Notice that since  
+$${{\cal P}(\textrm{ spam } | \textrm{ content} )}
+ +{{\cal P}(\textrm{ ham } | \textrm{ content} )} = 1,$$
+this ratio is equal to 1 when spam and ham are equally likely,
+greater than 1 when the chance the message is spam is more likely than 
+the chance it is ham, and less than 1 when it is less likely.
+
+By using the ratio, we do not need to compute ${\cal P}(content)$ 
+in the denominator of Bayes Rule.
+\begin{eqnarray*}
+ \frac {{\cal P}(\textrm{ spam } | \textrm{ content} )}
+ {{\cal P}(\textrm{ ham } | \textrm{ content} )} 
+ &=&
+  \frac {{\cal P}(\textrm{ content }|\textrm{ spam} )\times {\cal P}(\textrm{ spam })}
+  {{\cal P}(\textrm{ content }|\textrm{ ham} )\times {\cal P}(\textrm{ ham })}\\
+ &=&
+  \frac {{\cal P}(\textit{high}|\textrm{ spam} )} {{\cal P}(\textit{high}|\textrm{ ham} )} 
+  \times
+  \cdots \times
+  \frac {{\cal P}(\textrm{ not }\textit{zebra}|\textrm{ spam} )} {{\cal P}(\textrm{ not }\textit{zebra}|\textrm{ ham} )} \\
+ & \times &
+  \frac {{\cal P}(\textrm{spam})} {{\cal P}(\textrm{ham})} 
+\end{eqnarray*}
+Our calculation has been reduced to a product of ratios of probabilities
+that are simple to estimate from the training data.
+
+
+\subsection*{Logs and smoothing}
+One further mathematical convenience is to take the logarithm of the  
+ratio of the probabilities.  Two benefits to logging the ratio are
+that the product becomes a sum, and values between 0 and 1 get 
+``stretched out" between $-\infty$ and 0.  This later fact often means
+that the logged-values have nice statistical properties.
+\begin{eqnarray*}
+ &~& \log \left( \frac {{\cal P}(\textrm{ spam } | \textrm{ content} )}
+ {{\cal P}(\textrm{ ham } | \textrm{ content} )} \right) \\
+ &=&
+  \log({\cal P}(\textit{high}|\textrm{ spam})) - \log({\cal P}(\textit{high}|\textrm{ ham} )) + \cdots \\
+  &+&
+  \log({\cal P}(\textrm{not }\textit{zebra}|\textrm{ spam})) - \log({\cal P}(\textrm{not }\textit{zebra}|\textrm{ ham} )) \\
+ &+&
+  \log({\cal P}(\textrm{ spam})) - \log({\cal P}(\textrm{ ham} ))
+\end{eqnarray*}
+
+One last computational consideration. When a word appears solely in ham
+then we estimate the chance,
+$$ {\cal P}(\textrm{ word }|\textrm{spam}),$$
+by 0, which we cannot log.  To remedy this problem, we ``smooth" all
+of the word counts by adding $1/2$ to all of the word counts: 
+\begin{equation}
+\frac {\# \textrm{of spam messages with }\textit{high} ~+1/2}
+   {\# \textrm{of spam messages} ~+1/2}
+\end{equation}
+
+\end{document}

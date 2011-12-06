@@ -1,0 +1,70 @@
+<foilgroup>
+<title>SPAM: junk email</title>
+
+<foil>
+<title>SPAM</title>
+
+<itemizedlist>
+<listitem>
+ SPAM = Unsolicited, mass, junk email.
+</listitem>
+<listitem>
+ &gt; 50% of mail is SPAM
+</listitem>
+<listitem>
+ Offensive, time-consuming
+</listitem>
+<listitem>
+  Want to be able to identify SPAM before we read it.
+</listitem>
+<listitem>
+  Statistical problem: 
+    <itemizedlist>
+     <listitem>
+     learn from messages
+     </listitem>
+     <listitem>
+       reject regular message as SPAM
+     </listitem>
+     <listitem>
+       accept SPAM as regular message.
+     </listitem>
+    </itemizedlist>
+</listitem>
+</itemizedlist>
+</foil>
+
+<foil>
+<title>Use Statistical classifier</title>
+
+Goal is to use statistical methodology to filter our mail.
+
+<itemizedlist>
+    <listitem>
+      develop classifier with training data
+      <itemizedlist>
+        <listitem> Get sample, classified messages</listitem>
+        <listitem> Convert to response, predictors data frame</listitem>
+        <listitem> Fit statistical model to data</listitem>
+        <listitem> Tune Type I and Type II errors</listitem>
+      </itemizedlist>
+    </listitem>
+    <listitem>
+      deploy classifier as filter.
+    </listitem>
+ 
+   <listitem>
+     Extensions
+     <itemizedlist>
+      <listitem>
+        share predictions/classifications with others
+      </listitem>
+      <listitem>
+        use information from mail headers (i.e. sender, routing
+          information, date, return address, etc.)
+      </listitem>
+    </itemizedlist>
+   </listitem>
+</itemizedlist>
+</foil>
+</foilgroup>

@@ -1,0 +1,356 @@
+<article>
+
+<articleinfo>
+<title>Relational Databases and Exploratory Data Analysis:  Baseball Data
+<para/>
+Due: 20th at midnight. 
+</title>
+</articleinfo>
+
+In this project, you will explore the database containing 22 tables
+containing information about baseball players, managers, teams,
+colleges, etc.  The goal is to find interesting characteristics of the
+data and to provide meaningful summaries of the large collection of
+information.  Plots, succinct tables, and if appropriate, models
+should be used to illustrate and support your findings.  
+The primary topics in this assignment are exploratory data analysis (EDA), 
+SQL and visualization.
+
+<para/>
+
+The BaseballDatabank04 database on gcox contains 22 relations/tables.
+These provide information about major league baseball teams and
+players for the years 1884 through 2004.  The database comes from
+<ulink url="http://baseball1.info">http://baseball1.info</ulink> and
+was created and licensed by Sean Lahman.  We are entitled to use it
+for research use and cannot distribute it further.  And we are
+grateful for his efforts in compiling and managing this database.
+
+<para/> The attributes in the different relations are described in
+<ulink url="http://baseball1.com/statistics/readme51.txt">Baseball
+Archive documentation</ulink>.
+
+<para/>
+Other sites for baseball data include
+<itemizedlist>
+ <listitem>
+<ulink url="http://asp.usatoday.com/sports/baseball/salaries/default.aspx">
+http://asp.usatoday.com/sports/baseball/salaries/default.aspx
+</ulink>
+ </listitem>
+ <listitem>
+<ulink url="http://www.baseball-databank.org/">
+http://www.baseball-databank.org/
+</ulink>
+ </listitem>
+</itemizedlist>
+
+<para/>
+
+
+You can pose or create questions that most interest you and that
+hopefully lead to interesting exploration of the data, of accessing
+the relational database, or composing and creating displays.  The goal
+is to illustrate aspects of using a relational database, understanding
+how and when to perform some commands in a database and others in R,
+and what and how to plot to display attributes of data.  You should
+explore one or more questions that allow you to illustrate each of
+these skills.
+
+
+<para/> Below are some questions you might consider if you are having
+difficulty coming up with your own.  You are strongly encouraged to
+find others, and you will get credit for working on your own
+questions.  You can get inspiration from other sources such as Web
+sites, newspaper articles, journals, etc.  In such cases, your task is
+to do the necessary computations and explain them.
+ The more work and questions you do, the more credit you will get.  So
+ this is an opportunity to shine.  (But don't go over-board and let
+ other classes suffer, of course.)   Not all the questions below
+are equally difficult, so it is not possible to say "do k of these".
+I am thinking that your report should be about 4 or 5 pages, not
+including figures and tables (but counting code). You can go into
+detail in a few questions, or do the basics on several questions.
+If the questions you  chose are simple one or two line SQL commands,
+then you will need to do more of them. If they are involved
+SQL commands and plots and interpretation, then 4 or 5 of them
+will be sufficient.
+
+<para/> 
+
+
+Visualization is a complex art.  Determining how to compose plots
+and present different attributes requires design.  Then creating the
+display in software is technical.  You should explore these two
+aspects, asking questions when you want.  I have provided some <ulink
+url="gallery.html">example plots</ulink> with code to get the data and
+create the basic plot.
+
+
+<para/>
+
+You might find the following functions and the related ones found on
+their help pages useful:
+<itemizedlist>
+<listitem>
+by(), table()
+</listitem>
+<listitem>
+boxplot(), legend(), lines(), points(),
+axis(), etc.
+</listitem>
+</itemizedlist>
+The lattice package may also prove useful for creating plots with
+different panels for levels of factors, etc.
+
+<para/>
+
+If you think R might have a function to do something
+you want to do, use the help.search()
+and help.start() facilities in R or ask on the
+class bulletin board.
+
+
+
+<questions>
+<question>
+How many people are included in the databases?
+</question>
+
+<question>
+Are all of these players?  How many are players? how many are
+managers? and how many are both?
+</question>
+
+<question>
+What is the earliest season recorded in this database?  and the most
+recent?
+<answer>
+<sql>
+SELECT DISTINCT yearID from Teams;
+</sql>
+
+SELECT MAX(yearID), MIN(yearID) from Teams;
+
+Do we need to look over the other tables to see if there was an
+earlier record.  This depends on the model for the database and its
+integrity constraints.
+Can we concatenate the years from
+the pitcher and batter statistics?
+
+<sql>
+SELECT yearID AS year FROM Batting 
+ UNION DISTINCT 
+SELECT yearID AS year FROM Pitching
+ ORDER BY year;
+</sql>
+</answer>
+</question>
+
+
+<question>
+What college produced the largest number of major league baseball
+players? Is there a geographical  trend?
+How many colleges are there in total?
+And how many players didn't go to college at all?
+<answer>
+<sql>
+select college, COUNT(*) as Number FROM Master GROUP BY college ORDER BY  Number DESC;
+</sql>
+
+<sql>
+select DISTINCT COUNT(college) FROM Master;
+</sql>
+doesn't give the right answer.
+
+We could issue the query
+<sql>
+select DISTINCT college FROM Master;
+</sql>
+and count the number of tuples.
+We'd like to be able to do this in the database itself
+rather than transferring all the tuples that we don't necessarily
+want.
+
+XXX
+Alternatively, we can 
+select DISTINCT college FROM Master GROUP BY college;
+</answer>
+</question>
+
+
+<question>
+Can we tell who won the "World" series in a given year?
+
+<answer>
+ SELECT SeriesPost.yearID AS Year, Teams.name AS Team FROM Teams, SeriesPost 
+   WHERE SeriesPost.round = 'WS' 
+     AND Teams.teamID = SeriesPost.teamIDwinner
+     AND Teams.yearID = SeriesPost.yearID;
+</answer>
+</question>
+
+<question>
+Who lost the "World" series in each year?
+</question>
+
+<question>
+Look at the relationship between the number of games
+won in a season and winning the world series?
+And similarly relate these to payroll.
+</question>
+
+<question>
+For 1999, compute the payrolls of the different teams?
+Can we do this for all years in a single SQL statement?
+
+<answer>
+If you do this interactively in MySQL, you will run out of memory.  A
+problem in client/server computing is "which application ran out of
+memory" or reported the error?
+
+In contrast with the MySQL shell, doing it in R works fine and doing
+it in blocks via <r>fetch(rs, n = 100)</r> would be even less
+stressful on the memory requirements.
+
+<r>
+rs = dbSendQuery(con, "select CONCAT(nameFirst, ' ', nameLast) AS Name, Salaries.yearID, Salaries.salary FROM Master, Teams, Salaries WhERE Salaries.yearID > 2000 AND Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID;")
+</r>
+
+<r>
+d = dbGetQuery(con, "select Salaries.yearID AS Year, Teams.name AS Team, SUM(Salaries.salary) AS Payroll FROM Master, Teams, Salaries WhERE Salaries.yearID = Teams.yearID AND Master.playerID = Salaries.playerID AND Teams.teamID = Salaries.teamID GROUP BY Team, Year ORDER BY Team, Year;")
+</r>
+</answer>
+</question>
+
+<question>
+Plot the payrolls over years for the different teams.  What plot types
+are good for showing this data?  Contrast different graphical
+techniques.  Information for inflation rates from 1986 to the present
+is available in the database inflation and in the relation
+AnnualRates.  You might consider using this to adjust/control the
+dollar amounts for inflation.
+
+<para/>
+Superimpose the payroll of the two teams that made it to the "World
+Series" on this plot.  Is there a relationship?  How about for the
+teams that made it into the playoffs in a year?
+
+<answer>
+<r>
+plotPayrolls =
+function(d, dd = by(d, d[,"Team"], function(x) x), ..., xlab = "Year", ylab = "Payroll")
+{
+ plot(0, xlim = range(d[,"Year"]), ylim = range(d[,"Payroll"]), type = "n", ..., xlab = xlab, ylab = ylab)
+ sapply(1:length(dd), function(i) {
+                        lines(dd[[i]][,"Year"], dd[[i]][,"Payroll"], col = i, lty = i) 
+                        TRUE
+                     })
+ legend(min(d[,"Year"]), max(d[,"Payroll"]), names(dd), col = 1:length(dd), lty = 1:length(dd), cex = .90)
+
+ invisible(dd)
+}  
+</r>
+
+We probably want to standardize by dividing the total or maximum
+payroll for each year.
+
+<r>
+mx = by(d, d[,1], function(x) max(x[,3]))
+maxPayroll = as.vector(mx)
+names(maxPayroll) = names(mx)
+dd = by(d, d[,"Team"], function(x) x[ ])
+d[,"Payroll"] = d[,"Payroll"]/maxPayroll[as.character(d[,"Year"])]
+</r>
+
+<r>
+jpeg("PayrollYear.jpg", width = 900, height = 900)
+plotPayrolls(d, add = FALSE, main = "Payroll for Baseball Teams over years")
+boxplot(Payroll ~ Year, data = d,at = 1985:2003, add = TRUE, col="red", lwd=2, notch = TRUE)
+dev.off()
+</r>
+Add NL and AL to this plot by using line width
+or plotting characters.
+
+</answer>
+</question>
+
+<question>
+Show the distributions of the payrolls over years.  We can think of a
+boxplot for each year for this.  Again, we can superimpose additional
+attributes and even lines connecting the different statistics for
+particular teams if they are not very noisy.
+
+<answer>
+boxplot(Payroll ~ Year, data = d)
+
+  # Standardize by dividing by the maximum for each year
+d[,3] = d[,3]/maxPayroll[as.character(d[,1])]
+boxplot(Payroll ~ Year, data = d)
+</answer>
+</question>
+
+
+<question>
+Look at the payrolls for the teams
+that are in the same leagues? and then in the same divisions?
+Are there any interesting characteristics?
+</question>
+
+<question>
+Is the payroll related to the age of the players?  One might expect an
+old team to be paying veteran players a lot near the end of their
+careers. Teams with a large number of older players would therefore
+have a large payroll.  Is there any evidence supporting this?
+</question>
+
+
+<question>
+Look at the distribution of salaries of individual
+players over time for different teams.
+</question>
+
+<question>
+Look at players and see whether the distribution
+of home runs has increased over the years?
+</question>
+
+
+<question>
+
+Are Hall of Fame players, in general, inducted because of rare,
+excellent performances or years or are they rewarded for consistency
+over years?
+
+</question>
+
+
+<question>
+Are certain baseball parks better for hitting Home Runs?
+Can we tell from this data? Can we make inferences about this
+question?
+</question>
+
+<question>
+Do teams with a few good players and many mediocre players tend to do better
+than a team made up more homogeneous talent?
+</question>
+
+<question>
+Look at the distribution of how well batters do.
+Does  this vary over the years?
+Do the same players excel each year?
+Is there a clustering? a bi-modal distribution?
+</question>
+
+<question>
+Do pitchers get better with age?  Is there an improvement and then a
+fall off in performance?  And is this related to how old they are?
+the number of years they have been pitching?  which league they are in
+and the designated hitter rule?  Do we have information about each of
+these factors and how can we combine them to present information about
+the general question?
+
+</question>
+</questions>
+</article>

@@ -1,0 +1,13 @@
+#!/bin/sh
+
+
+while test -n "${1}" ; do
+  echo "LOAD DATA INFILE \"${1}\" INTO TABLE "
+  if test -r "${1}1" ; then
+    echo "Skipping"
+  else
+    perl -np quote.pl ${1} > ${1}1
+  fi
+  shift
+done
+
