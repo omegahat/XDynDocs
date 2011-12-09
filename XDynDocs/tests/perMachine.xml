@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<article xmlns:r="http://www.r-project.org">
+
+<section>
+<title>Motivation</title>
+<para>
+The idea in this short document is to figure out how to use a dynamic,
+reproducible document to create a single document which has content
+computed on different machines.  We could use a cluster-computing
+approach where we dispatch commands to different machines and get the
+result of interest.  That is probably the "best" way to achieve the
+goal, but requires a lot of installed software.  So instead, let's see
+if we can use a more basic approach using XML/XSL and
+<r:pkg>IDynDocs</r:pkg>.
+</para>
+<para>
+The idea is this. We create an XML document which contains the
+computations of interest.  We'll be very explicit for the moment and
+later relax the strictness.  We are going to fill in a table with
+timings for a particular computation within the document.
+
+</section>
+
+</article>

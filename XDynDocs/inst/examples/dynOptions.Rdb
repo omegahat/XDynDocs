@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:fo="http://www.w3.org/1999/XSL/Format"        
+         xmlns:html="http://www.w3.org/1999/xhtml"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+  <!-- Note that we are using xhtml's  URI for html. -->
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+The following is a very long line that will be reformatted by R using the default width.
+<r:code>
+matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16), 8, 2, dimnames = list(NULL, c("X", "Y")))
+</r:code>
+<r:code>
+w = "original"
+getOption("width") # original
+</r:code>
+
+<r:dynOptions width="20" name="A">
+
+<r:code>
+w = 20
+getOption("width")
+</r:code>
+<r:code>
+matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16), 8, 2, dimnames = list(NULL, c("X", "Y")))
+</r:code>
+
+<r:dynOptions width="80" name="B">
+<r:code>
+w = 80
+getOption("width") 
+</r:code>
+ <r:code>
+  matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16), 8, 2, dimnames = list(NULL, c("X", "Y")))
+ </r:code>
+</r:dynOptions>
+
+<r:code>
+w = 20
+getOption("width")
+</r:code>
+
+ <r:code>
+  matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16), 8, 2, dimnames = list(NULL, c("X", "Y")))
+ </r:code>
+</r:dynOptions>
+
+</para>
+
+<para>
+And here we should be back to the usual value.
+<r:code>
+w = "original"
+getOption("width")
+</r:code>
+ <r:code>
+  matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16), 8, 2, dimnames = list(NULL, c("X", "Y")))
+ </r:code>
+</para>
+
+</section>
+
+<section>
+<title>By Target</title>
+
+<para>
+Here we test the facilities for setting options on a per output target
+(e.g. FO, HTML, LaTeX) basis.
+The idea is that we use the prefixes fo, html, ltx on the attribute name.
+When there is no prefix, the options apply to all targets.
+<r:dynOptions width="149" fo:width="72" fg="red" fo:fontSize="9" html:fontSize="12">
+
+<para>
+Now we use these settings to format the code appropriately.
+<r:code>
+matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16), 8, 2, dimnames = list(NULL, c("X", "Y")))
+</r:code>
+</para>
+
+</r:dynOptions>
+
+
+</para>
+
+<para>
+
+
+When we qualify an attribute with a prefix, it applies to that alone.
+There is no direct, general way to specify an option should apply to two
+targets and not another. 
+However, since we are commonly dealing with just three targets, we can 
+set an option for two by setting it as the default and then
+providing an additional attribute with the prefix for the target for
+which the default does not apply. This does not generalize past 3 targets.
+Note also that the order of processing these attributes becomes important in these
+cases.
+</para>
+<para>
+
+We might  experiment with allowing the value of options to be specified as sub-nodes
+of <xml:tag>r:dynOptions</xml:tag> rather than simple attributes, e.g.
+
+<programlisting><![CDATA[
+<r:dynOptions>
+<r:dynOption name="device">
+ 
+<r:function>
+  function(...) {
+  }
+</r:function>
+</r:dynOption>
+<r:dynOption name="width">
+<r:code>
+  min( options()$width, getScreenWidth() )
+</r:code>
+</r:dynOption>
+</r:dynOptions>
+]]></programlisting>
+</para>
+</section>
+
+<section>
+<title>Accessing the Dynamic Options</title>
+
+<para>
+This indicates that we can access the current dynamic options in effect.
+Here we print the value of the function <r:func>getDynOptions</r:func>:
+<r:code>
+.environment
+</r:code>
+<r:code>
+getDynOptions
+</r:code>
+
+
+We can also get the values
+<r:code>
+getDynOptions()@width
+</r:code>
+
+</para>
+
+
+<para>
+We now set the width in the dynamic options via <xml:tag>r:dynOptions</xml:tag>
+and then query this via <xml:tag>r:code</xml:tag>
+<r:dynOptions width="76">
+
+<para>
+
+This should give 76
+
+<r:code>
+getDynOptions()@width
+</r:code>
+
+</para>
+
+</r:dynOptions>
+</para>
+
+
+</section>
+
+</article>

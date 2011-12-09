@@ -1,0 +1,16 @@
+To install, 
+
+  ./configure --prefix=<wherever>
+  make install
+
+Then to use these, set SGML_CATALOG_FILES to <wherever>/catalog.
+
+If you want to overwrite the existing catalog file, use the --enable-add
+flag for the configuration script.
+
+  ./configure --prefix=<wherever>
+
+If you do not want to create the modified catalog, you can use the
+--enable-no-catalog. This allows you to use the XSL files directly
+from the Omegahat site.
+

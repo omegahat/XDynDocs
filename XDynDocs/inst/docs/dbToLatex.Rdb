@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+This describes aspects of converting from Docbook to <latex/>
+and then from <latex/> to PDF.
+</para>
+
+<para>
+We can use either db2latex or dlbatex. Both work pretty well,
+but dblatex seems to handle more nodes ( e.g. see samplePaper.xml)
+To use db2latex rather than dblatex,  specify 
+USE_DB2LATEX=2 in the call to make, e.g.
+<sh:code>
+ make -f ~/Rpackages/XDynDocs/Make/Makefile USE_DB2LATEX=1
+</sh:code>
+</para>
+
+
+<para>
+To process the resulting <latex/> file, <latex/> needs to find  additional
+.sty files which are in the <r:pkg>XDynDocs</r:pkg> package. 
+You need to add the relevant directories to the TEXINPUTS environment variable.
+See  the shell scripts in the shellScripts directory in the installed <r:pkg>XDynDocs</r:pkg>
+package.
+<note>
+We might add a function to the package to run latex for the user with these set.
+</note>
+</para>
+
+
+</section>
+
+<section>
+<title></title>
+
+<para>
+We have the dblatex generated code refer to our
+Rdocbook style file via a usepackage.
+We do this by setting the latex.style XSL parameter.
+</para>
+
+<para>
+We turn off the collaborator table, revision history, etc. 
+by specifying the doc.layout XSL parameter as "mainmatter".
+</para>
+
+
+<para>
+We control the color of links within our dblatex.xsl file
+by defining a parameter.
+</para>
+
+</section>
+</article>

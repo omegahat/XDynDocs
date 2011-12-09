@@ -1,0 +1,106 @@
+<?xml version='1.0'?>
+<article xmlns:r="http://www.r-project.org"
+      xmlns:hw="http://www.stat.berkeley.edu/~nolan/stat133"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<para>
+<invisible>
+<r:init>
+library(lattice)
+library(xtable)
+data(cats, package = "MASS")
+</r:init>
+</invisible>
+</para>
+
+<section>
+ <title>The Cats Data</title>
+ 
+<para>
+Consider the <r:var>cats</r:var> regression example from 
+Venables and Ripley <citation>VR</citation>.
+The data frame contains measurements of heart and body
+weight of <r:expr>nrow(cats)</r:expr> cats
+(<r:expr>sum(cats$Sex=="F")</r:expr> female,
+<r:expr>sum(cats$Sex=="M")</r:expr> male).
+ </para>
+
+ <para>
+A linear regression of heart weight by sex and gender can be fitted
+in R using the command
+   <r:code r:showCode = "true">
+lm1 = lm(Hwt ~ Bwt *Sex, data = cats)
+   </r:code>
+ </para>
+ <para>
+Tests for significance of the coefficients are shown in
+<xref linkend="tab:coef2"/> and
+<xref linkend="tab:coef"/>, a scatter plot including the
+regression lines is shown in <xref linkend="fig:cats"/>.
+ </para>
+
+ <figure id = "tab:coef2">
+ <title>Linear regression model for <r:var>cats</r:var> data</title>
+ <r:code r:showCode = "false">
+anova(lm1)
+ </r:code>
+ </figure>
+
+
+ <table id = "tab:coef">
+ <title>Linear regression model for <r:var>cats</r:var> data</title>
+ <tgroup cols = "2">
+  <tbody>
+   <row>
+    <entry>Date
+    </entry>
+    <entry>
+     <r:expr>date()</r:expr>
+    </entry>
+   </row>
+<row><entry>Number of records</entry><entry> <r:expr>nrow(cats)</r:expr></entry></row>
+<row><entry> ANOVA table </entry><entry>
+      <r:code showCode="false">
+        anova(lm1) 
+      </r:code>
+</entry></row>
+  </tbody>
+ </tgroup>
+ </table>
+
+<ignore>
+ <!-- This table gives an error because it has no proper children -->
+ <table id = "tab:withCode">
+ <title>Linear regression model for <r:var>cats</r:var> data</title>
+   <r:code>
+anova(lm1) 
+   </r:code>
+ </table>
+</ignore>
+
+<figure id='fig:cats'>
+ <title>The cats data from package MASS</title>
+<r:plot originalFile="logo.jpg">
+xyplot(Hwt ~ Bwt | Sex, data = cats, type = c("p", "r"))
+</r:plot>
+</figure>
+
+</section>
+
+<bibliography>
+<title>References</title>
+<biblioentry xreflabel="VR" id="VR">
+  <authorgroup>
+    <author><firstname>William</firstname><surname>Venables</surname></author>
+    <author><firstname>Brian</firstname><surname>Ripley</surname></author>
+  </authorgroup>
+ <date>1997</date>
+  <title>Modern Applied Statistics with S-PLUS</title>
+  <edition>Second edition</edition>
+ <publisher>
+    <publishername>Springer</publishername>
+    <address>New York</address>  
+ </publisher>
+</biblioentry>
+</bibliography>
+</article>

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+This is intended to test (and verify) that when an R expression
+doesn't print the result (e.g. with an assignment), we
+do not display the result in  our dynamic document.
+</para>
+<para>
+
+<r:code>
+x = 1:10
+y = 10 + 3 * x + rnorm(length(x))
+</r:code>
+
+</para>
+<para>
+This command does print its results
+<r:code>
+lambda = rnorm(1, 10)
+rexp(4, 1/lambda)
+</r:code>
+
+</para>
+<para>
+Now we look at <xml:tag>r:commands</xml:tag>
+<r:commands>
+ x = rnorm(10)
+ y = x > 0
+ sum(y)
+</r:commands>
+</para>
+
+</section>
+</article>

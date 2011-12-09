@@ -1,0 +1,65 @@
+<section  xmlns:r="http://www.r-project.org">
+<title>Formatting an R result as a table</title>
+
+<para>
+
+In this example, we illustrate how to get more tailored output from R
+than just a simple verbatim view of R's printed/displayed output.
+When the dynamic evaluation mechanism evaluates an R expression or
+calls an R function, it takes the resulting value and attempts to
+convert it to XML.  By default, it returns a string which is the
+result of printing the object.  However, if there is a method for the
+<r:func>convert</r:func> function for that type of object and the
+target format, then that will be invoked.  This can create a more
+interesting and appropriate display.  It can return a string, but it
+can also return an XML node which will be inserted into the document.
+In this example, we show how to create a table from a data frame
+</para>
+
+<para>
+
+We first ensure that our method for converting a data frame into an XML
+node is registered:
+<r:code eval="false">
+setMethod("convert", c("data.frame", target = "FOTarget"), 
+           function(from, opts = NULL, target, context = NULL)
+              matrix2FO(from))
+</r:code>
+This would typically be done in an R package or with separate stand-alone code,
+i.e. outside of the XML document.
+</para>
+
+<para>
+Now, we continue with our XML document as we normally would and
+describe an R computation.
+(We add a column so that one of the columns is a character/non-numeric.)
+<r:code showCode="true">
+ mtcars$other = substring(rownames(mtcars), 1, 4)
+ mtcars
+</r:code>
+</para>
+
+<para>
+Here we display the cats data set from MASS which contains  a factor.
+<r:code>
+library(MASS)
+cats[1:10,]
+</r:code>
+</para>
+
+<para>
+You can run this with both FO and HTML as targets and 
+</para>
+
+<para>
+Note that a trellis plot is convenient for the convert because we can
+recognize the object and then open a graphics device and print it.
+With regular plots, we have to explicitly open an appropriate graphics
+device before evaluating the commands that create it.  This separation
+and avoidance of global variables (i.e. the active graphics device) or
+side-effects is useful.
+</para>
+
+
+
+</section>

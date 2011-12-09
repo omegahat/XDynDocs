@@ -1,0 +1,25 @@
+<faq>
+<question>
+How do I add extra files to a Word .docx, or any Open Packaging 
+archive?
+When I do add the ZIP file and try to open the .docx in Word, I get an
+error about the file being corrupt.
+<answer>
+You will need to add a &lt;Default&gt; entry to the [Content_Types].xml
+file specifying the extension and the ContentType, e.g
+<![CDATA[
+<Default Extension="R" ContentType="application/R"/>
+<Default Extension="rda" ContentType="application/Rdata"/>
+<Default Extension="c" ContentType="application/C"/>
+<Default Extension="cc" ContentType="application/C++"/>
+<Default Extension="cxx" ContentType="application/C++"/>
+]]>
+If you have a file that is not recognized, Word complains!
+</answer>
+</question>
+<question>
+
+<answer>
+</answer>
+</question>
+</faq>

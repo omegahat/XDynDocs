@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:i="http://www.statdocs.org/interactive"
+         xmlns:html='http://www.w3.org/TR/REC-html40'
+      >
+<!--          version="4.0" xml:lang="en" -->
+ <articleinfo>
+  <authorgroup>
+    <author>
+     <firstname>Duncan</firstname>
+     <surname>Temple Lang</surname>
+    </author>
+  </authorgroup>
+  <title>An interactive document with a simulation</title>
+ </articleinfo>
+
+
+<section>
+<title>The Basics</title>
+
+<para>
+This is a very simple and essentially uninteresting simulation.
+We set the sample size, n, and the distribution, F, 
+and then we  generate a sample. And then we look at 
+the maximum. We repeat this R times and look at the distribution
+of our maximum.
+</para>
+
+<para>
+Here we add some interactive controls.
+
+
+   		<!-- will be discarded if not interactive -->
+<interactive ref="setVars">   <!-- ref must connect to the r:code with which this is associated and the value
+                                   is propogated to the i:* nodes within this. -->
+
+  <!-- Could use Docbook, but also can use HTML directly. Either works as the
+       the XML will be run through a Docbook to HTML transformer. -->
+<table border="1" xmlns='http://www.w3.org/TR/REC-html40'>
+<tr>
+<td>
+<a href="n">n</a></td>
+<td align="right">
+ 1 <i:slider var="n" min="1" max="300" r:type="integer" width="200" height="50" /> 300
+</td>
+</tr>
+<tr>
+<td><a href="http://en.wikipedia.org/wiki/Beta_distribution">shape1</a></td>
+<td align="right">
+ .01 <i:slider var="shape1" min=".01" max="10" by=".01" r:type="numeric"/> 10
+</td>
+</tr>
+<tr>
+<td>shape2</td>
+<td align="right">
+ .01 <i:slider var="shape2" min=".01" max="10" by=".01" r:type="numeric"/> 10
+</td>
+</tr>
+<tr>
+<td>Statistic</td>
+<td align="right">
+<i:combo-box var="stat" choices="min,max,mean,median"/>      <!-- r:type="function" -->
+</td>
+</tr>
+</table>
+</interactive>
+
+We use a value of 20 and a Beta distribution with parameters .1 and .5.
+
+
+<table>
+<tgroup cols='2'>
+<colspec colwidth="2*"/>
+<colspec colwidth="3*"/>
+<tbody>
+<row>
+<entry valign="top">
+  <!-- suppress the output from R here in the XSL code. Alternatively, at the R interpreter level use r:output="false" or showResult="false" -->
+<r:code showOutput="false" showCode="true" id="setVars" eval="true" i:width="400" i:height="200">
+n = 20
+shape1 = .1
+shape2 = .5
+stat = "max"
+F = function(n) rbeta(n, shape1, shape2)
+<r:output>
+This is our own output.
+</r:output>
+</r:code>
+</entry>
+<entry valign="top">
+<r:code  i:height="350" digits="3" id="sample">
+R = 100
+samples = replicate(R, F(n), simplify = FALSE)
+T = sapply(samples, stat)
+</r:code>
+</entry>
+</row>
+<row>
+<entry>
+<interactive ref="sample">
+ <i:data-grid var="T" r:transform="summary(T)" width="600" height="75"/>
+</interactive>
+</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+</para>
+
+
+
+<para>
+Distribution of the maximum value for each of the <r:expr>R</r:expr>
+samples and the distribution of values for each of the <r:expr>R</r:expr> 
+individual samples.
+<table>
+<tgroup cols="2">
+<colspec colwidth="2*"/>
+<colspec colwidth="2*"/>
+<tbody>
+<row>
+<entry>
+<r:plot>
+hist(T, xlim = c(0, 1), prob = TRUE, 
+      main = paste("n =", n, ",a =", shape1, ", b =", shape2))
+curve(dbeta(x, shape1, shape2), 0, 1, add = TRUE, col = "red")
+</r:plot>
+</entry>
+<entry>
+<r:plot width="600">
+boxplot(samples, ylim = c(0, 1))
+</r:plot>
+</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+</para>
+
+</section>
+
+<section>
+<r:run eval="false">
+dynDoc("examples/isim.xml", 
+         device = list(svg = function(file, w, h, ...) 
+                                 devSVG(file, w/96, h/96, ...)), 
+         createDoc = TRUE)
+</r:run>
+</section>
+
+</article>

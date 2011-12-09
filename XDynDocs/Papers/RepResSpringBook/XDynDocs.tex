@@ -1,0 +1,90 @@
+\documentclass{article}
+
+\begin{document}
+
+\section{The Document as a Notebook/Database}
+
+What is the basic concept.
+
+Projections, filtering, querying, updating (correcting function
+locations)
+
+That this approach is richer than Sweave.
+Using either an R package, a zip archive (same as Office Open and Open
+Office container format), or putting the data, etc. all in the one document.
+
+
+Connection with literate programming, writing help pages for
+functions, ...  Same markup vocabulary.  Same toolchain and
+computational model for processing the documents (i.e. LaTeX and then
+Rd is something entirely different).
+
+Another vocabulary and toolchain to learn for \LaTeX{} users
+but not for word processor users. But a much richer framework
+that open up many new possibilities that we will be able to 
+explore given these primitives. Interactive documents, drill-down,
+alternative paths/branches,  semantic web.
+
+\section{Authoring Formats: Word processor and Docbook}
+
+\section{The XML Tools: XML, XSL, XPath, XInclude, XPointer}
+
+\subsection{XML Schema}
+
+\section{Tools for Authors}
+
+\subsection{}
+For users of Microsoft Word, we provide
+a template (.dotm) file which contains numerous styles
+corresponding to the different markup elements, e.g. R code,
+R plot, R lattice plot, R expr, R class, R function, ...
+One can also create derived styles based on these and other
+``abstract'' styles.
+
+The Word template file also contains a toolbar that facilitates
+applying these styles.  There are also definitions for various key
+bindings to allow the styles to be applied via keyboard manipulation
+rather than point and click.
+
+Programmers and users wishing to customize how R objects are rendered
+or inserted into a document can provide methods for the
+\Rfunc{RtoWordProcessingML} function.
+
+An alternative to the approach we take for Word is to use an XSL style
+sheet to transform the Word document into another Word document. We
+think it is better to use R to manage this transformation as we have
+more control to deal with multiple files and can leverage the ROOXML
+package. But it is quite natural to put the rules to handle
+code identified by certain styles within XSL.
+
+
+\subsection{Emacs}
+There is 
+\section{Opportunities}
+SVG
+
+\section{Challenges}
+
+Dealing with mathematical content. We can use MathML.
+
+\section{Caching, Code dependencies}
+We have taken a different approach to caching and avoiding
+computation.  Firstly, we allow the author to explicitly put the
+output they obtained into the document.  They can use this rather than
+reperforming the computations.  This is the advantage of having markup
+for arbitrarily many (i.e. more than two) types of chunks.
+
+We also can work at the level of individual variables and expressions
+to determine what expressions within code segments need to be
+reevaluated when the value of an individual variable is changed.  This
+uses reasonably detailed but conceptually straightforward code
+analysis that is possible in a language such as R.
+
+This code analysis and high-resolution sub-expression dependencies is
+important for the interactive documents we can create from the dynamic
+documents.
+
+\section{Future Work}
+More on alternatives and different projections.
+
+\end{document}

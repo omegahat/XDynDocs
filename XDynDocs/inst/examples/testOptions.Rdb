@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:ropt="http://www.r-project.org/options"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+
+
+<r:code r:width="100" width="50">
+#quote(foo(x1, x2, x3, x4, bar(x5, x6, x7, x8, x9), main = 1:10, title = "A long string", other= rnorm(1000, mean = 10, sd = 3)))
+options()$width
+</r:code>
+
+
+<r:code ropt:width="50">
+options()$width
+</r:code>
+
+
+<r:plot width="800" height="800"><![CDATA[
+plot(1:10)
+]]></r:plot>
+
+
+
+</para>
+
+</section>
+</article>

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org" xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+
+
+<para>
+<table><title>Motor Car Trends 1970 data on cars</title><tgroup cols="4"><thead><row><entry>Name</entry>
+<entry>Type</entry>
+<entry>Unit</entry>
+<entry>Description</entry>
+</row></thead><tbody><row>
+<entry>mpg</entry>
+<entry>double</entry>
+<entry>mpg</entry>
+<entry>
+Miles per US gallon.
+</entry>
+</row>
+<row>
+<entry>cyl</entry>
+<entry>positiveInteger</entry>
+<entry/>
+<entry>Number of cylinders</entry>
+</row>
+</tbody></tgroup></table>
+</para>
+
+</section>
+</article>

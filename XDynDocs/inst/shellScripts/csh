@@ -1,0 +1,8 @@
+
+tmp=/Users/duncan/Rpackages/XDynDocs/latexStyles:/Users/duncan/Rpackages/XDynDocs/XSL/dblatex-xsl-current/latex//
+
+if !(${?TEXINPUTS}) then
+  setenv TEXINPUTS=${tmp}::
+else
+  setenv TEXINPUTS=${tmp}:${TEXINPUTS}::
+endif

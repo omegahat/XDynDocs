@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:i="http://www.statdocs.org/interactive"
+         xmlns:html='http://www.w3.org/TR/REC-html40'
+      >
+<!--          version="4.0" xml:lang="en" -->
+ <articleinfo>
+  <authorgroup>
+    <author>
+     <firstname>Duncan</firstname>
+     <surname>Temple Lang</surname>
+    </author>
+  </authorgroup>
+  <title>An interactive document with a simulation</title>
+ </articleinfo>
+
+
+<section>
+<title>The Basics</title>
+
+<para>
+This is a very simple and essentially uninteresting simulation.  We
+set the sample size, n, and the distribution, F, and then we generate
+a sample. And then we look at the maximum. We repeat this R times and
+look at the distribution of our maximum.
+</para>
+
+<para>
+We use a value of 20 and a Beta distribution with parameters .1 and .5.
+  <!-- suppress the output from R here in the XSL code. Alternatively, at the R interpreter level use r:output="false" or showResult="false" -->
+<r:code showOutput="false" showCode="true" id="setVars" eval="true" i:width="400" i:height="200">
+n = 20
+shape1 = .1
+shape2 = .5
+F = function(n) rbeta(n, shape1, shape2)
+<r:output>
+This is our own output.
+</r:output>
+</r:code>
+</para>
+<para>
+Once we have these initial settings, we can go ahead with the sampling:
+<r:code  i:height="150" digits="3">
+R = 100
+samples = replicate(R, F(n), simplify = FALSE)
+T = sapply(samples, max)
+</r:code>
+</para>
+
+
+<para>
+Distribution of the maximum value for each of the <r:expr>R</r:expr>
+samples.
+<r:plot>
+hist(T, xlim = c(0, 1), prob = TRUE, main = paste("n =", n, ",a =", shape1, ", b =", shape2))
+curve(dbeta(x, shape1, shape2), 0, 1, add = TRUE, col = "red")
+</r:plot>
+</para>
+
+<para>
+The distribution of values for each of the <r:expr>R</r:expr> 
+individual samples.
+<r:plot width="600">
+boxplot(samples, ylim = c(0, 1))
+</r:plot>
+</para>
+
+
+<para>
+Why did we chose these values.  Well, imagine that we have some data
+and we believe it follows a Beta distribution and these are our
+parameter estimates. We want to see the variability of our estimate of
+the maximum.  But a reader might want to see what happens when we use
+different parameters.  The Beta density is very flexible changing from
+a U-shaped curve to a Uniform to a bell-shaped curve as we vary the
+parameters.  So by changin these, we can see what happens to our
+simulation and get a sense of its "robustness".  We can also change
+the data sample size to see how this effects matters.  An industrious
+student might want to adapt the code that we have and run the
+simulation to a) get a measure of variability for a given (n, shape1,
+shape2) triple, and b) plot this for different n Undoubtedly, drawing
+over the same plot is not ideal.  Inserting another into the document
+is tricky.  But inserting a new plot into the same container such as a
+notebook is easier. But then we can't compare them readily, needing to
+switch between the notebook pages.  We can allow the reader to create
+new "floating" windows and if we wanted to, we could connect them to
+the document and then show these.  The new windows are like post-it
+notes which are moved in coordination with the scrolling of the HTML
+widget. We might use an MDI-style setup for this.
+</para>
+
+<para>
+We might allow the author to specify the type of the
+result in an r:code node and thus "control" the
+way it is displayed in an interactive widget.
+For example, if you tell us it is a data frame,
+we could use a worksheet to display the value.
+On the other hand, if it is a plot, then 
+we would use a graphics device.
+And if it were a linear model, we might have a customized
+display.
+</para>
+
+
+</section>
+
+<section>
+<r:run eval="false">
+dynDoc("examples/isim.xml", device = list(svg = function(file, w, h, ...) devSVG(file, w/96, h/96, ...)), createDoc = TRUE)
+</r:run>
+</section>
+
+</article>

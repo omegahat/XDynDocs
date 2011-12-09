@@ -1,0 +1,53 @@
+<article xmlns:r="http://www.r-project.org">
+
+<r:function file="foo.R">
+foo = 
+function(x,y)
+{
+  x + y
+}
+</r:function>
+
+<r:function file="foo.R">
+bar = 
+function(x)
+ foo(x, x)
+</r:function>
+
+<r:function file="other.R">
+other = function() rnorm(100)
+</r:function>
+
+
+<r:code name="a">
+a = mapply(foo, 1:10, 11:20)
+</r:code>
+
+<r:code name="b">
+b = sapply(bar, 1:10)
+</r:code>
+
+<r:plot name="plot">
+plot(a, b)
+</r:plot>
+
+
+<r:code name="composite">
+ <r:code ref="bob"/> 
+ cat("foobar\n")
+ <r:code ref="jane"/> 
+</r:code>
+
+<r:code id="bob" name="bob">
+  "me llamo bob"
+</r:code>
+
+<r:code id="jane" standalone="true" name="jane">
+  "me llamo jane"
+</r:code>
+
+<r:code id="unreferenced" name="unref">
+# This is not referenced in any other r:code node 
+</r:code>
+
+</article>

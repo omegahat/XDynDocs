@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title>Trying out the plot tag and attributes</title>
+
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+This is an example of running simple R code
+</para>
+
+
+<para>
+We create a plot
+
+<r:plot><![CDATA[
+plot(rnorm(100))
+]]></r:plot>
+
+</para>
+
+<para>
+We create a plot now where we use width and height attribute
+
+<r:plot width = "1000" height= "1000"><![CDATA[
+plot(rnorm(100))
+]]></r:plot>
+
+</para>
+
+<para>
+Now we try to hide the code that is used to create a plot 
+
+<r:plot showCode="false" width = "1000" height= "1000"><![CDATA[
+plot(rnorm(100))
+]]></r:plot>
+
+</para>
+
+</section>
+
+</article>

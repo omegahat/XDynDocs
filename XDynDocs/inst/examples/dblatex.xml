@@ -1,0 +1,45 @@
+<article xmlns:r='http://www.r-project.org'>
+<title>Example of <docbook/> being converted to <latex/></title>
+<section>
+<title>Introduction</title>
+<para>
+This is an example that is different from <ulink url="latex.xml"/> as
+it illustrates how we have a regular <docbook/> document that we
+convert to <latex/>.  <ulink url="latex.xml"/> is a very simple XML
+document that is essentially in <latex/> format with a very thin
+<docbook/> wrapper.
+</para>
+
+<para>
+This is <docbook/> markup:
+<table>
+<tgroup cols="2">
+<tbody>
+<row><entry>A</entry><entry>B</entry></row>
+<row><entry>C</entry><entry>D</entry></row>
+</tbody>
+</tgroup>
+</table>
+</para>
+<para>
+A plot
+<r:plot originalFile="logo.jpg">
+plot(1:10)
+</r:plot>
+</para>
+
+<para>
+<tex><![CDATA[
+This is pure \TeX{} and should go through
+without being $x < 2$ interpreted.
+It may need to be escaped via a CDATA segment.
+]]></tex></para>
+
+</section>
+
+<section>
+<r:code eval="false">
+dynDoc("dblatex.xml", "LaTeX", "../inst/XSL/db2latex.xsl", force = TRUE, runCode = FALSE)
+</r:code>
+</section>
+</article>

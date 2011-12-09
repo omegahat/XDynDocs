@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:i="http://www.statdocs.org/interactive"
+         xmlns:html='http://www.w3.org/TR/REC-html40'
+      >
+<!--          version="4.0" xml:lang="en" -->
+ <articleinfo>
+  <authorgroup>
+    <author>
+     <firstname>Duncan</firstname>
+     <surname>Temple Lang</surname>
+    </author>
+  </authorgroup>
+  <title>An interactive document with a simulation</title>
+ </articleinfo>
+
+
+<section>
+<title>The Basics</title>
+
+<para>
+This is a very simple and essentially uninteresting simulation.
+We set the sample size, n, and the distribution, F, 
+and then we  generate a sample. And then we look at 
+the maximum. We repeat this R times and look at the distribution
+of our maximum.
+</para>
+
+<para>
+Here we add some interactive controls.
+
+
+   		<!-- will be discarded if not interactive -->
+<interactive ref="setVars">   <!-- ref must connect to the r:code with which this is associated and the value
+                                   is propogated to the i:* nodes within this. -->
+
+  <!-- Could use Docbook, but also can use HTML directly. Either works as the
+       the XML will be run through a Docbook to HTML transformer. -->
+<table border="0" xmlns='http://www.w3.org/TR/REC-html40'>
+<tr>
+<td>
+<a href="n">n</a></td>
+<td>
+ <i:slider var="n" min="1" max="300" r:type="integer" width="200" height="50" />
+</td>
+</tr>
+<tr>
+<td><a href="http://en.wikipedia.org/wiki/Beta_distribution">shape1</a></td>
+<td>
+ <i:slider var="shape1" min=".01" max="10" by=".01" r:type="numeric"/>
+</td>
+</tr>
+<tr>
+<td>shape2</td>
+<td>
+ <i:slider var="shape2" min=".01" max="10" by=".01" r:type="numeric"/>
+</td>
+</tr>
+</table>
+</interactive>
+
+We use a value of 20 and a Beta distribution with parameters .1 and .5.
+
+
+<!-- The next two are to illustrate that these are ignored. -->
+<ignore>
+<r:code>
+"garbage"
+</r:code>
+</ignore>
+
+<!-- This should be displayed but not evaluated. -->
+<r:code eval="false">
+x = 1
+</r:code>
+
+<table>
+<tgroup cols='2'>
+<colspec colwidth="2*"/>
+<colspec colwidth="3*"/>
+<tbody>
+<row>
+<entry>
+  <!-- suppress the output from R here in the XSL code. Alternatively, at the R interpreter level use r:output="false" or showResult="false" -->
+<r:code showOutput="false" showCode="true" id="setVars" eval="true" i:width="400" i:height="200">
+n = 20
+shape1 = .1
+shape2 = .5
+F = function(n) rbeta(n, shape1, shape2)
+<r:output>
+This is our own output.
+</r:output>
+</r:code>
+</entry>
+<entry>
+<r:code  i:height="150" digits="3">
+R = 100
+samples = replicate(R, F(n), simplify = FALSE)
+T = sapply(samples, max)
+</r:code>
+</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+</para>
+
+
+<!-- The start of an alternative way of doing things. -->
+<ignore>
+<!-- A different version from the one above where we actually supply the code for the interactive components. -->
+<i:code><![CDATA[
+ panel = wxPanel(htmlWidget, wxID_ANY)
+ sizer = wxBoxSizer(wxVERTICAL)
+ 
+ n.slider = wxSlider(panel, wxID_ANY, n, 1, 300)
+ sizer$Add(n.slider)
+ n.slider$AddCallback(wxEVT_SCROLL_CHANGED,
+                        function(ev) {
+			  sl = ev$GetEventObject()
+                          n <<- sl$GetValue()
+                          recalculateNodes(thisNodeId)
+                        })
+ shape1.slider = wxSlider(panel, wxID_ANY, n, 1, 10*(1/.01))
+ shape2.slider = wxSlider(panel, wxID_ANY, n, 1, 10*(1/.01))
+
+ sizer$Add(shape1.slider)
+ sizer$Add(shape2.slider)
+
+ panel$SetSizer(sizer)
+ sizer$SetSizeHints(panel)
+
+ panel
+]]></i:code>
+<i:slider var="n" min="1" max="300" r:type="integer"/>
+<i:slider var="shape1" min=".01" max="10" by=".01" r:type="numeric"/>
+<i:slider var="shape2" min=".01" max="10" by=".01" r:type="numeric"/>
+<i:object type="app/x-R-editor" var="F" />
+</ignore>
+
+
+
+<table>
+<tgroup cols='2'>
+<colspec colwidth="2*"/>
+<colspec colwidth="1*"/>
+<tbody>
+<row>
+<entry>
+<para>
+Distribution of the maximum value for each of the <r:expr>R</r:expr>
+samples.
+</para>
+</entry>
+<entry>
+<para>
+The distribution of values for each of the <r:expr>R</r:expr> 
+individual samples.
+</para>
+</entry>
+</row>
+<row>
+<entry>
+<r:plot>
+hist(T, xlim = c(0, 1), prob = TRUE, main = paste("n =", n, ",a =", shape1, ", b =", shape2))
+curve(dbeta(x, shape1, shape2), 0, 1, add = TRUE, col = "red")
+</r:plot>
+</entry>
+<entry>
+<r:plot width="600">
+boxplot(samples, ylim = c(0, 1))
+</r:plot>
+</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+
+
+<para>
+Why did we chose these values.  Well, imagine that we have some data
+and we believe it follows a Beta distribution and these are our
+parameter estimates. We want to see the variability of our estimate of
+the maximum.  But a reader might want to see what happens when we use
+different parameters.  The Beta density is very flexible changing from
+a U-shaped curve to a Uniform to a bell-shaped curve as we vary the
+parameters.  So by changin these, we can see what happens to our
+simulation and get a sense of its "robustness".  We can also change
+the data sample size to see how this effects matters.  An industrious
+student might want to adapt the code that we have and run the
+simulation to a) get a measure of variability for a given (n, shape1,
+shape2) triple, and b) plot this for different n Undoubtedly, drawing
+over the same plot is not ideal.  Inserting another into the document
+is tricky.  But inserting a new plot into the same container such as a
+notebook is easier. But then we can't compare them readily, needing to
+switch between the notebook pages.  We can allow the reader to create
+new "floating" windows and if we wanted to, we could connect them to
+the document and then show these.  The new windows are like post-it
+notes which are moved in coordination with the scrolling of the HTML
+widget. We might use an MDI-style setup for this.
+</para>
+
+<para>
+We might allow the author to specify the type of the
+result in an r:code node and thus "control" the
+way it is displayed in an interactive widget.
+For example, if you tell us it is a data frame,
+we could use a worksheet to display the value.
+On the other hand, if it is a plot, then 
+we would use a graphics device.
+And if it were a linear model, we might have a customized
+display.
+</para>
+
+
+</section>
+
+<section>
+<r:run eval="false">
+dynDoc("examples/isim.xml", device = list(svg = function(file, w, h, ...) devSVG(file, w/96, h/96, ...)), createDoc = TRUE)
+</r:run>
+</section>
+
+</article>

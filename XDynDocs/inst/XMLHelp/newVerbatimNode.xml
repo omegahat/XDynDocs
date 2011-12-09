@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<rh:help xmlns:rh="http://www.r-project.org/help" xmlns:r="http://www.r-project.org" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <rh:topic> </rh:topic>
+  <rh:topic>newVerbatimNode</rh:topic>
+  <rh:title>Create a node to contain literal/verbatim content</rh:title>
+  <rh:description>
+    <para>This is a utility function for users who want to provide their
+  own facilities for converting R objects to HTML, FO, Docbook, and generally XML.
+ This allows programmers to use this function for all formats when inserting output from
+ R literally. The function is not generally intended for use by R users just processing
+ documents with existing style files and R conversion.
+     </para>
+  </rh:description>
+  <rh:arguments>
+   <rh:arg id="target"><para>an object of class DynamicTarget which is used to identify
+the format of the document being generated. This is used to dispatch methods
+based on the different formats such as HTML, FO, LaTeX, and so on.
+</para></rh:arg>
+   <rh:arg id="..."><para>text or XML nodes to be placed as the contents/childre of the verbatim 
+node.
+</para></rh:arg>
+   <rh:arg id="inline"><para>
+</para></rh:arg>
+   <rh:arg id="parent"><para>the parent XML node of this new verbatim node.
+</para></rh:arg>
+   <rh:arg id="doc"><para>the XMLInternalDocument object which is to "house" the new node.
+ If the <r:arg>parent</r:arg> argument is specified, the document is not necessary.
+</para></rh:arg>
+   <rh:arg id="cdata"><para>a logical value indicating whether to add the content
+  within an XML CDATA construct to avoid interpreting special XML-related characters
+  such as &lt; and &amp; as XML, but literally. This is the safe thing to do.
+</para></rh:arg>
+   </rh:arguments>
+  <rh:value>
+    <para>An XMLInternalNode.
+     </para>
+  </rh:value>
+  <rh:seealso>
+   </rh:seealso>
+  <xi:include href="generalInfo.xml" xpointer="xmlns(rh=http://www.r-project.org/help) xpointer(//author|//authorgroup)"/>
+  <rh:references>
+   </rh:references>
+  <rh:examples>
+    <r:init/>
+    <rh:example id="">
+      <rh:title> </rh:title>
+      <rh:description>
+        <para>
+	</para>
+      </rh:description>
+      <r:code>
+	</r:code>
+    </rh:example>
+  </rh:examples>
+  <rh:keywords>
+    <rh:keyword> </rh:keyword>
+  </rh:keywords>
+  <rh:versionIntroduced version=""/>
+</rh:help>

@@ -1,0 +1,27 @@
+<dataDescription>
+<title>Motor Car Trends 1970 data on cars</title>
+<description>
+The data was extracted from the 1974 <emphasis>Motor Trend</emphasis> US magazine,
+and comprises fuel consumption and 10 aspects of automobile design
+and performance for 32 automobiles (1973-74 models).
+</description>
+<author></author>
+<source>Henderson and Velleman (1981), Building multiple regression models
+     interactively.  Biometrics, 37, 391-411.</source>
+<version></version>
+<schema>
+</schema>
+<date></date>
+<variables count="2">
+<variable name="mpg" type="double">
+<description>
+Miles per US gallon.
+</description>
+<unit>mpg</unit>
+<note>This is in US gallons, not imperial gallons.</note>
+</variable>
+<variable name="cyl" type="positiveInteger">
+<description>Number of cylinders</description>
+</variable>
+</variables>
+</dataDescription>

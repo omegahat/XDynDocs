@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+
+
+<r:code eval="false">
+summary(rnorm(100))
+</r:code>
+</para>
+<para>
+
+<r:code eval="false">
+summary(rnorm(100))
+<r:output><![CDATA[
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+-2.7270 -0.8053 -0.1116 -0.0624  0.6728  2.5020 
+]]></r:output>
+</r:code>
+
+</para>
+
+</section>
+</article>

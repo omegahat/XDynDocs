@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude"
+	xmlns:sh="http://www.shell.org">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+
+r:command or r:code.
+
+
+</para>
+
+</section>
+
+<section>
+<title></title>
+
+<para>
+There are three basic scenarios for writing about (R) code
+within a document.
+These are:
+<ul>
+<li>([<xml:tag>r:code</xml:tag>]) we issue an command (interactively) and examine the output and explain how this leads us to the next command
+which leads to the next <xml:tag>r:code</xml:tag> element;</li>
+<li>(<xml:tag>r:commands</xml:tag>) we issue a collection of commands and examine the output of each;</li>
+<li>(<xml:tag>r:code</xml:tag>)  we issue several commands, but we are only interested in the output of the
+last one; the preceding ones are intermediate computations that do not change which commands we perform next</li>
+</ul>
+
+</para>
+</section>
+
+<section>
+<title>Customizing the appearance of the output</title>
+
+<para>
+When we insert the result of a computation in R into our 
+dynamic document, we often have strong ideas about how it should appear.
+Frequency tables should be actual tables; similarly matrices  and data frames should
+be two-way tables; vectors should appear in a particular form.
+The <omg:pkg>XDynDocs</omg:pkg> package facilitates customizing the appearance in
+several (4) ways:
+
+<ol>
+<li> use the default verbatim output from R</li>
+<li> provide a method for the existing class </li>
+<li> return the object as an instance of a new class and provide a method for that class</li>
+<li> provide a template for the output and allow R and <omg:pkg>XDynDocs</omg:pkg>to try to extrapolate
+  that patter. This is best done with a table.</li>
+</ol>
+
+The <r:func></r:func>
+
+
+
+
+
+
+
+
+
+</para>
+</section>
+
+</article>

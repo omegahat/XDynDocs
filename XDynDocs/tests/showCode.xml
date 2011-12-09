@@ -1,0 +1,42 @@
+<section  xmlns:r="http://www.r-project.org">
+<title>Traffic flow on highways in California</title>
+ <para>
+
+In the first case, there is no showCode attribute and so it is shown
+or not depending on the value of showCode.
+
+<r:code>
+ summary(rnorm(100))
+</r:code>
+
+But this next one will "always" show the code,
+regardless of the global XSL variable/parameter showCode:
+<r:code showCode="true">
+ summary(rnorm(100))
+</r:code>
+</para>
+
+<para>
+Now set it to false.
+
+<r:code showCode="false">
+ summary(rnorm(100))
+</r:code>
+</para>
+
+<para>
+Now set invisible to true.
+
+<r:code invisible="true">
+ summary(rnorm(100))
+</r:code>
+</para>
+
+<para>
+Now set eval to false.
+
+<r:code eval="false">
+ summary(rnorm(100))
+</r:code>
+</para>
+</section>

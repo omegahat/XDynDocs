@@ -1,0 +1,59 @@
+<article xmlns:r="http://www.r-project.org">
+<articleinfo>
+<title>Using <latex/>{} for dynamic documents</title>
+<author>
+<firstname>Duncan</firstname><surname>Temple Lang</surname>
+</author>
+</articleinfo>
+<para>
+\def\myMacro{My Expanded Macro}
+
+
+This is an example of a documentat that we want
+to convert to <latex/>.
+It uses, for example, its own format for mathematical
+content such as
+$$
+ E[X] =  \int_0^\infty x f(x) dx
+$$
+
+<tex><![CDATA[
+This is pure \TeX{}
+which is passed through to 
+latex as is $x < 2$
+]]></tex>
+
+Here we introduce some R code
+<r:init>
+n = 100
+</r:init>
+
+And then we generate a sample of size $n$
+<r:code>
+summary(rnorm(n))
+</r:code>
+
+\begin{center}
+\begin{tabular}[l]{ll}
+ Info &amp; value \\
+\hline
+ $n$ &amp; <r:expr>n</r:expr> \\
+ date &amp; <current-date/> 
+\end{tabular}
+\end{center}
+
+It also uses a local macro such as \myMacro.
+
+\section{A section} This is a regular <latex/>{} section.  So we see
+that we are mixing <latex/> with \textit{DocBook}.
+
+\section{Another section}
+\includegraphics{logo.jpg}
+
+<r:plot originalFile="logo.jpg">
+plot(1:10)
+</r:plot>
+
+
+</para>
+</article>

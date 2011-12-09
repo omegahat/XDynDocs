@@ -1,0 +1,122 @@
+
+<section>
+<title>Implementing random number generators for mixture models</title>
+
+<para>
+Here we show how we can implement a random number generator
+for a mixture model. We'll show two different approaches.
+</para>
+
+<altImplementations>
+<para>
+We'll focus on a mixture of normals.  Each implementation will accept
+the number of values to generate, the vector of means and the vector
+of SDs of the components, and a vector of probabilities.
+(These are bare-bones implementations for illustrating the
+<xml:tag>alternative</xml:tag> tag.)
+
+</para>
+<altImplementation id="A">
+The first version handles each value separately,
+generating the component from which to sample
+and then sampling that.
+This is the non-vectorized approach.
+
+
+<r:function><![CDATA[
+rmix = rmix1 = 
+function(n, means, sd = rep(1, length(means)), prob = rep(1, length(means)))
+{
+  idx = seq(along = means)
+  replicate(n, { i = sample(idx, 1, prob = prob)
+                 structure(rnorm(1, means[i], sd[i]), names = i)
+               })
+}
+]]></r:function>
+We can test it with 
+
+<r:test><![CDATA[
+x = rmix(10000, c(0, 5, 10))
+plot(density(x))
+]]></r:test>
+
+</altImplementation>
+<altImplementation>
+
+<para>
+A better approach is to sample the components 
+in one operation and then use the vectorization
+of <r:func>rnorm</r:func> to sample the values
+in a single operation also.
+
+
+<r:function><![CDATA[
+
+rmix = rmix2 =
+function(n, means, sd = rep(1, length(means)), prob = rep(1, length(means)))
+{
+   k = sample(seq(along = means), n, replace = TRUE, prob = prob)
+ 
+   rnorm(n, means[k], sd[k])
+}
+
+]]></r:function>
+
+Again we can test this using the same code:
+
+<r:test><![CDATA[
+x = rmix(10000, c(0, 5, 10))
+plot(density(x))
+]]></r:test>
+
+and of course do more extensive tests.
+
+</para>
+
+</altImplementation>
+
+
+<compare>
+
+<para>
+
+We can compare the results with a Q-Q plot.
+
+<r:plot><![CDATA[
+x1 = rmix1(10000, c(0, 5, 10))
+x2 = rmix2(10000, c(0, 5, 10))
+
+qqplot(x1, x2)
+
+]]></r:plot>
+We have to be careful we are comparing values within the same 
+components.
+</para>
+
+<para>
+
+We can compare these functions by timing them for different number of observations being generated.
+We can also look at how this varies with different numbers of components.
+
+
+<r:code><![CDATA[
+
+n = seq(10, length = 50, by = 1000)
+tm1 = sapply(n, function(i) system.time(rmix1(i, means = c(0, 10, 20, 30))))
+tm2 = sapply(n, function(i) system.time(rmix2(i, means = c(0, 10, 20, 30))))
+
+]]></r:code>
+
+
+<r:plot><![CDATA[
+matplot(n, cbind(tm1[3,], tm2[3,]))
+]]></r:plot>
+
+</para>
+
+</compare>
+
+</altImplementations>
+
+
+</section>

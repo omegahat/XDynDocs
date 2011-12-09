@@ -1,0 +1,70 @@
+<?xml version='1.0'?>
+
+<article xmlns:r="http://www.r-project.org"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<section>
+<title></title>
+<para>
+This is an example of code that is very wide that we want R to format for us.
+<r:code showOutput="false">
+myDynDoc =
+function (doc, target = "FO", xsl = getStyleSheet(target), out = paste(directory,  gsub("(xml|Rdb)$", getExtension(tolower(target)), basename(doc)),     sep = .Platform$file.sep), fop = FopExec, xslParams = getStyleSheetParams(target),     fopArgs = character(), env = new.env(parent = globalenv()),     directory = ".", imageDirectory = directory, graphicsDevice = list(svg = svg),     dynOpts = DynamicOptions(target, directory = directory, device = graphicsDevice,     env = env), ..., force = FALSE, invocation = paste(deparse(sys.call(), 
+        if (target == "HTML") 90 else 50), collapse = "\n"), 
+    .errorFun = XML:::xmlErrorCumulator(), verbose = TRUE) 
+{
+
+}
+</r:code>
+</para>
+
+
+<para>
+This is not reformatted because we indicate that it should be shown as is via the
+<xml:tag>showAsIs</xml:tag> attribute on the <xml:tag>r:code</xml:tag> node.
+<r:code showAsIs="true">
+myDynDoc =
+function (doc, target = "FO", xsl = getStyleSheet(target), out = paste(directory,  
+                                                                       gsub("(xml|Rdb)$", getExtension(tolower(target)), basename(doc)), 
+                                                                       sep = .Platform$file.sep), 
+          fop = FopExec)
+{
+
+}
+</r:code>
+</para>
+
+<para>
+This version sets the width of the display via <xml:attr>r:width</xml:attr>
+<r:code showOutput="false" r:width="120">
+myDynDoc =
+function (doc, target = "FO", xsl = getStyleSheet(target), out = paste(directory,  gsub("(xml|Rdb)$", getExtension(tolower(target)), basename(doc)),     sep = .Platform$file.sep), fop = FopExec, xslParams = getStyleSheetParams(target),     fopArgs = character(), env = new.env(parent = globalenv()),     directory = ".", imageDirectory = directory, graphicsDevice = list(svg = svg),     dynOpts = DynamicOptions(target, directory = directory, device = graphicsDevice,     env = env), ..., force = FALSE, invocation = paste(deparse(sys.call(), 
+        if (target == "HTML") 90 else 50), collapse = "\n"), 
+    .errorFun = XML:::xmlErrorCumulator(), verbose = TRUE) 
+{
+
+}
+</r:code>
+</para>
+
+
+<para>
+Here we check that the temporary setting of <xml:attr>r:width</xml:attr> was indeed temporary.
+<r:code showOutput="false">
+myDynDoc =
+function (doc, target = "FO", xsl = getStyleSheet(target), out = paste(directory,  gsub("(xml|Rdb)$", getExtension(tolower(target)), basename(doc)),     sep = .Platform$file.sep), fop = FopExec, xslParams = getStyleSheetParams(target),     fopArgs = character(), env = new.env(parent = globalenv()),     directory = ".", imageDirectory = directory, graphicsDevice = list(svg = svg),     dynOpts = DynamicOptions(target, directory = directory, device = graphicsDevice,     env = env), ..., force = FALSE, invocation = paste(deparse(sys.call(), 
+        if (target == "HTML") 90 else 50), collapse = "\n"), 
+    .errorFun = XML:::xmlErrorCumulator(), verbose = TRUE) 
+{
+
+}
+</r:code>
+</para>
+
+
+
+</section>
+
+</article>
+
+

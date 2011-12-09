@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+	 xmlns:sh="http://www.shell.org"
+	 xmlns:xp="http://www.w3.org/TR/xpath"
+	 xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<section>
+<title>A simple sample illustration of DynDocs</title>
+<para>
+This is a simple  test of the <r:func>dynDoc</r:func>
+function in the <r:pkg>IDynDocs</r:pkg> package.
+It attempts to test the basic functionality and 
+XML elements related to R.
+</para>
+<para>
+We do some simple calculations
+<!-- size to change font in FO as a test -->
+<r:code size="6">
+x = 1:100
+sum(x)
+</r:code>
+and create a plot (without an explicit graphics device)
+<r:plot>
+plot(1:10)
+</r:plot>
+and next with an explicit PDF device:
+<r:plot r:format="pdf">
+plot(1:100)
+</r:plot>
+and an libcairo-based SVG device:
+<r:plot r:format="svg">
+plot(1:50)
+</r:plot>
+(Use <r:func>svgPlot</r:func> to create an annotated plot
+with a single operation.)
+</para>
+<para>
+We do a short simulation
+<r:code digits="3">
+means = replicate(100, mean(rexp(100, 1)))
+<r:value r:id="means" r:type="dput"><![CDATA[
+c(0.876245503790606, 1.18131276052242, 1.05568648187, 1.16310634140434, 
+1.13265381184948, 0.991088662533095, 0.846519660493099, 1.00273717215008, 
+0.89184512765577, 0.938319874393507, 0.78852435734592, 1.00506879397703, 
+1.03575235620860, 1.04043859917245, 0.788999941533669, 0.966111626164293, 
+0.961830571948379, 0.907748570806703, 1.03013953568941, 1.07263485825092, 
+0.916402643694237, 1.04368429311933, 0.912176845390475, 1.07623015164105, 
+0.991357921427092, 0.985752972701808, 0.9014637726704, 0.971267854728055, 
+0.960018044220618, 1.15598518300572, 0.945600546402939, 0.928830258894308, 
+0.905719279155433, 0.891647182886272, 1.06766718992535, 0.91439111984302, 
+0.881689126368207, 1.09408741651470, 0.93052644735598, 0.944271359048729, 
+1.01007809219674, 1.04057510908583, 0.993592433933054, 0.969209180541579, 
+1.06747240466686, 1.00938213000266, 0.871617405015065, 1.17385995635909, 
+1.04918517434573, 1.02326394557057, 0.983524540022996, 0.985111331793372, 
+1.06770453137257, 1.16479730360667, 1.19191580675572, 1.05131925549869, 
+0.887311723495166, 0.984395329935584, 1.12869433360030, 0.90124288498509, 
+0.966813280590784, 0.993221582620814, 1.09956145035221, 0.891899583120514, 
+0.995162740274822, 1.08826702546413, 1.04224858815874, 1.19608094427666, 
+1.07356282777882, 0.898921224076434, 1.10616523799238, 0.92164260355062, 
+1.20145147057241, 1.14236742274840, 0.922726095658349, 1.01422916177301, 
+0.938090986628787, 1.03330979114455, 1.13968174337149, 0.902721572304687, 
+1.06920345206641, 0.906088568636147, 1.156954829123, 1.02630589764166, 
+1.08616372904660, 0.950577366986493, 1.07877781741980, 1.04705837528429, 
+0.771301885200003, 0.955963711981925, 1.09387263624504, 0.876015624360383, 
+1.11929789982958, 1.10080749608352, 1.05886763251335, 0.930799690713235, 
+0.92970958709728, 1.03996344683943, 1.03822490297797, 1.13053272442853
+)
+]]></r:value>
+</r:code>
+Then we show a summary of the results
+<r:code>
+summary(means)
+</r:code>
+</para>
+</section>
+
+<section>
+<title>Illustrating an r:value attribute and node</title>
+<para>
+The previosly computed and cached value is in the
+r:value node whose id is "bob".
+<r:code r:value="bob">
+mean(1:10)
+</r:code>
+
+<r:value r:id="bob">
+c(55L)
+</r:value>
+The result is intentionally incorrect to illustrate that
+it is different from having R evaluate the expression
+at run-time.
+</para>
+</section>
+
+<para>
+This can be processed with the command
+<!--<r:code eval="false" show="true"> -->
+<programlisting lang="r">
+x = dynDoc("~/Classes/StatComputing/XDynDocs/inst/examples/simple.xml", "HTML",
+            force = TRUE, xslParams = c(showCode = "1", "use.existing.data" = 1, 'r:verbose' = 1),
+            xsl = "~/Classes/StatComputing/XDynDocs/inst/XSL/html.xsl", )
+</programlisting>
+</para>
+
+<para>
+<invocation/>
+</para>
+</article>

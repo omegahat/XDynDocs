@@ -1,0 +1,1867 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--  For Docbook 5 
+xmlns="http://docbook.org/ns/docbook" 
+-->
+
+<article 
+         xmlns:r="http://www.r-project.org"
+         xmlns:omg="http://www.omegahat.org"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 xmlns:cxx="http://www.open-std.org/JTC1/SC22/WG14"
+	 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	 xmlns:xml="http://www.w3.org/XML/1998/namespace"
+	 xmlns:xi="http://www.w3.org/2003/XInclude"
+	 xmlns:sh="http://www.shell.org">
+
+ <articleinfo>
+  <title>Dynamic and Interactive Documents - RDocbook Markup</title>
+   <titleabbrev>RDocbook Markup</titleabbrev>
+  <subtitle></subtitle>
+    <author><personname>
+     <firstname>Duncan</firstname>
+     <surname>Temple Lang</surname>
+     </personname></author>
+   <address><email>duncan@wald.ucdavis.edu</email></address>
+ </articleinfo>
+
+<section>
+<title>Summary</title>
+<para>
+This document provides some details about how to write and process
+dynamic XML documents containing R code.  The idea is to use an
+extended Docbook vocabulary for writing documents that can be rendered
+as HTML and PDF and processed programmatically in R and other
+languages to extract different elements. The document contains
+computer code which is evaluated and the results inserted into the
+document while it is being processed for rendering.  This is the
+dynamic part.  The second aspect of these documents is that they can
+be displayed as interactive HTML documents within an R-based browser.
+Support for these transformations and processing facilities is
+centralized in the <r:pkg>XDynDocs</r:pkg> package.
+This contains R functions to perform the processing
+and supporting XSL documents that provide the XSL rules
+for doing the transformations.
+</para>
+</section>
+
+<section>
+<title>Working with XML RDocbook</title>
+
+<para>
+We write a document using XML, and specifically an extended version of
+Docbook that has support for R-related elements.  Docbook provides us
+with all the markup for writing technical documents such as sections,
+tables, figures, cross references, bibliographies.  There is limited
+support for mathematical notation, but we can use MathML for that (but
+processing MathML for rendering is more involved and incomplete).  We
+add R code to the document where we want it to be evaluated and/or
+displayed using XML elements such as <xml:tag>r:code</xml:tag>, <xml:tag>r:plot</xml:tag>, <xml:tag>r:function</xml:tag>,
+<xml:tag>r:test</xml:tag>, <xml:tag>r:init</xml:tag>, <xml:tag>r:expr</xml:tag>, 
+<xml:tag>r:dynOptions</xml:tag>, <xml:tag>r:func</xml:tag>, <xml:tag>r:var</xml:tag>, <xml:tag>r:pkg</xml:tag>.  The purpose
+of each of these is described in table <xref
+linkend="tab:r-elements"/>.
+<!-- want this to span multiple pages and float -->
+<footnote>
+<para>
+Each of the nodes supports an r:output child which can contain a
+pre-computed display of the results which allows us to display these
+in cases where we do not want to evaluate the code.  Similarly, one
+can specify an R object that is the result of the computation.  This
+can be done via an attribute r:result whose value is a file name or
+URL identifying the location of the content.  Alternatively, we can
+have an r:result child node whose contents are the serialized R
+objects, i.e.  the save'd RDA, dump or dput format, suitably encoded.
+The r:output node supports an r:format attribute indicating 
+the style of serialization.
+</para>
+</footnote>
+<table id="tab:r-elements" width="100%">
+<title>R-related XML elements for Docbook</title>
+<?dbfo keep-together="auto" ?>	  <!--http://www.sagehill.net/docbookxsl/PageBreaking.html-->
+<tgroup cols='3'>
+<colspec colwidth="15*"/>
+<colspec colwidth="65*"/>
+<colspec colwidth="20*"/>
+<thead>
+<row>
+<entry>Node</entry>
+<entry>Description</entry>
+<entry>Attributes</entry>
+</row>
+</thead>
+<tbody>
+<row>
+<entry>r:code</entry>
+<entry>
+This identifies R code, typically to be executed.
+It supports and eval attribute which can have a value false or true to indicate
+whether it should be evaluated in the usual processing of a dynamic document.
+The code is formatted in the same manner as verbatim in <latex/> or PRE in HTML.</entry>
+<entry>
+id, eval, r:output, i:display, i:update, 
+r:capture.output - which evaluates the code and returns the output that was written to the console, i.e. using sink().
+any R options, e.g. digits.
+</entry>
+</row>
+
+<row>
+<entry>r:commands</entry>
+<entry>
+takes a block of R code and parses it into expressions
+and then evaluates each expression in turn
+returning the code, preceded by a prompt, and the converted output 
+as an XML node.
+The prompt can be specified on the node or picked up from the 
+global XSL parameter or can be specified via the xslParam
+argument in R.
+</entry>
+<entry>
+r:prompt - defaults to XSL top-level/global parameter r:prompt defined in dynamic.xsl
+</entry>
+</row>
+
+<row>
+<entry>r:function</entry>
+<entry>A code block that defines a function.
+This could define more than one function, but
+the intent is that we can easily evaluate
+the code to define a function by specifiying
+just the id of this node.</entry>
+<entry>
+id, eval
+</entry>
+</row>
+<row>
+<entry>r:plot</entry>
+<entry>The code creates a plot.
+This allows us to format the result
+properly in HTML, PDF, etc. by inserting 
+an image from a file or creating a live graphics device.
+By using this element rather than a generic r:code,
+we can ensure that the plot is "printed" in the case
+of a lattice plot and we can manage
+the graphics devices automatically, e.g. create the file
+in which the plot will be saved and can cache the result
+to avoid regenerating a plot.
+</entry>
+<entry>
+id, eval,  i:update, i:display, 
+r:width, r:height - in pixels (not inches),
+file - the name of the file to write the generated plot to
+(not used when creating an inline graphics device in interactive
+use), 
+r:background - a color that is passed to the graphics device function
+as the <r:arg>bg</r:arg> argument.
+r:format - name of function that creates a graphics device,
+called with filename, r:width and r:height and r:background.
+r:inline - indicates to return the plot as an XML node, currently only meaningful for SVG.
+   This allows us to avoid using auxiliary files.
+
+originalFile - gives the name of the file that contains the plot that is to be used
+   if we don't run the code, i.e runCode = FALSE. This is the cached plot.
+   It is different from file as when we do run the code, file will be overwritten
+   whereas this one won't.
+</entry>
+</row>
+<row>
+<entry>r:test</entry>
+<entry>
+This is for code that validates the computations
+and ensures that things are working correctly.
+How this is processed depends on the options, but
+in some cases, we will have output from
+each expression within this element
+and in other cases we may suppress the output altogether
+but merely run this code and terminate the processing if
+it does not return <r:true/>.
+</entry>
+<entry>
+id, eval
+</entry>
+</row>
+<row>
+<entry>r:init</entry>
+<entry>R code that is essentially initialization
+code that defines the inputs for the 
+document or a section.
+This often identifies the important inputs 
+that the reader might want to modify
+and have propogate to the subsequent code
+elements for evaluation.
+</entry>
+<entry>
+id, eval
+</entry>
+</row>
+<row>
+<entry>r:dynOptions</entry>
+<entry><para>A node that specifies new values
+to be set via the R <r:func>options</r:func> function.
+The values can be given via attributes,
+and in the future, will also be allowed as child nodes
+of this <xml:tag>r:dynOptions</xml:tag> element in the form
+&lt;name&gt; values &lt;/name&gt;
+and values might be some rich content described in XML.
+For the most part, however, the values
+are strings or numbers and we can use XML attributes
+to specify the name = "value" pairs.
+</para></entry>
+<entry>
+attributes are the arguments
+to <r:func>options</r:func>.
+</entry>
+</row>
+
+
+
+<row>
+<entry>r:frag</entry>
+<entry>
+short-hand for fragment, this is intended to be used when the code in
+this element is referenced from another block of code and this code is
+not to be evaluated separately.  This is the same as r:code with an
+attribute eval set to "false".
+</entry>
+<entry>
+</entry>
+</row>
+
+
+<row>
+<entry>r:expr</entry>
+<entry>This is intended
+for use within regular text
+(i.e. not in a separate verbatim box)
+and is used  to insert the value
+of an R expression.
+For example, we might have a sentence
+that says
+"there were &lt;r:expr&gt;nrow(failures)&lt;/r:expr&gt;
+in the &lt;r:expr&gt;length(levels(failures$month))&lt;/r:expr&gt;
+months"
+and </entry>
+<entry>
+eval, R-level options such as digits.
+</entry>
+</row>
+
+<row>
+<entry>r:value</entry>
+<entry>
+a node that contains one or more serialized R objects, often via dput
+but also as a binary RDA file that is then base64-encoded to be added
+to the XML document as text.
+</entry>
+<entry>
+<para>
+
+</para>
+</entry>
+</row>
+
+
+
+<row>
+<entry>r:output</entry>
+<entry>
+This is intended to be a child of
+the r:code, r:output, r:init, r:test, etc.
+nodes and is used to include the output from the
+code in the associated node.
+This allows us to render the document
+without having to actually evaluate the code
+in the r:* nodes.
+So it is intended to capture the output from
+the original author's evaluation of the code.
+This is optional.
+</entry>
+</row>
+
+<row>
+<entry>r:func</entry>
+<entry>reference to an R function.
+This is used to identify the reference
+to the function rather than having any
+impact on the evaluation of the R code.
+However, when we process a document
+within R, we can add information about the
+location of the help file,
+e.g. a link.
+</entry>
+<entry>
+pkg, the name of the R package in which the function is located.
+This is optional.
+</entry>
+</row>
+<row>
+<entry>r:var</entry>
+<entry>referring to an R variable.
+Like r:func, this is used for  rendering and not evaluation.</entry>
+<entry>
+name to be used when we don't want the end &lt;/r:var&gt;,
+e.g.
+&lt;r:var name="source"/&gt;
+</entry>
+</row>
+
+<row>
+<entry>r:arg</entry>
+<entry>
+a reference to an R function parameter.
+</entry>
+<entry>
+r:func identifying the R function by name.
+</entry>
+</row>
+
+<row>
+<entry>r:pkg</entry>
+<entry>
+a reference to an R package.
+</entry>
+</row>
+
+<row>
+<entry>omg:pkg</entry>
+<entry>
+a reference to an Omegahat package.
+</entry>
+</row>
+
+<row>
+<entry>bioc:pkg</entry>
+<entry>
+a reference to a BioConductor package.
+</entry>
+</row>
+
+
+<row>
+<entry>r:opt</entry>
+<entry>
+a reference to an R session-level option, i.e. accessible via <r:func>options</r:func> 
+</entry>
+</row>
+
+
+
+<row>
+<entry>invisible</entry>
+<entry>
+a container node which causes the content/children 
+to be evaluated but not displayed.
+This might also be done via an invisible attribute
+on the r:code, r:plot, etc. node
+</entry>
+</row>
+
+<row>
+<entry>ignore</entry>
+<entry>
+a container node which causes the content/children 
+to be entirely omitted from the processed
+document. This is a convenient way to "comment out" 
+a portion of a document.
+</entry>
+</row>
+
+<row>
+<entry>data, datalisting
+</entry>
+<entry>
+container for displaying verbatim data.
+This is equivalent to <xml:expr>&lt;programlisting lang="data"&gt;....</xml:expr>
+</entry>
+</row>
+
+<row><entry/><entry/></row>
+
+<row>
+<entry>
+show, do
+</entry>
+<entry>
+Used to display one piece of code but
+run a slight different version. This is typically
+when we want to hide some of the details
+but still evaluate code with those details,
+e.g. creating a plot with axes' labels and 
+a title:
+<programlisting><![CDATA[
+<r:code>
+<show>plot(1:10)</show>
+<do>plot(1:10, xlab = "...", ylab = "...", 
+          main = "...")
+</r:code>
+]]></programlisting>
+
+</entry>
+</row>
+
+<row>
+<entry>r:remove, r:rm</entry>
+<entry>identify R objects that can be garbage collected.
+The content is raw text given as a comma-separated list of
+R names, or alternatively a sequence of
+<xml:tag>r:var</xml:tag> elements with the latter
+handling names with spaces, etc.,
+e.g.
+<programlisting><![CDATA[
+<r:rm>
+x, y, abc
+</r:rm>
+<r:rm><r:var>x</r:var><r:var>abc efg<r:var></r:rm>
+]]></programlisting>
+
+In the future, we will do this programmatically
+via <omg:pkg>CodeDepends</omg:pkg>.
+
+These are not displayed in the document,
+but merely used to cleanup variables
+that are not  needed in subsequent computations.
+These act as hints for the evaluator/processor.
+</entry>
+</row>
+
+
+
+</tbody>
+</tgroup>
+</table>
+
+</para>
+
+<para>
+As with all XML documents, the namespace prefix, e.g. r in r:code, 
+is defined by the author of the document and one can use any 
+word, e.g. rproj:code or R:code.  The critical thing
+is that the prefix is associated with the same namespace URI
+that we use. These are
+<table><title>Namespace URIs used in the Rdocbook Project</title>
+<tgroup cols='2'>
+<colspec colwidth="30*"/>
+<colspec colwidth="70*"/>
+<tbody>
+<row>
+<entry>r</entry>
+<entry>http://www.r-project.org</entry>
+</row>
+<row>
+<entry>omg</entry>
+<entry>http://www.omegahat.org</entry>
+</row>
+<row>
+<entry>bioc</entry>
+<entry>http://www.bioconductor.org</entry>
+</row>
+
+<row>
+<entry>i</entry>
+<entry>http://www.statdocs.org/interactive</entry>
+</row>
+
+
+<row>
+<entry>s</entry>
+<entry>http://cm.bell-labs.com/stat/S4</entry>
+</row>
+
+<row>
+<entry>splus</entry>
+<entry>http://www.insightful.com/S-Plus</entry>
+</row>
+
+
+
+<row>
+<entry>c</entry>
+<entry>http://www.open-std.org/JTC1/SC22/WG14</entry>
+</row>
+
+<row>
+<entry>cxx</entry>
+<entry>http://www.open-std.org/jtc1/sc22/wg21</entry>
+</row>
+
+<row>
+<entry>py</entry>
+<entry>http://www.python.org</entry>
+</row>
+
+<row>
+<entry>pl</entry>
+<entry>http://www.perl.org</entry>
+</row>
+
+</tbody>
+</tgroup>
+</table>
+
+The Emacs Lisp code in Rdocbook.el has  additional name space mappings
+and a function to dynamically add one.
+
+</para>
+
+<section>
+<title>Graphics</title>
+<para>
+Plots are generated and displayed via an <xml:node>r:plot </xml:node>
+node in the input document.  This is very similar to a
+<xml:node>r:code</xml:node> and contains code that is evaluated.  The
+big difference is that the code has a side effect of creating a plot
+and that is what is displayed.  Since this does not just involve text
+being rendered, there are more controls available.
+
+<section><title>Graphics Formats</title>
+<para>
+When an <xml:node>r:plot</xml:node> node is processed, first a
+graphics device is created.  The particular type of device, or format
+of the output, is determined by first looking at the attributes of the
+node, and if no <xml:attr>r:format</xml:attr> attribute is present,
+using the graphics device in the <r:slot>device</r:slot> slot of the
+<r:class>DynamicOptions</r:class> object in the call to
+<r:func>dynDoc</r:func>.  This is a list with a single named element.
+The name gives the target format, e.g., JPG or PNG, and the
+corresponding element is a function which creates the appropriate
+graphics device.  That function should take a file name as the first
+argument, the width and height of the image as the next arguments and
+should also have a <r:arg>bg</r:arg> parameter which will be used to
+pass the background color (as a string).  We look for values for these
+arguments from the <xml:node>r:plot</xml:node> node and use defaults
+otherwise. The file name corresponds to the <xml:attr>file</xml:attr>
+attribute. If this is an absolute path name, it is used as-is,
+otherwise, it is assumed to be a file in the output directory
+specified in the call to <r:func>dynDoc</r:func>.
+If no <xml:attr>file</xml:attr> attribute is present, a unique file name is generated.
+<fixme>What about Windows?</fixme>
+</para>
+<para>
+The width and height attributes for the R graphics device are taken
+from the name-space qualified <xml:attr>r:width</xml:attr> and
+<xml:attr>r:height</xml:attr> attributes.  These are passed directly
+to the graphics device creation function and so should make sense to
+it.  <note><para>We could do something with units here, a la SVG, but
+because we know nothing about the actual device, it is hard to make
+sense of them.</para></note>
+We use the r: namespace prefix as these values are R-specific.
+The node can also have a <xml:attr>width</xml:attr> and <xml:attr>height</xml:attr>
+attributes and these are passed on, <fixme>in the case of HTML at least</fixme>,
+as regular attributes of the result, e.g. as width and height
+attributes of an HTML <xml:node>IMG</xml:node> node.
+<fixme>We can have html:width and fo:width also to be more specific.</fixme>
+</para>
+</section>
+
+
+</para>
+<section><title>SVG</title>
+<para>
+SVG (Scalable Vector Graphics) is an XML-based language for describing
+vector graphics.  Vector graphics are nicer than bitmap/raster
+graphics as they scale nicely. In principal, we can draw at any
+resolution and then scale to a different level and get the same
+"quality" result.  While JPEG and PNG files are easy to display inline
+within HTML documents, they do not scale well.  When we resize a
+window, they either don't scale or become "pixelated".  When we zoom,
+the same thing happens.  PDF scales well as it is also uses vector
+graphics, but we cannot inline it within HTML documents.  SVG, on the
+other hand, scales well and can be inlined in several browsers, and
+the number is increasing.  It is not clear whether SVG will become a
+widely used format, but there is support in both Opera and Firefox and
+numerous tools for working with (creating, editing and viewing) SVG.
+SVG provides dynamic facilities for animation.  SVG is also scriptable
+using JavaScript/ECMAscript and this allows it to provide interactive
+capabilities such as tooltips, hyperlinks, etc.  One can even respond
+to use events on objects and, e.g., move them.
+</para>
+<para>
+R has three SVG graphics device.
+With libcairo installed, we can use the <r:func>svg</r:func>
+function in <r:pkg>grDevices</r:pkg>.
+Alternatively, we can use the  <r:pkg>RSVGDevice</r:pkg> package
+by Jake Luciani.  There is also <r:pkg>RSVGTipsDevice</r:pkg> which is
+derived from <r:pkg>RSVGDevice</r:pkg> and provides facilities for
+adding tooltips and hyperlinks.
+Such annotations of the SVG can be achieved with the
+<omg:pkg>SVGAnnotation</omg:pkg> package also.
+The following is an example of what it produces:
+<figure><title>Output from RSVGTipsDevice</title>
+<!-- Run the example for devSVGTips(), but have to do it manually as it is within a dontrun. -->
+<graphic fileref="svgplot1.svg" width="4in" height="4in" format="SVG"/>
+</figure>
+</para>
+<para>
+
+The core engine underlying these two packages needs some
+enhancements to make it produce high quality output in all
+circumstances.  The most notable missing element is in doing
+computations involving text sizes as the font metric information is
+not available.  Also, it would be nice to have more structure
+on the output. But R does not readily lend itself to being
+able to, for example, group drawings of lines and text
+to identify an axis or even collections of dots as the output
+of a call to <r:func>points</r:func>.
+</para>
+<para>
+It is possible to post-process SVG in R, or other environments, by reading it 
+back as an XML document and deciphering its components and 
+adding extra content.
+</para>
+
+<para>
+There are several ways to generate SVG graphics for use in <r:pkg>XDynDocs</r:pkg>
+documents.  As with many things in our system, the flexibility makes
+the description seem complex, but in fact it is reasonably
+straightforward.  First, you chose to use SVG for an individual plot
+by specifying an <xml:attr>r:format</xml:attr> attribute on the
+<xml:node>r:plot</xml:node> node, or alternatively use SVG as the
+default.  Alternatively, you can indicate that all
+<xml:node>r:plot</xml:node> nodes without an
+<xml:attr>r:format</xml:attr> have a particular format by specifying a
+value for the <r:arg>graphicsDevice</r:arg> format. 
+The second of these approaches is easy to setup. 
+First, load your preferred SVG device package, e.g.
+<r:code>
+library(RSVGDevice)
+</r:code>
+Then, call <r:func>dynDoc</r:func> with 
+a value for <r:arg>graphicsDevice</r:arg> such as
+<r:code>
+dynDoc("file.xml", "HTML", graphicsDevice = list(svg = devSVG))
+</r:code>
+Here we associate the function with the name "svg"
+which is converted to upper-case and used  as the value
+of the XSL variable <xsl:var>graphicsFormat</xsl:var>.
+</para>
+<para>
+If we wanted to use the first approach for an individual plot,
+e.g. if one plot needs to be scalable for potential zooming
+or if it were to have some animation or interactivity within it,
+then we would have a node in our document something like
+<xml:code><![CDATA[
+<r:code r:format="SVG" r:width="4" r:height="4" file="myPlot.svg">
+hist(rnorm(100), prob = TRUE)
+curve(dnorm(x), -4, 4, add = TRUE)
+</r:code>]]>
+</xml:code>
+But for this to work, the processor must be able to find the function
+named "SVG".  So we need to assign either <r:var>devSVG</r:var> or
+<r:var>devSVGTips</r:var> to that variable before the call to
+<r:func>dynDoc</r:func>: 
+<r:code>
+ SVG = devSVG
+</r:code>
+</para>
+</section>
+
+<section>
+<title>Inline Graphics Content</title>
+<para>
+When we create plots for inclusion in a document, we create them as
+separate files and refer to those files in the document, e.g. via a
+<xml:node>fo:external-graphics</xml:node> or HTML
+<xml:node>IMG</xml:node> node.  When we process the FO file to PDF, we
+end up with a single file.  But when puting our HTML file on a Web
+site, we have to also transfer these auxiliary files.  It is often
+convenient to simply inline the graphics directly into the target
+(HTML or FO) document.  When using SVG, this is possible.  We can
+create the node within R and return that.  For XHTML, we can just
+insert the <xml:node>svg</xml:node> root node directly into the output
+document.  Note that this needs to be XHTML and not just HTML.  For
+FO, we would use an <xml:node>fo:instream-foreign-object</xml:node> to
+contain the <xml:node>svg</xml:node> node.  This also makes the code
+slightly cleaner in the R-XSL interface as we would be returning nodes
+to display rather than a file name which then has to be transformed
+into an appropriate node.  If the SVG device created an
+<xml:node>xmlInternalNode</xml:node> directly, all the graphics could
+be done without I/O.  There are many reasons we cannot move entirely
+to SVG, but it is useful to be able use it to do things more
+elegantly.
+</para>
+</section>
+
+</section>
+
+<section><title>Entities and XSL Stylesheet elements</title>
+<para>
+One of the useful aspects of <latex/> that the combination of XSL and
+<docbook/> does not directly support is the ability to define our own
+macros for frequently repeated content and to customize the appearance
+of the output.  XML is used to separate content from appearance, so
+this makes sense. But what about repeated content.  Entities allow us
+to define "macros" or constant/fixed content centrally which can be
+used in numerous places.  We can define an entity within the internal
+DTD of a document and then refer to it within the document.  For
+example, in order to refer to DocBook consistently rather than using
+Docbook and DocBook, I can define it as an entity and refer to that
+throughout the document.  This can be done as follows:
+<programlisting><![CDATA[ <?xml version="1.0" ?> <!DOCTYPE article [
+<!ENTITY Docbook "DocBook"> ]> <article
+xmlns:r="http://www.r-project.org"> <para> &DTL </para> </article>
+]]></programlisting>
+</para>
+
+<para>
+But what if I want tot to have XML content within the entity.
+For example, suppose I want to have a link to the 
+DocBook web site.
+It is an error to define the entity as
+<programlisting><![CDATA[
+  <!ENTITY Docbook  "<ulink url="http://docbook.sourceforge.net">DocBook</ulink>">
+]]></programlisting>
+which may seem natural.
+So what are we to do? We can use external entities.
+That is, we can put the content we want in a separate file and then
+define an external entity to refernce that content verbatim.
+We could put 
+<![CDATA[<ulink url="http://docbook.sourceforge.net">DocBook</ulink>]]>
+in a file name, say, docbook-entity.xml,
+and then define the entity at the top of our document
+ to reference it as
+<programlisting><![CDATA[
+  <!ENTITY Docbook  SYSTEM "docbook-entity.xml">
+]]></programlisting>
+Then we can use this as we would like.
+</para>
+<para>
+We will end up with lots of small files, each corresponding
+to an entity.  And  we may well want to reuse
+this in other documents in other directories/folders
+so have to copy them there or else get the relative names right.
+To get around this, we can use identifiers when defining an entity 
+such as
+<programlisting><![CDATA[
+  <!ENTITY Docbook  PUBLIC "foo" SYSTEM "docbook-entity.xml">
+]]></programlisting>
+or we could use a URI for the file name and
+leave the catalog mechanism to resolve the local file name.
+</para>
+<para>
+External entities act very much like XInclude but are less flexible as we
+cannot access subsets of the external document.  So what's the point?
+Well, external entities will be "included" directly by the XML parser,
+assuming it is capable of it, whereas one might have to explicitly
+enable XInclude within the parser, e.g. with
+<sh:exec>xsltproc</sh:exec>. This is a minor issue.  Generally,
+entities (internal or external) can be useful but we probably won't
+make use of them very often.  They are mentioned here for
+completeness.
+</para>
+
+<para>
+Entities work like macros, but what about adding <latex/>-like macro
+definitions for generating and formatting output.  As we mention, XML
+separates content and appearance and that is good.  But in our case,
+the document is being written not as regular data but to be displayed.
+We can provide a few templates to customize the layout by creating a
+separate XSL file and importing the "regular" one.  And we will do
+this for each target format of interest, e.g. FO and HTML.
+Such files are easy to write:
+<programlisting><![CDATA[
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+      version="1.0">
+
+  <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl" />
+
+  <xsl:template match="docbook">
+    <a href="http://docbook.sourceforge.net">DocBook</a>
+  </xsl:template>
+
+</xsl:stylesheet>
+]]></programlisting>
+
+But these extra files mean that the document can no longer be distributed
+as a single file. Also, if we want to use a different base style sheet,
+we have to edit the file(s) rather than just specify the
+file name of the different style sheet in the call
+to the XSL transformer.
+</para>
+<para>
+Instead, it seems reasonable in the case of our extended docbook
+format to allow authors to include one or more
+<xml:node>xsl:stylesheet</xml:node> nodes in the document itself.
+Because we potentially want to transform the document into both HTML
+and FO (to get PDF), we often have two style sheets.  We identify
+which is which by adding a <xml:attr>format</xml:attr> attibute to the
+<xml:node>xsl:stylesheet</xml:node> node.
+This allows us to determine which style sheet to use.
+</para>
+<para>
+The function <r:func>xsltApplyStyleSheet</r:func> has a
+parameter <r:arg>.merge</r:arg> which can be used to control if it
+looks for an internal style sheet.  This can be <r:false/> indicating
+that no attempt to use an internal style sheet is performed.
+Otherwise, <r:arg>.merge</r:arg> can be <r:true/> or a string.  In
+either case, the function gets a <xml:node>xsl:stylesheet</xml:node>
+nodes from the input document.  If there is only one and
+<r:arg>.merge</r:arg> is <r:true/>, this works well.  If there is more
+than one, then it matches the value of <r:arg>.merge</r:arg> to the
+<xml:attr>target</xml:attr> attribute of these
+<xml:node>xsl:stylesheet</xml:node> nodes and so <r:arg>.merge</r:arg>
+should be a string such as "html" or "fo".
+</para>
+<para>
+These embedded/internal style sheets can import the base style sheet
+and so be a self-contained stylesheet.  In such cases, one can call
+<r:func>xsltStyleSheetApply</r:func> without specifying the stlyle
+sheet and the function will use the one in the XML document by itself.
+If however, one does specify a style sheet, that is imported into the
+style sheet taken from the XML file.  If one wants to have the
+templates from the style sheet in the XML document added to the given
+XSL stylesheet, you need to use <r:func>mergeXSL</r:func> and its
+additional parameters to do this.
+</para>
+
+<para>
+One thing to remember is that our XML document now contains additional
+<xml:node>xsl:stylesheet</xml:node> nodes. These will appear in the output
+of the XSL transformation so we need to add a template to
+discard them, e.g.,
+<programlisting><![CDATA[
+<xsl:template  match="xsl:*" />
+]]></programlisting>
+or alternatively and more simply, the author can 
+wrap these nodes within an <xml:node>ignore</xml:node>
+or <xml:node>invisible</xml:node> node.
+</para>
+
+<para>
+
+Let's look at a simple example.
+Consider the document 
+<programlisting language="xml"> <!-- /Users/duncan/Projects/org/omegahat/XML/XSL/S/libxslt/examples/embeddedXSL.xml -->
+<para>
+This is the first section and refers to the <xml:node>author</xml:node> tag which should
+get expanded to <author/>
+</para>
+</programlisting>
+<!-- can't use xpointer within the doc and then say treat it as text.  -->
+<!-- <xi:include href="http://www.omegahat.org/Sxslt/examples/embeddedXSL.xml" xpointer="xpointer(/article/*[name() != 'ignore'])" parse="text"/>-->
+The template for processing the <xml:node>xml:node</xml:node> node will be found in 
+<ulink url="http://www.omegahat.org/XDynDocs/XSL/html.xsl"/>.
+But we want to override the author node to be transformed to
+<![CDATA[<a href="mailto:duncan@wald.ucdavis.edu">Duncan Temple Lang</a>]]>.
+So we add a template to this effect and put it in a stylesheet within the document
+yielding the complete document as
+<programlisting language="xml">
+  <!-- XInclude doesn't seem to use catalogs. -->
+<xi:include href="http://www.omegahat.org/Sxslt/examples/embeddedXSL.xml" parse="text" />.
+</programlisting>
+</para>
+<para>
+We can process this document with the command
+<r:code>
+doc = xsltApplyStyleSheet("embeddedXSL.xml", .merge = "html")
+</r:code>
+noting that we are telling <r:func>xsltApplyStyleSheet</r:func>
+that we want to use the html style sheet within the XML document.
+And the relevant bit of the resulting document is 
+<programlisting><![CDATA[
+This is the first section and refers to the 
+<font xmlns="" class="xmlTag">&lt;author&gt;</font> 
+tag which should get expanded to 
+<a xmlns="" href="mailto:duncan@wald.ucdavis.edu">Duncan Temple Lang</a>
+]]></programlisting>
+as we wanted.
+</para>
+<para>
+We can generate the FO document also with the command
+<r:code>
+doc = xsltApplyStyleSheet("embeddedXSL.xml", "http://www.omegahat.org/XSL/fo/Rfo.xsl", .merge = "fo")
+</r:code>
+We specify the XSL style sheet to use in addition to the one in
+<file>embeddedXSL.xml</file>.  This is because we omitted any
+<xml:node>xsl:import</xml:node> element within the FO style sheet in
+the XML document.  The XSL file Rfo.xsl is implicitly imported into
+the local style sheet.
+</para>
+
+</section>
+</section>
+
+
+<section>
+<title>Processing the Dynamic Document</title>
+
+<para>
+Within R, we can use the package <r:pkg>XDynDocs</r:pkg>.  This
+provides a function dynDoc and the typical invocation requires one to
+specify the name of the file identifying the XML document to be
+processed.  It defaults to generating PDF. However
+</para>
+
+<section>
+<title>XSL Files</title>
+<para>
+While most of the details are transparent to R users 
+(via the <r:arg func="dynDoc">target</r:arg>and
+those who use the make rules, it can be useful to understand
+how the XSL files are structured.
+</para>
+
+<para>
+There are seven target formats currently supported by the
+<r:pkg>XDynDocs</r:pkg> package, and these are divided into static,
+dynamic and both dynamic and interactive.  The static formats are
+regular HTML, regular FO (and hence PDF) and <latex/> (and hence PDF,
+Postscript and DVI).  The dynamic formats are the same: HTML, FO,
+<latex/>.  The difference is that we evaluate the code nodes in the
+dynamic version and display the results/output.  The dynamic and
+interactive version not only evaluates the code nodes, but also
+processes the interactive nodes (i:*) and converts the entire document
+into a form that is more suitable for processing within R and
+displaying within the wxWidgets HTML "browser"/widget via R.  This
+supports the display of interactive components within the HTML along
+with callbacks for the user events/interactions that re-evaluate the R
+code in the code nodes of the original document.
+</para>
+
+<para>
+The XSL file <filename>html.xsl</filename> is used to create the
+dynamic (non-interactive) HTML format.  It imports the
+<filename>dynamic.xsl</filename> file which provides the XSL templates
+for evaluating the r:code, r:plot, r:expr, ... nodes.  The
+<filename>html.xsl</filename> provides the templates for rendering the
+DocBook (and R-related) nodes.
+</para>
+<para>
+Similar to <filename>html.xsl</filename>,
+the <filename>latex.xsl</filename> provides the templates
+for converting/"formatting" the DocBook as <latex/>
+and uses <filename>dynamic.xsl</filename> to evaluate
+the R-related code nodes and generate the output in
+<latex/> format.
+</para>
+<para>
+The <filename>ihtml.xsl</filename> generates the 
+interactive HTML content by importing <filename>html.xsl</filename>
+and providing additional templates for processing the
+i:* nodes in the XML file.
+</para>
+
+</section>
+
+<section>
+<title>Finding the XSL files</title>
+<para>
+The <r:func>dynDoc</r:func> function allows the caller to specify the
+target format using the <r:arg>target</r:arg> and provides short-hand
+names for the different possible targets, i.e. "HTML", "FO", "LaTeX",
+or "iHTML".  From this, we can find the relevant XSL style sheet file
+within the <r:pkg>XDynDocs</r:pkg> package.  However, the files it
+imports also have to be found and these can be slightly more
+problematic to find as the user/administrator might want to make use
+of alternative files.  Except for the dblatex material (which is
+distributed under the GPL), all the files can be found within the
+XDynDocs distribution.  We have included the most recent version of
+the DocBook XSL files that were available when the most recent version
+of the <r:pkg>XDynDocs</r:pkg> package was packaged and distributed.
+However, these Docbook XSL files change as do some of the Omegahat XSL
+files and it can be beneficial to point to a different set of files.
+We can do this via a catalog file which is how the XML tools in the
+XML and Sxslt packages attempt to map URIs and XML/DTD identifiers to
+different URIs and files.
+</para>
+<para>
+The XSL files within <r:pkg>XDynDocs</r:pkg> refer to the
+http://www.omegahat.org/XSL/ and
+http://docbook.sourceforge.net/release/xsl/current/ and import files
+from there.  So we need to map these URIs to local files so that we
+fetch them locally rather than via network requests.  While we can map
+these within the package by providing a package-level catalog.xml
+file, we want the user to be able to add the relevant entries to other
+catalog files that she might be using.
+</para>
+<para>
+If you are using the style sheets in <r:pkg>XDynDocs</r:pkg> outside
+of R, e.g. via xsltproc, you will probably want to use the catalog.xml
+file that is installed as part of XDynDocs.  You can tell xsltproc and
+friends (i.e. libxml2) about this file by putting the fully-qualified
+file name as an element of the <sh:env>XML_CATALOG_FILES</sh:env>
+environment variable.  Unlike most multi-element shell variables, this
+uses a space to separate elements rather than the more conventional
+':'.  So you can specify multiple catalog files in this variable
+and they are consulted in the order in which they are given.
+So if you already have a catalog file in, say, <filename>~/catalog.xml</filename>
+and you also want to use the one in XDynDocs, say <filename>~/Rpackages/XDynDocs/XML/catalog.xml</filename>,
+you would set the environment variable as
+<sh:code eval="false">
+export XML_CATALOG_FILES="$HOME/catalog.xml 
+         $HOME/Rpackages/XDynDocs/XML/catalog.xml"
+</sh:code>
+(or use <sh:cmd>setenv</sh:cmd> command if you use csh or tcsh as your shell.)
+</para>
+<para>
+Alternatively, you can add the two entries from the XDynDocs
+using something like 
+<sh:code eval="false">
+xmlcatalog --noout --add rewriteURI 
+        'http://www.omegahat.org/XSL/' '...XDynDocs/XSL/' ~/catalog.xml
+xmlcatalog --noout --add rewriteURI 
+         'http://docbook.sourceforge.net/release/xsl/current/' '...XDynDocs/XSL/docbook-xsl'
+           ~/catalog.xml
+</sh:code>
+where you replace the <filename>.../XDynDocs/XSL</filename> with the actual location of the XSL directory within
+the installed <r:pkg>XDynDocs</r:pkg> package.
+</para>
+
+<para>
+From within R, things are easier. The <r:pkg>XML</r:pkg> provides
+facilities for adding to and querying the global catalog table and
+this allows us to load additional catalog files.  When the XML package
+first needs the catalogs, it loads the default ones from the
+<sh:env>XML_CATALOG_FILES</sh:env> environment variable or
+<filename>/etc/xml/catalog</filename> by default (at least on
+<unix/>).  So any settings you have will be used and take precedence.
+But the <r:pkg>XDynDocs</r:pkg> package also loads its own
+<filename>catalog.xml</filename> file and so provides a backup or
+fall-through rewrite rule for local versions of the <docbook/> and
+<omegahat/> and <r:pkg>XDynDocs</r:pkg> XSL directories.
+
+</para>
+
+<ignore>
+<sh:code file="updateCatalog">
+ln -s docbook-xsl-1.73-2 docbook-xsl
+</sh:code>
+</ignore>
+
+<para>
+We can find all the imports within the XSL files using the following code.
+This helps us verify that we have all the files and that we have
+the relevant  URIs mapped to local files in the catalog file.
+
+<r:code eval="false" show="false">
+files = list.files("~/Classes/StatComputing/XDynDocs/inst/XSL", pattern = ".*.xsl$", full.names = TRUE)
+imports = 
+   lapply(files, 
+        function(x) { 
+            doc = xmlTreeParse(x, useInternal = TRUE)  
+            xpathApply(doc, "(//xsl:import|//xsl:include)", xmlGetAttr, "href", namespaces = "xsl") 
+        })
+names(imports) = files
+
+# get the directory names
+sapply(imports,
+        function(x) {
+            if(length(x) == 0)
+              character()
+            else
+    	        unique(dirname(unlist(x)))
+        })
+
+# see if we 
+sapply(imports,
+        function(x) {
+	 getLongestSubstring(StringSet(unlist(x)), FALSE)         
+       })
+
+# getLongestSubstring(StringSet(unlist(imports)), FALSE)
+</r:code>
+</para>
+
+</section>
+
+</section>
+
+<section id="latex">
+<title><latex/> output</title>
+
+<para>
+There are many reasons why producing the final output via <latex/> but
+using <docbook/> and XML as the format language is desirable.  Using
+XML, we have a programmatically modififiable and queryable database as
+a document.  We can do significant filtering both in R and in XSL.
+And with <latex/>, we can produce extremely high quality typeset
+output, including mathematical content.  FO is very good and in
+several ways is easier to learn than <latex/>. But many of us are
+already familiar with <latex/> and learning a new technology is not
+very appealing.
+</para>
+<para>
+There are several approaches to integrating <docbook/> and <latex/>.
+One is  simply that we write everything in <docbook/> and 
+then utilize XSL converters to map these elements to <latex/>.
+For example, we would write 
+<programlisting><![CDATA[
+<section><title>My Section</title>
+]]></programlisting>
+and during the XSL transformation, this would be mapped to the <latex/> content
+<programlisting>
+\section{My Section}
+</programlisting>
+An example of this approach is given in <ulink url="../../tests/dblatex.xml"/>.
+</para>
+<para>
+Another approach is that we use a very thin <docbook/> layer to make a
+<latex/> document into an XML document.  Then we can declare name
+spaces and use <xml:node>r:code</xml:node> nodes and the like.  The
+text is almost entirely in <latex/>.  There is very little translation
+to <latex/> as the content is already in that format.  But a major
+drawback is that we can access only a very limited number of the
+elements of the document programmatically and we cannot easily convert
+it to other formats such as (X)HTML.
+The more <docbook/> content we use, the more we can programmatically
+process the document.
+</para>
+<para>
+An example of this style is given in <ulink url="../../tests/latex.xml"/>.
+</para>
+
+<para>
+Regardless of which style we use, there will be some <docbook/>
+elements that we need to transform to <latex/>.  There are two
+projects that provide XSL style sheets to aid in this.  These are
+<ulink url="http://db2latex.sourceforge.net">db2latex</ulink> and
+<ulink url="http://dblatex.sourceforge.net">dblatex</ulink>.  These
+are related and the latter is more recently developed.  To some
+extent, the former is easier to customize and has been easier to get
+to work in our framework. However, both are relatively easy to adapt
+and we provide the basic XSL style sheets to use them within the
+Dynamic Documents framework.
+</para>
+
+<para>
+  <!-- Focus on db2latex and avoid so much detail here. -->
+We can use dblatex to generate <latex/> from our <docbook/> file.  In
+our version, we can use a very minimal <docbook/> structure. Rather,
+we can have essentially raw <latex/> markup inside an article and para
+XML nodes, e.g.
+<programlisting>
+<xi:include href="../examples/latex.xml" parse="text"/>
+</programlisting>
+Our version overrides the escaping of <latex/> symbols so in our world
+$ maps to $ and not \$.  This allows us to use <latex/> markup
+directly.  If one wants to use <docbook/> markup and preserve these
+escapes, then use the original <file>docbook.xsl</file> in the dblatex
+distribution and then import our latex.xsl file
+which provide the extensions to <docbook/> that are of interest,
+e.g. r:code, etc.
+</para>
+
+<para>
+To process the resulting <latex/> file, 
+you will need to have the docbook.sty and any related files
+installed. You can set the environment variable
+TEXINPUTS to 
+<programlisting>
+setenv TEXINPUTS ~/XML/dblatex-0.2.7/latex//::
+</programlisting>
+
+</para>
+<para>
+You will also need to find definitions for the R-level environments.
+See Rdocbook.sty
+</para>
+
+<ignore>
+<para>
+The top-level template for dblatex is in main.xsl (line 87 at present)
+but we are interested in preamble.xsl (line 382).
+And the rule of interest is in preamble.xsl at line 32.
+This  invokes the template processing in preamble mode.
+There are very few hooks; just calls to named templates
+which we can't override.
+</para>
+<para>
+To get rid of the extra pages at the beginning,
+it is  simplest to remove the
+<programlisting>
+\frontmatter
+\maketitle
+\tableofcontents
+\mainmatter
+</programlisting>
+maketitle introduces an entire page.
+</para>
+</ignore>
+
+<para>
+Using dblatex:
+<r:code>
+dynDoc("latex.xml", "LaTeX", "../inst/XSL/dblatex.xsl", force = TRUE,
+        doc.collab.show = FALSE, 
+        latex.output.revhistory = FALSE)
+</r:code>
+Using db2latex:
+<r:code>
+dynDoc("latex.xml", "LaTeX", "../inst/XSL/db2latex.xsl", force = TRUE,
+        latex.documentclass.article = "10pt")
+
+</r:code>
+</para>
+
+</section>
+
+<section>
+<title>Interactivity</title>
+
+<para>
+One can add markup to the document that will be processed when the
+reader choses to view the document in our interactive viewer.  So that
+these interactive elements are not displayed in standard rendering, we
+put this content inside &lt;interactive&gt;.  Within this, we can have
+arbitrary markup which is typically used to position, annotate and
+layout the interactive controls.  For example, we might arrange the
+controls in a table or place labels and images beside the controls.
+</para>
+
+<para>
+When working with a document, we have authors and readers.  There is
+one or more authors that create the original document.  Then we may
+have later authors who add components to the document,
+e.g. interactive controls, branches for alternative approaches to a
+data analysis, etc. And then we have readers.  Authors determine what
+they want the reader to see via their specification of the markup.
+However readers can chose how they want to see it and can specify
+options that control how the document and its nodes are processed.
+So there are two sets of options in effect.
+
+</para>
+<para>
+The interactive tag has a ref to identify the 
+associated r:code, etc. element(s).
+This is used when creating the environment
+for storing the interactive controls within
+this interactive node and getting the evaluation
+of callbacks, etc. right.
+</para>
+<para>
+One can give give the newly created environment
+for the interactive node a name using
+the id attribute.
+</para>
+
+
+
+
+<section>
+<title>i: elements</title>
+
+<para>
+To specify the controls, we can use regular HTML OBJECT tags.
+However, often the sort of interactive control we want in a document
+is one which allows the reader to change the value of a variable in an
+r:code, etc. element.  So to do this, it is often more convenient to
+use specialized markup that leaves the details to our rendering
+system.  We have to identify the variable and the type of control and
+provide some parameters to give the control the appropriate
+characteristics.  For example, suppose we have a simulation and a
+variable, <r:var>n</r:var>, controlling the sample size. This is an integer that should
+be positive and for practical purposes we put a limit on it of, say,
+300.  Then we might want to have a slider in the document with which
+the reader can set the value. 
+We could mark this up with
+<programlisting><![CDATA[
+<i:slider var="n" min="1" r:type="integer" max="300"/>
+]]></programlisting>
+Alternatively, we might want a spin control and in this case, we might
+not want to specify a maximum value.
+<programlisting><![CDATA[
+<i:spin var="n" min="1" r:type="integer" />
+]]></programlisting>
+We can be even more "general" and merely specify
+the variable and its type and leave it to the rendering
+software to use an appropriate control.
+This allows the reader and her software to decide
+what control  is generally appropriate
+for such a type. Sometimes, the author of a document
+will want to specify the control precisely, and other times
+this can be left to the reader's environment.
+</para>
+
+<para>
+One can provide a name attribute in the i: element and if
+this is present, the newly created widget is assigned
+to this value within the environment associated
+with the &lt;interactive&gt; element in the XML document.
+This is useful when the controls need access to each other,
+i.e. a callback for one needs to update another.
+Although this can also be done by using the
+general i:object element and creating the two controls
+together, using the provided tools is often easier and the name
+attribute handles simple cases.
+</para>
+
+
+</section>
+
+<section>
+<title>Generic i:object element</title>
+<para>
+
+There also may be cases where we want to create a control for which we
+have not provided support via an XML element or for which we want to
+specify more parameters to customize it.  In this case, we will want
+to provide R code that is used to create the control. We can do this
+with the general with the HTML element OBJECT.  Since this control
+will typically alter one or more variables that are used in the r:code
+nodes, it is helpful to identify these and it is also useful to
+identify the code node(s) by name to ensure that the R code has access
+to those variables. Each r:code, etc. element has an associated
+environment and it is essential that the interactive controls are
+connected with the relevant environment.  So rather than using the
+regular OBJECT tag, it is better to use i:object and a ref.
+
+<note><para>We should use an r: namespace for the ref attribute.</para></note>
+
+<programlisting><![CDATA[
+<i:object type="R-generic" width="" height="" ref="r:code id">
+ 
+ 
+</i:object> ]]></programlisting> The code is run just like an OBJECT
+handler for the htmlViewer in the <r:pkg>RwxWidgets</r:pkg> package.
+It will be evaluated within an environment that has the variables
+tagHandler (RwxHtmlTagHandler), tag (wxHtmlTag) and parser
+(wxHtmlWinParser) and html (wxHtmlWindow).  The parent of the
+evaluation environment will be one for created for the interactive
+group.  And its parent environment will be the one corresponding to
+the associated r:code node.  
+</para>
+</section>
+
+<section>
+<title>Multiple r:code References</title>
+<para>
+If one needs to identify multiple r:code, etc. elements, you can
+specify the names as a comma-separated list in the ref attribute.  If
+any of the names contains a comma, this will cause problems. So in
+these cases, choose a different separator character, e.g. |, that does
+not appear in any of the names and specify the values using this
+character as a separator and then specify the separator usingthe
+refSep attribute.  For example,
+<programlisting>
+ ref="x,y,z|a,b|a third one" refSep="|"
+</programlisting>
+to yield "x,y,z", "a,b" and "a third one"
+uses the | character.
+
+</para>
+
+<para>
+If there are multiple r:code nodes specified (see below), the
+environment in which the code will be evaluated will be associated
+with the last of these. Specifically, we create a new environment for
+evaluating code within the interactive node and the parent of that
+environment will be the environment associated with the "lowest" of
+the code nodes, i.e.  the one latest in the document.  The reason for
+this is that the code in the interactive elements will be able to
+"see" the variables in all of the nodes since the environments of the
+r:code, etc. nodes are chained together.
+Note that one will also see
+variables in any r:code environments in between
+the ones specified.  For example, if we refer
+to code nodes A and C, we will also see the variables in B.
+</para>
+<para>
+
+Referring to multiple r:code, etc. elements could potentially cause
+some issues in the evaluation model.  For example, suppose we have
+four code nodes named A, B, C, D.  In both A and C, we define a
+variable n and in B we use n, say to generate a sample of a certain
+size. Now, we define an interactive node that refers to both A and D.
+The environment for evaluating our interactive code and callbacks
+would be a child of D's environment.  Now, if we ended up with a call
+to set A's version of <r:var>n</r:var> with an expression of the form
+<r:code eval='false'><![CDATA[
+  n <<- value
+]]></r:code>
+this would change the definition in C, and not in A.  As a result, we
+would end up with the wrong semantics.  Instead, we want to have an
+expression of the form
+<r:code eval='false'>
+ assign(n, value, A.envir)
+</r:code>
+where A.envir is the environment associated with the
+r:code element with id A.
+</para>
+<para>
+To avoid this ambiguitiy, when referring to variables in the i:* nodes,
+one should use both the name of the variable
+and also the  id of the r:code, etc. node, e.g.
+<programlisting><![CDATA[
+<i:slider var="n" ref="A" .../>
+<r:code id="A">...</r:code>
+]]></programlisting>
+One might also use a namespace-like notation of the form A::n,
+<programlisting><![CDATA[
+<i:slider var="A::n" .../>
+]]></programlisting>
+This raises the possiblity of confusion when we are actually
+referring to a variable within an R namespace, so it is preferrable
+to use the var &amp; ref attribute pairing.
+</para>
+
+<ignore>
+<para>
+However, one will also see
+variables in any r:code environments in between.  For example, if we
+have 3 r:code nodes named A, B and C and an &lt;interactive &gt; node
+which refers to A and C, then the environments will have the
+relationship: A is the parent of B is the parent of C.  And so when we
+evaluate in the context of C, we will be able to affect the variables
+in B eventhough we don't refer to it.  One can deal with this in terms
+of branches and alternative paths.
+</para>
+</ignore>
+</section>
+
+<section>
+<title>The Update Button</title>
+
+<para>
+Generally, we might have several controls, each updating one or more
+variables that are used in subsequent r:code, etc. nodes.  When we
+update one variable, we could recalculate all the subsequent code
+elements.  However, typically we will want to vary several inputs and
+the run the computations.  And since the computations can be lengthy,
+we do not want updates to one variable to propogate instaneously.
+Instead, for each &lt;interactive&gt; element, we add an "Update"
+button which the user can click to have their changes propogated
+through the calculations of the R code.
+</para>
+
+<para>
+If there is only one control (i.e. one i: element) within a group and
+it is not a generic one with its own code, but rather tied to a
+variable, we can omit the Update button.  Instead, the callback on the
+interactive control propogates the new value through the subsequent R
+code.
+</para>
+<para>
+One can use the attribute addUpdate within the
+&lt;interactive&gt; element to override
+the creation of the Update button, specifying a value
+of true or false.
+</para>
+<para>
+In addition to the Update button, we can also have a reset option on
+each r:code, etc. node.  This could reset the controls to the
+specified value in the original document.  It could also restore the
+values from the original evaluation of each code node.
+</para>
+<para>
+In the presence of a reset button, we need to ensure that
+we can explicitly set the  value of each widget
+to its original value. This is different from
+setting the value when we create it and,
+in particular, it means we need to 
+assign each newly created widget to a variable.
+If an i:* element has a name attribute, we use
+this.  This allows the author to know the name
+of the variable bound to the widget reference so the
+she can use it in the computations.
+If no name attribute is specified, then we
+use the variable name 
+by taking the value of the 
+var attribute and concatenating
+it with the type of control.
+For example, the element
+<programlisting><![CDATA[
+<i:slider var="n" .../>
+<i:slider var="n" ref="A" .../>
+]]></programlisting>
+would give .n.slider and .A.n.slider, respectively.
+If those variables already exist, then we generate a unique name.
+Since the author has not explicitly named it, there
+should be no reference to it in the code.
+We could provide a function for finding it however by
+storing the generated name and allowing the "user"
+to specify the var and ref arguments and the type.
+</para>
+
+</section>
+
+<section>
+<title>Managing the Evaluation of Code nodes</title>
+
+<para>
+Each code element will be displayed in the interactive document.
+(Ideally we would be able to expand or collapse it using dynamic HTML-like facilities, but within
+the wxHtml widget, this is probably not feasible.)
+But we do add a checkbox that indicates whether this node
+should be updated when inputs up-stream are changed.
+If this is checked, then the code is not reevaluated.
+It will be marked as such with a different color or some text
+that indicates it is out of date.
+</para>
+
+<para>
+In addition to checkbox within the HTML document, we will also allow
+the user to interact with the code blocks via a tree widget which
+displays the code blocks symbolically. This is an outline view of the
+documentation or a table of contents that acts as a navigation tool.
+The reader can "lock" code elements here too to avoid recalculations.
+She can also jump to a particular code element and its output by
+double clicking on the element in the tree.  Also, she can drag and
+drop one or more elements into another outline view and create a
+second document.  Or she can create a branch/path in this document to
+explore alternative approaches.
+</para>
+<para>
+In addition to the reader explicitly locking a code block, the
+author can indicate that she wants it to be locked and
+so not updated and the new results displayed.
+This is done with the i:update attribute
+and specifying a value 'false'.
+This (currently) means that the code should not be revaluated.
+</para>
+</section>
+
+<section>
+<title>Interactive Control Markup</title>
+<para>
+While it might be more direct to inline R code that uses wxWidgets to
+create the interactive controls, it is a good idea to use abstract
+markup of controls.  There are several reasons. Firstly, using XML
+markup such as i:slider, etc.  clearly separates the specification
+from the R language and so the same code can work with different
+implementations. For example, we might have MATLAB code that parallels
+the R code in the document and the interactive controls could be used
+for either version.  Also, it is not obvious that wxWidgets is the
+right toolkit to be using in all circumstances.  We might use Qt or
+Gtk and Mozilla. Having an abstract description of the controls
+allows us to provide alternative implementations.
+And indeed, one of the interfaces we think is potentially compelling is 
+Microsoft Word and other word processors. Since Office
+has rich support and extensibility for XML and XSL,
+we could process the document in R by sending content to 
+Word and have it render the output there along with the interactive
+controls. And the interactive controls would be very different there.
+</para>
+
+</section>
+
+<section>
+<title>Implementation</title>
+<para>
+
+We first transform an XML file into an HTML file using the ihtml.xsl
+file.  This transforms r:code, etc. nodes into regular HTML OBJECT
+elements.  It also processes the i:* and interactive nodes.  It adds
+the ref attribute from each ancestor interactive node to their child
+i:* nodes.  We then take this document and pass it to the HTML widget
+and its parser.  The parser hands control back to our handler
+functions in R when they encounter an "HTML" tag for which we have
+registered handlers. It is up to us to create and insert the relevant
+content for that node.  We provide handlers for the i:* nodes and the
+OBJECT handlers.  We could do this for r:code nodes directly, but have
+left it to XSL to transform these.  
+
+</para>
+<para>
+
+We need to evaluate the R code before the associated interactive code
+so that we have the correct values for the variables and so the
+"current values" in the controls are reflective of the actual values
+in the R code.  Each r:code, etc. node has an id (which we either
+generate and add to the OBJECT node or is specifie by the user)
+and this is how we associate the nodes. However, when using
+the HTML parser, we won't necessarily have seen the r:code node
+when we process the associated interactive node
+because the r:code node may appear later in the document,
+e.g. if the controls are to appear above the output.
+So in order to deal with this, we have to be able to fetch
+the r:code and evaluate it, and in the appropriate order
+(just in case an interactive node refers to an r:code, etc.
+node out of order.)
+Perhaps the simplest thing to do is to put all the code nodes
+in a special node at the top of the HTML document 
+which treats them as a collection of named elements indexed by their id, i.e.
+a dictionary. Then we transform the r:code nodes for the HTML document to 
+refer to the relevant r:code, etc. node in that dictionary.
+This allows us to read all the r:code, etc. nodes early in the parsing of the
+HTML document and as we encounter the the interactive, i:* and r:code, etc.
+nodes to be able to ensure the code is evaluated.
+We do have to make certain to handle r:code, etc. nodes nested
+within ignore elements or which has an eval="false" attribute value.
+</para>
+<para>
+Note that instead of creating the r:code dictionary
+when transforming the XML document to HTML, we could
+do this separately from the XSL transformatio.
+Instead, we could use the XML parser to fetch these
+nodes from a second processing of the original XML document.
+</para>
+
+<para>
+Given this reorganization, we can parse and render the HTML in a
+natural order.  Suppose the r:code, etc. dictionary is contained with
+an HTML node named r:codeDictionary.  When we read these elements, we
+can create a separate environment in which each will be
+evaluated. Subsequent r:code nodes need to see the variables created
+by earlier code blocks.  So we arrange for the environment for an
+r:code, etc. element to have the environment of the previous r:code,
+etc. block as its child.  For an interactive node, we find the
+environment for the associated r:code, etc. node.  Then we create a
+new environment with that environment as the parent.  This allows the
+code in that interactive node, i.e. within the i:* elements, to
+directly access the variables in that r:code, etc. elements.
+
+</para>
+<para>
+
+So when we see an interactive node, we create its new environment and
+make that the active one.  The parser continues processing the child
+nodes which are typically HTML formatting nodes and then encounters an
+i:* node and so hands control to our R tag handler.
+We then create the widget/component, specify the callback action and
+return.
+For example, in our isim.xml document,
+we have an i:slider node to set the sample size variable
+<r:var>n</r:var>:
+<programlisting><![CDATA[
+ <i:slider var="n" min="1" max="300" r:type="integer" />
+]]></programlisting>
+Our R tag handler function might be something like
+the following:
+<r:code eval='false'><![CDATA[
+function(html, tag, parser)
+{
+ id = tag$GetParam("id")
+ envir = getInteractiveEnvironent(id)
+
+ win = parser$GetWindow()
+
+ varName = tag$GetParam("var")
+ tmp = tag$GetParam("r:envir")  # code chunk id.
+ if(tmp != "") {
+    varName = c(varName, tmp)
+#    hostEnvironment = getEnvironment(tmp)
+ }
+
+ value = get(varName, envir)
+ min = as.integer(tag$GetParam("min"))
+ max = as.integer(tag$GetParam("max"))
+
+ slider = wxSlider(win, wxID_ANY, value, min, max)
+
+ assignTo = tag$GetParam("name")
+ if(assignTo != "") 
+     assign(assignTo, slider, envir)
+
+ hostEnvironment = parent.env(envir)
+
+ slider$AddCallback(wxEVT_SCROLL_CHANGED,
+                      function(ev) {
+	     	          sl = ev$GetEventObject()
+                          assign(varName, sl$GetValue(), hostEnvironment)
+                          recalculateNodes(envir)
+                        })
+
+ slider
+}
+]]>
+</r:code>
+When we specify this function, we need to ensure that
+it has access to the appropriate function <r:func>getInteractiveEnvironment</r:func>.
+This will be provided by the top-level environment for our interactive document.
+So we must set the environment for this function to be able to see that
+function. This function will work on any i:slider node within the document,
+and the environment associated with the computations is obtained 
+dynamically via the a call to <r:func>getInteractiveEnvironment</r:func>.
+After this, all the calculations can be done programmatically within 
+this general handler, i.e. it is not tied to a particular environment
+for a particular interactive node.
+The symbol <r:func>recalculateNodes</r:func> will be found in 
+this top-level document environment as that is, of course, independent of
+any particular node but can work generically when given an environment or
+id.
+
+<note><para>
+We could define a function, say <r:func>updateVar</r:func>,
+which does the assignment of the new value to the specified variable
+and then recalculates the nodes.
+For example, 
+<r:function eval="false">
+updateVar = 
+function(name, value, envir)
+{
+  assign(name, value, parent.env(envir))
+  recalculateNodes(id)
+}
+</r:function>
+Also we would define a function
+getVarName() and define it as
+<r:function>
+getVarName = 
+function(tag)
+{
+ varName = tag$GetParam("var")
+ tmp = tag$GetParam("r:envir")  # code chunk id.
+ if(tmp != "") {
+    varName = c(varName, tmp)
+#    hostEnvironment = getEnvironment(tmp)
+ }
+
+ varName
+}
+</r:function>
+ varName = getVarName(tag) 
+</para></note>
+
+
+</para>
+<para>
+We would like to allow the user to customize the created widget by
+either providing their own code or callback or general code that is
+run after our code.  This can be done by allowing content within the
+i:* nodes, and not relying exclusively on attributes.  We could have
+i:callback with an append attribute taking values true or false to
+indicate that the author wanted the code added to ours or run instead
+of ours.  We could also use an enumeration of before, after, instead.
+And we could have an i:create  child with code to create the widget.
+But this is of secondary importance as we will have support for 
+a generic i:object.
+</para>
+<para>
+
+The style of one of these general i: handler functions
+is to extract the information from attributes of the HTML node
+and use these to create the widget. Then we add one or more callbacks
+to handle the reader's interaction with this control to update
+variables and recalculate the subsequent parts of the document.
+
+<note><para>
+If interactive nodes are allowed to be nested, then we use a stack for
+the active environments so that when we end one, we pop its
+environment from the top of the stack to leave environment from the
+parent interactive node active.
+</para></note>
+
+
+</para>
+<para>
+Almost all of the i:* handlers will need access to the environment
+and to the wxHtmlWindow object. So it would make sense for us
+to create a type of function (i.e. with a class) that has a signature
+that accepts the html window, the tag, the parser and the environment.
+The R handlers for the general OBJECT node in HTML are given
+the tag handler, the tag object, the parser and an optional
+environment. Since this has not been released yet, perhaps we should add the 
+HTML window as an argument, before the environment.
+And we should use a class label to identify the function
+as supporting this "interface" rather than just counting
+the number of parameters it accepts.
+</para>
+
+<para>
+In order to support r:code, etc. nodes being "locked" or not
+recalculated, we need only maintain a logical vector in the top-level
+environment indicating whether the r:code, etc. element is locked or
+not.  This vector is indexed by the id values for the r:code,
+etc. nodes.  When we go to recalculate the nodes, we check the value
+of the element for each node.  Alternatively, we can add it as a slot
+in the CodeBlock class and look at that in <r:func>recalculateNodes</r:func>.
+and this
+
+</para>
+<para>
+The code associated with the nodes are maintained in the order
+in which they are to be evaluated and this makes it easy to
+process the chain of "down-stream" code nodes.
+</para>
+</section>
+
+
+<section>
+<title>Type Annotations and Dependencies</title>
+<para>
+
+We have in mind that a code node (e.g. r:code, r:plot, etc.)  will be
+able to support markup describing its inputs and the outputs.  These
+will specify the "variable names" and their types.  The idea is to
+charactertize the computational flow as we do in a
+program. Specifically we want to be able to allow authors and readers
+to create branches which represent alternative approaches to the
+analysis within a segment of the document.  They would start at a
+particular node with a collection of outputs.  They can then provide
+alternative computations on these values and connect back to a later
+node in the document with inputs of a similar type.  For example,
+suppose a document describes a data analysis in which e-mail messages
+are classified as SPAM or HAM using CART.  It starts by reading the
+e-mail messages and moves on to create derived variables which are
+then passed to the next node which fits a classification tree to these
+observations and the resulting classifier is used to predict entirely
+different messages.  An author or reader might chose to investigate
+the use of a k-nearest neighbors approach in contrast to CART. This
+would be a branch from the derived variables node with the data frame
+of observations as inputs and a classifier as the output.  It would
+then pass this to the prediction stage for the new data. 
+</para>
+<para>
+How feasible it is to swap one set of inputs for another depends on
+the code in the node to which they act as inputs.  But given R's
+reasonably consistent modeling interface, it is not terribly unlikely.
+But it is greatly helped by providing descriptions of the inputs
+and outputs  in terms of their types or classes.
+Precisely how we do this remains to be determined.
+But something of the form 
+<programlisting><![CDATA[
+<input>
+ <var name="messages" r:type="data.frame" />
+  ...
+</input>
+<output>
+ <var name="model" r:type="rpart" />
+</output>
+]]></programlisting>
+</para>
+<para>
+
+Note that a branch may contain multiple steps or nodes that are
+sequential, i.e. so we would have parallel sequences of computations
+representing alternative approaches.  And a node may have many
+branches emerging from it, not just 2. And a branch can have branches
+within it, i.e. inner- or sub-branches.  For example, within the
+k-nearest neighbor approach, we might determine the metric and then
+the value for k in two separate steps, or use cross validation to
+determine both and then explore the fit.  And a branch could have and
+end point that connects to an arbitrary node within the document, or
+even in another document.  In other words, we can define a
+computational flow by allowing links to other nodes, local or remote.
+Again, in the context of the k-nearest neighbor fit, we might explore
+several metrics in parallel, chosing the value of k for each
+separately and exploring the confusion matrices for each.
+
+</para>
+</section>
+<section>
+<title>Alternatives to wxWidgets</title>
+<para>
+Having implemented this, we see that there is, as we expect, a natural
+separation between the the XML processing and the rendering in the
+HTML widget and any HTML renderer would do.  It is convenient to run
+this from within R but, as we did before <biblioref ref="SNetscape" />,
+one can use a plugin to an existing browser that embeds an R engine
+within the browser.  There are security issues and one has to
+connect the Java, JavaScript, C and R code.
+</para>
+<para>
+Running the browser inside R means that we need to embed a rendering
+engine within R.  There are several possiblities.  khtml, gecko and
+gtkhtml are the three natural ones.  But additionally, we can think of
+entirely platform-specific approaches such as using Word to render the
+XML via DCOM.  In this setup, we would send Word an XML document or a
+sequence of XML chunks, or alternatively entirely process the document
+elements in R and add words and paragraphs, etc. to the Word document.
+And we would insert ActiveX controls to create the interactive
+components in the display and use the RDCOMEvents package to register
+R functions as event handlers for these controls.  There are several
+</para>
+<para>
+Using Gecko/Mozilla's embeddable HTML widget
+would mean that we get support
+for SVG, MathML, CSS, JavaScript.
+And the combination of SVG and an interface
+to JavaScript and the SVG objects via JavaScript
+could give us a style of updatable, interactive graphics in R.
+</para>
+
+</section>
+</section>
+
+</article>
+

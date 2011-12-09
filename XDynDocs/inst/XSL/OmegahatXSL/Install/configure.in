@@ -1,0 +1,94 @@
+AC_INIT(XSL/Rstyle.xsl)
+
+AC_ARG_WITH(docbook-xsl, [  --with-docbook-xsl	location of the XSL files for docbook], DOCBOOK_XSL=$withval)
+AC_ARG_ENABLE(add, [  --enable-add	add to the system catalog, by default ], ADD_TO_CATALOG=$enableval)
+AC_ARG_ENABLE(no-catalog, [  --enable-no-catalog	ignore building the catalog, by default ], NO_CATALOG="$enableval", NO_CATALOG="no")
+
+# Find the original catalog that we want to add to.
+CATALOG=${CATALOG-${SGML_CATALOG_FILES-/etc/xml/catalog}}
+
+dnl Signal an error if we can find it.
+dnl We could use a template that we provide but it will be pretty empty. 
+echo "no catalog: ${NO_CATALOG}"
+if ! test -r "${CATALOG}" &&  ! test "${NO_CATALOG}" = "yes" ; then
+ echo "Can't read existing catalog. Specify this with the environment variable SGML_CATALOG_FILES,"
+ echo "or use the one in catalog.in via the command"
+ echo ""
+ echo "     export CATALOG=catalog.in ; ./configure"
+ echo "or"
+ echo "     setenv CATALOG catalog.in ; ./configure"
+ exit 1
+fi
+
+
+dnl find xsltproc
+if test -z "${XSLTPROC}" ; then
+ AC_PATH_PROG(XSLTPROC, xsltproc)
+fi
+
+if test -z "${XSLTPROC}" ; then
+
+ echo "ERROR:  Cannot find the xsltproc application"
+ echo "Please add this to your path and re-run this configuration."
+ exit 2
+fi
+
+dnl compute the installation directory.
+if test ${prefix} = "NONE" ;  then
+ prefix=`pwd`
+fi
+
+OMEGA_XSL=$prefix
+
+
+if test "${NO_CATALOG}" == "no" ; then
+dnl Process the catalog by
+dnl  a) copying it to a local file.
+dnl  b) removing the xmlns="urn:...." from the <catalog> that is causing us grief
+dnl  c) process the catalog using install.xsl and add our terms for OMEGA_XSL and DOCBOOK_XSL
+dnl  d) put the xmlns="urn..." back into the document.
+dnl Hopefully we can find a way around needing b and d soon by reading the XSL spec.
+
+cp $CATALOG catalog.tmp
+sed -e 's/<catalog .*>/<catalog>/' catalog.tmp > catalog 
+$XSLTPROC  --novalid -param OMEGA_XSL "'$OMEGA_XSL'" -param DOCBOOK_XSL "'$DOCBOOK_XSL'" -o catalog.tmp install.xsl catalog
+sed -e 's/<catalog>/<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">/' catalog.tmp > catalog
+
+# Resolve docbook/current from the catalog
+DOCBOOK=`$XSLTPROC --novalid --nonet getDocbook.xsl catalog.tmp`
+
+# Announce that we haven't found docbook.
+if test -z "${DOCBOOK}" ; then
+ echo ""
+ echo "Note:"
+ echo "\tDocbook current (http://) doesn't seem to be registered."
+ echo "\tPlease specify the relevant directory via --with-docbook-xsl."
+ echo "\tIf you don't have it installed, please download and install the Docbook XSL files."
+ echo "\tYou can find the source at http://telia.dl.sourceforge.net/docbook/"
+ echo ""
+fi
+
+INSTALLED_CATALOG_FILE="${OMEGA_XSL}"
+if test -n "${ADD_TO_CATALOG}" ; then
+ INSTALLED_CATALOG_FILE=${CATALOG}
+fi
+
+fi  dnl
+
+AC_SUBST(OMEGA_XSL)
+AC_SUBST(INSTALLED_CATALOG_FILE)
+
+AC_OUTPUT(GNUmakefile)
+
+dnl report the settings.
+
+echo ""
+echo "******************************************************"
+echo ""
+echo "Installation directories:"
+echo "	XSL -> $OMEGA_XSL"
+echo "	catalog -> $INSTALLED_CATALOG_FILE"
+echo "Docbook files located in $DOCBOOK"
+echo ""
+echo "*****************************************************"
+echo ""

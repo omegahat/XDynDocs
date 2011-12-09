@@ -1,0 +1,21 @@
+<article xmlns:r="http://www.r-project.org">
+
+<para>
+Example  of dealing with r:output nodes and displaying
+the if we don't run the code, but hiding them if we do.
+<r:code>
+rnorm(10)
+<r:output>
+ [1] -0.39542104  1.70422171 -2.35953697  0.46140344  0.79622155 -1.14226863
+ [7] -0.20915520  0.02211213 -2.57250467 -0.28662076
+</r:output>
+</r:code>
+</para>
+
+<para>
+<r:code>
+dynDoc("output.xml", "HTML", out = "output.html", force = TRUE, runCode = FALSE)
+dynDoc("output.xml", "HTML", out = "output1.html", force = TRUE, runCode = TRUE)
+</r:code>
+</para>
+</article>

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude"
+	 xmlns:omg="http://www.omegahat.org">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+This is speled wrong.
+
+--- BEGIN PGP A--
+speled
+--- END PGP A--
+
+<r:function>
+This is speled wrong.
+</r:function>
+
+<function>
+This is speled wrong.
+</function>
+
+
+<r:func>speled</r:func>
+
+<r:code>
+This is speled wrong.
+</r:code>
+
+
+<r:pkg>Wrng</r:pkg>
+<omg:pkg>Wrng</omg:pkg>
+
+<r:function>
+This is speled wrong.
+</r:function>
+
+
+</para>
+
+</section>
+</article>

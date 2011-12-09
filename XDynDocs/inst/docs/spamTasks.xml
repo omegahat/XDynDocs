@@ -1,0 +1,52 @@
+<section>
+<title>Creating the Derived Variables</title>
+
+<task title="Create Derived Variables">
+<para>
+Now that we have read the messages into R and have them
+as a list of R objects, we can set about computing the 
+</para>
+
+<parallelTasks>
+<task>
+numCapitals =
+function(msg)
+{
+  nchar(gsub("[^A-Z]", "", msg$header["Subject"]))
+}
+</task>
+
+<task>
+numRecipients =
+function(msg)
+{
+
+}
+</task>
+</parallelTasks>
+</task>
+
+
+<task title="Build Classifier">
+
+<altApproaches>
+
+<altApproach title="rpart">
+
+
+</altApproach>
+
+
+<altApproach title="Naieve Bayes">
+
+</altApproach>
+
+</altApproaches>
+</task>
+
+
+<task title="Predict Test Set">
+
+</task>
+
+</section>

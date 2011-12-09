@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+This example shows how we can have a
+<xml:tag>r:code</xml:tag> node that contains
+code that is actually run but yet we show slightly different code.
+We do this with <xml:tag>show</xml:tag> and <xml:tag>do</xml:tag> elements
+within the <xml:tag>r:code</xml:tag> element.
+We use this when we want to show a simple command without lots of
+details, but yet we want to run code that specifies all these details
+so that the output or resulting value is more "correct".
+This arises when we want to show what we might do interactively 
+to create a plot, but yet we want to specify the 
+X and Y axis labels, the title and/or control the tick marks.
+So let's show this.
+We do this with
+
+<r:code>
+<show>
+plot(1:10)
+</show>
+<do>
+plot(1:10, xlab = "time", ylab = "value", main = "Made up plot")
+</do>
+</r:code>
+
+
+</para>
+<para>
+We might have an <xml:tag>r:output</xml:tag> element within the node also
+<r:code>
+<show>
+plot(1:10)
+</show>
+<do>
+plot(1:10, xlab = "time", ylab = "value", main = "Made up plot")
+</do>
+<r:output><![CDATA[
+[1] 1 2 3 4
+]]></r:output>
+</r:code>
+
+
+
+
+
+
+
+</para>
+
+</section>
+</article>

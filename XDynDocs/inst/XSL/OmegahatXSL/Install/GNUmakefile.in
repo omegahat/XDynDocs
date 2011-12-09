@@ -1,0 +1,8 @@
+PREFIX=@OMEGA_XSL@
+INSTALLED_CATALOG_FILE=@INSTALLED_CATALOG_FILE@
+
+install:
+	if test ! -d $(PREFIX) ; then mkdir -p $(PREFIX) ; fi
+	cp -r XSL DTD $(PREFIX)
+	if test -n "$(INSTALLED_CATALOG_FILE)"; then cp catalog $(INSTALLED_CATALOG_FILE) ; fi
+

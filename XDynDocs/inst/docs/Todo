@@ -1,0 +1,47 @@
+[low] <output> as generic for <r:output>
+  i.e. for many different languages
+
+
+do/show within <*:code>
+  in html, have a link or tooltip for the  actual code.
+  [done] have a parameter that controls whether we show the <show> or the <do>.
+      $r-show-do-code
+
+Installation of catalogs, etc.
+
+DYNAMIC DOCUMENTS
+--------------------------------------------------
+
+Sxslt and dynamic documents run through.
+
+caching
+
+Run sh:code when doing dynamic documents.
+
+<r:code @prompt="true | string" @individual="true|false">
+
+<r:remove> elements.  (Suppressed in output)
+
+@numLines for <r:output> or <output>
+ or on <*:code>
+
+order of evaluation of the nodes
+   @depends='id' or thread.
+   CodeDepends automation of this.
+
+------------------------------------------------------------
+
+create Rd files from tables in a document.
+
+programmatic creation of task figure/schematic from the document
+
+
+DOCUMENTATION
+-------------------------------------
+
+writeup formatting of output in documents
+   4 possible approaches.
+
+writeup notion of dynamic and fixed content
+   e.g. data that is prepared in separate (dynamic) code
+        a plot that is not created.

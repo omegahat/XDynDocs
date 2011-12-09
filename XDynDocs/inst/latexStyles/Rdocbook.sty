@@ -1,0 +1,23 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{Rdocbook}{}
+
+\DeclareOption*{%
+  \PassOptionsToClass{\CurrentOption}{docbook}%
+}
+
+\ProcessOptions\relax
+
+\RequirePackage{fancyvrb}
+
+
+\DefineVerbatimEnvironment{routput}{Verbatim}{fontshape=sl}
+\DefineVerbatimEnvironment{rcode}{Verbatim}{fontshape=sl}
+\DefineVerbatimEnvironment{Routput}{Verbatim}{fontshape=sl}
+
+\DefineVerbatimEnvironment{Rinvocation}{Verbatim}{}
+
+\def\Svar#1{\textsl{#1}}
+
+\usepackage{docbook}
+\usepackage{xml}
+

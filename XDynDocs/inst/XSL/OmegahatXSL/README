@@ -1,0 +1,21 @@
+In order to use these XSL files locally from within a Web browser,
+put a link to the current docbook-xsl directory (that contains the
+html/ and xsl/ directories) within the OmegahatXSL/XSL/ directory.
+
+The best way to do this is  to install the more recent docbook-xsl
+files by un-tarring them into, say, docbook-xsl-1.73.2/
+and then putting a symbolic link in that parent directory to this
+version of the docbook distribution, e.g.
+
+  ln -s docbook-xsl-1.73.2 docbook-current
+
+Then, in the OmegahatXSL/XSL/ directory, create a link to
+docbook-current, e.g.
+
+  ln -s docbook-xsl  ~/OmegahatXSL/XSL 
+
+In this way, when you install a new version of docbook using the
+initial description above, you will not have to update the link in the
+OmegahatXSL/XSL/ directory.
+
+

@@ -1,0 +1,360 @@
+<article xmlns:r="http://www.r-project.org"
+         xmlns:omg="http://www.omegahat.org"
+         xmlns:el="http://www.gnu.org/software/emacs/manual/elisp.html">
+
+<articleinfo>
+
+<title>Emacs Facilities for Authoring Rdocbook Documents</title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title>Introduction</title>
+
+<para>
+I primarily write technical documents using XML, specifically an
+extension of the <ulink url="http://www.docbook.org">Docbook</ulink>.
+The extensions allow one to add R code, references to R functions,
+packages and parameters and generally create literate, dynamic
+documents with a structured markup.  This allows us to use a rich,
+standard toolset to manipulate such documents, validate and correct
+them, transform them into different views, reuse components and
+generally programmatically and faithfully operate on them.
+</para>
+<para>
+Since XML is slightly verbose and highly structured,
+we want some tools that help us author these documents.
+I, like many, use Emacs as my primary editor and environment for
+programming, interactive computing and authoring documents.  Jim
+Clarke's nxml-mode for Emacs provides a rich mode for authoring
+general XML documents. It can prompt the author with the set of permissible XML
+elements at a particular point in a document, it can close
+elements, navigate by elements (rather than just lines and characters),
+provides an outline mode to expand and collapse details.
+It reads information from a schema and understands the structure of
+documents that use that schema.
+</para>
+<para>
+When writing technical documents that embed R code,
+we want to be able to send code to the R interpreter
+directly from where it resides in the document.
+We also at times want to include the output from a command into
+the document<footnote><para>This may seem unusual for a dynamic
+document in which we insert the results from running the code when
+generating the view of the document rather than when authoring it.
+However, it is convenient to include the results as the author performs
+the computations so that she has them visible when writing about those results.
+These results are also available without running the code.
+Because we have a structured document, we can replace the results with those
+computed dynamically.</para></footnote>
+In this document, we present some simple utilities to handle these
+interactions as well as inserting common XML elements such as
+<xml:tag>r:code</xml:tag>,  <xml:tag>r:function</xml:tag>,
+<xml:tag>r:output</xml:tag>.
+
+</para>
+</section>
+
+<section>
+<title>Basics</title>
+<para>
+When first start to author an R-Docbook, we would
+like to use a template that provides the
+standard XML declarations, the top-level <xml:tag>article</xml:tag>
+tag and namespace definitions we are likely to use (e.g.
+<xml:expr>xmlns:r="http://www.r-project.org"</xml:expr>)
+a place to specify the author's name, the title and so on.
+The sample nxml-mode hook provided by <filename>Rdocbook.el</filename>
+will insert a default template file  into an empty buffer whose name
+ends with ".Rdb", i.e. the R Docbook extension.
+The file used by default is the one in the same directory as
+Rdocbook.el, but users are encouraged to copy this to a new file (and
+add their own name to the author list) or create their own template
+and specify the location by setting the value of  the Emacs Lips variable
+<el:var>r-default-nxml-file</el:var>.
+</para>
+
+
+<para>
+The template allows us to get started authoring a document quickly.
+The regular nxml-mode facilities help us to create Docbook 
+content relatively easily.  We have added a few key bindings
+for common compound Docbook tags.
+For example, <el:key>C-s C-s C-s</el:key> creates a section
+with a title and para(graph) elements.
+Similarly, we can insert an itemizedlist element with
+a listitem element with a para child element via <el:key>C-c C-l</el:key>.
+One can use <el:key>C-c RETURN</el:key> to end this
+listitem element and start another.
+A new paragraph with a blank line between it and the previous
+one and space within the <xml:tag>para</xml:tag>
+is added with <el:key>C-c C-p</el:key>.
+</para>
+<para>
+We have added bindings to insert many of the R-specific markup elements such
+as r:code, r:output, etc.  These are available via the
+<el:key>C-q</el:key> key binding prefix.  <xref
+linkend="tbl:keyBindings"/> lists the different key bindings and the
+associated nodes they insert.  
+</para>
+
+<para align="center">
+<table id="tbl:keyBindings" align="center">
+<title>Key Bindings for R Docbook Nodes</title>
+<tgroup cols='2' align='left'>
+<thead>
+<row align='center'>
+ <entry>Key binding</entry>
+ <entry>Action</entry>
+</row>
+</thead>
+
+<tbody>
+<row><entry><el:key>C-q x</el:key></entry> <entry>insert an <xml:tag>r:expr</xml:tag> element</entry></row>
+<row><entry><el:key>C-q f</el:key></entry> <entry>insert a reference to an R function via a <xml:tag>r:func</xml:tag> element</entry></row>
+<row><entry><el:key>C-q p</el:key></entry> <entry>insert a reference to an R package via a <xml:tag>r:pkg</xml:tag> element. Note that the p is not qualified by a Control.</entry></row>
+<row><entry><el:key>C-u C-q p</el:key></entry> <entry>insert a reference to an Omegahat package via a <xml:tag>omg:pkg</xml:tag> element. Note that the p is not qualified by a Control but the key sequence is prefixed with Control-u.</entry></row>
+<row><entry><el:key>C-q v</el:key></entry> <entry>insert a reference to an R variable via a <xml:tag>r:var</xml:tag> element</entry></row>
+<row><entry><el:key>C-q a</el:key></entry> <entry>insert a reference to an R parameter via a <xml:tag>r:arg</xml:tag> element</entry></row>
+<row><entry><el:key>C-q c</el:key></entry> <entry>insert a reference to an R class via a <xml:tag>r:class</xml:tag> element. Note that the 
+second key is not qualified by a Control.</entry></row>
+<row><entry><el:key>C-u C-q c</el:key></entry> <entry>insert a reference to an R S3 class via a <xml:tag>r:s3class</xml:tag> element. Note that the 
+second key is not qualified by a Control.</entry></row>
+<row><entry><el:key>C-q k</el:key></entry> <entry>markup for an R language keyword (e.g. <r:keyword>if</r:keyword>) using the  <xml:tag>r:keyword</xml:tag> element</entry></row>
+<row><entry><el:key>C-q s</el:key></entry> <entry>insert a reference to an S3 method using the  <xml:tag>r:s3method</xml:tag> element</entry></row>
+<row><entry/></row>
+<row><entry><el:key>C-q C-c</el:key></entry> <entry> insert an <xml:tag>r:code</xml:tag> element for R code</entry></row>
+<row><entry><el:key>C-q C-g</el:key></entry> <entry> insert an <xml:tag>r:plot</xml:tag> element for R code that creates graphics</entry></row>
+<row><entry><el:key>C-q C-f</el:key></entry> <entry> insert an <xml:tag>r:function</xml:tag> element for code defining an R function</entry></row>
+<row><entry><el:key>C-q C-o</el:key></entry> <entry> insert an <xml:tag>r:output</xml:tag> element for representing the output from an R expression</entry></row>
+
+<row><entry><el:key>C-q C-t</el:key></entry> <entry> insert an <xml:tag>r:test</xml:tag> element for representing code that is used to test a condition</entry></row>
+
+<row><entry><el:key>C-q C-e</el:key></entry> <entry> insert an <xml:tag>r:error</xml:tag> element to represent the contents of an R error message</entry></row>
+<row><entry><el:key>C-q C-w</el:key></entry> <entry> insert an <xml:tag>r:warning</xml:tag> element to represent the contents of an R warning</entry></row>
+
+<row><entry><el:key>C-q i</el:key></entry> <entry> insert an <xml:attr>id</xml:attr> attribute in the current node, prompting the 
+author for the value of the id attribute. (Note the i is not qualified with Control.)
+</entry></row>
+
+
+<row><entry><el:key>C-q C-i</el:key></entry> <entry> insert an <xml:tag>ignore</xml:tag> element so that
+the contents are ignored when the document is processed</entry></row>
+<row><entry/><entry/></row>
+<row><entry><el:key>C-q C-n</el:key></entry> <entry>evaluate the R code within the node in which the cursor is currently located</entry></row>
+<row><entry><el:key>C-q C-p</el:key></entry> <entry>evaluate the R code and insert the output for the node in which the cursor is currently located</entry></row>
+
+<row><entry/><entry/></row>
+<row><entry><el:key>C-c C-p</el:key></entry> <entry> insert a new paragraph (<xml:tag>para</xml:tag>) with white space around and within the element.</entry></row>
+<row><entry><el:key>C-c C-s C-s</el:key></entry> <entry> insert a section template with a title and paragraph</entry></row>
+<row><entry><el:key>C-c C-l</el:key></entry> <entry> insert a new itemized list (<xml:tag>itemizedlist</xml:tag>) with an empty item</entry></row>
+<row><entry><el:key>C-q C-i</el:key></entry> <entry> insert a new listitem (<xml:tag>listitem</xml:tag>) with an empty para element</entry></row>
+
+<row><entry><el:key>C-q C-n</el:key></entry> <entry>insert an xml namespace (<xml:tag>xml:ns</xml:tag>)</entry></row>
+
+<row><entry><el:key>C-q n</el:key></entry> <entry> insert a namespace definition (xmlns) in the root node using the built-in table
+ of namespace prefix - URI pairs.</entry></row>
+
+<row><entry><el:key>C-q b</el:key></entry><entry>insert a citation to a bibliography item.  This prompts for the id of the bibliography
+item. We typically prefix our bib IDs with bib: so this adds a "bib:" prefix string if you don't.</entry></row>
+
+</tbody>
+</tgroup>
+</table>
+</para>
+
+<para>
+Let's take a quick look at using these key bindings.
+To add a reference to an R function named <r:func>xmlSource</r:func>,
+we use <el:key>C-q C-f</el:key> to create the
+<![CDATA[<r:func></r:func>]]> content and position the cursor 
+in the middle of these two elements.
+Then we type the function name (xmlSource) and use <el:key>C-e</el:key>
+to jump to the end of the line, i.e. the end of the <![CDATA[</r:func>]]>.
+
+</para>
+
+<para>
+The Emacs Lisp function
+<el:func>r-insert-node</el:func> underlies all of these and can be
+called directly or used in one's own key bindings. This allows the
+caller to specify whether to use CDATA and add new lines between the
+XML tags and the content.
+</para>
+
+<para>
+One can use these key bindings to insert the start and end node and
+then fill the contents in. However, sometimes we will create the content first and
+then want to put it inside an XML element, i.e. surround
+it with the starting and ending XML element.  You can do this easily.
+If you make the content active, i.e. highlight/select it by setting a mark and moving the
+point to the start or end of the text, the XML node insertion
+function(s) will do the right thing and put the content inside the new
+node.
+</para>
+
+<para>
+The key bindings are chosen to avoid conflicts with common key bindings
+in other emacs modes. They are not ideal. You should feel free to change them
+and suggest better ones.
+In addition to using key bindings, one can also call the 
+<el:func>r-insert-node</el:func> function interactively in emacs.
+It prompts for the name of the node to insert.
+You can control whether a CDATA is added by prefixing the call with
+<el:key>C-u</el:key>, i.e.
+<el:key>C-u</el:key><el:key>ESC-x</el:key>r-insert-node
+<note><para>We are adding functionality that will set the default values of the
+other parameters approrpiately</para></note>
+</para>
+
+</section>
+
+<section>
+<title>Using an XML Template Document</title>
+<para>
+When writing articles, it can be tedious to have
+to input the basic structure of the document,
+e.g., the <xml:tag>article</xml:tag>,
+<xml:tag>title</xml:tag> and especially the details of the
+<xml:tag>authorinfo</xml:tag> elements.
+Instead, we can create a template  document
+and insert this. 
+Emacs provides the <el:func>insert-file</el:func>
+command (bound to <el:key>C-x i</el:key>).
+However, it is even more convenient to automatically
+insert a standard document when we first open an 
+empty XML buffer.
+The Emacs Lisp variable <el:var>r-default-nxml-file</el:var>
+specifies the location of such a document.
+These extensions to nxml-mode arrange to insert the contents
+of that file into an empty XML buffer, if it exists.
+</para>
+</section>
+
+<section>
+<title>Evaluating R Code</title>
+
+<para>
+When we have code in markup within an Rdb document, we often want to
+evaluate different nodes. We can do this from within R using the
+function <r:func>xmlSource</r:func>.  This gives quite a bit of
+control over which nodes to process and one can use XPath expression
+to identify them explicitly.
+But it is often convenient to evaluate code from within the document
+itself by sending code to R.
+We use some of the functionality from ESS (Emacs Speaks Statistics) <biblioref linkend="bib:ESS"/>
+and some of our own to extract the content from an XML node and
+have it evaluated in an R session run via ESS.
+We start by creating an R session. We do this by loading
+ESS (see the installation instructions for that software). 
+Then we run R with <el:key>Esc-R</el:key> and specify the
+relevant directory. 
+Now, suppose we have the following in our Rdb document:
+<programlisting><![CDATA[
+We simulate some data with
+<r:code>
+x = runif(100)
+y = 10 + 3 * x + rexp(length(x))
+</r:code>
+
+Then we fit a linear model with
+<r:code>
+m = lm(y ~ x)
+</r:code>
+]]></programlisting>
+
+We position the Emacs cursor anywhere within the
+contents of either <xml:tag>r:code</xml:tag> node.
+Then we use the key binding <el:key>C-q C-n</el:key>
+to send the entire block of code to be evaluated in the R  session.
+When R has finished that task, we see the "Finshed evaluation"
+message in the Emacs status/message bar.
+</para>
+
+<section>
+<title>Evaluating R Code and Inserting the Output</title>
+
+<para>
+As we briefly mentioned in the introduction, 
+we also may want to include the output from
+the evaluation of the R commands within the
+Rdb document. We typically put these within 
+<xml:tag>r:output</xml:tag> elements that
+are nested within the <xml:tag>r:code</xml:tag> element.
+Instead of just evaluating the code, we use
+<el:key>C-q C-p</el:key> (p for the p in output)
+and this arranges to both evaluate the expressions
+and also gather up the output and insert it into the document.
+One should set an appropriate value for the <r:opt>width</r:opt>
+option in R so that the output is suitably formatted for the document.
+</para>
+<para>
+Note that at present, collecting the output is a little kludgy
+because of the asynchronous communication between R and ESS.
+</para>
+</section>
+
+</section>
+
+
+
+
+<section>
+<title>Adding Name Space Definitions</title>
+
+<para>
+As we author a document, we often want to use new namespaces to
+identify code or content from a different language or context.  For
+example, we might want to show shell commands with
+<xml:tag>sh:code</xml:tag> or illustrate the equivalent MATLAB code
+with <xml:tag>m:code</xml:tag>.  We can inline the namespace
+definition in the tag itself, e.g., 
+
+<programlisting><![CDATA[ 
+<m:code xmlns:m="http://www.mathworks.org"> x = 1..10 </m:code>
+]]></programlisting>
+
+However, we often end up using this namespace
+prefix again in other places within the document and so it is best to
+put the definition on the root node of the XML document.  The function
+<el:func>r-add-namespace-def</el:func> does this for us.  It prompts
+for the prefix and looks that up in the Emacs variable
+<el:var>rxml-namespaces</el:var>.  If there is an entry corresponding
+to that prefix, the function adds the definition to the root and you
+can continue editing.  If you want to use a different prefix and URL
+than any in the pre-defined table, either add your entry to the table
+or alternatively call <el:func>r-nxml-insert-namespace</el:func> with
+the namespace prefix and the URL. This function is the one that
+actually does the insertion.
+</para>
+</section>
+
+
+
+
+<section>
+<bibliography>
+<title>Bibliography</title>
+
+<biblioentry id="bib:ESS">
+<abbrev>ESS</abbrev>
+<title>Emacs Speaks Statistics</title>
+<authorgroup>
+<author><personname><firstname>A</firstname><surname>Rossini</surname></personname></author>
+<author><personname><firstname>Richard</firstname><surname>Heiberger</surname></personname></author>
+<author><personname><firstname>Kurt</firstname><surname>Hornik</surname></personname></author>
+<author><personname><firstname>Martin</firstname><surname>Maechler</surname></personname></author>
+<author><personname><firstname>Rodney</firstname><surname>Sparapani</surname></personname></author>
+<author><personname><firstname>Stephen</firstname><surname>Eglen</surname></personname></author>
+</authorgroup>
+
+</biblioentry>
+</bibliography>
+</section>
+
+</article>

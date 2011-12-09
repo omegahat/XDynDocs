@@ -1,0 +1,17 @@
+<article xmlns:r="http://www.r-project.org">
+
+<para>
+Example  of capturing the output from an r:code node.
+<r:code r:capture.output="true">
+cat("Generating sample\n")
+x = rnorm(10)
+print(summary(x))
+</r:code>
+</para>
+
+<para>
+<r:code eval="false">
+dynDoc("capturePrint.xml", "HTML", force = TRUE)
+</r:code>
+</para>
+</article>

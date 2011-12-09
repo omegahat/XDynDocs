@@ -1,0 +1,39 @@
+
+<faq>
+<q>
+When I install the package from source, I get errors about
+'dirname -help'. Where is this coming from?
+<a>
+It is coming from when we compute the options for building
+FO and HTML documents as  vectors of R strings.
+We defer to make which, as a side effect, tries to resolve the 
+local location of the omegahat XSL files on this machine.
+It is in determining the value of  DYN_DOCS
+that we use xmlcatalog and then try to get the directory name.
+This will be fixed. But in the meantime, use a catalog
+file by setting the XML_CATALOG_FILES environment variable.
+</a>
+</q>
+
+
+<q>
+When I create a latex file (using the dblatex format),
+I can't run latex/pdflatex on the resulting .tex file.
+I get an error message about not being able to find docbook.sty.
+<a>
+You need the dblatex/latex directories in your TEX search path.
+Set the  environment variable TEXINPUTS to 
+<sh:code>
+ export TEXINPUTS= dblatex-xsl-current/latex//:${TEXINPUTS}::
+</sh:code>
+</a>
+</q>
+
+<q>
+The <latex/> I generate refers to \XMLAttr, \XMLTag, etc.,
+but these macros are not defined. Where can I find them?
+<a>
+</a>
+</q>
+
+</faq>

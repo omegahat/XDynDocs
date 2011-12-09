@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--  For Docbook 5 -->
+
+<article xmlns="http://docbook.org/ns/docbook" 
+         xmlns:r="http://www.r-project.org"
+         version="5.0" xml:lang="en">
+ <info>
+  <title></title>
+  <subtitle></subtitle>
+    <author><personname>
+     <firstname>Duncan</firstname>
+     <surname>Temple Lang</surname>
+     </personname></author>
+   <address><email>duncan@wald.ucdavis.edu</email></address>
+ </info>
+
+<section>
+<title>Example of Invalid R-Docbook file</title>
+
+<para>
+<r:func name="get" pkg="base" />
+
+<r:function>
+<r:output>
+This is intentionally invalid as a function cannot have an r:output.
+</r:output>
+</r:function>
+
+</para>
+
+</section>
+
+</article>

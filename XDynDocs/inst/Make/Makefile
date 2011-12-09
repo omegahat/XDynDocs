@@ -1,0 +1,332 @@
+ifndef XML_CATALOG_FILES
+# $(warning "no value for XML_CATALOG_FILES. You most likely need to set this.")
+ XML_CATALOG_FILES=/Users/duncan/catalog.xml
+# $(error "Need an XML catalog file to resolve")
+endif
+
+ifndef DYN_DOCS
+  # $(warning "computing DYN_DOCS from the catalog")
+  #XXX have to handle case where we get nothing back.
+  DYN_DOCS=$(shell dirname `xmlcatalog ${XML_CATALOG_FILES} http://www.omegahat.org/XDynDocs/foo | grep -v '^No'`)
+endif
+
+ifndef OMEGA_XSL_FILE
+#  OMEGA_XSL_FILES=$(DYN_DOCS)/inst/XSL/OmegahatXSL/common/RCommonDocbook.xsl
+  OMEGA_XSL_FILES=$(shell xmlcatalog  ${XML_CATALOG_FILES} http://www.omegahat.org/XSL/common/RCommonDocbook.xsl)
+endif
+
+ifndef DB
+# DB=/usr/share/sgml/docbook/docbook-xsl-1.60.1
+# DB=$(HOME)/docbook-xsl-1.75.1
+ DB=$(DYN_DOCS)/XSL/docbook-xsl-current
+endif
+
+
+ifndef DBLATEX_PARAMS
+  DBLATEX_PARAMS= -stringparam doc.layout "mainmatter" \
+                  -param doc.collab.show 0 \
+                  -param latex.use.hyperref 1 \
+                  -stringparam latex.style Rdocbook 
+endif
+
+ifndef FOP
+ FOP="/Users/duncan/fop-0.95/fop"
+endif
+
+
+ifndef BATIK_DIR
+#  BATIK_DIR=$(HOME)/Downloads/batik-1.7
+ BATIK_DIR=
+endif
+
+
+ifndef BATIK_CLASSES
+ # BATIK_CLASSES=$(BATIK_DIR)/batik.jar
+ BATIK_CLASSES=
+endif
+
+
+ifndef OMEGA_XSL_DIR
+ OMEGA_XSL_DIR=http://www.omegahat.org/XSL
+endif
+
+ifndef OMEGA_CSS_DIR
+  OMEGA_XSL_FILES=$(DYN_DOCS)/CSS
+endif
+
+ifndef YAHOO_UI_DIR
+  YAHOO_UI_DIR=$(DYN_DOCS)/JavaScript
+endif
+
+# Could use either $(OMEGA_XSL_DIR)/html/myarticle.xsl or $(OMEGA_XSL_DIR)/html/Rstyle.xsl
+ifndef XSTYLE
+XSTYLE=$(OMEGA_XSL_DIR)/html/Rhtml.xsl
+endif
+
+USE_DB_SHORTHAND=1
+
+ifndef USE_DOCBOOK_SHORTHAND
+   USE_DOCBOOK_SHORTHAND=$(USE_DB_SHORTHAND)
+endif
+
+ifndef LATEX_STYLE
+ifdef USE_DB2LATEX
+  LATEX_STYLE=$(OMEGA_XSL_DIR)/latex/db2latex.xsl
+else
+  LATEX_STYLE=$(OMEGA_XSL_DIR)/latex/basicLatex.xsl
+endif
+endif
+
+TO_DOCBOOK_XSL=http://www.omegahat.org/XSL/docbook/expandDB.xsl
+
+ifndef FO_XSTYLE
+ FO_XSTYLE=$(OMEGA_XSL_DIR)/fo/Rstyle.xsl
+ FO_XSTYLE=$(OMEGA_XSL_DIR)/fo/Rfo.xsl
+endif
+
+
+RESOLVED_FO_XSTYLE=$(shell xmlcatalog $(XML_CATALOG_FILES) $(FO_XSTYLE) | grep -v '^No' | tail -n 1)
+
+CXSL=$(HOME)/Projects/org/omegahat/XML/Literate/croutine.xsl
+
+ifndef HTML_STYLESHEET
+  HTML_STYLESHEET=http://www.omegahat.org/XDynDocs/CSS/OmegaTech.css
+endif
+
+
+ifndef NO_RESOLVE_VIA_CATALOG
+  HTML_STYLESHEET:=$(shell xmlcatalog $(XML_CATALOG_FILES) $(HTML_STYLESHEET) | tail -n 1)
+endif
+
+ifndef XSLTPROC
+  XSLTPROC=xsltproc
+endif
+
+ifndef XSLT_FLAGS
+  XSLT_FLAGS= -param "html.stylesheet" "'$(HTML_STYLESHEET)'"
+endif
+
+ifndef XSLT_OPTS
+  XSLT_OPTS= --xinclude  --novalid
+endif
+
+# To put the index information into the PDF so we can extract it and 
+# reduce the repetition of pages to a single entry.
+ifdef USE_INDEX_MARKUP
+  FO_INDEX_MARKUP = -stringparam make.index.markup 1
+endif
+
+ifndef DB_IMAGES_DIR
+# DB_IMAGES_DIR=$(DB)/images
+   # use catalogs
+ DB_IMAGES_DIR=http://docbook.sourceforge.net/release/xsl/current/images
+endif
+
+ifndef DB_OPTS
+ DB_OPTS= -stringparam draft.watermark.image $(DB_IMAGES_DIR)/draft.png \
+	  -stringparam callout.graphics.path $(DB_IMAGES_DIR)/callouts/ \
+     \
+          -stringparam admon.graphics 1 \
+          -stringparam admon.graphics.path $(DB_IMAGES_DIR)/ \
+          -stringparam admon.graphics.extension .svg \
+     \
+          -param bibliography.numbered 1 
+
+#          -stringparam bibliography.numbered 1 \
+#          -stringparam linenumbering.extension 1 \
+#          -stringparam use.extensions 1
+endif
+
+ifndef FO_XSL_OPTS
+  # specify the local location of draft.png for the draft.watermark.image so that we don't have to go to the Web when running fop.
+# -param use.extensions 1
+FO_XSL_OPTS= -stringparam fop.extensions 0 \
+             -stringparam fop1.extensions 1 \
+             -param ulink.show 0 \
+             -stringparam index.on.type 1 \
+             -stringparam insert.xref.page.number yes \
+             -param header.rule 1 \
+             -param header.column.widths '"0 5 0"' \
+             -param toc.section.depth 8 \
+             $(FO_INDEX_MARKUP) \
+             $(FO_XTRA_XSL_OPTS)
+
+
+#-param xep.extensions 1
+#-param linenumbering.everyNth 10
+endif
+
+
+ifndef DOCBOOK5_XSL
+  DOCBOOK5_XSL=$(HOME)/docbook-5.0CR5/tools/db4-upgrade.xsl
+endif
+
+
+config:
+	@echo "DYN_DOCS: $(DYN_DOCS)"
+	@echo "OMEGA_XSL_DIR: $(OMEGA_XSL_DIR)"
+	@echo "XML_CATALOG_FILES: $(XML_CATALOG_FILES)"
+	@echo "FOP: $(FOP)"
+	@echo "DB: $(DB)"
+	@echo "OMEGA_XSL_FILES: $(OMEGA_XSL_FILES)"
+
+
+
+define html-from-rdb 
+   $(XSLTPROC) -xinclude $(TO_DOCBOOK_XSL) $< | $(XSLTPROC) -o $@ $(XSLT_FLAGS) $(XSLT_OPTS) $(DB_OPTS) $(R_DB_OPTS) $(XSLT_ARGS) $(HTML_XSL_ARGS) $(XSTYLE) -
+endef
+
+R_DB_OPTS=-stringparam yahoo.tab.utils.js "$(YAHOO_UI_DIR)/yahooTabUtils.js"
+
+#%.xml: %.Rdb 
+#	$(XSLTPROC) -o $@ $(XSLT_FLAGS) $(XSLT_OPTS) $(XSLT_ARGS) $(DOCBOOK5_XSL) $<
+
+#$(XSTYLE)
+
+#$(XSTYLE)
+%.xhtml: %.xml 
+	$(XSLTPROC) -o $@ $(XSLT_FLAGS) $(XSLT_OPTS) $(XSLT_ARGS) $(XSLT_XTRA_ARGS) $(OMEGA_XSL_DIR)/Rxhtml.xsl $<
+
+%.tex: %.xml 
+ifneq ($(USE_DOCBOOK_SHORTHAND),0)
+	$(XSLTPROC) -xinclude $(TO_DOCBOOK_XSL) $< | $(XSLTPROC) -o $@ $(XSLT_OPTS) $(DBLATEX_PARAMS) $(XSLT_ARGS)  $(XSLT_XTRA_ARGS) $(LATEX_STYLE) -
+else
+	$(XSLTPROC) -o $@ $(XSLT_OPTS) $(DBLATEX_PARAMS) $(XSLT_ARGS) $(TEX_XSL_ARGS)  $(XSLT_XTRA_ARGS) $(LATEX_STYLE) $<
+endif
+
+%.tex: %.Rdb 
+ifdef USE_DOCBOOK_SHORTHAND 
+	$(XSLTPROC) -xinclude $(TO_DOCBOOK_XSL) $< | $(XSLTPROC) -o $@ $(XSLT_OPTS) $(DBLATEX_PARAMS) $(XSLT_ARGS) $(TEX_XSL_ARGS)  $(XSLT_XTRA_ARGS) $(LATEX_STYLE) -
+else
+	$(XSLTPROC) -o $@ $(XSLT_OPTS) $(DBLATEX_PARAMS) $(XSLT_ARGS) $(TEX_XSL_ARGS)  $(XSLT_XTRA_ARGS) $(LATEX_STYLE) $<
+endif
+
+
+#"$(FO_XSTYLE)"
+# Let this one be first so that if there is an Rdb file, then we use that.
+ifdef USE_DOCBOOK_SHORTHAND
+
+%.fo: %.Rdb $(RESOLVED_FO_XSTYLE) $(DYN_DOCS)/Make/Makefile 
+	$(XSLTPROC) --xinclude $(TO_DOCBOOK_XSL) $< | $(XSLTPROC) $(XSLT_OPTS) $(DB_OPTS) $(FO_XSL_OPTS) $(FO_XTRA_OPTS) $(XSLT_XTRA_ARGS) $(XSLT_ARGS) -o $@ "$(FO_XSTYLE)" -
+
+%.html: %.Rdb 
+	$(html-from-rdb)
+
+%.html: %.xml 
+	$(html-from-rdb)
+
+else
+
+%.html: %.xml 
+	$(XSLTPROC) -o $@ $(XSLT_FLAGS) $(XSLT_OPTS) $(DB_OPTS) $(R_DB_OPTS) $(XSLT_ARGS) $(HTML_XSL_ARGS)  $(XSLT_XTRA_ARGS) $(XSTYLE) $<
+
+%.html: %.Rdb 
+	$(XSLTPROC) -o $@ $(XSLT_FLAGS) $(XSLT_OPTS) $(DB_OPTS) $(R_DB_OPTS) $(XSLT_ARGS)  $(XSLT_XTRA_ARGS) $(XSTYLE) $<
+
+
+
+%.fo: %.xml # $(OMEGA_XSL_FILES) 
+	$(XSLTPROC) $(XSLT_OPTS) $(DB_OPTS) $(FO_XSL_OPTS) $(FO_XTRA_OPTS) $(XSLT_ARGS)  $(XSLT_XTRA_ARGS) -o $@ "$(FO_XSTYLE)" $<
+
+%.fo: %.Rdb  $(OMEGA_XSL_FILES) 
+	$(XSLTPROC) $(XSLT_OPTS) $(DB_OPTS) $(FO_XSL_OPTS) $(FO_XTRA_OPTS) $(XSLT_ARGS)  $(XSLT_XTRA_ARGS) -o $@ "$(FO_XSTYLE)" $<
+endif
+
+
+ifndef DB2JSS_XSL
+#  DB2JSS_XSL=$(DYN_DOCS)/XSL/OmegahatXSL/latex/myjss.xsl
+  DB2JSS_XSL=$(DYN_DOCS)/XSL/OmegahatXSL/latex/myRawJSS.xsl
+endif
+
+%.tex: %.xml $(DB2JSS_XSL)  GNUmakefile
+	echo "DB2JSS_XSL = $(DB2JSS_XSL)"
+	$(XSLTPROC)) $(XSLT_OPTS) --stringparam bibliog.file $*  $(XSLT_XTRA_ARGS) -o $@ $(DB2JSS_XSL)  $<
+
+DB2BIB_XSL=$(DYN_DOCS)/XSL/OmegahatXSL/latex/biblio.xsl
+LATEX_MACROS=$(DYN_DOCS)/XSL/OmegahatXSL/latex/latexMacros.tex
+
+%.bib: %.xml $(DB2BIB_XSL)  GNUmakefile
+	$(XSLTPROC) $(XSLT_OPTS) -o $@ $(DB2BIB_XSL) $<
+
+%.bib: %.Rdb $(DB2BIB_XSL)  GNUmakefile
+	$(XSLTPROC) $(XSLT_OPTS) -o $@ $(DB2BIB_XSL) $<
+
+
+ifndef USE_FO
+ ifndef USE_TEX
+   USE_FO=1
+ endif
+endif
+
+
+
+ifdef USE_FO
+%.pdf: %.fo 
+	(export CLASSPATH=${CLASSPATH}:${BATIK_CLASSES} ; $(FOP) -fo $< -pdf $@)
+
+else
+%.pdf: %.tex # $(JSS_STYLE_DIR)/jss.cls $(LATEX_MACROS)
+	(export TEXINPUTS=$(JSS_STYLE_DIR):$(shell dirname $(LATEX_MACROS)):$(TEXINPUTS):: ; pdflatex $*)
+	(export BSTINPUTS=$(JSS_STYLE_DIR):$(shell dirname $(LATEX_MACROS)):$(TEXINPUTS):: ; bibtex $*)
+	(export TEXINPUTS=$(JSS_STYLE_DIR):$(shell dirname $(LATEX_MACROS)):$(TEXINPUTS):: ; pdflatex $*)
+	(export TEXINPUTS=$(JSS_STYLE_DIR):$(shell dirname $(LATEX_MACROS)):$(TEXINPUTS):: ; pdflatex $*)
+endif
+
+
+
+%.S %.R: %.xml 
+	$(XSLTPROC) $(XSLT_OPTS) -param language "'R'" -o $@ $(CXSL) $<
+
+#
+%.py: %.xml  $(CXSL)
+	$(XSLTPROC) $(XSLT_OPTS) -param language "'python'" -o $@ $(CXSL) $<
+
+# 
+%.pl: %.xml  $(CXSL)
+	$(XSLTPROC) $(XSLT_OPTS) -param language "'perl'" -o $@ $(CXSL) $<
+# 
+%.vb: %.xml $(CXSL)
+	$(XSLTPROC) $(XSLT_OPTS) -param language "'VB'" -o $@ $(CXSL) $<
+
+%.Rdb: %.xml
+	$(XSLTPROC) -xinclude $(TO_DOCBOOK_XSL_OPTS) -o $@ $(TO_DOCBOOK_XSL)  $<
+
+
+
+tmp:
+	@echo "CXSL: $(CXSL)"
+	@echo "CXSL: $(OMEGA_XSL_FILES)"
+
+showDBOpts:
+	@echo "$(DB_OPTS)"
+
+showFOOpts:
+	@echo "$(FO_XSL_OPTS)"
+
+
+
+ifndef FAQ_XSL
+  FAQ_XSL=$(OMEGA_HOME)/Docs/XSL/faq.xsl
+endif
+
+ifndef FAQ_CSS
+  FAQ_CSS=$(OMEGA_HOME)/Docs/XSL/faq.css
+endif
+
+FAQ.html: FAQ.xml $(FAQ_XSL)
+	  $(XSLTPROC) --stringparam cssFile $(FAQ_CSS) $(FAQ_XSL) $< > $@
+
+
+TODO_CSS=http://www.omegahat.org/OmegaTech.css
+TODO_XSL=http://www.omegahat.org/XSL/Todo.xsl
+Todo.html: Todo.xml 
+	  $(XSLTPROC) -o $@ --stringparam cssFile $(TODO_CSS) $(TODO_XSL) $< 
+
+
+showFODeps:
+	@echo "$(RESOLVED_FO_XSTYLE) $(DYN_DOCS)/Make/Makefile"
+	@ls -as $(RESOLVED_FO_XSTYLE) $(DYN_DOCS)/Make/Makefile
+
+
+cleanTex::
+	-rm $(MAIN_DOC).{tex,aux,bbl,bib,log,out,prmpt,blg} $(MAIN_DOC)*.cpt

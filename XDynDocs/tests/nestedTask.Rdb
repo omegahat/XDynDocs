@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+</articleinfo>
+
+<section>
+<title></title>
+
+<task thread="A">
+
+ <task thread="B">
+    <r:code>
+       x = 1
+     </r:code>
+ </task>
+
+ <task>
+
+<r:code>
+y = 2
+</r:code>
+
+ </task>
+
+</task>
+
+</section>
+</article>

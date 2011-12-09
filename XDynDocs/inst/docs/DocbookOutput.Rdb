@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+This document is about how we do a two pass processing
+for dynamic documents.
+We process the Rdb file by evaluating the relevant 
+code nodes in the document. We insert the output as
+R-Docbook content. Then we process that static document with
+our XSL files that format that content  for HTML or FO or LaTeX.
+</para>
+<para>
+This is less desirable than a single pass approach where we 
+transform the output from the R code to the final target
+format. This allows us to avoid the second pass.
+However, there are several advantages.
+Firstly, we need only define conversion/formatting
+functions for R objects to a single target, Docbook.
+We can then put energy into formatting these in the other targets,
+e.g. HTML, FO, LaTeX.  Much of this is done for us and relatively
+straightforward by re-using existing XSL.
+</para>
+<para>
+We can also more easily integrate the generated output
+with Docbook templates.  For example, if the author
+wants to specify a <xml:tag>table</xml:tag> with a particular <xml:attr>id</xml:attr>,
+we can recognize that we are inserting R output into this node and
+strip the <xml:tag>table</xml:tag> node we create and simply insert the
+child nodes.  Alternatively, we can use XSL to strip
+directly nested <xml:tag>table</xml:tag> elements to get the
+"right" result.
+
+</para>
+
+</section>
+
+<section>
+<title></title>
+
+<para>
+How do we generate the Docbook content from the input Rdb file?  In
+the Rdb file we have nodes of the form <xml:tag>r:code</xml:tag>,
+<xml:tag>r:plot</xml:tag>, <xml:tag>r:commands</xml:tag>,
+<xml:tag>r:expr</xml:tag>.  We want to evaluate those (except when
+<xml:attr>eval</xml:attr> is "false") and insert the result.  For
+<r:expr>r:code</r:expr>, we want to insert the result as an
+<xml:tag>r:output</xml:tag> node within <xml:tag>r:code</xml:tag>
+node.  (When transforming from the intermediate document to HTML or FO,
+we set runCode to 0 so that we use the <xml:tag>r:output</xml:tag>
+within the <xml:tag>r:code</xml:tag> elements.)
+</para>
+<para>
+For <xml:tag>r:commmands</xml:tag>, we again insert the 
+<xml:tag>r:output</xml:tag> elements after each expression.
+This is done in R.
+</para>
+<para>
+For r:expr
+</para>
+<para>
+
+</para>
+</section>
+
+</article>

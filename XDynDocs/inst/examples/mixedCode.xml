@@ -1,0 +1,46 @@
+<article xmlns:r="http://www.r-project.org"
+         xmlns:s="http://cm.bell-labs.com/stat/S4"
+         xmlns:sp="http://www.insightful.com/s-plus"
+         xmlns:c="http://www.C.org">
+
+<section>
+<title>Example Code</title>
+<para>
+This is an example of mixing code for different languages
+in a single document and then being able to extract what we want in
+useful ways.
+We mix R and C code. We also add some general S code
+which can be interpreted by either R or S-Plus
+and some S-Plus specific code.
+
+<r:code>
+x = 1:10
+</r:code>
+
+<s:code>
+y = 10 + pi * x + rnorm(length(x))
+</s:code>
+
+<c:code id="fib" file="fibonacci.c">
+int
+fib(int n)
+{
+   if(n == 0 || n == 1)
+     return(1);
+
+   return(fib(n-1) + fib(n-2));
+}
+</c:code>
+
+<sp:code>
+plot()
+</sp:code>
+
+<?R sessionInfo?>
+<?S-plus version?>
+
+</para>
+</section>
+
+
+</article>

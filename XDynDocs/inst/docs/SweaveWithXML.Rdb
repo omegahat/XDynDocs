@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+Imagine if Sweave hadn't used the limited, obscure noweb syntax.
+What if it had used a simpler notation that used one
+&lt; rather than two.
+
+<programlisting><![CDATA[
+Here is some \LaTeX{} text and it is
+followed by a code chunk.
+<code>
+ x = 1
+ y = 2
+ plot(1:10)
+</code>
+And here is more text followed by another code chunk
+<plot>
+ xyplot(mpg ~ wt | cyl + am, mtcars)
+</plot>
+]]></programlisting>
+Yes this  is just different and is not any more efficient
+in terms of keys.
+In fact, the basic structure is twice as long as
+we have to end the tags and the opening tags have
+the same number of characters as the @ and the code chunk markers
+<programlisting><![CDATA[
+@<<>>=
+<plot>
+]]></programlisting>
+
+But good editors create the closing tag for us, and indeed even
+the opening one with moderate key bindings.
+</para>
+
+
+<para>
+So why would we entertain such a minimal change that potentially requires
+more typing?  Because with this, we get a whole new world of possibilities.
+
+<ol>
+<li>This syntax admits hierarchical structure; noweb does not.
+</ol>
+W
+</para>
+
+
+
+
+
+
+</section>
+</article>

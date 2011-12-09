@@ -1,0 +1,7 @@
+To get nxml-mode working on my machine, I had to comment out
+
+  (easy-menu-define rng-nxml-menu nxml-mode-map
+    "Menu for nxml-mode used with rng-validate-mode."
+    rng-nxml-easy-menu)
+
+in the rng-nxml-mode-init function.

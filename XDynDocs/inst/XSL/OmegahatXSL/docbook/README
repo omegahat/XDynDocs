@@ -1,0 +1,7 @@
+The reason for a docbook XSL directory is for transformations that
+take a Docbook file an expand/alter it and return an Docbook file for
+further processing.
+For example, we might create a glossary or link table 
+within an existing Docbook document and then allow that to be processed by HTML.
+
+expandDB.xsl is the general XSL container to use.

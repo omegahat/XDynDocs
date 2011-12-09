@@ -1,0 +1,32 @@
+AC_INIT(Rstyle.xsl)
+
+AC_ARG_WITH(docbook-xsl, [--with-docbook-xsl location of the XSL files for docbook], DOCBOOK_XSL=$withval)
+AC_ARG_ENABLE(add, [--enable-add add to the system catalog, by default ], ADD_TO_CATALOG=$enableval)
+
+echo "Enable add $ADD_TO_CATALOG"
+
+if test -z "${ADD_TO_CATALOG}" && test -z "${DOCBOOK_XSL}" ; then
+   dnl How can we compute this. Perhaps it is in the catalog
+   dnl http://docbook.sourceforge.net/release/xsl/current
+ AC_PATH_PROG(XSLTPROC, xsltproc)
+ CATALOG=/etc/xml/catalog
+ CATALOG=/tmp/foo.xml
+ echo "Computing DOCBOOK location"
+ DOCBOOK_XSL=`${XSLTPROC} getDocbook.xsl ${CATALOG}`
+ echo "Answer: ${DOCBOOK_XLS}"
+fi
+
+OMEGA_XSL=`pwd`
+
+echo "Prefix: $PREFIX, $prefix"
+
+if test ${prefix} = "None" ;  then
+ prefix=`pwd`
+fi
+ 
+#$prefix
+
+AC_SUBST(DOCBOOK_XSL)
+AC_SUBST(OMEGA_XSL)
+
+AC_OUTPUT(catalog)

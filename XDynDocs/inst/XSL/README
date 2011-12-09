@@ -1,0 +1,16 @@
+template.xsl - an empty/prototype/"template" XSL file that one can edit
+
+dummy.xsl - a simple example XSL file for suppressing some nodes
+             and writing templates for new nodes or overriding
+             imported templates.
+
+
+
+
+We could also add an output target of a word processing format such as
+Word, KOffice, Open Office, etc.
+Open Office already has readers for DocBook so we would just extend
+these. 
+The word processors have support for specifying ones own XSLT
+processing rules.
+

@@ -1,0 +1,1 @@
+\contentsline {section}{\numberline {1}The \textbf {\texttt {read.table()}} function}{1}

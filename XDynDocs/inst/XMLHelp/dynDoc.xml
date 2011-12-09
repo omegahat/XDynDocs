@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+<rh:help xmlns:rh="http://www.r-project.org/help" xmlns:r="http://www.r-project.org"
+         xmlns:c="http://www.C.org">
+  <rh:topic>dynDoc</rh:topic>
+  <rh:topic>xslDynamicDoc</rh:topic>
+  <!--  <rh:topic>dummy</rh:topic> -->
+  <rh:title>Process a dynamic document </rh:title>
+  <rh:description>
+    <para>
+    This uses XSL and R to process an XML dynamic document 
+    into a rendered document by evaluating the R code 
+    within the document and inserting the results within the 
+    newly generated document.
+    This is the top-level function which handles details
+    of finding the correct style sheet, checking whether the
+    processing needs to be done, etc.
+    The function <r:func>xslDynamicDoc</r:func> does the
+    actual processing via XSLT.
+    </para>
+    <para>
+    The action of the function is a combination of XSL and R processing, with 
+    Docbook XSL style sheets and our extensions processing
+   the input XML and applying template rules to render those.
+    Some of the templates make calls to R functions via 
+    the <r:pkg>Sxslt</r:pkg> infrastructure and similarly,
+     the R functions can access the XSL engine and its templats and "functions".
+    </para>
+    <para>
+     There are many different options that can be passed to the
+      XSL processor and to the R functions that perform the evaluation.
+     Documentation for the XSL parameters is <ulink url="">provided elsewhere</ulink>
+    </para>
+    <para>
+     Since the evaluation of the code can, in general, take some timek
+     the function checks whether the output file already exists and 
+     if it is more recent than the source XML document. If it is,
+     it will return immediately and avoid re-processing the document.
+     The argument <r:arg>force</r:arg> can be used to avoid this.
+    </para>
+    <para>
+    This function is similar to weaving in Sweave to generate
+     the document for the end reader.
+    </para>
+  </rh:description>
+  <rh:arguments><rh:arg id="doc"><para>the name of the file containing the document or alternatively a previously parsed or generated 
+   <r:s3class>XMLInternalDocument</r:s3class> object.
+   </para></rh:arg><rh:arg id="target"><para>a string identifying the desired target format.
+This can be one of "HTML", "FO", "LaTeX", "iHTML".
+This is used to find the relevant style file, etc.
+</para></rh:arg><rh:arg id="xsl"><para>
+either the file name of the XSL style sheet to use (given as a local
+file or as a URL which is passed through the catalog resolution
+mechanism to attempt to find a local file) or a previously parsed
+(or created) XSL style sheet, e.g. 
+</para></rh:arg><rh:arg id="out"><para>the name of the file to which the resulting
+document should be written.
+This can be <r:na/> or <r:expr>character(0)</r:expr>
+to indicate that the internal XML document should be returned
+directly. This allows the 
+</para></rh:arg><rh:arg id="fop" r:type="character"><para> a string
+that specifies the executable for running
+the FO processing step. We have used
+FOP, the <ulink url="http://www.apache.org/fop">Apache</ulink>
+FO processor written in Java.
+This string tells R where fop was installed. This
+should be detected/specified at configuration time,
+but we allow the caller to specify it here so
+that he/she can experiment with new versions.
+</para></rh:arg><rh:arg id="xslParams"><para> a name-value character vector (i.e. named
+strings) providing XSL parameter values that are passed to
+<r:func>xslDynamicDoc</r:func> and onto <r:func pkg="Sxslt">xsltApplyStyleSheet</r:func>.
+These include parameters such as 
+use.existing.data, r:verbose,  showCode
+which are used within the XSL style sheets.
+</para></rh:arg><rh:arg id="fopArgs"><para>
+a character vector providing command line
+arguments that are used in a call to the FO processing
+application, if that is performed.
+This is irrlevant for conversion to HTML and formats other than
+PDF via FO.
+</para></rh:arg><rh:arg id="createDoc" ignore="true"><para>
+</para></rh:arg><rh:arg id="env"><para>
+the R environment in which the R code within the document nodes
+will be evaluated.
+This can be <r:func>globalenv</r:func> if any function
+definitions and assignments in general
+are to be preserved after the processing of the XML document,
+or alternatively a separate environment.
+The default is to create a new environment which will serve 
+for this instance of processing this document.
+One can supply an environment which is already populated with
+values, however this does not necessarily make sense given that
+the XML document is supposed to contain all the code it needs.
+However, that would allow us to process a sub-part of
+the document and not starting at the beginning.
+</para></rh:arg><rh:arg id="directory"><para> the name of a directory/folder in which
+temporary files (if they are needed) such as images will be
+stored. For example, in an HTML or FO/PDF file that includes images,
+we can either use SVG an inline the images within the output document,
+or we have to store them and refer to them in the second rendering
+process (i.e. in the HTML browser or the processing of the FO or
+<latex/> document).  </para></rh:arg><rh:arg id="dynOpts"><para>
+</para></rh:arg><rh:arg id="..."><para>
+a character vector (or named list) giving
+name-value pairs which are, by default, used 
+as elements of the XSL parameters.
+This occurs when no value is given for 
+<r:arg>xslParams</r:arg>.
+
+<!--
+  This is no longer the case. ... moved to getStyleSheetParams() call for xslParams
+name-value pairs of R objects that are passed down
+to <r:func>DynamicOptions</r:func> for setting
+options for the R engine that provide 
+the "top-level" context for the evaluation of the code within 
+the document.-->
+</para></rh:arg><rh:arg id="force" r:type="logical"><para> if the target/ouptut file
+already exists and is more recent than the input XML file(s), the
+function will not bother running the XSL transformation, assuming that
+the the request is unnecessary (much like dependencies in the make
+utility).  This parameter allows the caller to force the processing
+to occur even if the output is more recent than the input.
+This is useful when we want to by-pass the computations
+to find the dependencies or when we want to perform the
+processing with different command-line parameters
+on the same file.
+</para></rh:arg>
+ <rh:arg id="invocation"><para>a string or R expression 
+  that gives the command that was used to process and generate the 
+  new document. This is typically added to the bottom of the newly generated document
+  for readers to consult to determine the origin of the new document.
+  </para></rh:arg>
+ <rh:arg id=".xslParams"><para>a list of named parameters that are used 
+  as XSL variables within the XSL transformation. See the parameter <rh:arg pkg="Sxslt">xsltApplyStyleSheet</rh:arg>.
+  </para></rh:arg>
+ <rh:arg id="format" type="string"><para>the desired format of the output document, typically one of
+   "HTML", "FO", "PDF", "LaTeX". </para></rh:arg>
+ <rh:arg id="imageDirectory"><para>the directory in which the images written to a file should be
+  located</para></rh:arg>
+ <rh:arg id="graphicsDevice"><para>a list of named elements giving the
+   association between the file extensions and a function that creates the corresponding
+   graphics device.  The first element is treated as the default graphics device
+   for r:plot and similar nodes that do not have an explicit format attribute.
+ </para></rh:arg>
+ <rh:arg id=".errorFun"><para>the error function to use in the call to 
+   <r:func pkg="Sxslt">xsltApplyStyleSheet</r:func></para></rh:arg>
+ <rh:arg id="verbose" type="integer"><para>a logical or integer value
+   that controls whether information about the individual steps is written on the console
+   as they occur. <r:false/> means no information, <r:true/> means information about the
+   evaluation of the individual code nodes, and a number &gt; 1 gives more information.</para></rh:arg>
+
+  
+  <rh:arg id="xslFuns" type="list">
+<para>
+a collection of R functions that are to be registered as
+     XSL functions that can be used within XSL templates.
+     These are registered with \code{addXSLTFunctions} in the Sxslt package.
+</para>
+  </rh:arg>
+
+
+ </rh:arguments>
+<rh:value r:class="character | XMLInternalDocument">
+ The name of the newly created file (<r:argRef>out</r:argRef>) or if <r:argRef name="out"/>
+ is <r:na/>, the document in memory as an <r:class>XMLInternalXSLTDocument</r:class>.
+ This internal document can be saved to a file via <r:func>saveXML</r:func>
+ and can also be post-processed, e.g. by applying additional XSL stylesheets to it
+ or manipulating it in R with, e.g., XPath and <r:func>getNodeSet</r:func> or 
+  node manipulation functions such as <r:func>xmlRoot</r:func>, <r:func>xmlChildren</r:func>,
+ <r:func>xmlName</r:func>.
+</rh:value>
+ <rh:seeAlso>
+    <para>
+    The <r:pkg>Sxslt</r:pkg> package and its 
+     <r:func pkg="Sxslt">xsltApplyStyleSheet</r:func> function.
+   </para>
+    <para>
+      <r:func>xslDynamicDoc</r:func>
+    </para>
+  </rh:seeAlso>
+  <rh:references>
+    <para>
+    We use <ulink url="http://docbook.sourceforge.net">DocBook</ulink>
+    as the basis for the markup vocabulary for the dynamic documents.
+    We have extended it to support additional XML  nodes such as r:code, r:plot, r:expr, 
+    r:value, r:func, r:arg, etc. for including R code and concepts within the document.
+   </para>
+  </rh:references>
+  <rh:note>
+      Just a test of whether the XSL templates can determine whether a 
+        reference to an R function is to one which is being documented within this same help file: <r:func>dynDoc</r:func>.
+   </rh:note>
+  <rh:examples>
+    <r:init/>
+    <rh:example label="Basic">
+      <rh:title>Process a basic XML file</rh:title>
+      <rh:description>
+          This uses a very simple example dynamic document within the 
+          package.  The code illustrates some of the XSL parameters we can 
+          specify. We pass XSL parameters via <r:arg>xslParams</r:arg>
+	</rh:description>
+      <r:code>
+dynDoc(system.file("examples", "simple.xml", package = "XDynDocs"), "HTML",
+        xslParams = c('r:verbose' = 1, showCode = 1, use.existing.data = 1),
+         force = TRUE)
+	</r:code>
+    </rh:example>
+    <rh:example id="fo" label="To PDF">
+      <rh:title>Generating PDF</rh:title>
+      <rh:description>
+       Here we  generate FO output and process it into PDF by invoking
+       Apache's  FOP tool whose location we specify directly via <r:arg>fop</r:arg>.
+      </rh:description>
+      <r:code>
+dynDoc(system.file("examples", "simple.xml", package = "XDynDocs"), "FO")
+
+      </r:code>
+    </rh:example>
+    <rh:example label="To SVG">
+      <title>SVG</title>
+     <rh:description>This illustrates how we can specify the graphics device to use when generating plots.
+     </rh:description>
+      <r:code>
+	library(RSvgDevice)
+	dynDoc("svg.xml", "HTML", force = TRUE, graphicsDev = list(svg = devSVG), 'r:verbose' = FALSE)
+
+	SVG = devSVG
+	dynDoc("svg.xml", "HTML", force = TRUE, graphicsDev = "SVG", 'r:verbose' = FALSE)
+      </r:code>
+    </rh:example>
+  </rh:examples>
+  <author>
+    <firstname>Duncan</firstname>
+    <surname>Temple Lang</surname>
+    <email>duncan@wald.ucdavis.edu</email>
+  </author>
+  <rh:keywords>
+    <rh:keyword>IO</rh:keyword>
+  </rh:keywords>
+</rh:help>

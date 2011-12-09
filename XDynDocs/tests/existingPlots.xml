@@ -1,0 +1,20 @@
+<article xmlns:r="http://www.r-project.org">
+
+<para>
+Example of  using the file attribute
+to insert the existing image if 
+runCode is false.
+<r:plot file="hist.svg" originalFile="logo.jpg" width="400" height="400" r:width="4" r:height="4">
+hist(rnorm(100))
+</r:plot>
+</para>
+
+<para>
+<r:code eval="false">
+dynDoc("existingPlots.xml", "HTML", runCode = FALSE, force = TRUE, dir = ".")
+library(RSvgDevice)
+dynDoc("existingPlots.xml", "HTML", runCode = TRUE, force = TRUE, 
+       graphicsDevice = c(SVG = devSVG), dir = ".")
+</r:code>
+</para>
+</article>

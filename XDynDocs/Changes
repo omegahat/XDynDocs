@@ -1,0 +1,34 @@
+0.4-0
+
+  *   no longer change working directory when running dynDoc().
+
+  *   add preXSL and postXSL as parameters for dynDoc().
+
+  *   dynDoc(, out = NA) returns the document.
+
+  *   In dynDoc(), allow target = "TeX" as well as "LaTeX" (means the same thing for now.)
+
+0.3-1
+ 
+ *  Fixed simple error in catalog.xml.in file that referred to docbook-current rather than
+    docbook-xsl-current and so XSL files in the Docbook distribution were not found.
+
+0.3-0
+
+ *  added Docbook as a target which converts the R-Docbook document dynamically to
+    Docbook and then we can transform to HTML, FO, LaTeX and we only need one set of 
+    R to "target" converters for generating content from the results of R expressions.
+
+ *  formatting of code using deparse() for r:code, r:plot, r:function if the XSL is run within R
+    (or R is embedded)
+
+ *  put a tooltip on r:func outputs in HTML that display the package name if @pkg is set.
+
+ *  Support for data contained inline in the Rdb document.
+     XML elements r:dataArchive, r:data[@ref], r:data[@autload="true"]
+
+ *  XSL sheets for converting to HTML, FO.
+
+ *  Set FOP option in R options().
+
+ *  Determines where the fop executable is located, with an option for the configuration script.

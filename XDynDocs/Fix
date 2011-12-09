@@ -1,0 +1,12 @@
+Document:
+     createGraphicsDevice 
+
+     
+  Undocumented S4 classes:
+        Docbook DynamicDocContext FO HTML
+  Undocumented S4 methods:
+     generic 'coerce' and siglist 'character,Directory'
+
+
+Rename directories
+  [Done]  latex

@@ -1,0 +1,42 @@
+I am having trouble running XSL on the /etc/xml/catalog file.  It
+pulls down a DTD from the web, and this seems to cause some grief. If
+we remove this and the xmlns element in the catalog file below, we can
+process it.  We can avoid this by not validating via the --novalid 
+option to xsltproc. 
+
+Then we can either redirect to a local version or to the original
+version if we have permissions to overwrite it.  Let's suppose we can
+process this document. Then, we merely want to add our pieces,
+specifically
+
+<rewriteURI uriStartString="http://www.omegahat.org/XSL" rewritePrefix="file:///@OMEGA_XSL@/XSL"/>
+
+To add this, we want to simply provide a rule for <catalog>
+that copies its elements and then adds our entry.
+
+XXX
+We need to recover the xmlns attribute
+
+  <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+
+This is getting dropped when we create the new catalog.  We do this
+with sed in the configure script currently.
+
+If the docbook material has not been registered already, we will tell
+the user to do so and give suggestions how.
+
+
+<?xml version="1.0"?>
+<!DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN" "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+<delegatePublic publicIdStartString="-//OASIS//ENTITIES DocBook XML" catalog="file:///usr/share/sgml/docbook/xmlcatalog"/>
+<delegatePublic publicIdStartString="-//OASIS//DTD DocBook XML" catalog="file:///usr/share/sgml/docbook/xmlcatalog"/>
+<delegatePublic publicIdStartString="ISO 8879:1986" catalog="file:///usr/share/sgml/docbook/xmlcatalog"/>
+<delegateSystem systemIdStartString="http://www.oasis-open.org/docbook/" catalog="file:///usr/share/sgml/docbook/xmlcatalog"/>
+<delegateURI uriStartString="http://www.oasis-open.org/docbook/" catalog="file:///usr/share/sgml/docbook/xmlcatalog"/>
+<rewriteSystem systemIdStartString="http://docbook.sourceforge.net/release/xsl/1.49" rewritePrefix="file:///usr/share/sgml/docbook/xsl-stylesheets-1.49-1"/>
+<rewriteURI uriStartString="http://docbook.sourceforge.net/release/xsl/1.49" rewritePrefix="file:///usr/share/sgml/docbook/xsl-stylesheets-1.49-1"/>
+<rewriteSystem systemIdStartString="http://docbook.sourceforge.net/release/xsl/current" rewritePrefix="file:///usr/share/sgml/docbook/docbook-xsl-1.61.2"/>
+<rewriteURI uriStartString="http://docbook.sourceforge.net/release/xsl/current" rewritePrefix="file:///usr/share/sgml/docbook/docbook-xsl-1.61.2"/>
+</catalog>
+

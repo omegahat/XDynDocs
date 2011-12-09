@@ -1,0 +1,32 @@
+<article>
+<para>
+
+<programlisting>
+xml2Rd =
+function(doc,
+         xsl = "http://www.omegahat.org/RXMLDoc/xsl/xml2Rd.xsl",  <co label="catalog" id="catalog" linkend="catalog-end"/>
+         out = gsub("\\.xml$", "\\.Rd", doc),
+         ...)
+{
+   style = xsltParseStyleSheet(xsl)
+   for(i in seq(along = doc)) {
+       tt = xsltApplyStyleSheet(doc[i], style, ...)
+       saveXML(tt, file = out[i])
+   }
+                       
+   out
+}  
+</programlisting>
+<calloutlist>
+<callout arearefs="catalog" id="catalog-end">
+<para>Note the use of a URI which will be resolved by a catalog and so not necessarily come from the
+  installed package. 
+  However a catalog in the installed package provides a default rewrite  for this URI
+  but a user can provide a different one in her own catalog file.
+  This is useful when developing/debugging the code and not wanting to re-install the R package
+  after each change.
+</para>
+</callout>
+</calloutlist>
+</para>
+</article>

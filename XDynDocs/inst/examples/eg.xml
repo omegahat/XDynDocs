@@ -1,0 +1,60 @@
+<article xmlns:r="http://www.r-project.org">
+<title>A simple Simulation</title>
+<section>
+<title>Need a title</title>
+<para>
+We do a very simple simulation and end up with
+a plot.
+We separate the computations into chunks
+in the spirit of literate programming
+and define variables in some and use them in others.
+</para>
+<para>
+We start by defining the data and so a sample size
+and then we sample that many values.
+<r:code>
+n = 1000
+x = rnorm(n)
+</r:code>
+</para>
+<para>
+Next, we double all the positive values.
+<r:code>
+x[ x > 0 ] =  2 * x[x > 0]
+</r:code>
+</para>
+<para>
+Just because we want to illustrate this, we 
+use a separate code element to define a variable that 
+we will use for the title of our plot.
+<r:code>
+description = expression(paste("Normals with positive values having SD = ", sqrt(2)*sigma, " of the negative values"))
+</r:code>
+</para>
+<para>
+And now we can make our plot.
+<r:plot id="fig">
+fig = plot(x, main = description)
+</r:plot>
+And we can generate a second plot:
+<r:plot id="hist">
+hist(x, main = "A histogram")
+</r:plot>
+</para>
+
+<para>
+<r:code>
+sapply(getVariableDepends("fig", ff), eval, globalenv())
+</r:code>
+</para>
+</section>
+
+<section>
+<title>Links</title>
+
+<para>
+This is a link
+<ulink url="http://www.omegahat.org/XDynDocs"/>.
+</para>
+</section>
+</article>

@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<!--
+Deb added this to the document.
+-->
+
+<r:init showCode='false'>
+library(digest)
+library(quantreg)
+library(SparseM)
+</r:init>
+
+<section>
+<title></title>
+
+<para>
+This is an example of having one or more threads
+or alternative approaches (altApproach elements).
+At the top of the page, you see the two approaches: ols and quantile.
+You can click on either of those and each tab container will change
+to display the corresponding tab. In this way, we can switch between different
+approaches and see the entire flow of computations (and output).
+One can also view the content of an particular segment of a calculation
+using a particular approach by clicking on the particular tab.
+These are displayed independently of each other; only the "Choose approach"
+changes all of the tabs.
+</para>
+
+
+<para>
+
+
+<r:code><![CDATA[
+N = 1000
+x = runif(N, 0, 20)
+e = (rexp(length(x), .3) - 1/.3)
+y = 3 * x + 10 + e
+]]></r:code>
+
+We create a plot
+
+<r:plot><![CDATA[
+plot(y  ~ x)
+]]></r:plot>
+
+</para>
+
+<para>
+So now we try to fit a model.
+<altApproaches>
+<altApproach thread="ols">
+<para>
+Here we use simple linear regression
+<r:code><![CDATA[
+fit = lm ( y ~ x)
+]]></r:code>
+</para>
+</altApproach>
+
+<altApproach thread="quantile">
+<para>
+Here we use quantile regression.
+<r:code><![CDATA[
+qfit  = rq(y ~ x, c(.25, .5, .75))
+]]>
+<r:output><![CDATA[
+Call:
+rq(formula = y ~ x, tau = c(0.25, 0.5, 0.75))
+
+Coefficients:
+             tau= 0.25     tau= 0.50  tau= 0.75
+(Intercept) 9.16740459 10.5850936501 12.8406346
+x           0.03438852 -0.0003489062  0.0372398
+
+Degrees of freedom: 100000 total; 99998 residual
+]]></r:output>
+</r:code>
+</para>
+</altApproach>
+
+</altApproaches>
+
+</para>
+
+</section>
+
+<section>
+<title></title>
+
+<para>
+We'll go on now and do something else that might
+in theory depend on which approach we used above.
+For example, we may produce 50% confidence intervals.
+
+<altApproaches>
+
+<altApproach thread="ols">
+
+<!-- Deb added the eval="false" -->
+
+<r:code eval="true"><![CDATA[
+stop("Not implemented")
+]]></r:code>
+
+
+</altApproach>
+
+<altApproach thread="quantile">
+
+<r:plot eval="true"><![CDATA[
+
+x.new = c(.4, .5, .6, .94)
+
+yhat = predict(qfit, data.frame(x = x.new))
+
+plot(rep(x.new, 3), yhat, pch = c(11, 19, 21)[factor(rep(c(".25", ".5", "75"), each = 4))])
+
+]]></r:plot>
+
+</altApproach>
+</altApproaches>
+
+</para>
+</section>
+
+</article>

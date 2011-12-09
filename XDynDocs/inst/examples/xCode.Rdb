@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title>The code tag and attributes</title>
+
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+This is an example of running and displaying simple R code
+</para>
+
+
+<para>
+Here is some code that we want to run
+
+<r:code><![CDATA[
+N = 20
+x = runif(N, 0, 20)
+x
+]]></r:code>
+
+The output is displayed too.
+</para>
+
+
+<para>
+Next the same code is shown, but not run.
+We set the eval attribute to false. 
+
+<r:code eval="false"><![CDATA[
+N = 20
+x = runif(N, 0, 20)
+x
+]]></r:code>
+
+The output is not displayed of course.
+We can confirm it has not been run, by looking at
+the first element of x again, <r:expr>x[1]</r:expr>.
+and we can set the number of digits on the output with
+the digits attribute:  x[1]  is <r:expr digits="3">x[1]</r:expr>.
+</para>
+
+<para>
+Now I want code to not be shown, but run.
+We set the showCode attribute to false.
+
+<r:code showCode="false"><![CDATA[
+y = 1:4
+y
+]]></r:code>
+
+This code has set y to 1:4. We confirm by displaying it.
+
+<r:code><![CDATA[
+y
+]]>
+</r:code>
+
+</para>
+
+
+<para>
+Next, we hide the code in a different way.
+We surround it by an invisible tag. 
+
+<invisible>
+<r:code><![CDATA[
+x = 1:20
+x
+]]></r:code>
+</invisible>
+
+The output is not displayed either.
+We have reset <r:var>x</r:var> to be 1:20.
+
+<r:code>
+x
+</r:code>
+
+Another way to check whether it did run we include
+an r expression looking at the value of x.
+That is, x = <r:expr>2*x</r:expr>
+</para>
+
+</section>
+
+</article>

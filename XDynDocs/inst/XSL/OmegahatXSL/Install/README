@@ -1,0 +1,57 @@
+This provides a collection of XSL files associated with Omegahat.
+XSThese provide different transformations such as creating 
+literate programming tools, rules for presenting Docbook-like
+documents to HTML with our tags.
+
+Several of these XSL files are considered top-level entry points that
+one would pass directly to XSLT. The others are imported into these
+different top-level stylesheets. In order to do this conveniently on
+different machines, we must have a way to refer to the sub-XSL files
+in a directory independent manner.  We can do this by explicitly
+substituting the particular directory into which we install the files
+later into the <xsl:import> statements. A simpler and more centralized
+approach is to use catalog entries. This allows us to fix the XSL
+files with references to the sub-XSL files via a URI. In the catalog,
+we map this URI to a local file on the system. In this way, we only
+need to change the catalog to change the location of the entire
+collection.
+
+Note that one does not have to install these files on the local
+machine. Instead, one can use them implicitly from the Omegahat Web
+site. This obviously requires an active network connection and can be
+slow. Additionally, it will retrieve the versions available on that
+site. So if there are differences, this may be important.
+
+
+To use catalogs with Daniel Veillard's xsltproc, one needs
+to identify the catalog file with the URI rewrites
+and identifiers via the XML_CATALOG_FILES environment
+variable, e.g.
+
+  setenv XML_CATALOG_FILES file://`pwd`/catalog
+
+One can and should use the catalog file created when this
+package is configured.
+
+
+To verify (or monitor) the effect of the catalog, one can set the
+environment variable XML_DEBUG_CATALOG to a non-zero value, e.g. 1.
+
+
+
+On Windows, we should not use the file:// prefix before the
+local filename, but instead use the filename directly both within
+the catalog and in the environment variable.
+For example, 
+
+ export XML_CATALOG_FILES=d:/cygwin/home/duncan/OmegahatXSL/catalog
+
+and within the catalog
+
+  <rewrite uriStartString="http://www.omegahat.org/XSL" rewritePrefix="d:/cygwin/home/duncan/OmegahatXSL/XSL/ ">
+  <rewrite uriStartString="http://docbook.sourceforge.net/release/xsl/current/" rewritePrefix="d:/cygwin/home/duncan/docbook-xsl-1.65.1/">
+
+The configuration script for this distribution of XSL files doesn't deal with Windows yet.
+
+
+ 

@@ -1,0 +1,271 @@
+<?xml version="1.0"?>
+
+<article xmlns:r="http://www.r-project.org">
+<title>Approaches to Nested XSL Transformations in R</title>
+<para>
+This is an example for testing how we can generate
+rich content from R to pass back to the XSL engine
+by generating the XML content by first
+creating <docbook/> nodes and then
+transforming this to the target format (HTML in our example)
+using the existing XSL engine.
+This involves a nested XSL transformation
+</para>
+
+<para>
+Our example is very simple and does the "wrong" thing.
+
+<r:code eval="false" mode="setup"><![CDATA[
+cat("Here\n")
+source("../R/R2DocBook.R")
+setClass("bob", representation(link = "character"))
+
+htmlDocBook = 
+function(from, opts = NULL, target, context = NULL) {
+
+  doc = newXMLDoc(name = "duncan")
+     # a simple link
+     #     node = newXMLNode("ulink", attrs = c(url = from@link), doc = doc)
+     # or create a bigger example
+  node = matrix2DocBook(mtcars[1:9,], doc = doc)
+
+     # now get ready to process this node with the stylesheet.
+  sty = as(context, "XSLStyleSheet") # xsltGetStyleSheet(context)
+
+  ans = xsltApplyStyleSheet(doc, sty)
+    
+      # Get the node of interest from the result
+      # Precisely how this is done depends on what XSL style sheet was used to 
+      # generate the output.  In our example, we could look for a table.
+      # And whether there is a default namespace or not depends also on who generated
+      # the content.
+  body = getNodeSet(ans$doc, "//x:body", c(x = "http://www.w3.org/1999/xhtml"))[[1]]
+
+assign("html", saveXML(ans$doc), globalenv())
+     # copy the nodes to the output/target document so they are owned there.
+     # We this in the conversion so the users wouldn't have to, but we can do it.
+     #  xsltCopyNodes(context, body[[1]])
+
+    body[[1]]
+}
+
+setMethod("convert", c("bob", target = "HTMLTarget"), htmlDocBook)
+]]>
+</r:code>
+
+</para>
+<para>
+
+FO is very slightly different.  The <docbook/> XSL style sheets will
+generate an error when the root node is not one of the following:
+appendix article bibliography book chapter colophon dedication
+glossary index part preface qandaset refentry reference sect1 section
+set setindex So if we try to use the style sheet directly with a node
+not in this set, we will get an error.  So we have several different
+ways to get around this.  One is to not use the style sheet directly
+but to create a new one that imports that style sheet.  The new style
+sheet would provide a new template for the root node which is simply a
+call to apply-templates and so pick up the templates in the original
+style sheet for arbitrary nodes.
+</para>
+<para>
+
+The other approach is to put our node inside one of these top-level nodes and
+then apply the style sheet and extract the first child of the root node of 
+the resulting document, much like we did with the  HTML document
+via the  XPath expression //body//div[@id='content'].
+</para>
+<para>
+
+<ignore>
+<r:code eval="false"><![CDATA[
+foDocBook = 
+ function(from, opts = NULL, target, context = NULL) {
+  if(FALSE) {
+     doc = newXMLDoc() # addFinalizer = FALSE - tried, still double frees.
+     node = matrix2DocBook(mtcars[1:4,], doc = doc)
+  } else 
+    doc = xmlInternalTreeParse("DocBookTable.xml")
+
+     # no finalizer
+   sty = xsltGetStyleSheet(context)
+   sty = paste(c('<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">',
+                 paste('<xsl:import href="', docName(sty), '"/>', sep = ""),
+                 '<xsl:template match="/">',
+                 '<xsl:apply-templates />',
+                 '</xsl:template>',
+                 '</xsl:stylesheet>'), sep = "", collapse = "\n")
+
+# what about importing the already compiled stylesheet directly,
+# or at least the document directly
+
+	     sty = xsltParseStyleSheet(sty)
+	     ans = xsltApplyStyleSheet(doc, sty)
+
+             ans = xmlRoot(ans$doc)
+	     outDoc = xsltGetOutputDocument(context)  # .Call("RXSLT_getInsertNode", context);   as(inode, "XMLInternalDocument")
+#print(saveXML(outDoc))
+#	     .Call("RS_XML_copyNodesToDoc", ans, outDoc)
+
+	     #print(saveXML(ans))
+	     ans = newXMLNode("fo:block", namespaceDefinitions = c(fo="http://www.w3.org/1999/XSL/Format"))
+             ans
+           }
+]]>
+</r:code>
+</ignore>
+</para>
+
+<para>
+Here we use a separate XSL style sheet which explicitly imports the
+top-level style sheet being used in the bigger XSL transformation.
+The name of this style sheet is available from the XML document for
+that style sheet which we can get from XSL context.
+
+<r:code mode="setup" eval="false"><![CDATA[
+foDocBook = 
+function(from, opts = NULL, target, context = NULL) 
+{
+      # The node we want to transform and insert into the output document.
+   doc = newXMLDoc(name = "temp", node = matrix2DocBook(mtcars[1:4,]))
+
+      # Get the name of the style file in effect.
+   sty = docName(as(context, "XMLInternalDocument"))
+
+   sty = paste(c('<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">',
+                 paste('<xsl:import href="', sty, '"/>', sep = ""),
+                 '<xsl:template match="/">',
+                 '<xsl:apply-templates />',
+                 '</xsl:template>',
+                 '</xsl:stylesheet>'), sep = "", collapse = "\n")
+
+    result = xsltApplyStyleSheet(doc, xsltParseStyleSheet(sty))$doc
+    
+    # No need to explicitly copy 
+    # xsltCopyNodes(context, xmlRoot(result))  
+    
+    result
+}
+setMethod("convert", c("bob", target = "FOTarget"), foDocBook)
+]]></r:code>
+
+</para>
+<para>
+We could read this from a file and then change the import,
+programmatically generate it with newXMLNode
+or just create the version without the import and then use importStyleSheets()
+in which case we would have to make certain to remove it from the imports list
+before freeing the top-level style sheet here.
+</para>
+<para>
+A slight variant on this is to a) create the new XSL as XML nodes
+directly and b) to import the original style sheet as an internal
+document.  We must be careful to un-import it when we are done so that
+when we release the new temporary style sheet, it doesn't throw away
+that XML document.
+
+<r:code mode="setup" eval="false"><![CDATA[
+foDocBook = 
+function(from, opts = NULL, target, context = NULL) 
+{
+      # The node we want to transform and insert into the output document.
+   doc = newXMLDoc(name = "temp", node = matrix2DocBook(mtcars[1:4,]))
+
+   FO.ns = c(xsl="http://www.w3.org/1999/XSL/Transform")
+
+   sty = newXMLDoc()
+   top = newXMLNode("xsl:stylesheet", namespaceDefinitions = FO.ns, attrs = c(version="1.0"), doc = sty)
+   tmpl = newXMLNode("xsl:template", attrs = c(match = "/"), parent = top)
+   newXMLNode("xsl:apply-templates", parent = tmpl)
+
+print(xmlName(xmlRoot(sty)) )
+print(saveXML(sty))
+   sty = xsltParseStyleSheet(sty)
+#   importStyleSheets(sty, list(as(context, "XMLInternalDocument")))
+   .Call("R_addStylesheetImport", sty, as(context, "XSLStyleSheet"))
+print(saveXML(as(sty, "XMLInternalDocument")))
+   result = xsltApplyStyleSheet(doc, sty)$doc
+
+       # unimport
+   .Call("R_clearStylesheetImport", sty)
+  
+   xsltCopyNodes(context, xmlRoot(result))
+}
+setMethod("convert", c("bob", target = "FOTarget"), foDocBook)
+]]></r:code>
+</para>
+
+<para>
+This next approach is  more limited in application,
+but is very short, fast and actually works in
+most situations.
+The idea is simply to create the node
+we want processed and the pass it to the existing
+XSL transformation and ask it to so.
+This will actually insert the result
+into the document at the current location/insertion
+point. 
+This is the limitation.
+If we wanted to return a
+node for further processing in the XSL template,
+this would not work.
+<r:code mode="setup" eval="false"><![CDATA[
+cat("foDocBook\n")
+foDocBook = 
+function(from, opts = NULL, target, context = NULL) 
+{
+      # The node we want to transform and insert into the output document.
+   node = matrix2DocBook(mtcars[1:10,])
+
+   xsltProcessNode(context, node)
+
+   NULL
+}
+setMethod("convert", c("bob", target = "FOTarget"), foDocBook)
+]]></r:code>
+
+Note that we return NULL. If we return anything else, it
+may well be inserted into the document
+by the XSL template that invoked this R function.
+That is up to the XSL template as to what it does with
+the result, but it cannot find out that we have inserted 
+something into the tree "behind its back"
+when it thought it was in charge.
+</para>
+
+<para>
+Now that we have our setup, we process the document.  It consists of a
+single r:code node and merely creates an instance of the new class
+<r:class>bob</r:class>.  This will then be passed to our
+<r:func>convert</r:func> method and we will end up with whatever our
+method gives us.
+
+<r:code>
+new("bob", link = "http://www.nytimes.com")
+</r:code>
+</para>
+
+
+<para>
+You can run this in R with the following commands:
+<r:code eval="false" id="run">
+xmlSource("R2HTMLviaDocBook.xml", xnodes = "//r:code[@mode='setup']")
+dynDoc("R2HTMLviaDocBook.xml", "FO", force = TRUE, draft.mode = "no")
+dynDoc("R2HTMLviaDocBook.xml", "HTML", force = TRUE)
+</r:code>
+</para>
+
+<para>
+Note
+<r:code eval="false">
+xmlSource(xmlInternalTreeParse("R2HTMLviaDocBook.xml")["//r:code[@id='setup']"])
+</r:code>
+will seg fault potentially because the doc is released and gc'ed
+while the nodes are still active.
+This will solve that problem:
+<r:code>
+doc = xmlInternalTreeParse("R2HTMLviaDocBook.xml"); xmlSource(doc["//r:code[@id='setup']"])
+</r:code>
+</para>
+
+</article>

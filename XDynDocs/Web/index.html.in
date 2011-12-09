@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<link rel="stylesheet" href="http://www.omegahat.org/OmegaTech.css">
+<title>XDynDocs</title>
+</head>
+
+<body>
+<h1>XDynDocs</h1>
+<p align=right>Last Release:
+ <a href="@TAR_FILE@"> @VERSION@</a> (<font color="red">@DATE@</font>)
+
+<p>
+
+This is an R package for working with and processing dynamic,
+reproducible documents using XML, XSL and R.  It supports Docbook
+(with extensions for identifying R code and other markup elements) and
+Microsoft Word 2007 documents.  The idea is that we take an XML document
+containing both regular text and r:code, r:plot, r:expr, r:function
+XML elements that contain R code. When transforming the document
+to HTML or PDF (via FO), we evaluate the R code within
+these XML elements and add the output to the resulting document.
+The content is  therefore dynamically generated.
+</p>
+
+<p> This is similar to Sweave but has been around about a year before
+Sweave was released.  It uses XML technologies - Docbook, XSL, XPath,
+XInclude - and leads to a much richer document format which can
+support hierarchical non-sequential documents.  We can easily
+programmatically manipulate the documents to achieve various tasks
+using XML tools.
+</p>
+
+<p>
+Other packages providing similar or related facilities include:
+<ul>
+  <li> odfWeave
+  <li> Sweave
+  <li> RWordXML
+</ul>
+
+Why is this package different?  Firstly, it uses XML and XML-related
+technologies such as XSL, XPath, XInclude, catalogs and so on. This is
+a good thing as these are powerful, ubiqitous tools with a
+well-documented, rich, flexible, extensible format that can be used by
+many communities.  Docbook is used in many projects for technical
+documentation, authoring books, and so on.  Word is a widely used word
+processing tool that is more "convenient" for many users than LaTeX.
+Open Office and odfWeave are good tools, but Word is probably more
+widely used than Open Office.  odfWeave primarily uses the Sweave
+syntax to identify code chunks (i.e. &lt;&lt;&gt;&gt;=).  We use
+styles to introduce markup.  </> <p> We use XSL to handle Docbook
+format.  This provides a clear and rich means to extend and customize
+the processing for different targets, e.g. HTML, FO/PDF.
+
+There are a few features in this package  that are different from
+odfWeave (but which could be added)
+</p>
+<p>
+Somewhat tangential are the RDCOMClient, RDCOMServer, RDCOMEvents
+and rcom pacakges. I'll explain why these are relevant later.
+</p>
+
+<p>
+RXHelp - a Docbook XML-based format for documenting
+R functions, classes, methods and data with
+richer content and more flexible tools than available in the current Rd format.
+</p>
+
+
+<hr>
+<address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@wald.ucdavis.edu>&lt;duncan@wald.ucdavis.edu&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Wed Nov  3 12:24:15 PDT 2010
+<!-- hhmts end -->
+</body> </html>

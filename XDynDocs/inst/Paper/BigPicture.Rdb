@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+The Web has radically transformed how we obtain, read and interact
+with documents.  We retrieve documents via the Internet.  We use the
+Web browser to read many documents and we interact with these
+documents in rich ways that are possible because of HTML and
+JavaScript.  These documents are interactive and dynamic, with content
+being updated and displayed as we read it.  We are moving a long way
+from static files in the form of PDF documents These changes should
+make us think about documents in different ways, to consider how we
+can seize opportunities and also how we can improve the process of
+authoring, displaying and interacting with these documents.
+To not do so, is a wasted opportunity or obligation.
+</para>
+
+<para>
+The focus on <latex/> and statistic documents is entirely natural.
+However, it is not necessarily desirable.
+The different versions of HTML and the support in Web browsers
+presents significantly much richer formats for rendering
+documents. In the recent past, typesetting quality and support for mathematical
+content has "required" us to use <latex/>.
+But the continued growth of HTML and support for mathematical
+content (MathJacks) should make us reconsider this.
+</para>
+<para>
+More than anything however, the longevity and reusability of
+documents, the Semantic Web and the technologies that change the
+authoring of documents should make us at least evaluate our current
+approach to authoring documents.  There is are alternative approaches
+that may be better.  We have to consider the entire lifetime of a
+document and think of the process of creating and rendering it in
+different ways. When we consider all of the dimensions and extents of
+the process of the document, it is compelling to think of different
+ways to author, render and interact with documents.
+</para>
+<para>
+Documents are, can and should be reusable.  But there are different
+ways to make them more reusable.  We should be able to easily render a
+document in different formats such as PDF, HTML, LaTeX, Word
+(processor).  The same document should be easily converted to each of
+these end-formats.  We abstract code and software, why should we not
+abstract documents so that we can reuse them and project them into
+different formats.
+</para>
+<para>
+Documents are different than the way they have been.  We don't need to
+create a document focusing on a single output format.  We don't need
+to think of a document as being something only an author
+constructs. Instead, software can help to create the content.
+Documents with multiple authors can be integrated programmatically
+rather than requiring manual intervention.  The contents of documents
+can be updated across author and across machine to gather content in
+dynamic and programmatic ways that both remove the human input and
+validate the content.  Perhaps more progressive and ambitious,
+documents can be not just mere hyperlinks but direct integration of
+"live" content across parts of other documents.
+</para>
+<para>
+XDocTools
+</para>
+
+</section>
+</article>

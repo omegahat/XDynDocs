@@ -1,0 +1,41 @@
+<article xmlns:r="http://www.r-project.org"
+	 xmlns:xml="http://www.w3.org/XML/1998/namespace"
+	 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" >
+
+<para>
+Example of executing expressions one at a time.  We use the
+<xml:node>r:commands</xml:node> element for this.  The prompt symbol
+comes either from the node's attribute or the global XSL parameter
+<xsl:param>r:prompt</xsl:param>.  The <xml:attr>r:visible</xml:attr>
+attribute on the <xml:node>r:commands</xml:node> node indicates
+whether to suppress the output of expressions which are not ordinarily
+visible in an R session, e.g. assignments or explicit calls to
+<r:func>invisible</r:func>.
+</para>
+<para>
+The following are two different nodes with the same code but with
+different settings for <xml:attr>r:prompt</xml:attr> and
+<xml:attr>r:visible</xml:attr>.
+The first uses the default settings.
+<r:commands>
+x = rnorm(10)
+invisible(x)
+summary(x)
+</r:commands>
+
+This second one sets the prompt to 
+R-ex&gt; and sets <xml:attr>r:visible</xml:attr> to "true":
+<r:commands r:prompt="R-ex>" r:visible="true">
+x = rnorm(10)
+invisible(x)
+summary(x)
+</r:commands>
+
+</para>
+
+<para>
+<r:code eval="false">
+dynDoc("expressions.xml", "HTML", force = TRUE)
+</r:code>
+</para>
+</article>

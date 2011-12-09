@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+This shows how we can specify the number of lines
+of output from an  R object to show
+in the output of a command.
+<r:code numLines="8">
+mtcars
+</r:code>
+</para>
+
+</section>
+</article>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<table>
+<tgroup cols="3">
+<tbody>
+<row>
+ <entry>1</entry>
+ <entry>2</entry>
+ <entry>3</entry>
+</row>
+<row>
+ <entry>A</entry>
+ <entry>B</entry>
+ <entry>C</entry>
+</row>
+</tbody>
+</tgroup>
+</table>

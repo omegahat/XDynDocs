@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org" xmlns:xi="http://www.w3.org/2003/XInclude"><articleinfo><title/><author><firstname>Duncan</firstname><surname>Temple Lang</surname><affiliation><orgname>University of California at Davis</orgname><orgdiv>Department of Statistics</orgdiv></affiliation></author></articleinfo><section><title/><para>
+This is a simple example that we will use to see
+how the dynamic documents being output to Docbook format
+works. It could be used for any other target too.
+
+This illustrates the conversion from R data types to the target format.
+</para><para>
+We start with a matrix
+<table bgcolor="gray"><?dbfo keep-together="auto"?><tgroup cols="5"><thead><row><entry align="right"></entry><entry align="center">W</entry><entry align="center">X</entry><entry align="center">Y</entry><entry align="center">Z</entry></row></thead><tbody><row><entry align="right">A</entry><entry align="right">1</entry><entry align="right">4</entry><entry align="right">7</entry><entry align="right">10</entry></row><row><entry align="right">B</entry><entry align="right">2</entry><entry align="right">5</entry><entry align="right">8</entry><entry align="right">11</entry></row><row><entry align="right">C</entry><entry align="right">3</entry><entry align="right">6</entry><entry align="right">9</entry><entry align="right">12</entry></row></tbody></tgroup></table>
+
+</para><para>
+Next we look at a data frame.
+
+<table bgcolor="gray"><?dbfo keep-together="auto"?><tgroup cols="12"><thead><row><entry align="right"></entry><entry align="center">mpg</entry><entry align="center">cyl</entry><entry align="center">disp</entry><entry align="center">hp</entry><entry align="center">drat</entry><entry align="center">wt</entry><entry align="center">qsec</entry><entry align="center">vs</entry><entry align="center">am</entry><entry align="center">gear</entry><entry align="center">carb</entry></row></thead><tbody><row><entry align="right">Mazda RX4</entry><entry align="right">21</entry><entry align="right">6</entry><entry align="right">160</entry><entry align="right">110</entry><entry align="right">3.9</entry><entry align="right">2.62</entry><entry align="right">16.5</entry><entry align="right">0</entry><entry align="right">1</entry><entry align="right">4</entry><entry align="right">4</entry></row><row><entry align="right">Mazda RX4 Wag</entry><entry align="right">21</entry><entry align="right">6</entry><entry align="right">160</entry><entry align="right">110</entry><entry align="right">3.9</entry><entry align="right">2.88</entry><entry align="right">17.0</entry><entry align="right">0</entry><entry align="right">1</entry><entry align="right">4</entry><entry align="right">4</entry></row><row><entry align="right">Datsun 710</entry><entry align="right">22.8</entry><entry align="right">4</entry><entry align="right">108</entry><entry align="right">93</entry><entry align="right">3.85</entry><entry align="right">2.32</entry><entry align="right">18.6</entry><entry align="right">1</entry><entry align="right">1</entry><entry align="right">4</entry><entry align="right">1</entry></row><row><entry align="right">Hornet 4 Drive</entry><entry align="right">21.4</entry><entry align="right">6</entry><entry align="right">258</entry><entry align="right">110</entry><entry align="right">3.08</entry><entry align="right">3.21</entry><entry align="right">19.4</entry><entry align="right">1</entry><entry align="right">0</entry><entry align="right">3</entry><entry align="right">1</entry></row><row><entry align="right">Hornet Sportabout</entry><entry align="right">18.7</entry><entry align="right">8</entry><entry align="right">360</entry><entry align="right">175</entry><entry align="right">3.15</entry><entry align="right">3.44</entry><entry align="right">17.0</entry><entry align="right">0</entry><entry align="right">0</entry><entry align="right">3</entry><entry align="right">2</entry></row></tbody></tgroup></table>
+
+</para><para>
+We also look at a 2-way frequency table.
+
+<table bgcolor="gray"><?dbfo keep-together="auto"?><tgroup cols="4"><thead><row><entry align="right"></entry><entry align="center">3</entry><entry align="center">4</entry><entry align="center">5</entry></row></thead><tbody><row><entry align="right">4</entry><entry align="right">1</entry><entry align="right">8</entry><entry align="right">2</entry></row><row><entry align="right">6</entry><entry align="right">2</entry><entry align="right">4</entry><entry align="right">1</entry></row><row><entry align="right">8</entry><entry align="right">12</entry><entry align="right">0</entry><entry align="right">2</entry></row></tbody></tgroup></table>
+</para><para>
+And finally we look at an object for which there is no explicit method.
+
+<programlisting><![CDATA[
+[1] "a" "b" "c" "d" "e"
+]]></programlisting>
+
+And a linear model
+<programlisting><![CDATA[
+
+Call:
+lm(formula = mpg ~ ., data = mtcars)
+
+Coefficients:
+(Intercept)          cyl         disp           hp         drat           wt         qsec           vs           am         gear         carb  
+   12.30337     -0.11144      0.01334     -0.02148      0.78711     -3.71530      0.82104      0.31776      2.52023      0.65541     -0.19942  
+
+]]></programlisting>
+
+and its summary
+<programlisting><![CDATA[
+
+Call:
+lm(formula = mpg ~ ., data = mtcars)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.4506 -1.6044 -0.1196  1.2193  4.6271 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)  
+(Intercept) 12.30337   18.71788   0.657   0.5181  
+cyl         -0.11144    1.04502  -0.107   0.9161  
+disp         0.01334    0.01786   0.747   0.4635  
+hp          -0.02148    0.02177  -0.987   0.3350  
+drat         0.78711    1.63537   0.481   0.6353  
+wt          -3.71530    1.89441  -1.961   0.0633 .
+qsec         0.82104    0.73084   1.123   0.2739  
+vs           0.31776    2.10451   0.151   0.8814  
+am           2.52023    2.05665   1.225   0.2340  
+gear         0.65541    1.49326   0.439   0.6652  
+carb        -0.19942    0.82875  -0.241   0.8122  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
+Residual standard error: 2.65 on 21 degrees of freedom
+Multiple R-squared: 0.869,	Adjusted R-squared: 0.8066 
+F-statistic: 13.93 on 10 and 21 DF,  p-value: 3.793e-07 
+
+]]></programlisting>
+
+and the coefficients
+<table bgcolor="gray"><?dbfo keep-together="auto"?><tgroup cols="5"><thead><row><entry align="right"></entry><entry align="center">Estimate</entry><entry align="center">Std. Error</entry><entry align="center">t value</entry><entry align="center">Pr(&gt;|t|)</entry></row></thead><tbody><row><entry align="right">(Intercept)</entry><entry align="right">12.3</entry><entry align="right">18.7</entry><entry align="right">0.657</entry><entry align="right">0.518</entry></row><row><entry align="right">cyl</entry><entry align="right">-0.111</entry><entry align="right">1.05</entry><entry align="right">-0.107</entry><entry align="right">0.916</entry></row><row><entry align="right">disp</entry><entry align="right">0.0133</entry><entry align="right">0.0179</entry><entry align="right">0.747</entry><entry align="right">0.463</entry></row><row><entry align="right">hp</entry><entry align="right">-0.0215</entry><entry align="right">0.0218</entry><entry align="right">-0.987</entry><entry align="right">0.335</entry></row><row><entry align="right">drat</entry><entry align="right">0.787</entry><entry align="right">1.64</entry><entry align="right">0.481</entry><entry align="right">0.635</entry></row><row><entry align="right">wt</entry><entry align="right">-3.72</entry><entry align="right">1.89</entry><entry align="right">-1.96</entry><entry align="right">0.0633</entry></row><row><entry align="right">qsec</entry><entry align="right">0.821</entry><entry align="right">0.731</entry><entry align="right">1.12</entry><entry align="right">0.274</entry></row><row><entry align="right">vs</entry><entry align="right">0.318</entry><entry align="right">2.10</entry><entry align="right">0.151</entry><entry align="right">0.881</entry></row><row><entry align="right">am</entry><entry align="right">2.52</entry><entry align="right">2.06</entry><entry align="right">1.23</entry><entry align="right">0.234</entry></row><row><entry align="right">gear</entry><entry align="right">0.655</entry><entry align="right">1.49</entry><entry align="right">0.439</entry><entry align="right">0.665</entry></row><row><entry align="right">carb</entry><entry align="right">-0.199</entry><entry align="right">0.829</entry><entry align="right">-0.241</entry><entry align="right">0.812</entry></row></tbody></tgroup></table>
+
+
+</para><para>
+We need to test the plots and expressions
+
+5.5
+
+</para></section></article>

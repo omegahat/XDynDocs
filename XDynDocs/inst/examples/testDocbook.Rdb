@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+This is a simple example that we will use to see
+how the dynamic documents being output to Docbook format
+works. It could be used for any other target too.
+
+This illustrates the conversion from R data types to the target format.
+</para>
+
+<para>
+We start with a matrix
+<r:code>
+matrix(1:12, 3, 4, dimnames = list(c("A", "B", "C"), c("W", "X", "Y", "Z")))
+</r:code>
+
+</para>
+<para>
+Next we look at a data frame.
+
+<r:code>
+mtcars[1:5,]
+</r:code>
+
+</para>
+<para>
+We also look at a 2-way frequency table.
+
+<r:code>
+with(mtcars, table(cyl, gear))
+</r:code>
+</para>
+
+<para>
+And finally we look at an object for which there is no explicit method.
+
+<r:code>
+letters[1:5]
+</r:code>
+
+And a linear model
+<r:code>
+lm(mpg ~ . , mtcars)
+</r:code>
+
+and its summary
+<r:code>
+summary(lm(mpg ~ . , mtcars))
+</r:code>
+
+and the coefficients
+<r:code>
+summary(lm(mpg ~ . , mtcars))$coefficients
+</r:code>
+
+
+</para>
+<para>
+We need to test the plots and expressions
+
+<r:expr>mean(1:10)</r:expr>
+
+</para>
+
+
+
+</section>
+</article>

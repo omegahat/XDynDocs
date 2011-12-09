@@ -1,0 +1,1973 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- <?xml-stylesheet type="text/xsl" href="file:///Users/duncan/Projects/org/omegahat/Docs/XSL/Todo.xsl" ?> -->
+
+<?xml-stylesheet type="text/xsl" href="inst/XSL/OmegahatXSL/Todo.xsl" ?>
+
+<!--<?xml-stylesheet type="text/xsl" href="file:///home/duncan/Projects/org/omegahat/Docs/XSL/Todo.xsl" ?>-->
+<!-- <?xml-stylesheet type="text/xsl" href="http://www.omegahat.org/Todo.xsl" ?> -->
+
+<topics xmlns:r="http://www.r-project.org" 
+	xmlns:sh="http://www.shell.org">
+
+
+<ulink url="../../../Books/RPackages/RXMLDoc/Todo.xml">RXMLDoc Todo</ulink>
+<ulink url="../../../Projects/org/omegahat/XML/XSL/S/libxslt/Todo.xml">Sxslt Todo</ulink>
+<ulink url="../../../Projects/org/omegahat/XML/RS/Todo.xml">XML Todo</ulink>
+
+<topic>
+<title>HTML</title>
+<items>
+
+<item>
+Need default dimensions for all device types as we may have a r:format
+specified in a node and so different from the 
+</item>
+
+
+<item>
+When an error occurs in an r:plot, don't put the error message as the filename!
+</item>
+
+<item>
+NaN's coming in on Frances's machine for the size (width and height attributes) of the SVG
+documents in HTML. First one is okay.
+SimpleWireless.Rdb.
+</item>
+
+<item status="check">
+Relative file names for images we create and reference, i.e.  ./foo.svg
+rather than /home/duncan/..../foo.svg
+<br/>
+Use plotDirectory option in DynamicOptions. Or is it imageDir?
+<br/>
+Make certain references to external files are relative to the document.
+Use a prefix.
+<br/>
+The directory for graphics files can be specified by the plotDirectory
+dynamic option.
+</item>
+
+<item status="check">
+Check garbage collection counts to ensure everything is cleaned up.
+</item>
+<item>
+R CMD check XML
+</item>
+
+
+<item status="done">
+Specifying an environment, e.g. 
+
+<r:code>
+dynDoc("svgEg.Rdb", "HTML", force = TRUE, env = globalenv())
+</r:code>
+
+fails. Ends up trying to assign to odd places, e.g. packages.
+Happens in the registration of functions.
+</item>
+
+<item status="done">
+Memory management.
+<r:code>
+dynDoc("simpleWirelss.Rdb", "HTML", force = TRUE)
+</r:code>
+Turn the memory management in XML back on and find the seg fault
+from releasing a node that we no longer own.
+</item>
+
+<item>
+Allow user to control whether we catch errors and continue.
+<br/>
+Isn't this just the existing stopOnError = TRUE?
+Yes, but we are not stopping in the options(error = recover)
+at that point.
+Calling xslError() so the error is getting caught by 
+the call to dynDoc(). Could just call stop(), but want
+to go back through the XSL engine.
+</item>
+
+<item status="done">
+Use @r:width rather than @width to specify the value for the deparse width.
+In r:plot we use width to mean the width of the plot, and were picking
+this up as the width for the deparse!
+<br/>
+Need to match the namespace of the prefix to http://www.r-project.org.
+So need to look up ancestors to find namespace definition.
+<br/>
+Use xmlAttrs(, TRUE) to get the definitions as the names on the namespaces attribute vector.
+<br/>
+<r:code>
+library(XDynDocs)
+dynDoc("inst/examples/testOptions.Rdb", "HTML", force = TRUE)
+</r:code>
+
+</item>
+
+<item status="complete">
+Add time of computation to output. Optionally of course.
+<br/>
+How do we pass back the result and the time. 
+Glue them together in a div for  HTML?
+Or as a node set with two elements - the value and the timing.
+<br/>
+See inst/examples/timing.Rdb
+</item>
+
+<item>
+Add caching.
+</item>
+
+<item status="done">
+The generation of the JavaScript array of ids for toggling the code is not working.
+<br/>
+Oh yes it is. Just didn't have the //r:plot in the xpath expression.
+</item>
+
+
+
+<item status="done">
+The r:plot runs and SVG documents are created, but they are not included in the HTML document.  There are no img tags. 
+<br/>
+See tests/simplePlot.Rdb
+<r:code>
+library(XDynDocs)
+dynDoc("simplePlot.Rdb", "HTML", force = TRUE)
+</r:code>
+</item>
+
+<item status="check">
+Implement code displays as being HTML divs that can be hidden/removed
+by clicking on a +.
+<br/>
+Also allow them to be controlled globally, to show or hide them all in one operation.
+</item>
+
+<item status="check">
+Fix up the formatting of the + which toggles the visibility of the
+code blocks.
+<br/>
+Put the a inside a div and then the code inside that div.
+</item>
+
+<item status="done">
+Not getting unique ids in uid in Rsource.xsl
+<br/>
+Need a different generation mechanism.
+<br/>
+Use XSL's generate-id()!
+</item>
+
+<item status="check">
+When there is no r output from a code node, make certain to 
+add something that has a float: clear.
+<br/>
+See inst/XSL/OmegahatXSL/Rsource.xsl and the addition of 
+div class="clearFloat" in the template named makeVerbatimCode.
+</item>
+
+<item status="check">
+Inside an r:code[@showCode = 'false'], put a tooltip
+on the r:output showing the code. 
+i.e. when we have an r:output or when we dynamically generate the content inside an r:code with a @showCode = false.
+<br/>
+See 
+<r:code>
+dynDoc("inst/examples/showCode.Rdb", "HTML", force = TRUE, verbose = FALSE)
+</r:code>
+
+</item>
+
+<item status="done">
+Create the list of all ids for these code divs.
+<br/>
+Use a mode and apply to all nodes of interest.
+Make certain to centralize the generation of the UIDs
+so that they are the same in the place where we refer to them
+and define them.
+<br/>
+See generateToggleAllCodeJS template in Rsource.xsl.
+</item>
+
+<item status="partial">
+Put controls on the page for toggling all the code pieces
+<br/>
+See user.header.content in alt.xsl and the 
+generateToggleAllCodeJS template in Rsource.xsl.
+<br/>
+Pretty this up, but the essentials of the mechanism is there.
+</item>
+
+<item status="low">
+For altApproaches, display the graph of threads.
+Allow the viewer to navigate with that.
+</item>
+
+
+<item>
+do/show within *:code elements
+  in html, have a link or tooltip for the  actual code.
+</item>
+
+<item status="done">
+
+<issue>
+  Converters for R objects to HTML.
+</issue>
+</item>
+
+
+<item status="done">
+Add the formatting for r:code[@ref]
+and links to r:code[@id].
+See that in Rfo.xsl
+</item>
+
+<item status="done">
+Figure out why the DIV.r-code-chunk-refs-box
+in OmegaTech.css doesn't work.
+<br/>
+Use text-align.  align is deprecated but
+works fine in Firefox directly, but not via CSS.
+</item>
+</items>
+</topic>
+
+<topic>
+<title>Threads/AltApproaches</title>
+
+<item>
+Drawing a graph of the tasks with CodeDepends.
+</item>
+
+
+<item>
+When there are multiple sets of altApproaches, the "Choose Approach" tabs 
+at the top of the document produce errors when you click on them.  
+The threadsMultiple.Rdb document in inst/examples has been set up to 
+test a bunch of nesting and multiplicity.  There are 5 sets of threads, 
+labeled a, b, ..., e. Two belong to altImplementations and three to 
+altApproaches.  Each of the altApproaches set of threads is added at 
+the top of the document (the a's, d's, and e's), including the set that are subtasks to one of the other threads. When you click on one of the labels in the "Choose approach" area at the top of the document, you get 
+a JavaScript error that says "couldn't find tab for #taba1, possible: 
+Tab LI #tabb1 Tab LI #tabb2 Tab LI #tabb3".  These tabs are for the altImplementations within a1.  Once you click on OK, it comes up with a similar message about the tabs for c1 and c2, then e1 and e2.
+<br/>
+We can avoid the "error" by turning off the call to alert() which notifies
+that it couldn't find a corresponding entry in a TabView. Such a message is not
+an error, so should disappear.
+<br/>
+We really want this to be quite different. We want
+the viewer to be able to see a map of the tasks and alternative
+implementations and be able to click on a thread made up of
+a particular path.
+An image map or interactive SVG plot would be a good interface.
+In the absence of this, we need a hierarchical menu that  allows 
+people to select nested alternatives within that container.
+</item>
+
+
+</topic>
+
+
+<topic>
+<title>Configuration</title>
+<items>
+
+<item status="done">
+Get configuration correct if no catalog pointing to OmegahatXSL.
+See the make file in inst/Make/Makefile.in and the setting of DYN_DOCS.
+</item>
+
+<item status="check">
+Set the catalog entries if  they are not set when we load the package.
+</item>
+</items>
+</topic>
+
+
+<topic>
+<title>threads.html - eeyore version vs "current" version</title>
+
+<para>
+The following items point out the differences between the html
+produced from processing the threads.Rdb document
+(dynDoc("threads.Rdb", "HTML")), which I call "current" and the
+version that appears on eeyore.
+</para>
+
+<items>
+<item status="check">
+JavaScript is surrounded by CDATA in the current version. If it is
+changed to comments, then the thread tabs work, otherwise not.
+<br/>
+Gone now, but we may need a method specific to JavaScript code.
+Also, we want a test that has a &lt; in it so that the HTML would get
+confused without the comments.
+<br/>
+In alt.xsl in inst/XSL/OmegahatXSL/html/, I have added an xsl:comment
+around the JavaScript code. It appears that this is where the JavaScript
+code is coming from, not R.
+<reply>
+Where are the CDATA nodes? I don't see them.
+Perhaps things have changed in the code.
+I did remove a CDATA in one place in the R code,
+but that wasn't explicitly for JavaScript.
+So maybe JavaScript code is coming in via the general
+ANY convert() method for HTMLTarget.
+</reply>
+</item>
+
+<item status="check">
+When r:code has an @eval = "false", any r:output is not show.
+<br/>
+Added a test to r:code/r:output in OmegahatXSL/html/Rstyle.xsl
+to see if the parent (the r:code) has an @eval = "false".
+<br/>
+<q>Why is $runCode false?</q>
+<br/>
+<q>Have we broken anything else?</q>
+<br/>
+<r:code>
+dynDoc("inst/examples/showCode.Rdb", "HTML", force = TRUE, out = "/tmp/DynDocs/A", verbose = FALSE)
+</r:code>
+
+</item>
+
+
+<item status="check">
+rename r:options to r:dynOptions
+</item>
+
+<item status="done">
+Should we have the default be that the output document goes to the 
+directory of the original document itself, i.e. out = dirname(doc).
+
+<r:code>
+dynDoc("inst/examples/dynOptions.Rdb", "HTML", force = TRUE, verbose = FALSE)
+</r:code>
+goes to inst/examples/dynOptions.html
+
+</item>
+
+<item status="done">
+Nice to find a way to get the dynamic options from within the document's code.
+i.e. query the dynamic processor.
+<br/>
+Done now. getDynOptions is available through the central environment.
+</item>
+
+
+<item status="partial">
+Remove the need to set the R options (e.g. width) when we set 
+DynamicDocContext fields. 
+i.e. have the width passed to the functions that need it.
+Probably need to provide the functions that are now called
+via r:call() in XSL as part of our registered XSL functions
+and so share an environment.
+<br/>
+We export a version of formatCode.
+</item>
+
+
+<item status="done">
+Allow for target (FO or HTML) specific r:dynOptions.
+Perhaps use the namespace prefix on the  attribute name - fo:width
+</item>
+
+<item status="low">
+Allow for r:dynOption elements within an r:dynOptions 
+to allow more complex values and/or R code  to be used
+for the values of dynamic options.
+</item>
+
+<item status="done">
+The code from the r:init is being displayed in the current version.
+Note, there is no r:init in the original threads.Rdb, I added it to 
+load the libraries in advance of needing them. 
+<reply>
+But it is supposed to be. It is code the user needs to see.
+You can enclose it within an invisible or add a 
+showCode="false" attribute.
+</reply>
+</item>
+
+<item status="partial">
+The value of the last computation is being displayed in r:code for the
+current html file. For example, if y=1:20 is the last line of code,
+then the values 1 through 20 are displayed, even though they are
+assigned to y.
+<reply>
+Need to check if the invisible flag is on.
+Use a variant of <r:func>withVisible</r:func>. Need to do some jumping through hoops
+to get evaluation right.
+<br/>
+Need to consolidate the places in the code we do the <r:func>eval</r:func>
+<br/>
+See 
+<r:code>
+z = dynDoc("inst/examples/visibility.Rdb", "HTML", force = TRUE, verbose = FALSE)
+</r:code>
+
+</reply>
+</item>
+
+<item status="confirm">
+I have to put eval="false" in the r:code tags for the second/last set
+of threads. Otherwise the command 'stop("Not implemented")' stops the
+entire processing of the document, and the html file contains only the
+output from the Rdb document up to that point.
+<reply>
+We can catch the error and continue. That is what stop() is generating.
+We have to decide if that is a good thing to or should we terminate 
+when we get an error in a node.
+We also want to return an error node in the appropriate format.
+<br/>
+The last of the r:code elements should be a r:plot as we create a plot.
+The second to last explicitly calls stop() and we should catch 
+this and put in the error.
+</reply>
+</item>
+
+<item status="need test">
+The div and pre and p tags in the current and the eeyore versions are
+very different.  I don't know if this is a problem or not.
+</item>
+
+<item status="done">
+The css file for the current threads.html points to 
+/Users/nolan/EMD/StatComputing/trunk/XDynDocs/inst/XSL/../CSS/OmegaTech.css
+the one on eeyore points to
+http://www.omegahat.org/XDynDocs/CSS/DynDocs.css
+<br/>
+
+DynDocs.css imports OmegaTech.css. So probably want DynDocs.css
+<br/>
+Changed in XSLStyleSheetParams in dynamic.R  now so
+will apply to all HTML documents.
+I probably set it by hand in the call to make, e.g.
+make HTML_STYLESHEET=DynDocs.css
+</item>
+
+<item status="done">
+After changing the CDATA to comments in the JavaScript, I get the
+following errors when loading the html file into Firefox:
+
+<programlisting>
+Error: altTabWidgets is not defined
+Source File: file:///Users/nolan/EMD/StatComputing/trunk/XDynDocs/inst/examples/threads.html
+Line: 218
+</programlisting>
+
+I don't know what's happening with this one.
+<br/>
+Probably the yahooTabUtils.js is not being found. 
+We have to provide the location for it either on the 
+local file system or as a URL. So we need to expand this
+with catalogResolve() (preferred to system.file())
+Then we pass this as an XSL parameter, only if the target is HTML.
+See getStyleSheetParams()
+</item>
+
+</items>
+
+</topic>
+
+<topic>
+<title>Emacs</title>
+<items>
+
+<item status="done">
+Get C-q f to be r:func and not r:false.
+<br/>
+Made it C-q F
+</item>
+
+<item status="done">
+In emacs mode, have C-uC-qx insert &lt;r:expr eval="false"&gt;...
+</item>
+
+
+<item status="done">
+Fix the r-nxml-keys functions for r:expr.
+<br/>
+The C-u is not working in C-qx or C-qc
+</item>
+</items>
+</topic>
+
+<topic>
+<title>dynamic.R</title>
+<items>
+
+<item status="done">
+Make 
+<r:code>
+ dynDoc(system.file("examples", "expandEg.xml", package = "XDynDocs"), "LaTeX", out = NA)
+</r:code>
+work.
+<br/>
+Ensure db2latex-xsl-0.8pre1.tar.gz  is installed and referenced correctly in
+the catalog.
+Make certain to fix xsl/qandaset.xsl (line 366) to change name of the template
+question.answer.label.
+</item>
+
+<item status="done">
+Allow "TeX" or "LaTeX" as target.
+</item>
+
+<item>
+Do we really want to change directory?
+If we don't we have to adjust 
+references to files in the resulting document.
+We could do this in one pass or with a second pass.
+</item>
+<item>
+Return XML document or save it to a file?
+<r:expr>out = NA</r:expr> does this.
+</item>
+
+<item>
+Make the xCode example work again
+</item>
+
+<item>
+If the name of the output is the same as the output  (any of them)
+raise an error.
+</item>
+
+
+<item status="check">
+Need to rationalize if the environment is working correctly in .evalNode
+now that we compute the environment from the call.
+<br/>
+
+<r:code>
+dynDoc("inst/examples/xCode.Rdb", "FO", force = TRUE, verbose = FALSE)
+dynDoc("inst/examples/removeVars.Rdb", "FO", force = TRUE, verbose = FALSE)
+</r:code>
+
+<br/>
+Put load in with the dynamic processing functions, e.g. getDynOptions, evalNode.
+
+<br/>
+Do we need to have the global environment earlier in our chain of environments?
+It is there after the base, but using <r:func>dynDocsEnv</r:func>, we end up with
+env, env, XDynDocs, imports:XDynDocs, base, R_GlobalEnv
+<br/>
+We can have 
+env, env, R_GlobalEnv, search path,
+but then we will probably have to load XML (and perhaps Sxslt)
+to make the functions available to the dynamic functions.
+<br/>
+
+Still can't find getDynOptions from the code in the document.
+See 
+
+<r:code>
+dynDoc("inst/examples/dynOptions.Rdb", "HTML", force = TRUE, verbose = FALSE)
+</r:code>
+
+</item>
+
+<item>
+Rdb to Docbook and then to HTML/FO.
+<br/>
+Need to consider how to pass on the code to Docbook formatting
+and how to include the "output".
+e.g. r:expr  and then we insert the result into the r:expr.
+<br/>
+See inst/XSL/dynDocbook.xsl and the convert methods.
+<r:code>
+dynDoc("inst/examples/testDocbook.Rdb", "Docbook")
+</r:code>
+</item>
+
+<item>
+Add XSL templates for table/r:code and figure/r:plot (this is probably okay)
+<br/>
+This is to allow us to refer to the table. In fact, we can do this if
+we target docbook rather than a one step Rdb to HTML/FO. 
+We still have to allow the author to specify the table
+and then we take ours out of the way. We can do this in
+the step from docbook to HTML/FO, e.g. rewriting
+and recognize a table/table.
+<br/>
+Need to generate the table in R for the matrix via convert and
+put the rows into the table in the output document that is essentially
+a copy of the 
+
+<br/>
+We will recognize table/r:code specially and use the Docbook table
+as the target into which we will put our own R-generated contents
+for the rows.  This really makes going from Rdb to Docbook as a seperate
+first pass followed by a docbook to FO/HTML/LaTeX as a second pass
+more appealing/appropriate.
+
+<originalItem>
+In order to include a table from R in a DB table, I create a table
+with one cell and put the r:code in it.  Is that waht I should be
+doing?
+<br/>
+Do you really want the R table as a cell of the DB table?
+</originalItem>
+</item>
+
+
+
+<item status="check">
+Check that mechanism we have added for creating the file names from the target
+works for all the different targets, HTML, docbook, FO/PDF, latex.
+<br/>
+The code is in targetNames.R and dynDoc().
+<br/>
+
+</item>
+
+<item status="done">
+When generating fo output, put it in the output directory, not the local one.
+<br/>
+</item>
+
+<item>
+<r:code>
+dynDoc("inst/examples/load.Rdb", "FO", force = TRUE)
+</r:code>
+gives errors in going from FO to PDF.
+<br/>
+Works okay for HTML.
+<br/>
+Problem is the session info being inserted after the page sequence.
+<br/>
+We could parse the input XML  file, insert an r:sessionInfo node
+at the end, i.e. as the last child of the root node, and then
+use our regular XSL files.
+But we should find a way to do it within the Docbook format.
+</item>
+
+
+
+
+<item status="check">
+r:dynOptions implementation.
+<br/>
+See inst/examples/dynOptions.Rdb
+</item>
+
+<item status="done">
+[Not dynamic]
+xmlSourceFunctions() and xmlSource need to handle fragments/refs correctly.
+<br/>
+See RCodeTagExs.Rdb.
+<br/>
+[Done] Recursive fragments need to be handled.
+<br/>
+[Done] Handle CDATA in a node as part of the fragment definition.
+</item>
+
+<item status="done">
+Default size for a plot (at least in HTML) should be the size of the plot.
+<br/>
+Read the contents back from the SVG document and retrieve the width and height
+attributes on the svg node!
+</item>
+
+<item>
+Plots in the pdf version are too big for the page. Is this because of
+the height and width attributes that I put on plot? I put them on it
+because the plots region in the HTML versions was so small that they
+were inside scrollable windows and you couldn't see the whole plot.
+<br/>
+We might need fo:width, fo:height and html:width, html:height.
+We can have width and height be the defaults for HTML.
+</item>
+
+<item>
+Control generation of table of contents more easily and regularly, e.g. in FO/PDF.
+Don't appear in HTML.
+</item>
+
+<item status="check">
+Avoid loading Yahoo UI tools if not needed.
+<br/>
+See inst/XSL/OmegahatXSL/alt.xsl and we conditionally
+insert the code if add.yahoo.ui.code is 1/true or
+if there are any altApproaches nodes in the input document.
+</item>
+
+<item>
+Rationalize the formatCode, formatRCode, etc.
+See OmegahatXSL/html/Rsource.xsl, OmegahatXSL/fo/Rstyle.xsl
+RCommonDocbook/RCommonDocbook.xsl 
+<br/>
+Implement formatting of code (i.e. the call to R's <r:func>formatCode</r:func>) for FO and Docbook as we did for
+HTML (see next item).
+<br/>
+Done for FO - see inst/XSL/OmegahatXSL/fo/Rstyle.xsl.
+</item>
+
+<item status="low">
+Explore marking up R code with the facilities in RXMLHelp or in
+other pretty printers.
+</item>
+
+
+
+
+<item>
+<r:func>convert</r:func> methods for <r:class>DocbookTarget</r:class>
+<br/>
+ANY, data frame, matrix, array, table, lm, anova, xtable.
+<br/>
+See matrix2DocBook. May already have several done.
+<br/>
+Have ANY, data frame, matrix, table.
+<br/>
+Leaves array, lm, anova, xtable, and all the others!
+</item>
+
+<item status="partial">
+Color coding, formatting for FO templates for R variables, code, expr, ...
+<br/>
+Currently, we just call the inline.monoseq  template with no coloring/formatting information.
+See r:expr template in inst/XSL/OmegahatXSL/fo/Rfo.xsl
+and also where we call the template named r-expression in inst/XSL/dynRFO.xsl.
+Done for r-var, etc. 
+Colors are specified in RCommonDocbook.xsl in inst/XSL/OmegahatXSL/common/.
+</item>
+
+
+
+
+<item status="check">
+Fix fancy quotes issue. 
+If encoding is not C but en_US.UTF-8, then file names get messed up
+with fancy quotes.
+<br/>
+Seems okay now.
+Needed to add <r:func>dQuote</r:func> function or else
+the CSS file is not used.
+<br/>
+But Deb was having problems in a regular shell using bash with an
+en_US.UTF-8 locale.
+</item>
+
+<item status="done">
+Resulting/output HTML document needs to have the files locally, i.e the SVG files.
+<br/>
+outputDirectory
+<br/>
+We revert to setting the directory to the dirname() of the out.
+</item>
+
+<item status="done">
+If out is a directory, compute the name from the input
+<br/>
+
+<r:code>
+dynDoc("inst/examples/showCode.Rdb", "HTML", force = TRUE, out = "/tmp/DynDocs/A")
+</r:code>
+
+</item>
+
+
+
+<item status="done">
+Should consolidate the xsl:param in dynRFO.xsl and html.xsl into a single file.
+<br/>
+See dynParams.xsl.
+Also added templates that are common to all formats, e.g. loading data.
+</item>
+
+<item status="low">
+Document the parameters, and also the templates in the XSL files.
+</item>
+
+<item status="done">
+In r:plot the attribute showCode=false does not work. We probably need
+to update the xsl template in the same way that we updated the r:code
+to recognize showCode=false.
+<br/>
+The test is in inst/examples/showCode.Rdb.
+Use 
+<r:code>
+dynDoc("inst/examples/showCode.Rdb", "HTML", showCode = "false", showExpressionCode = TRUE, force = TRUE)
+</r:code>
+and different options for showCode and showExpressionCode.
+</item>
+
+
+<item status="check">
+In r:expr when set the number of digits, not all digits are printed if
+they are trailing 0s, e.g. with digits=3 and the number is 0.00005, it
+will print 0, rather than 0.000. This is a problem if want to show the
+number of significant digits.
+<br/>
+Changed now in dynamic.R where we xmlGetAttr the "digits" in the .eval() function.
+Mess with this and test for big numbers too.
+sprintf, formatC, round, print.
+</item>
+
+
+<item status="done">
+For r:code we will eventually want to format pdf (and html?) code
+display to add linebreaks so that it will fit within the margins.
+<br/>
+See 
+
+<r:code>
+options(width = 72)
+dynDoc("inst/examples/formattingCode.Rdb", "HTML", force = TRUE)
+</r:code>
+
+<br/>
+We can use deparse to do this. We need to honor an 
+options(width = ?) in the document. Also allow
+the user to specify whether the code should be 
+as-is or formatted. And allow individual nodes to have
+an attribute that controls this too by the author.
+<br/>
+But while processing the code, we can also add links to 
+help files, color code it, etc.
+There are packages that do this so we should use them.
+</item>
+
+<item status="done">
+Recognize width as an XSL parameter that sets R's width option.
+<br/>
+See inst/examples/formattingCode.Rdb for an example.
+</item>
+
+
+
+<item status="partial">
+<note>Need to finish off support for RDA</note>
+<br/>
+Is there a way to read the data from within the document into R? That
+is, the data is in csv format within a special tag and it is read into
+R in an r:code block, via read.csv or something like that.
+<br/>
+Yep, r:data or r:value or r:object.
+These should have attributes r:id giving the name of the R object
+to which the value is assigned and also an r:type giving
+the format of the content.
+@format controls how the result is displayed, or not.
+<br/>
+We need to add support for RDA content inlined as base64.
+<br/>
+Also need to enable the xsl template for these objects.
+<br/>
+For adding data to a document, see <r:func>insertCode</r:func>.
+</item>
+
+<item status="done">
+Process r:dataArchive.
+<br/>
+Done in dynParams.xsl
+<br/>
+Done if there are no r:data[@ref] nodes.
+If there, process the r:data[@autoload="true"].
+<br/>
+See inst/examples/containedData.Rdb and inst/examples/autoloadData.Rdb.
+</item>
+
+
+
+<item status="done">
+The title for a table appears in pdf version of documents, but not the
+html version.
+<br/>
+Example document?
+Does this happen also in the non-dynamic documents?
+<br/>
+</item>
+
+<item status="done">
+In the PDF version, the r:expr code does not appear in (), is not
+color coded, and need spacing between the code and the return value.
+<br/>
+Added the () and a space. The colors and formatting need to be addressed
+here conceptually. See below.
+</item>
+
+<item status="done">
+In r:expr we often don't want to see the code (the code is shown for
+scalars too). Should we require showCode = false to not show it?  Or,
+should showCode=false be the default? And/or should we put it as a
+tooltip?
+<br/>
+Added showExpressionCode with default = 0.
+<br/>
+For HTML there is now code in html.xsl which makes it a tooltip, regardless.
+</item>
+
+<item status="done">
+For r:code we will eventually want to format pdf (and html?) code
+display to add linebreaks so that it will fit within the margins.
+<br/>
+We can use deparse to do this. We need to honor an 
+options(width = ?) in the document. Also allow
+the user to specify whether the code should be 
+as-is or formatted. And allow individual nodes to have
+an attribute that controls this too by the author.
+</item>
+
+
+<item status="done">
+Add a logical parameter to allow the caller of <r:func>dynDoc</r:func>
+to control whether an error terminates the XSL or if we should 
+continue.
+<br/>
+It is named stopOnError.
+</item>
+
+
+<item status="done">
+When we get an error, don't create the document.
+Either remove it or terminate the XSL explicitly rather
+than let it continue.
+
+<r:code>
+dynDoc("inst/examples/stopError.Rdb", "HTML", force = TRUE, out = "/tmp/DynDocs/A", stopOnError = TRUE)
+</r:code>
+
+<br/>
+We needed to get the status from the xsltApplyStyleSheet.
+Versions 0.8-1 of Sxslt will give us this.
+
+</item>
+
+
+<!-- End of Deb's new stuff -->
+
+<item status="done">
+Why do we end up creating an .svg and a .SVG file.
+<br/>
+We don't any more.
+
+<r:code>
+x = dynDoc("~/Classes/StatComputing/XDynDocs/tests/simple.xml", "HTML",
+            force = TRUE, xslParams = c(showCode = "1", "use.existing.data" = 1, 'r:verbose' = 1),
+            xsl = "~/Classes/StatComputing/XDynDocs/inst/XSL/html.xsl", )
+</r:code>
+</item>
+
+<item status="partial">
+Mechanism to allow caller to add more registered functions to 
+the XSL context.
+See xslDynamicDoc and  the call to closureGenerator().
+<br/>
+Added an xslFun parameter and defaultXSLFunctions.
+</item>
+
+<item>
+When we get an error in dynDoc(), we crash R.
+<br/>
+Really when we crash in the code that processes the document,
+not the code within the document, i.e. the author's code.
+<br/>
+If we change  removeVariables() to think it gets a node
+and not a XMLNodeSet or just even call stop("..."), then we get a fatal segmentation fault with
+<r:code>
+dynDoc("inst/examples/removeVars.Rdb", "HTML", force = TRUE)
+</r:code>
+The problem lies within the AND as, perhaps, libxslt
+doesn't check the error status when doing a boolean AND.
+</item>
+
+
+<item status="done">
+do/show within *:code elements
+  [done] have a parameter that controls whether we show the show or the do.
+      $r-show-do-code
+</item>
+
+<item status="done">
+Sxslt and dynamic documents run through.
+i.e. check it works okay. What about OS X?
+<br/>
+Issues with mis-matched compilers being used for  libxml and libxslt
+and the packages.
+</item>
+
+<item>
+caching
+</item>
+
+<item status="done">
+recognize Rdb extension.
+<br/>
+Changed the substitution of xml$ to (xml|Rdb)$ in dynDoc's out default value.
+</item>
+
+<item status="done">
+Run sh:code when doing dynamic documents.
+<br/>
+  In html.xsl.
+</item>
+
+<item status="done">
+@numLines for r:output or output
+ or on *:code
+<br/>
+Currently just on sh:code.
+Need to add to r:code...
+and also on r:output..
+This can all be done in R.
+</item>
+
+<item status="done">
+Handle a numLines attribute on the r:code output.
+</item>
+
+<item status="check">
+&lt;r:code @prompt="true | string" @individual="true|false"&gt;
+<br/>
+This is r:commands which is implemented. 
+Having problems with it crashing when we insert nodes at the current insertion point
+in the output document.
+<br/>
+Seems to be working now (Jan 15 2010).
+</item>
+
+<item status="done">
+r:remove elements.  (Suppressed in output)
+  [Done] Need to get the environment in which the processing is taking place.
+      See env in dynDoc().
+        dynDoc("inst/examples/removeVars.Rdb", "HTML", force = TRUE)
+</item>
+
+
+<item>
+order of evaluation of the nodes
+   @depends='id' or thread.
+   CodeDepends automation of this.
+</item>
+
+<item>
+output into existing table format.
+   recycling rules.
+</item>
+
+
+<item>
+XML nodes returned by convert() across the interface
+need to be stripped of any memory management.
+Add a routine to do this in the XML package and call it
+when we do this.
+</item>
+
+
+
+<item status="done"> 
+Where did the SVG plots go. See inst/examples/svg.xml.
+Are we not returning the name of the file in graphicsEval.
+<br/>
+Commented out the width and height computations and
+the insertion of the src attribute! Oops.
+</item>
+
+<item>
+ragged arrays from tapply need to be formatted for HTML, etc.
+</item>
+
+<item>
+Graphics device. What aspect of this?
+</item>
+
+<item status="done">
+Add CSS as a parameter for dynDoc or leave via xsl options.
+<br/>
+One can specify this as an XSL parameter in the call to <r:func>dynDoc</r:func>
+as in 
+
+<r:code>
+dynDoc("file.Rdb", ..., html.stylesheet = "foo.css")
+</r:code>
+
+</item>
+
+<item status="done">
+Get the verbose = 2 to work.
+<br/>
+Explicitly pass the R argument as an element of <r:arg>.params</r:arg> in the
+call to <r:func>xsltApplyStyleSheet</r:func>.
+</item>
+
+<item status="partial">
+Using CSS for the HTML output.
+ Table headers being centered.
+</item>
+
+<item>
+It would be good to be able to do zip -u for a
+.docx file directly in memory rather than using
+the shell command "zip -u".
+<br/>
+Is this for the Rcompression or ROOXML package?
+<br/>
+Look into Info-Zip source code: http://www.info-zip.org/
+</item>
+
+<item status="check" id="extensions">
+Map the target to an extension,
+e.g. HTML to xhtml, LaTeX to tex, ...
+<br/>
+See getExtension() in dynamic.R.
+</item>
+
+<item>
+More methods for convert()
+</item>
+
+<item>
+Put warnings and errors into the output?
+<br/>
+We can collect the warnings and put them on the side
+of the output to allow the viewer to 
+explore them if she wants. Or put them in a hidden 
+div under the output. Color code the output if there are warnings.
+</item>
+
+<item status="done">
+Have an attribute on r:code, etc. that says capture the output 
+and put it in the result.
+<br/>
+See r:capture.output
+</item>
+
+<item status="done">
+In getXSLVariables() if nsDefs is missing, get the definitions
+from the top of the document in the context. 
+Which document ? The style sheet.
+</item>
+
+<item status="low">
+Can't have an r:plot, etc. in an r:code[@r:capture.output].
+</item>
+
+<item status="done">
+A new element or an attribute on r:code, etc. that says run one expression at a time
+and display the result.
+<br/>
+r:commands  (could be r:session)
+</item>
+
+<item status="done">
+Add visibility controls to evalExpressions, i.e. recognize invisible()
+using eval.with.vis
+</item>
+
+<item status="done">
+Do the r:commands with all the attributes for FO.
+Will it just work as we know the target format in that evalExpressions function?
+<br/>
+Need line breaks between commands that have no output.
+And need to ensure that the code is not shown.
+</item>
+
+<item status="low">
+Have an r:prompt-expr so that it can be dynamic?
+</item>
+
+<item status="low">
+Where are the CDATA nodes going when emitting the prompt in 
+evalExpressions?
+<br/>
+They are in the node when R passes them back. But then they disappear.
+The characters are escaped.
+They appear in the FO output. So it seems to be something with the 
+HTML/XHTML driver.
+</item>
+
+<item status="done">
+Put the R prompt as a global XSL variable.
+<br/>
+r:prompt in inst/XSL/dynamic.xsl.
+</item>
+
+<item>
+When we return XMLInternalNode(s) to the XSL function
+and it copies them to the output document, who frees those
+nodes
+</item>
+
+<item status="done">
+Where has the invocation gone?
+<br/>
+Changed who processed the root node /
+and so this was dropped.
+Now done by defining the user.footer.content 
+template which calls postamble in OmegahatXSL/html/Rsource.xsl.
+<br/>
+Could do this with the html.append param, but would need
+the whole thing to be created already in R.
+</item>
+
+<item>
+If we get errors in the evaluation of the code, we
+still generate the document. Perhaps we don't want to do this.
+</item>
+
+<item>
+Have to do something to terminate on serious XSL errors.
+Seems like all the output goes through our error handler.
+</item>
+
+<item>
+Insert doesn't seem to work anymore.
+</item>
+
+<item status="low">
+Allow r:plot to also return output,
+e.g. insert the image and then return the result
+as usual or vice verse. 
+Maybe too much for very little.
+</item>
+
+<item>
+Give the XSLT context to the error handler.
+<br/>
+What for?
+</item>
+
+<item status="done">
+Are there any reflection/run-time typing facilities in XSL?
+We can add them via an R function, but it would be nice if
+there was something.
+The exslt seems to have object-type?
+<br/>
+We could use this in the r:plot template  to determine 
+if we have been given back a node or a file name.
+</item>
+
+<item status="done">
+How do we figure out the type of an RTF?
+e.g. in the r:plot template in html.xsl how
+can we figure out if we have a string or an XML node?
+Use svg.xml as an example.
+<br/>
+Be careful to create the value via select=".." rather than <![CDATA[<xsl:param><xsl:copy-of...]]>
+</item>
+
+<item status="done">
+If generating XHTML, write to an XHTML file or Firefox will not treat it as XHTML!
+Even though it has (some of) the relevant  directives.
+<br/>
+In other words, use an extension of xhtml rather html.
+<br/>
+See <xref linkend="extensions"/>
+</item>
+
+<item>
+Do we want to introduce the distinction between html and xhtml? It is very simple distinction,
+just importing a different docbook.xsl. Everything else stays the same.
+</item>
+
+<item status="done">
+Inline SVG to avoid auxiliary files.
+<br/>
+Use the r:inline
+</item>
+
+<item status="done">
+Have the DynamicOptions  have slots for
+graphics device dimensions e.g. c(400, 400) and 
+the background and foreground colors.
+Reminds me of grid - anyway to borrow structure/code.
+</item>
+
+<item status="done">
+When creating a plot, output the format in such a way that HTML can handle SVG.
+<br/>
+Done  (see examples/svg.xml)
+We set graphicsFormat from the name of the 
+<r:code>
+library(RSvgDevice); SVG = devSVG; dynDoc("svg.xml", "HTML", force = TRUE, graphicsDev = list("svg" = SVG), 'r:verbose' = FALSE)
+</r:code>
+<br/>
+But need to identify the r:format on the r:plot or specify the 
+graphicsFormat.
+</item>
+
+<item status="optimize">
+To make things faster, see if we can reuse a pre-parsed Docbook
+style sheet.
+
+</item>
+
+<item status="check">
+When evaluating a node via an XSL call to evalNode,
+make that do what xmlSource() does and 
+look for references to other code nodes
+via an xpath expression such as  getNodeSet(doc, //r:code[@ref])
+or by looping over the children and recursively
+following those.
+Use the code in xmlSource.
+</item>
+
+
+<item status="done">
+<issue>
+Insert text result from r:expr into HTML display
+as simple text if it is not going to be updated,
+e.g. not interactive or dependent on 
+interactive variables.
+<p/>
+Are spaces okay?
+</issue>
+</item>
+
+
+<item status="done"> 
+<issue>
+Use xhtml and switch the R style files.
+Then we can use  inline SVG.
+<p/>
+All we have to do is change Rsource.xsl to
+xsl:output method="xml"
+and change Rstyle.xsl to include
+docbook-xsl/xhtml/docbook.xsl
+rather than
+docbook-xsl/html/docbook.xsl,
+i.e. look in the xhtml directory, not the html directory.
+<p/>
+Now have Rhtml.xsl and Rxhtml.xsl
+</issue>
+</item>
+
+<item status="check">
+<issue>
+When we use XHTML, get the margins to work.
+And the CSS.
+<br/>
+Seems to work.
+</issue>
+</item>
+
+<item status="low">
+<issue>
+Adapt the RSvgDevice package to be able to write to a textConnection
+or even better to use the internal XML nodes.
+<br/>
+Can read the XML back into R when it is closed.
+</issue>
+</item>
+
+<item status="done">
+<issue>
+Manage existing r:output nodes.
+<br/>
+I.e. if we are evaluating the code within an r:code or r:test, etc.
+node and it has an r:output, then kill this off.
+But if we are not evaluating the code, show it as is.
+<br/>
+OmegahatXSL/html/Rstyle.xsl for HTML  and OmegahatXSL/fo/Rfo.xsl for FO
+</issue>
+</item>
+
+<item status="done">
+Inline SVG for FO.
+</item>
+
+<item status="low">
+<issue>
+Format r:output data in HTML and FO.
+<p/>
+Done for HTML by adding PRE.routput to OmegaTech.css.
+</issue>
+</item>
+
+<item status="done">
+<issue>
+Allow for existing images when we are not running the calculations.
+<br/>
+This is tricky because we would like to use the same file attribute.
+But if we start with an existing document and auxiliary image
+files, the first time we run it, we overwrite that file.
+So we need to say
+</issue>
+</item>
+
+
+<item status="low">
+<issue>
+Allow the caller to regenerate different parts of the document
+and avoid some of the computations.
+Can use cache for this.
+</issue>
+</item>
+
+<item status="low">
+<issue>
+ Allow evaluate element-wise of a {}
+ with the results inserted.
+i.e. 
+   { x = rnorm()
+     mean(x)
+     median(x)
+     sd(x)
+   }
+produces 
+   [1] .....
+   
+
+put side by side.
+
+Interspersing is hard from XSL..
+
+e.g. the r:test segment of buffer.xml
+</issue>
+</item>
+
+
+<item status="low">
+<issue>
+ Support caching of results.
+<br/>
+We allow r:values which amounts to this.
+</issue>
+</item>
+
+
+<item status="done">
+  <issue>Unregister functions for xsltApplyStyleSheet.</issue>
+</item>
+
+<item status="done">
+ <issue> Evaluation in separate environment.</issue>
+</item>
+
+
+<item status="done">
+<issue>
+  r:expr needs to use r:eval() but needs the environment to match.
+     Need to pass the right environment.
+     Can grab the function registered for the method for XMLInternalNode
+     and then set the environment for that.
+<p/>
+   Have to use a different one for now. If we grab the one from
+   Sxslt we end up being called with a node set, not an
+   XMLInternalNode.
+  So working, but not right yet.
+</issue>
+</item>
+
+<item status="done">
+<issue>
+ allow specification of directory in which the results are cached,
+ image files created, etc.
+     add to options ?
+<p/>
+
+ dynamic.xsl uses imageDir which defaults to /tmp.
+ We set this to be the same as directory given to dynDoc()
+ and set in the dynOpts
+</issue>
+</item>
+
+<item status="done">
+<issue>
+ Identify the target doc type, i.e. HTML, FO, .... 
+   Currently hard-coded to FO.
+   Need to get this from the stylesheet.
+
+   Can get this from the environment and is also passed to us in XSL calls.
+<p/>
+  Done when we register the XSL functions and we know the target type.
+</issue>
+</item>
+
+
+
+<item status="done">
+<issue>
+ Allow r:plot nodes inside &lt;r:code&gt;
+    Need to process the r:plot node inside the r:code. See need to
+    call  xslt:apply-templates within the node.
+
+   done have to deal with combining the text around this into blocks and
+              evaluating these first.
+
+</issue>
+</item>
+
+<item status="done">
+<issue>
+ print for lattice plots
+   [done] Need to be able to tell if they are already printed.
+</issue>
+</item>
+
+<item status="done">
+<issue>
+ title for plot and  labels for cross-referencing.
+   Use <![CDATA[<figure id=""><title><r:plot>....</r:plot></title>]]>
+
+</issue>
+</item>
+
+
+
+<item status="done">
+<issue>
+Compute file stamps for inputs and outputs.
+
+</issue>
+</item>
+
+
+<item status="done">
+<issue>
+  deal with internal documents.
+     Should be no problem. Just specify the xmlInternalDocument as 'doc'
+</issue>
+</item>
+
+
+<item status="done">
+<issue>
+ c:routine in XSL processing.
+<p/>
+ Import www.omegahat.org/fo/c.xsl
+</issue>
+</item>
+
+
+
+<item status="low">
+<issue>
+ recover from errors and continue.
+    allow the user to intervene and fix things.
+
+
+</issue>
+</item>
+
+
+<item status="low">
+<issue>
+ Allow for interactive mode of running the chunks.
+</issue>
+</item>
+
+</items>
+
+</topic>
+
+
+
+
+<topic>
+<title>LaTeX output to PDF</title>
+<items>
+
+<item status="addressed">
+Need to get the Rdocbook into the latex generated via dblatex.
+</item>
+
+<item status="ok">
+Deal with the bibliography for LaTeX.
+<br/>
+See samplePaper.xml from SVGOpen format.
+<br/>
+<sh:code>
+make -f ../Make/Makefile samplePaper.tex
+pdflatex samplePaper
+</sh:code>
+</item>
+
+<item>
+Get information for LaTeX table for use by xtable from the node.
+<br/>
+In other words, look at the Rdocbook content we are processing
+and grab the width, columns, title, etc. as the attributes
+and pass these to xtable.
+</item>
+
+<item>
+When not running the code, what do we put in the text?
+Old values, the code, etc.
+<br/>
+Both the code and the r:output, if present.
+</item>
+
+
+
+<item>
+Fill in the latex.xsl rules to give nice output,
+e.g. include the code, etc.
+</item>
+
+<item status="done">
+The &lt;tex&gt; template needs to emit a new line
+or something  after it.
+<br/>
+Where is the tex template?
+</item>
+
+
+<item status="done">
+Check the Sweave1.xml file under db2latex and HTML and FO now that it is changed.
+<p>
+\begin{rcode} in the table is causing grief. Crashing sometimes!
+It looks like a LaTeX issue with things not being allowed.
+</p>
+<p class="done">
+What we really want to have is an R method that produces a latex
+table.
+Since we are generating text and not XML, we can use xtable.
+</p>
+</item>
+
+
+
+<item status="check">
+Show how to have both latex and other markup for the same thing and only show
+one or the other.
+<p>
+e.g. kill &lt;tex&gt; content in other formats
+and have an equivalent in the other.
+Or a ns:literal such as ltx:literal, db:literal, html:literal
+and kill off the others in the target.
+</p>
+<br/>
+See inst/examples/literal.Rdb.
+Use make -f ../Make/Makefile literal.{tex,fo,html}
+</item>
+
+<item status="done">
+<issue>
+
+    Map to LaTeX or Docbook and then convert to LaTeX using db2latex.
+
+<p/>
+See dblatex.xml and latex.xml in tests/
+<p/>
+ We markup the output from R by default by going to a programlisting.
+Then when we apply the db2latex stylesheet(s), that will get converted
+to LaTeX's appropriate equivalent (i.e. whichever of the verbatim/fancyVrb environments
+is used by db2latex).
+We specify fop = NA and then we get back the XMLInternalDocument
+and can apply the db2latex stylesheet  to that
+and then save the resulting document.
+</issue>
+</item>
+
+<item status="done">
+<issue>
+Include our macros in the resulting latex document.
+<p/>
+Use an XSL param.
+In db2latex, we can use latex.article.preamble.post.
+So use that in dblatex also. But have to take over verbatim.setup named template.
+</issue>
+</item>
+
+<item status="done">
+<issue>
+Ensure that the backslashes are passed through as is.
+<br/>
+See dblatex.xsl and db2latex.xsl
+dblatex redefines the named template special-replace.
+db2latex redefines the named template scape.
+<br/>
+In dblatex, change texmap.xml.
+In format.xsl, there is a template named tex-format and it 
+
+Alternatively, just replace the macro special-replace with a
+template that just returns its third argument, string.
+
+<p/>
+By-pass the map file. Redefine the template named "scape".
+See db2latex.xsl.
+</issue>
+</item>
+
+<item status="done">
+With
+<![CDATA[
+<xsl:template match="current-date">
+ <xsl:value-of select="r:call('date')"/>
+</xsl:template>
+]]> in latex.xsl and running latex.xml,
+get a segfault.
+<br/>
+Works on Linux and Mac.
+</item>
+
+<item status="done">
+In db2latex, get the Rdocbook.sty file in via a usepackage.
+<br/>
+XSL Parameter  latex.article.preamble.post
+</item>
+
+<item status="done">
+<issue>
+Use the db2latex.xsl file in  IDynDocs/inst/XSL
+and also the dblatex.xsl file there also.
+The common material is now in latex.xsl.
+</issue>
+</item>
+
+<item status="done">
+<issue>
+Allow a <latex></latex>
+node that just copies things through unaltered.
+<br/>
+Call it &lt;tex&gt;.
+</issue>
+</item>
+
+
+
+</items>
+</topic>
+
+
+
+
+
+<topic>
+<title>FO</title>
+
+<items>
+<item status="done">
+<issue>
+   FO header with title bleeding over into page
+       Use <titleabbrev>my shorter version</titleabbrev>
+       or change the widths of the columns in the table  for the header.
+        See the section in the .fo file  flow-name="xsl-region-before-odd"
+
+</issue>
+</item>
+
+
+<item status="done">
+<issue>
+   Change size of font for R code.
+       Need to be able specify the size in makeVerbatimCode and so
+       probably need to make that XML element programmatically
+       generated so we can create our own size or use one within the
+       r:code element..
+
+<p/>
+  Use size=""
+
+</issue>
+</item>
+
+<item  status="done">
+<issue>
+   Margins.
+      parameters for XSL passed via xslApplyStyleSheet
+<p/>
+      Perhaps have an object for this.
+
+</issue>
+</item>
+
+<item status="done">
+<issue>
+Use other graphics formats,
+e.g. SVG, PNG.
+Use 
+dynDoc(device = list(extension = function))
+</issue>
+</item>
+
+</items>
+</topic>
+
+
+
+<topic>
+<title>Interactive</title>
+<items>
+
+<item>
+<issue>
+Determine the list of interactive variables
+and put these in the document, like the code dictionary.
+Then we can tell which variables are not going to be updated.
+<p/>
+In the processed HTML document in i:interactiveVariables now
+but we can get this information also directly from
+the document in R using an XPath expression. (Same with the r:codeDictionary.)
+</issue>
+</item>
+
+
+<item>
+<issue>
+Code analysis to identify definitions of 
+interactive variables and avoid these when
+recomputing the nodes when updating a
+variable.
+<p/>
+Do a rewrite.
+</issue>
+</item>
+
+
+<item status="done">
+<issue>
+For interactive nodes, transfer the ref attribute to the i:* nodes
+that don't have one. Get it from the interactive
+ancestor of a given i:* node.
+See ihtml.xsl
+</issue>
+</item>
+
+<item status="">
+<issue>
+Get rid of the ?xml declaration at the top of the HTML.
+Had this removed at one point but now it is back and
+I am not sure why.
+<p/>
+This works in the shell, but not in R with xsltApplyStyleSheet().
+</issue>
+</item>
+
+<item status="done">
+<issue>
+Insert dynamic graphics devices
+by mapping r:plot to 
+&lt;OBJECT type="x-app/R-x-device"&gt;
+  code to draw plot
+</issue>
+</item>
+
+<item>
+<issue>
+  Create GUIs
+</issue>
+</item>
+
+<item>
+<issue>
+Handle explicit interactive component markup within documents,
+e.g. i:*.
+</issue>
+</item>
+
+<item status="done">
+<issue>
+Provide XSL file to process interactive components.
+<p/>
+ihtml.xsl
+</issue>
+</item>
+
+<item>
+<issue>
+Create environments for each r:code, etc. node.
+</issue>
+</item>
+
+<item>
+<issue>
+Connect callbacks to recomputing the code nodes.
+</issue>
+</item>
+
+<item status="low">
+<issue>
+Code analysis for dependencies.
+</issue>
+</item>
+
+
+</items>
+</topic>
+
+<topic>
+<title>Other</title>
+<items>
+
+<item>
+If there is an empty r:code node (even if it has a comment
+in it) this will cause problems. 
+</item>
+
+<item status="done">
+<issue>
+XMLNodeRef and XMLInternalNode
+   Fixed? Yes. Copied code from the XML package. 
+   Share this in a better way.
+</issue>
+</item>
+</items>
+</topic>
+
+<topic>
+<title>Other Systems</title>
+<items>
+<item>
+<issue>
+Do this in Perl or Python.
+</issue>
+</item>
+
+<item>
+<issue>
+Show how to support alternative code in a different language.
+</issue>
+</item>
+
+</items>
+</topic>
+
+
+<topic>
+<title>General Documentation</title>
+<items>
+DOCUMENTATION
+-------------------------------------
+<item>
+writeup formatting of output in documents
+   4 possible approaches.
+</item>
+
+<item>
+writeup notion of dynamic and fixed content
+   e.g. data that is prepared in separate (dynamic) code
+        a plot that is not created.
+</item>
+
+<item>
+create Rd files from tables in a document.
+</item>
+
+<item>
+programmatic creation of task figure/schematic from the document
+</item>
+</items>
+</topic>
+
+
+<topic>
+<title>Elements</title>
+<items>
+<item status="low">
+output as generic for r:output
+  i.e. for many different languages
+</item>
+</items>
+</topic>
+
+
+<topic>
+<title>wxWidgets</title>
+<items>
+<item>
+<issue>
+Fix the form code, e.g. load wikipedia/wiki/BetaDistribution
+and get an error on the textarea.
+Probably just in wxTextCtrl.
+</issue>
+</item>
+</items>
+</topic>
+
+</topics>

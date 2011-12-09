@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+<r:init>
+x =  1:10
+y = mtcars
+</r:init>
+
+<r:code>
+con = rawConnection(raw(0), "w")
+save(x, file = con)
+writeBin(rawConnectionValue(con), "/tmp/x.rda")
+rm(x)
+load("/tmp/x.rda")
+</r:code>
+
+<r:code>
+con = rawConnection(raw(0), "w")
+save(x, y, file = con)
+writeBin(rawConnectionValue(con), "/tmp/x.rda")
+rm(x)
+e = new.env()
+load("/tmp/x.rda", e)
+objects(e)
+</r:code>
+
+</para>
+<para>
+
+<r:code>
+con = rawConnection(raw(0), "w")
+save(x, y, file = con)
+content = rawConnectionValue(con)
+</r:code>
+
+
+<r:code>
+load(rawConnection(content))
+</r:code>
+
+
+Now we will convert it to base64 encoding
+<r:code>
+library(RCurl)
+b64 = base64(content)
+</r:code>
+<r:var>b64</r:var> can now be used as the value of an <xml:tag>r:value</xml:tag> node.
+</para>
+<para>
+Now we attempt to restore the content
+<r:code>
+orig = base64(b64, FALSE, mode = "raw")
+identical(orig, content)
+input = rawConnection(orig)
+load(input)
+</r:code>
+
+</para>
+<para>
+
+We can try to write the raw vector to a file and <r:func>load</r:func>
+from that.
+<r:code>
+writeBin(rw, "/tmp/raw.rda")
+e = new.env()
+load("/tmp/raw.rda", e)
+objects(e)
+</r:code>
+
+</para>
+
+</section>
+</article>

@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude"
+	 xmlns:sh="http://www.shell.org">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+This is an example of introducing a new XML element
+to our vocabulary. We introduce a
+<xml:tag>dataDescription</xml:tag> element
+to describe a data set.
+We also show how to provide the XSL to process this.
+In this case, we will map the content to regular <docbook/>
+content and then this can be converted to different
+formats using the regular <docbook/> XSL files.
+</para>
+
+<para>
+The motivation for this example is to think of the document
+as a database or lab notebook that contains different pieces of related
+material.  We want to be able to show different pieces of this
+in different places.
+</para>
+<para>
+This example is a little too complex as we have to deal
+with a node and its sub-nodes. On the positive side, it does illustrate 
+how to think about XSL and gives a real example. 
+</para>
+
+</section>
+
+<section>
+<title></title>
+
+<para>
+This is the article that talks about a data set.
+
+<xi:include href="mtcars.xml"/>
+</para>
+
+<para>
+We can also use other pieces of the data description in this document.
+For example, we can insert the description:
+<note>
+<xi:include href="mtcars.xml" xpointer="xpointer(/dataDescription/description)"/>
+</note>
+</para>
+
+
+<para>
+The XML is 
+<verbXML>
+<xi:include href="mtcars.xml"/>
+</verbXML>
+</para>
+
+</section>
+
+<section>
+<title></title>
+
+<para>
+How do we map the new XML element(s) to <html/>? FO? <latex/>?
+We can write XSL for each of these.
+An alternative is to write a single XSL transformation
+that transforms this XML content to <docbook/>.
+Then the existing XSL files will generate the <html/>, FO, <latex/>.
+We'll use this approach.
+We'll map the <xml:tag>dataDescription</xml:tag>
+to a table.
+See <file>dataDescription.xsl</file>.
+
+<sh:code>
+xsltproc --xinclude dataDescription.xsl dataDescArticle.Rdb | xsltproc --xinclude http://www.omegahat.org/XSL/html/Rhtml.xsl - > dataDescArticle.html
+</sh:code>
+Of course, we would use a Makefile to hide all this.
+<sh:code>
+make dataDescArticle.html TO_DOCBOOK_XSL=dataDescription.xsl
+</sh:code>
+</para>
+<para>
+Since we are using this dataDescription.xsl file as a filter, we will override
+the default filter http://www.omegahat.org/XSL/docbook/expandDB.xsl
+So we should arrange for that to be used as well as ours. So we can include (not import)
+that within our 
+dataDescription.xsl file or else we have to run an extra round of filtering.
+</para>
+
+<para>
+This content just shows that the <docbook/> short-hand we use
+is still processed:
+<ol>
+<li>A</li>
+<li>B</li>
+</ol>
+</para>
+</section>
+
+
+<section>
+<title>The XSL</title>
+<para>
+The following is the XSL that creates the <docbook/> table
+from the <xml:tag>dataDescription</xml:tag> node:
+<verbXML>
+<xi:include href="dataDescription.xsl"/>
+</verbXML>
+</para>
+
+<para>
+The two main templates are for 
+<xml:tag>dataDescription</xml:tag> and
+<xml:tag>dataDescription/variables/variable</xml:tag>.
+The first sets up a table with 4 columns.
+The second creates a row in this table for each variable
+in the data set description.
+
+</para>
+
+
+</section>
+</article>

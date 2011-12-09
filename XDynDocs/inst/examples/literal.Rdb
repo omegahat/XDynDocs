@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:fo="http://www.w3.org/1999/XSL/Format"
+         xmlns:ltx="http://www.latex.org"
+         xmlns:html="http://www.w3.org/TR/html401"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title>Checking Literal nodes</title>
+
+<para>
+This illustrates how to use the <xml:tag>literal</xml:tag> tag for different targets.
+</para>
+<para>
+This is for FO and will only appear if we are generating FO content:
+<fo:literal>
+<fo:inline color="#ff0000">INLINE text</fo:inline>
+</fo:literal>
+</para>
+
+<para>
+This is for <latex/> using <xml:tag>ltx:literal</xml:tag>.
+<ltx:literal><![CDATA[$x < \mu$]]></ltx:literal>
+</para>
+<para>
+We can also use the <xml:tag>tex</xml:tag> node in XML:
+<tex>
+$$ E[X] = \int_{-\infty}^\infty x f_X(x) dx $$
+</tex>
+</para>
+
+
+
+<para>
+This is HTML and will only appear for an HTML target. It is a table with
+a header and a single row.
+<html:literal>
+<div class="rcode">
+<p>
+ <table>
+  <tr><th>A</th><th>B</th>
+  </tr>
+  <tr>
+   <td>1.0</td><td>2.0</td>
+  </tr>
+ </table>
+</p>
+
+<p>
+<a href="http://www.omegahat.org">Omegahat</a>
+</p>
+</div>
+</html:literal>
+</para>
+
+
+
+</section>
+</article>

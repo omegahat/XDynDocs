@@ -1,0 +1,8 @@
+AC_INIT(XSL/OmegahatXSL/Todo.xsl)
+
+XDYNDOCS=`pwd`
+AC_SUBST(XDYNDOCS)
+
+AC_OUTPUT(XSL/OmegahatXSL/Todo.xsl)
+
+

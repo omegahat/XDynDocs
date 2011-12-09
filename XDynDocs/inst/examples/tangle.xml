@@ -1,0 +1,131 @@
+<article xmlns:r="http://www.r-project.org">
+<section>
+<para>
+In literate programming parlance, we tangle a document to extract the
+code and only the code.  In the literate programming world, this is
+quite simple as all the code is in the same language, e.g. R or C.
+Some of the code chunks may need to be written to a separate file.  In
+the world of dynamic documents that we use, we may have multiple types
+of code and so we want to be able to extract the code for all of the
+different languages or just some of the languages, perhaps just one.
+And again, we want to be able to write the code to separate file if
+that is what the user wants.  We might want to do this in R and get
+the results back as a list with elements for each language and with
+identifiers for different files.  Altenratively, we might do this via
+XSL.  We may also want to restrict the processing to a particular
+section or chapter within a document.
+</para>
+
+<para>
+In R, we can load the document into memory and
+then use XPath expressions to fetch the pieces.
+<r:code thread="tangle">
+doc = xmlInternalTreeParse(file, xinclude = TRUE)
+</r:code>
+The XPath expressions we want are to find all the code nodes for R, C,
+Perl, Python, MATLAB, etc.  For R, we have r:function, r:code, r:plot,
+r:expr.  For C, we just have c:code.  Of course, the particular
+namespace prefix may be different.
+<r:code thread="tangle">
+r.xpath = "//r:function|//r:code|//r:plot|//r:expr|//processing-instruction('R')"
+rnodes = getNodeSet(doc, r.xpath, c(r = "http://www.r-project.org"))
+
+<r:frag ref="filterRefs"/>
+</r:code>
+
+</para>
+<para>
+
+Given these, we have to find out which ones are to be written to a specific
+named file that is identified by the file attribute in the node.
+<r:code thread="tangle">
+fileNames = sapply(rnodes, xmlGetAttr, "file", "")
+</r:code>
+
+<r:code>
+ tapply(rnodes, fileNames, 
+         function(nodes) {
+            code = sapply(nodes, getRCode)
+            filename =  xmlGetAttr(nodes[[1]], "file", "")
+	    if(filename != "")
+              cat(code, sep = "\n", file = filename)
+            code
+         })
+</r:code>
+</para>
+
+<para>
+When dealing with fragment references, e.g.
+references to other r:code nodes within an 
+r:code node of the form
+<programlisting> <![CDATA[
+ <r:code id="bob">...</r:code>
+
+ <r:code>
+   <r:code ref="bob"/>
+ </r:code>
+]]></programlisting>
+we have to control whether to kill off the free-floating node
+r:code whose id is "bob" or leave it in the output in both places.
+The function getRCode used above takes care of fetching the
+contents of the referenced node. So all we need to do is
+see if we should remove it.  This needs to happen before we create the files.
+For each node that has an id attribute, we need to see if it 
+a) has an attribute named <xml:attr>standalone</xml:attr> with a value of  "true",
+or b)  is (not) contained in any of the other nodes.
+One way to do this is via R  commands
+<r:code eval="false">
+rnodes[ sapply(rnodes, xmlGetAttr, "standalone", FALSE) | 
+         sapply(rnodes, containsReferenceTo,
+                  sapply(rnodes, xmlGetAttr, "id", character()))
+</r:code>
+where <r:func>containsReferenceTo</r:func> checks the contents of an
+r:code, r:plot, etc. node to see if it has a reference to one of the
+nodes named in the second argument which we compute as the id
+attribute of all the top-level nodes.
+
+</para>
+<para>
+Another approach is to do this with an XPath expression,
+but performed in R.
+It is probably easier to find all top-level nodes, i.e. not
+within an r:code node which are referenced within an r:code
+node. We need to extend this to be within an r:plot or any other type of
+r:* node.
+Then we can fetch the top-level nodes and get the set difference
+to find the top-level nodes that we need to emit in the output.
+
+<r:code id="filterRefs"><![CDATA[
+referencedNodes = unique(unlist(getNodeSet(doc, "//r:code//r:code/@ref")))
+frags = getNodeSet(doc, "//r:code[@id and not(ancestor::r:code)]")
+# toEmit = frags[!(sapply(frags, xmlGetAttr, "id") %in% referencedNodes) | sapply(frags, xmlGetAttr, "standalone", FALSE, as.logical)]
+alreadyHandled = frags[sapply(frags, xmlGetAttr, "id") %in% referencedNodes & !sapply(frags, xmlGetAttr, "standalone", FALSE, as.logical)]
+]]></r:code>
+
+Having figured out which top-level fragments need to be emitted, we
+need to go back to our original set and match these nodes in
+<r:var>alreadyHandled</r:var> to those.  We can do that with 
+<r:code id="filterRefs">
+i = xmlNodeMatch(alreadyHandled, rnodes)
+if(!all(is.na(i)))
+ rnodes = rnodes[-i]
+</r:code>
+
+Alternatively, we can try to do the entire top-level identification of nodes in one step.
+The problem with the code below is that the
+//r:code//r:code[@ref = @id]
+has the @ref from the new //r:code//r:code and also the @id but we want the @id to be the one
+from the node we are checking, i.e. the one at the beginning of the XPath expression //r:code[...]
+<r:code>
+sapply(getNodeSet(doc, "//r:code[not(ancestor::r:code) or (@id and count(//r:code//r:code[@ref = @id]) = 0) or @standalone='true']"), xmlGetAttr, "name")
+</r:code>
+</para>
+
+</section>
+<section>
+<title>C and other Code</title>
+Whenever 
+</section>
+
+
+</article>

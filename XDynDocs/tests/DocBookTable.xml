@@ -1,0 +1,15 @@
+<article>
+<para>
+<table>
+<tgroup cols="2" colsep="0" rowsep="0" borer="topbot">
+<thead>
+<row rowsep="1"><?dbhtml class="header"?><entry>Col 0</entry><entry>Col 2</entry></row>
+</thead>
+<tbody>
+<row><entry>A</entry><entry>B</entry></row>
+<row><entry>1</entry><entry>2</entry></row>
+</tbody>
+</tgroup>
+</table>
+</para>
+</article>

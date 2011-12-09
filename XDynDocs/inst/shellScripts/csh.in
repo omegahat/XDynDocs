@@ -1,0 +1,8 @@
+
+tmp=@R_PACKAGE_DIR@/latexStyles:@R_PACKAGE_DIR@/XSL/dblatex-xsl-current/latex//
+
+if !(${?TEXINPUTS}) then
+  setenv TEXINPUTS=${tmp}::
+else
+  setenv TEXINPUTS=${tmp}:${TEXINPUTS}::
+endif

@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title></title><link rel="stylesheet" type="text/css" href="/Users/duncan/Classes/StatComputing/XDynDocs/inst/CSS/OmegaTech.css"></link><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"></meta></head><body class="yui-skin-sam">
+<script xmlns="" type="text/javascript"><!--
+var toggleCodeIds = [
+ 
+];
+--></script><p xmlns=""></p>
+<div class="article"><div class="titlepage"><div><div><div class="author"><h3 class="author"><span class="firstname">Duncan</span> <span class="surname">Temple Lang</span></h3><div class="affiliation"><span class="orgname">University of California at Davis<br></br></span> <span class="orgdiv">Department of Statistics<br></br></span></div></div></div></div><hr></hr></div><div class="section"><div class="titlepage"></div><p>
+This is an example of introducing a new XML element
+to our vocabulary. We introduce a
+<code xmlns="" class="xmlTag">&lt;dataDescription&gt;</code> element
+to describe a data set.
+We also show how to provide the XSL to process this.
+In this case, we will map the content to regular DocBook
+content and then this can be converted to different
+formats using the regular DocBook XSL files.
+</p><p>
+The motivation for this example is to think of the document
+as a database or lab notebook that contains different pieces of related
+material.  We want to be able to show different pieces of this
+in different places.
+</p><p>
+This example is a little too complex as we have to deal
+with a node and its sub-nodes. On the positive side, it does illustrate 
+how to think about XSL and gives a real example. 
+</p></div><div class="section"><div class="titlepage"></div><p>
+This is the article that talks about a data set.
+
+</p><div class="table"><a id="id1169361631172"></a><p class="title"><strong>Table 1. Motor Car Trends 1970 data on cars</strong></p><div class="table-contents"><table summary="Motor Car Trends 1970 data on cars" border="1"><colgroup><col></col><col></col><col></col><col></col></colgroup><thead><tr><th>Name</th><th>Type</th><th>Unit</th><th>Description</th></tr></thead><tbody><tr><td>mpg</td><td>double</td><td>mpg</td><td>
+Miles per US gallon.
+</td></tr><tr><td>cyl</td><td>positiveInteger</td><td> </td><td>Number of cylinders</td></tr></tbody></table></div></div><p><br class="table-break"></br>
+</p><p>
+We can also use other pieces of the data description in this document.
+For example, we can insert the description:
+</p><div class="note" title="Note" style="margin-left: 0.5in; margin-right: 0.5in;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="http://docbook.sourceforge.net/release/xsl/current/images/note.svg"></img></td><th align="left">Note</th></tr><tr><td align="left" valign="top">
+
+The data was extracted from the 1974 <span class="emphasis"><em>Motor Trend</em></span> US magazine,
+and comprises fuel consumption and 10 aspects of automobile design
+and performance for 32 automobiles (1973-74 models).
+
+</td></tr></table></div><p>
+</p><p>
+The XML is 
+</p><pre class="programlisting">
+&lt;dataDescription&gt;
+&lt;title&gt;Motor Car Trends 1970 data on cars&lt;/title&gt;
+&lt;description&gt;
+The data was extracted from the 1974 &lt;emphasis&gt;Motor Trend&lt;/emphasis&gt; US magazine,
+and comprises fuel consumption and 10 aspects of automobile design
+and performance for 32 automobiles (1973-74 models).
+&lt;/description&gt;
+&lt;author/&gt;
+&lt;source&gt;Henderson and Velleman (1981), Building multiple regression models
+     interactively.  Biometrics, 37, 391-411.&lt;/source&gt;
+&lt;version/&gt;
+&lt;schema&gt;
+&lt;/schema&gt;
+&lt;date/&gt;
+&lt;variables count="2"&gt;
+&lt;variable name="mpg" type="double"&gt;
+&lt;description&gt;
+Miles per US gallon.
+&lt;/description&gt;
+&lt;unit&gt;mpg&lt;/unit&gt;
+&lt;note&gt;This is in US gallons, not imperial gallons.&lt;/note&gt;
+&lt;/variable&gt;
+&lt;variable name="cyl" type="positiveInteger"&gt;
+&lt;description&gt;Number of cylinders&lt;/description&gt;
+&lt;/variable&gt;
+&lt;/variables&gt;
+&lt;/dataDescription&gt;
+</pre><p>
+</p></div><div class="section"><div class="titlepage"></div><p>
+How do we map the new XML element(s) to <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="progLang">HTML</b>? FO? <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i>?
+We can write XSL for each of these.
+An alternative is to write a single XSL transformation
+that transforms this XML content to DocBook.
+Then the existing XSL files will generate the <b xmlns:xd="http://www.xsldoc.org" xmlns="" class="progLang">HTML</b>, FO, <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i>.
+We'll use this approach.
+We'll map the <code xmlns="" class="xmlTag">&lt;dataDescription&gt;</code>
+to a table.
+See <code xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.C.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com" xmlns:sh="http://www.shell.org" xmlns="" class="file">dataDescription.xsl</code>.
+
+</p><pre xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.C.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com" xmlns:sh="http://www.shell.org" xmlns="" class="shell">
+xsltproc --xinclude dataDescription.xsl dataDescArticle.Rdb | xsltproc --xinclude http://www.omegahat.org/XSL/html/Rhtml.xsl - &gt; dataDescArticle.html
+</pre>
+<p>
+Of course, we would use a Makefile to hide all this.
+</p><pre xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.C.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com" xmlns:sh="http://www.shell.org" xmlns="" class="shell">
+make dataDescArticle.html TO_DOCBOOK_XSL=dataDescription.xsl
+</pre>
+<p>
+</p><p>
+Since we are using this dataDescription.xsl file as a filter, we will override
+the default filter http://www.omegahat.org/XSL/docbook/expandDB.xsl
+So we should arrange for that to be used as well as ours. So we can include (not import)
+that within our 
+dataDescription.xsl file or else we have to run an extra round of filtering.
+</p><p>
+This content just shows that the DocBook short-hand we use
+is still processed:
+</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>A</p></li><li class="listitem"><p>B</p></li></ol></div><p>
+</p></div><div class="section"><div class="titlepage"></div>
+The XSL
+<p>
+The following is the XSL that creates the DocBook table
+from the <code xmlns="" class="xmlTag">&lt;dataDescription&gt;</code> node:
+</p><pre class="programlisting">
+&lt;xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"&gt;
+
+&lt;!-- &lt;xsl:import href="http://www.omegahat.org/XSL/html/Rhtml.xsl"/&gt; --&gt;
+
+&lt;xsl:include href="http://www.omegahat.org/XSL/docbook/expandDB.xsl"/&gt;
+
+&lt;xsl:preserve-space elements="*"/&gt;
+
+&lt;xsl:template match="*|attribute::*"&gt;
+ &lt;xsl:copy&gt;
+    &lt;xsl:apply-templates select="@*|node()"/&gt;
+ &lt;/xsl:copy&gt;
+&lt;/xsl:template&gt;
+
+
+&lt;xsl:template match="dataDescription"&gt;
+&lt;table&gt;
+&lt;title&gt;&lt;xsl:apply-templates select="title"/&gt;&lt;/title&gt;
+&lt;tgroup cols="4"&gt;
+&lt;thead&gt;
+&lt;row&gt;
+&lt;entry&gt;Name&lt;/entry&gt;&lt;xsl:text&gt;
+&lt;/xsl:text&gt;
+&lt;entry&gt;Type&lt;/entry&gt;&lt;xsl:text&gt;
+&lt;/xsl:text&gt;
+&lt;entry&gt;Unit&lt;/entry&gt;&lt;xsl:text&gt;
+&lt;/xsl:text&gt;
+&lt;entry&gt;Description&lt;/entry&gt;&lt;xsl:text&gt;
+&lt;/xsl:text&gt;
+&lt;/row&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;xsl:apply-templates select="variables/variable"/&gt;
+&lt;/tbody&gt;
+&lt;/tgroup&gt;
+&lt;/table&gt;
+&lt;/xsl:template&gt;
+
+&lt;xsl:template match="dataDescription/variables/variable"&gt;
+&lt;row&gt;&lt;xsl:text&gt;
+&lt;/xsl:text&gt;
+&lt;entry&gt;&lt;xsl:value-of select="@name"/&gt;&lt;/entry&gt;&lt;xsl:text&gt;
+&lt;/xsl:text&gt;
+&lt;entry&gt;&lt;xsl:value-of select="@type"/&gt;&lt;/entry&gt;&lt;xsl:text&gt;
+&lt;/xsl:text&gt;
+&lt;entry&gt;&lt;xsl:apply-templates select="unit"/&gt;&lt;/entry&gt;&lt;xsl:text&gt;
+&lt;/xsl:text&gt;
+&lt;entry&gt;&lt;xsl:apply-templates select="description"/&gt;&lt;/entry&gt;&lt;xsl:text&gt;
+&lt;/xsl:text&gt;
+&lt;/row&gt;&lt;xsl:text&gt;
+&lt;/xsl:text&gt;
+&lt;/xsl:template&gt;
+
+&lt;xsl:template match="unit|title|description"&gt;
+&lt;xsl:apply-templates/&gt;
+&lt;/xsl:template&gt;
+
+
+
+&lt;/xsl:stylesheet&gt;
+</pre><p>
+</p><p>
+The two main templates are for 
+<code xmlns="" class="xmlTag">&lt;dataDescription&gt;</code> and
+<code xmlns="" class="xmlTag">&lt;dataDescription/variables/variable&gt;</code>.
+The first sets up a table with 4 columns.
+The second creates a row in this table for each variable
+in the data set description.
+
+</p></div></div></body></html>

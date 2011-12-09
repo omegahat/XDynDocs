@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title>Example with Multiple and Nested Sets of Threads</title>
+
+</articleinfo>
+
+<section>
+<title>Intro</title>
+
+<para>
+This is an example of having four sets of "threads" - a, b, c, d and
+e. The a set are altApproaches.  The b set are altImplementations and
+are nested within the a1.  The c set is an altImplementation with no
+nesting.  The d set is an altApproaches and has the e set of
+altApproaches nested in one of its altApproach.  The d set also
+appears twice in the doucment.
+</para>
+
+
+<altApproaches id="a">
+<altApproach thread="a1">
+<para>
+This is thread a1. It has an altImplenatation nested in it.
+<r:code><![CDATA[
+a1 = 1
+]]>
+</r:code>
+</para>
+
+<altImplementations id="b">
+
+<altImplementation thread="b1">
+<para>
+Here is altImplentation b1.
+</para>
+<r:code>
+b1=1
+</r:code>
+</altImplementation>
+
+<altImplementation thread="b2">
+<para>
+Here is altImplentation b2.
+</para>
+<r:code>
+b2=1
+</r:code>
+</altImplementation>
+
+<altImplementation thread="b3">
+<para>
+Here is altImplentation b3.
+</para>
+<r:code>
+b3=1
+</r:code>
+</altImplementation>
+
+</altImplementations>
+
+<para>
+This is the end of thread a1.
+</para>
+</altApproach>
+
+<altApproach thread="a2">
+<para>
+This is thread a2. It has not sub threads.
+<r:code><![CDATA[
+a2 = 1
+]]>
+</r:code>
+</para>
+</altApproach>
+</altApproaches>
+
+<para>
+Next we add an altImplementation that is not nested within an altApproach.
+</para>
+
+<altImplementations id="c">
+
+<altImplementation thread="c1">
+<para>
+Here is thread c1 in the implementation.
+<r:code>
+c1=1
+</r:code>
+</para>
+</altImplementation>
+
+<altImplementation thread="c2">
+<para>
+And here is thread c2.
+<r:code>
+c2=1
+</r:code>
+</para>
+</altImplementation>
+
+</altImplementations>
+
+<para>
+Lastly, we add another set of threads and they appear twice. These are the d threads.
+</para>
+
+<altApproaches>
+
+<altApproach thread="d1">
+
+<para>
+Here is the first time that thread d1 occurs.
+
+<r:code><![CDATA[
+d1 = 1
+]]></r:code>
+</para>
+</altApproach>
+
+<altApproach thread="d2">
+
+<para>
+Here is the first time that thread d2 appears.
+<r:code><![CDATA[
+d2 = 1
+]]></r:code>
+It has the e set of altaApproaches nested in it.
+</para>
+
+<altApproaches>
+
+<altApproach thread="e1">
+
+<para>
+Here is thread e1.
+
+<r:code><![CDATA[
+e1 = 1
+]]></r:code>
+</para>
+</altApproach>
+
+<altApproach thread="e2">
+
+<para>
+Here is thread e2.
+<r:code><![CDATA[
+e2 = 1
+]]></r:code>
+</para>
+
+</altApproach>
+</altApproaches>
+
+</altApproach>
+</altApproaches>
+
+<para>
+Now we will return to the d1 and d2 threads again.
+</para>
+
+<altApproaches>
+
+<altApproach thread="d1">
+
+<r:code><![CDATA[
+d1 = 2
+]]></r:code>
+
+</altApproach>
+
+<altApproach thread="d2">
+
+<r:code><![CDATA[
+d2 = 2
+]]></r:code>
+
+</altApproach>
+</altApproaches>
+</section>
+
+</article>

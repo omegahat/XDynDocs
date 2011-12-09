@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+We benefit greatly from immense flexibility in going from
+semantic markup (i.e. Docbook) to any target format.
+But there are <latex/> to HTML converters.
+<ulink url="http://enc.com.au/docs/latexhtml.html"/>
+
+<formalpara>
+<title>hevea</title>
+
+</formalpara>
+
+<formalpara>
+<title>tth</title>
+Doesn't work on quite simple documents, e.g. hevea.tex in inst/examples/ in this 
+package. It fails on the \begin{cases} that comes from the amsmath package.
+hevea handles  that.
+It also messes up fonts in the HTML for some mathematics (integral sign, infinity). There
+are directions to fix font-related issues, but  it would be nice
+to not have to do this.
+</formalpara>
+
+<formalpara>
+<title>Hyperlatex</title>
+Is not a general LaTeX converter, but uses a limited LaTeX vocabulary.
+</formalpara>
+
+<formalpara>
+<title>Latex2HTML</title>
+Is a dead project. The web site has many dead links, including
+to the downloads and CVS repository.
+</formalpara>
+
+</para>
+
+</section>
+</article>

@@ -1,0 +1,31 @@
+<article xmlns:r="http://www.r-project.org">
+  <!-- saveXML(xsltApplyStyleSheet("level.xml", "level.xsl", level = 3))  -->
+
+<para id="bob">
+This is the start
+</para>
+<para level="3">
+This is only seen in level 3.
+</para>
+<r:code level="1">
+x = 1:10
+</r:code>
+
+<para level="2">
+This is an example of nesting.
+<r:code level="3">
+cat("Level 3")
+</r:code>
+</para>
+
+<para>
+This is regularly seen
+but <para level="2">
+in level 2  we also see this.
+<level value="4">
+and this is in level 4
+</level>
+</para> 
+This in 
+</para>
+</article>

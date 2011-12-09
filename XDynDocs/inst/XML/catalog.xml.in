@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN" "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+  <rewriteURI uriStartString="http://www.omegahat.org/XSL/" rewritePrefix="../XSL/OmegahatXSL/" />
+  <rewriteURI uriStartString="http://www.omegahat.org/XDynDocs/XSL/" rewritePrefix="../XSL/" />
+  <rewriteURI uriStartString="http://www.omegahat.org/XDynDocs/" rewritePrefix="@R_PACKAGE_DIR@/" />
+  <rewriteURI uriStartString="http://docbook.sourceforge.net/release/xsl/current/" rewritePrefix="../XSL/docbook-xsl-current/" />
+  <rewriteURI uriStartString="http://dblatex.sourceforge.net/" rewritePrefix="@R_PACKAGE_DIR@/XSL/dblatex-current/" />
+  <rewriteURI uriStartString="http://db2latex.sourceforge.net/" rewritePrefix="@R_PACKAGE_DIR@/XSL/db2latex-current/" />
+</catalog>

@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title>showCode</title>
+
+<para>
+
+This is a sample document that tests the <xml:attr>showCode</xml:attr> attribute.
+</para>
+
+<para>
+The first has no attribute and so is controlled by the global parameter 
+showCode, which defaults to true.						       <!--put xsl:param markup around this.-->
+<r:code>
+summary(rnorm(100))
+</r:code>
+</para>
+<para>
+
+This code will always be displayed.
+<r:code showCode='true'>
+# show this code always
+x = 1:10
+</r:code>
+
+</para>
+<para>
+This code should never be displayed.
+However, in HTML, it will appear as a tooltip over the output from
+this code.
+<r:code showCode="false">
+# never show this code.
+x = 1:100
+summary(x)
+<r:output>
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   1.00   25.75   50.50   50.50   75.25  100.00 
+</r:output>
+</r:code>
+
+</para>
+</section>
+<section>
+<title>Plots</title>
+<para>
+Next we deal with plots.
+This should be displayed if showCode is true.
+
+<r:plot>
+ # show this if $showCode is true
+with(mtcars, plot(mpg ~ wt, col = c("red", "green", "blue")[ordered(gear)], pch = c("+", "O", "*")[ordered(cyl)], xlab = "Weight", ylab = "Miles per gallon"))
+</r:plot>
+</para>
+<para>
+
+This will always be displayed.
+<r:plot showCode="true"><![CDATA[
+ # always show this code
+plot(density(rnorm(10000)))
+abline(v = 0, col = "red", lty = 2)
+]]></r:plot>
+
+</para>
+<para>
+
+This should never be displayed.
+<r:plot showCode="false"><![CDATA[
+# never show this code
+plot(1:10)
+]]></r:plot>
+
+</para>
+
+</section>
+<section>
+<title>Inlined Expressions</title>
+<para>
+
+This is always shown:
+<r:expr showCode="true">sum(1:10)</r:expr>.
+
+This is never shown, just the result:
+<r:expr showCode="false">sum(1:100)</r:expr>.
+</para>
+<para>
+This is show if showExpressionCode is true.
+<r:expr >sum(1:1000)</r:expr>
+
+</para>
+
+</section>
+
+
+</article>

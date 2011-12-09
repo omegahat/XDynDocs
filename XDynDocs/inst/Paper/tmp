@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org" xmlns:xi="http://www.w3.org/2003/XInclude" xmlns:sh="http://www.shell.org">
+
+<articleinfo>
+
+
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+
+
+<para>
+This is an example of introducing a new XML element
+to our vocabulary. We introduce a
+<xml:tag>dataDescription</xml:tag> element
+to describe a data set.
+We also show how to provide the XSL to process this.
+In this case, we will map the content to regular <docbook/>
+content and then this can be converted to different
+formats using the regular <docbook/> XSL files.
+</para>
+</section>
+
+<section>
+
+
+<para>
+This is the article that talks about a data set.
+
+<table><title>Motor Car Trends 1970 data on cars</title><tgroup cols="4"><thead><row><entry>Name</entry>
+<entry>Type</entry>
+<entry>Unit</entry>
+<entry>Description</entry>
+</row></thead><tbody><row>
+<entry>mpg</entry>
+<entry>double</entry>
+<entry>mpg</entry>
+<entry>
+Miles per US gallon.
+</entry>
+</row>
+<row>
+<entry>cyl</entry>
+<entry>positiveInteger</entry>
+<entry/>
+<entry>Number of cylinders</entry>
+</row>
+</tbody></tgroup></table>
+</para>
+
+<para>
+We can also use other pieces of the data description in this document.
+For example, we can insert the description:
+<note>
+
+The data was extracted from the 1974 <emphasis>Motor Trend</emphasis> US magazine,
+and comprises fuel consumption and 10 aspects of automobile design
+and performance for 32 automobiles (1973-74 models).
+
+</note>
+</para>
+
+</section>
+
+<section>
+
+
+<para>
+How do we map the new XML element(s) to HTML? FO? <latex/>?
+We can write XSL for each of these.
+An alternative is to write a single XSL transformation
+that transforms this XML content to <docbook/>.
+Then the existing XSL files will generate the HTML, FO, <latex/>.
+We'll use this approach.
+We'll map the <xml:tag>dataDescription</xml:tag>
+to a table.
+See <file>dataDescription.xsl</file>.
+
+<sh:code>
+xsltproc --xinclude dataDescription.xsl dataDescArticle.Rdb | xsltproc --xinclude http://www.omegahat.org/XSL/html/Rhtml.xsl &gt; dataDescArticle.html
+</sh:code>
+</para>
+</section>
+</article>

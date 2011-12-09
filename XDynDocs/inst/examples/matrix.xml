@@ -1,0 +1,15 @@
+<article xmlns:r='http://www.r-project.org'>
+<section>
+<title>A matrix</title>
+<para>
+A matrix
+<r:code>
+matrix(1:21, 3, 7, dimnames = list(letters[1:3], LETTERS[1:7]))
+</r:code>
+
+<r:code>
+mtcars
+</r:code>
+</para>
+</section>
+</article>

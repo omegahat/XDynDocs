@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<article>
+
+<section>
+<title>Uniform Random Numbers</title>
+
+<para>
+There are two sorts of uniform distributions that
+we might sample from.  Selecting a single value
+from set of possible values, with equal probability 
+for each possible value is performed using the 
+<userinput>sample</userinput> function, as shown below.
+</para>
+
+<programlisting><![CDATA[
+> (n <- sample(1:5, 1))
+
+[1] 3
+]]></programlisting>
+
+<para>
+The <userinput>runif()</userinput> function  may be used to generate
+random numbers from a continuous uniform distribution.
+For example, the following code generates three random numbers 
+between zero and one.
+</para>
+
+<programlisting><![CDATA[
+> runif(n)
+
+[1] 0.2554896 0.5595997 0.1491488
+]]></programlisting>
+
+</section>
+
+</article>

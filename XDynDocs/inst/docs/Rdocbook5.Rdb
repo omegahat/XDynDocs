@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--  For Docbook 5 -->
+
+<article xmlns="http://docbook.org/ns/docbook" 
+         xmlns:r="http://www.r-project.org"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+         version="5.0" xml:lang="en">
+ <info>
+  <title>Customizing Docbook for R and Emacs' nxml-mode</title>
+  <subtitle></subtitle>
+    <author><personname>
+     <firstname>Duncan</firstname>
+     <surname>Temple Lang</surname>
+     </personname></author>
+   <address><email>duncan@wald.ucdavis.edu</email></address>
+ </info>
+
+<section>
+<title>Docbook 5, R and nxml mode</title>
+
+<para>
+When using docbook 5, we have much more latitude to add our small
+collection of extension elements and attributes to nxml mode via RNC
+(Relax NG compact syntax) or directly via RNG.  
+This is done by using the file Rdocbook5.rnc.
+Before using it, you must ensure that the location of the
+docbook.rnc file is specified correctly.
+This should be done via installation.
+</para>
+
+<para>
+Now, there are several ways to use this file.  The manual way is to
+load the XML file that we want to edit into an Emacs buffer.  Then
+explicitly set the schema with the key sequence C-c C-s C-f or by
+calling the emacs-lisp function rng-set-schema-file-and-validate.  You
+will be prompted for the name of the .rnc file and you can specify
+Rdocbook5.rnc.  It will then ask you if you want to save the
+schemas.xml file which is a catalog of schema associations with file
+types and names.
+</para>
+
+<para>
+If you are going to be using this regularly, then it makes sense
+to specify this in a place that nxml-mode can find. 
+Probably the cleanest way to do this is to add
+
+We can add the line
+<programlisting><![CDATA[
+  <uri pattern="*.Rdb" uri="/home/duncan/Projects/org/omegahat/XML/Literate/Rdocbook5.rnc" />
+]]></programlisting>
+to the schemas.xml file in the schema/ directory of the nxml-mode installation.
+This establishes the association between the file extension .Rdb and 
+our Rdocbook5.rnc "schema". Of course, you need to specify the
+fully-qualified name of the file as appropriate for your system.
+Also, you need to make certain that this is read before any other rule is found to match.
+So putting this near the top of the schemas.xml is a good idea.
+I then add an association for Emacs between the .Rdb extension and nxml-mode
+with the command
+<programlisting>
+(setq auto-mode-alist (append (list '("\\.Rdb$" . nxml-mode))
+                        auto-mode-alist))
+</programlisting>
+which tells Emacs to load nxml-mode for any files whose name ends with
+".Rdb".
+</para>
+<para>
+You can select a different extension than .Rdb, or use several different
+extensions.  The extension Rdb  indicates that this is related
+to R and docbook (db). Coincidentally, it is close to the extension
+rda used to identify R data files created with the <r:func pkg="base">save</r:func>.
+</para>
+
+<para>
+There are alternative approaches.
+One is to use a two step process where we associate an extension with a typeId
+and then map the typeId to a URI. This can be done with the commands
+<programlisting><![CDATA[
+ <uri pattern="*.Rdb" typeId="RDocBook" />
+
+ <typeId id="RDocBook" uri="/home/duncan/Projects/org/omegahat/XML/Literate/Rdocbook5.rnc"/>
+]]></programlisting>
+</para>
+<para>
+And because our extensions are a superset of Docbook5, we could just
+use our rnc file in place of the docbook.rnc by changing the 
+association in the nxml-mode schemas.xml file for the
+docbook namespace to identify our file, e.g.
+<programlisting><![CDATA[
+ <namespace ns="http://docbook.org/ns/docbook" uri="/home/duncan/Projects/org/omegahat/XML/Literate/Rdocbook5.rnc"/>
+]]></programlisting>
+However, this is not a good idea in the long term.
+</para>
+
+<para>
+Our collection of extensions to docbook is (intentionally) relatively
+small.  We define r:func, r:var, r:expr, r:pkg, r:keyword, r:s3method
+as inline elements and the block elements r:function, r:code,
+r:output, r:plot, r:test.  And we also
+</para>
+
+<para>
+Now that we have our extensions available in nxml mode, we can make
+use of them.  nxml mode knows what nodes can go where from the rnc
+file.  It also knows where we are within an XML document and so we can
+have it prompt us with what is a valid node to enter at the current
+point.  We start a node with the character &lt; and then we can ask
+nxml-mode to give us a list of the possible completions.
+Do this with  C-return when the cursor is just after the &lt;.
+If we know the first few letters and want to see the subset of 
+possible nodes that start with that, the same mechanism works.
+For example, within a para node, if we type &lt;
+and then C-return, we get a split screen in Emacs and a buffer showing
+us the following completions:
+<programlisting><![CDATA[
+Click <mouse-2> on a completion to select it.
+In this buffer, type RET to select the completion near point.
+
+Possible completions are:
+/para				   abbrev
+accel				   acronym
+address				   alt
+anchor				   annotation
+application			   author
+bibliolist			   biblioref
+blockquote			   bridgehead
+calloutlist			   caution
+citation			   citebiblioid
+citerefentry			   citetitle
+classname			   classsynopsis
+cmdsynopsis			   code
+command				   computeroutput
+constant			   constraintdef
+constructorsynopsis		   coref
+database			   date
+destructorsynopsis		   editor
+email				   emphasis
+envar				   epigraph
+equation			   errorcode
+errorname			   errortext
+errortype			   example
+exceptionname			   fieldsynopsis
+figure				   filename
+firstterm			   footnote
+footnoteref			   foreignphrase
+funcsynopsis			   function
+glosslist			   glossterm
+guibutton			   guiicon
+guilabel			   guimenu
+guimenuitem			   guisubmenu
+hardware			   important
+indexterm			   indexterm
+informalequation		   informalexample
+informalfigure			   informaltable
+initializer			   inlineequation
+inlinemediaobject		   interfacename
+itemizedlist			   jobtitle
+keycap				   keycode
+keycombo			   keysym
+link				   literal
+literallayout			   markup
+mediaobject			   menuchoice
+methodname			   methodsynopsis
+modifier			   mousebutton
+msgset				   nonterminal
+note				   olink
+ooclass				   ooexception
+oointerface			   option
+optional			   orderedlist
+org				   orgname
+package				   parameter
+person				   personname
+phrase				   procedure
+productionset			   productname
+productnumber			   programlisting
+programlistingco		   prompt
+property			   qandaset
+quote				   r:code
+r:func				   r:function
+r:plot				   r:test
+r:var				   remark
+replaceable			   returnvalue
+revhistory			   screen
+screenco			   screenshot
+segmentedlist			   shortcut
+sidebar				   simplelist
+subscript			   superscript
+symbol				   synopsis
+systemitem			   table
+tag				   task
+termdef				   tip
+token				   trademark
+type				   uri
+userinput			   variablelist
+varname				   warning
+wordasword			   xref
+]]></programlisting>
+Notice that our r:code, r:func, etc. are there.
+So if we type &lt;r: and then C-return,
+we see
+<programlisting>
+Possible completions are:
+r:code				   r:func
+r:function			   r:plot
+r:test				   r:var
+</programlisting>
+</para>
+<para>
+The same works for attributes.
+For example, if we type '&lt;r:function ' (i.e. including the space)
+and then C-return, we see id and r:eval are two possible attributes.
+And if we type &lt;r:function r:eval=" but cannot remember the possible
+values, we can query these with C-return to see true and false.
+
+</para>
+
+<para>
+nxml-mode uses the rnc file to determine whether the current document
+is valid.  If it is not, the string Invalid appears in the status bar
+of the buffer.  As you move through the document, the invalid elements
+will be displayed as underlined in red (at least in my configuration).
+nxml-mode is quite precise. It highlights invalid attribute names or
+attribute values or nodes that are not legitimate in their current
+location.  C-c C-n brings you to the next point in the document where
+the potential error is.
+</para>
+<para>
+
+There are additional convenient features.
+When within a para node, C-c RETURN ends the current element and starts a new one.
+</para>
+
+<para>
+We can navigate around the XML nodes with C-c C-n and C-c C-p
+</para>
+
+<para>
+Our bindings (discussed below) allow C-c C-p to create a new para and end para node.
+</para>
+</section>
+
+<section>
+<title>Template Document</title>
+<para>
+Since I write a reasonable amount of Docbook documents, I
+have added a hook function for nxml-mode which inserts a template document.
+<programlisting>
+(add-hook 'nxml-mode-hook
+	  '(lambda ()
+            (r-nxml-keys)
+	    (when (and (file-exists-p default-nxml-file)
+                       (not (and (buffer-file-name)
+			         (file-exists-p (buffer-file-name)))))
+ 	      (insert-file (expand-file-name default-nxml-file)))
+            )
+	  t)  ; t means append
+</programlisting>
+
+</para>
+</section>
+
+<section>
+<title>R-specific Bindings for nxml-mode</title>
+<para>
+We have extended provided customized key bindings
+for supporting R code within an nxml document.
+We have provided a function r-nxml-keys that 
+can be used to in the hook for the nxml-mode to 
+associate keystrokes with inserting the different 
+R-related nodes such as r:code, r:function, r:var.
+</para>
+<para>
+Additionaly, there is an emacs function that 
+can send the contents of the current node to
+an R process using ESS - Emacs Speaks Statistics<biblioref linkend="ESS" />.
+C-r C-n sends the current node to the default process for a running ESS session.
+This currently does not handle nested r:output nodes, but does deal with 
+CDATA nodes surrounding the entire node's contents.
+</para>
+
+<para>
+An alternative to sending the code from an individual node to R
+is to have R read the nodes from the XML document.
+<r:func>xmlSource</r:func> does this and it knows about
+the basic r:code, r:function, r:output elements.
+It one can specify the nodes of interest by giving the
+id values for those. Also one can omit specific nodes using 
+the <r:param>omit</r:param>.
+</para>
+
+<para>
+In addition to sending code from our document to R, we can also 
+
+</para>
+</section>
+
+<section>
+<title>Mixed Modes in Emacs</title>
+<para>
+Working with two types of text in a single document does raise some
+problems.  For one, we have to escape certain characters or character
+sequences so that they are not interpreted by one system.  For
+example, &lt; in XML introduces an entity.  However, in <latex/> it is
+a separator for entries in tables and in R it is an operator. Since we
+are mixing XML and one or more programming languages (e.g. R, MATLAB,
+and Perl) and potentially also <latex/>, we need a mechanism to escape
+sequences. Entities and CDATA provide flexible ways to deal with this
+minor aggrevation.
+</para>
+
+<para>
+Much more importantly however is that when writing a document, we want
+word-processing facilities in our editor.  And when writing code, we
+want good programming facilities in our editor.  When combining them
+in a single document, we need the editor to be smart enough to
+recognize when we are working on content for the text of the document
+and when we are dealing with code.  So when we enter an r:code node,
+for example, we want Emacs to switch to ESS mode.  And when we leave
+that node, we want to switch back to regular docbook mode. Ideally we
+want to invert the minor and major modes so that we can continue to
+have the benefits of both but that the appropriate one becomes the
+dominant default.
+</para>
+<para>
+How do we do arrange things for working within R and docbook?  And can
+we extend this to be able to work with multiple languages within the
+same document?  The two-mode-mode in Emacs can deal with this and we
+can work with that.  noweb-mode also has the ability to switch.  And
+flyspell-xml-lang mode understands how to behave differently based on
+the current node, and specifically its lang attribute.
+</para>
+<para>
+There are two things we have to do to get this effect.  The first is
+to switch mode and have its bindings make sense.  The second is to
+know when we should do this switch.  the second question - when to do
+the switch - requires us to check each time we process a key stroke.
+Alternatively, each time we move forward or backwards or jump to a new
+point in the document, we can check then.  How do we check? Well, we
+might maintain a list of the locations of the relevant chunks,
+i.e. the start and end points.  Then, when we move, we can determine
+whether the new point is within one of these and so switch modes.
+Alternatively, when we move, we find the nearest starting node and
+determine whether it matches one of our nodes of interest and if so,
+switch to the appropriate mode.
+
+
+</para>
+
+<section>
+<title>Spell Checking</title>
+<para>
+<link xlink:href="http://www.dur.ac.uk/p.j.heslin/Software/Emacs/Download/flyspell-xml-lang.el">flyspell-xml-lang.el</link>
+</para>
+</section>
+</section>
+
+<section>
+<title>Example</title>
+<para>
+This is text inside a paragraph with 
+<r:var name="HashRoutines" pkg="dict" scope="exported">
+</r:var>
+
+<r:func name="bob" />
+<r:func>"bob"</r:func>
+<r:func name="get" pkg="base" />
+
+</para>
+
+<para>
+<r:code id="">
+</r:code>
+
+<r:code><![CDATA[
+ x && 1
+]]></r:code>
+
+
+
+<r:function r:eval="false">
+f =
+function(x, y)
+{
+  x + y
+}
+</r:function>
+
+<r:code id=""><![CDATA[
+n = 100
+x = rnorm(n)
+summary(x)
+hist(x)
+]]></r:code>
+
+<r:code r:eval="false">
+
+<r:output>
+</r:output>
+</r:code>
+</para>
+</section>
+
+<bibliography xmlns='http://docbook.org/ns/docbook'>
+<title>Bibliography</title>
+
+<biblioentry id="ESS">
+<abbrev>ESS</abbrev>
+<title>Emacs Speaks Statistics</title>
+<authorgroup>
+<author><personname><firstname>A</firstname><surname>Rossini</surname></personname></author>
+<author><personname><firstname>Richard</firstname><surname>Heiberger</surname></personname></author>
+<author><personname><firstname>Kurt</firstname><surname>Hornik</surname></personname></author>
+<author><personname><firstname>Martin</firstname><surname>Maechler</surname></personname></author>
+<author><personname><firstname>Rodney</firstname><surname>Sparapani</surname></personname></author>
+<author><personname><firstname>Stephen</firstname><surname>Eglen</surname></personname></author>
+</authorgroup>
+
+</biblioentry>
+</bibliography>
+
+</article>

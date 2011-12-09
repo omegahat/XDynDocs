@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- From http://www.svgopen.org/2009/docbook/samplePaper.xml  -->
+<?oxygen RNGSchema="http://www.docbook.org/xml/5.0/rng/docbook.rng" type="xml"?>
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
+    <info>
+        <title>A short docbook primer</title>
+        <subtitle>Writing proceedings for the SVG Open 2008 conference</subtitle>
+        <keywordset>
+            <keyword>conference proceedings</keyword>
+            <keyword>paper formats</keyword>
+        </keywordset>
+        <author>
+            <personname>
+                <firstname>Andreas</firstname>
+                <surname>Neumann</surname>
+            </personname>
+            <email>a.neumann@carto.net</email>
+            <personblurb><para>Andreas Neumann is the coordinator for the GIS activities in the City of Uster. His job is to organize and coordinate the city's GIS activities, design and operate the central geodatabase, identify requirements, integrate software and develop the Web-GIS activities.</para></personblurb>
+            <affiliation>
+                <jobtitle>GIS coordinator</jobtitle>
+                <org>
+                    <orgname>City of Uster</orgname>
+                    <orgdiv>Department of Construction</orgdiv>
+                    <address>
+                        <city>Uster</city>
+                        <street>Oberlandstrasse 78</street>
+                        <postcode>8610</postcode>
+                        <country>Switzerland</country>
+                        <phone>++41-44-944 72 66</phone>
+                        <fax>++41-44-944 67 42</fax>
+                    </address>   
+                </org>
+            </affiliation>
+        </author>
+        <!-- If you have several authors, you could nest all authors within an authorgroup element -->
+        <abstract>
+            <para>The purpose of this document is to demonstrate the use of the Docbook 5.0 format, explain the reasons why docbook was chosen as the paper format for the SVG Open conference, and prepare a sample structure as a starter for your own document.</para>
+        </abstract>
+    </info>
+    <section>
+        <title>Why docbook?</title>
+        <para>At the first SVG Open conference in Zurich, 2002, we instructed paper authors to submit their papers in XHTML format. We provided a sample structure as XHTML and CSS stylesheets in order to get a similar structure and look for all papers. We asked authors to validate their papers at the W3C XHTML validator prior to submission. Unfortunately, only a minority of the authors delivered well-formed and valid XHTML files. Even worse, some authors used Microsoft Word or similar tools to generate their XHTML files. It is well-known that MS Word (esp. older versions) creates non-valid and suboptimal XHTML code. The organizers of the first SVG Open conference spent many hours to correct the most obvious and severe XHTML errors.</para>
+        <para>As a consequence, the organizers of the second edition of the conference (2003) requested gcapaper, a subset of the docbook format. In recent years, the standard docbook (article profile) was requested. This has the advantage that authors can use standard XML editors or specialized docbook editors, while the conference organizers get a more structured, well-formed and valid result files. The organizers provide XSLT files for conversion to the XHTML format. Alternatively, the same source file could be used for conversion to other formats, such as the PDF format. Docbook is widely used in technical documentation, as a documentation source for many open source projects, and in the publishing industry. Finally, docbook plays well with SVG content (both inline and external) and other multimedia objects (such as audio and video).</para>
+    </section>
+    <section xml:id="doc_structure">
+            <title>The document structure</title>
+            <para>For the purpose of conference proceedings, the docbook "article" type is the logical choice. Following is the basic structure of an article, consisting of the XML header, the root element (<code>&lt;article/&gt;</code>), containing the <code>&lt;info/&gt;</code> section and the document itself (the sections):</para>
+            <para><programlisting>
+                <![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="http://www.docbook.org/xml/5.0/rng/docbook.rng" type="xml"?>
+<article xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0">
+    <info>
+        <title>A short docbook primer</title>
+        <subtitle>Writing proceedings for the SVG Open 2008 conference</subtitle>
+        <keywordset>
+            <keyword>paper formats</keyword>
+            <keyword>conference proceedings</keyword>
+        </keywordset>
+        <authorgroup>
+            <author>
+                <personname>
+                    <firstname>Mark</firstname>
+                    <surname>Foster</surname>
+                </personname>
+                <email>mark.foster@nowhere.com</email>
+                <personblurb><para>Some information about the person ...</para></personblurb>
+                <affiliation>
+                    <jobtitle>Chief documentation officer</jobtitle>
+                    <org>
+                        <orgname>Nowhere.com</orgname>
+                        <address>
+                            <city>New York</city>
+                            <street>345 Fifth Avenue</street>
+                            <postcode>23509</postcode>
+                            <country>United States</country>
+                            <phone>++1-44-944 72 66</phone>
+                            <fax>++1-44-944 </fax>
+                        </address>  
+                    </org>
+                 </affiliation>
+            </author>
+            <author>
+                <personname>
+                    <honorific>Prof. Dr</honorific>
+                    <firstname>Michael</firstname>
+                    <surname>Müller</surname>
+                </personname>
+                <email>michael.mueller@nowhere.com</email>
+                <personblurb><para>Dr. Müller is the technical directory of the company nowhere.com</para></personblurb>
+                <affiliation>
+                    <jobtitle>CTO</jobtitle>
+                    <org>
+                        <orgname>Nowhere.com</orgname>
+                        <address>
+                            <city>New York</city>
+                            <street>345 Fifth Avenue</street>
+                            <postcode>23509</postcode>
+                            <country>United States</country>
+                            <phone>++1-44-944 72 66</phone>
+                            <fax>++1-44-944 </fax>
+                        </address>  
+                    </org>
+                </affiliation>
+            </author>
+        </authorgroup>
+        <abstract>
+            <para>The purpose of this document is ...</para>
+        </abstract>
+    </info>
+    <section>
+    	<title>A title</title>
+    	<para>A paragraph ...</para>
+    </section>
+    <section>
+    	<title>A title</title>
+    	<para>A paragraph ...</para>
+    </section>
+</article>              
+]]>
+            </programlisting></para>
+            <para>In the <code>&lt;info/&gt;</code> section you should add the document <code>&lt;title/&gt;</code> and <code>&lt;subtitle/&gt;</code>, information about the authors (<code>&lt;author/&gt;</code> or <code>&lt;authorgroup/&gt;</code>) and a short <code>&lt;abstract/&gt;</code>. The <code>&lt;author/&gt;</code> element contains the <code>&lt;personname/&gt;</code> element, the <code>&lt;email/&gt;</code> element, the <code>&lt;personblurb/&gt;</code> element and the <code>&lt;affiliation/&gt;</code> (containing the jobtitle and information on the organization). The main "body" of the article follows after the <code>&lt;info/&gt;</code> section, and should start with a <code>&lt;sect1/&gt;</code> or <code>&lt;section/&gt;</code> element. Information on the article "body" follows in the next section.</para>
+        </section>
+        <section>
+            <title>The article body</title>
+            <section>
+                <title>Structuring the article with sections</title>
+            <para>The main body of the article may be structured either like</para>
+            <para><programlisting>
+                <![CDATA[
+<section>
+    <title>Title 1</title>
+    <para>Para 1</para>
+    <section>
+        <title>Title of subsection</title>
+        <para>A paragraph ...</para>
+        <section>
+            <title>Title of subsubsection</title>
+            <para>A paragraph ...</para>
+        </section>
+    </section>
+</section>
+<section>
+    <title>Title 2</title>
+    <para> A paragraph ...</para>
+</section>
+]]>
+            </programlisting></para>
+            <para>or like</para>
+            <para><programlisting>
+                <![CDATA[
+<sect1>
+    <title>Title 1</title>
+    <para>Para 1</para>
+    <sect2>
+        <title>Title of subsection</title>
+        <para>A paragraph ...</para>
+        <sect3>
+            <title>Title of subsubsection</title>
+            <para>A paragraph ...</para>
+        </sect3>
+    </sect2>
+</sect1>
+<sect1>
+    <title>Title 2</title>
+    <para> A paragraph ...</para>
+</sect1>
+]]>
+            </programlisting></para>
+            <para>Which of the two methods you choose is up to you.</para>
+            </section>
+            <section>
+                <title>Itemized and ordered lists</title>
+                <section>
+                    <title>Itemized Lists</title>
+                    <para>Itemized are also known as bulleted lists in word processors. They are written as follows:</para>
+                    <para><programlisting>
+                        <![CDATA[
+<itemizedlist mark='bullet'>
+    <listitem>
+        <para>circle</para>
+    </listitem>
+    <listitem>
+        <para>rect</para>
+    </listitem>
+    <listitem>
+        <para>ellipse</para>
+    </listitem>
+</itemizedlist>
+]]>
+                    </programlisting></para>
+                    <itemizedlist mark='bullet'>
+                        <listitem>
+                            <para>circle</para>
+                        </listitem>
+                        <listitem>
+                            <para>rect</para>
+                        </listitem>
+                        <listitem>
+                            <para>ellipse</para>
+                        </listitem>
+                    </itemizedlist>
+                </section>
+                <section>
+                    <title>Ordered Lists</title>
+                    <para>In the ordered list the <code>&lt;listitem/&gt;</code>s are labeled in an ordered fashion, either with arabic numbers, upper- or lower-case alphabetic numeration, upper- or lower-case roman numerations.</para>
+                    <para><programlisting>
+                        <![CDATA[
+<orderedlist numeration='arabic'>
+    <listitem>
+        <para>circle</para>
+    </listitem>
+    <listitem>
+        <para>rect</para>
+    </listitem>
+    <listitem>
+        <para>ellipse</para>
+    </listitem>
+</orderedlist>
+]]>
+                    </programlisting></para>
+                    <orderedlist numeration='arabic'>
+                        <listitem>
+                            <para>circle</para>
+                        </listitem>
+                        <listitem>
+                            <para>rect</para>
+                        </listitem>
+                        <listitem>
+                            <para>ellipse</para>
+                        </listitem>
+                    </orderedlist>
+                </section>
+            </section>
+            <section>
+                <title>Embedding Graphics</title>
+                <para>You can embed both raster (png or jpeg) or vector graphics (svg), using the <code>&lt;figure/&gt;</code> element and a <code>&lt;mediaobject/&gt;</code> inside the figure element. You shouldn't change image alignment parameters. These are handled with XSLT conversion.</para>
+                <section>
+                    <title>Embedding a raster graphic</title>
+                    <para><programlisting>
+                    <![CDATA[
+<figure xml:id="fig_png">
+    <title>Some image properties</title>
+    <mediaobject>
+        <imageobject>
+            <imagedata width="50%" fileref="http://www.docbook.org/tdg5/en/html/figures/graphic-attr-7.png" format="PNG"/>
+        </imageobject>
+        <textobject><phrase>A graphic illustrating the width and depth, align and valign attribute,
+        as well as the intrinsic size of the image.</phrase></textobject>
+    </mediaobject>
+    <caption><para>For a better reference of the <code>&lt;imagedata/&gt;</code> element see the
+      <link xlink:href="http://www.docbook.org/tdg5/en/html/imagedata.html">docbook reference</link>.</para></caption>
+</figure>
+]]>
+                    </programlisting></para>
+                    <figure xml:id="fig_png">
+                        <title>Some image properties</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata width="50%" fileref="http://www.docbook.org/tdg5/en/html/figures/graphic-attr-7.png" format="PNG"/>
+                            </imageobject>
+                            <textobject><phrase>A graphic illustrating the width and depth,
+                                align and valign attribute, as well as the intrinsic size of the image.</phrase></textobject>
+                        </mediaobject>
+                        <caption><para>For a better reference of the <code>&lt;imagedata/&gt;</code> 
+                            element see the <link xlink:href="http://www.docbook.org/tdg5/en/html/imagedata.html">docbook reference</link>.</para></caption>
+                    </figure>
+                </section>
+                <section>
+                    <title>Embedding a vector graphic (SVG)</title>
+                    <section>
+                        <title>External SVG</title>
+                        <para><programlisting>
+                        <![CDATA[
+<figure xml:id="fig_svg">
+    <title>An example of an external SVG graphic</title>
+    <mediaobject>
+        <imageobject>
+            <imagedata fileref="image_properties.svg" format="svg" width="60%"/>
+        </imageobject>
+         <textobject><phrase>A graphic illustrating the width and depth, align and valign attribute,
+         as well as the intrinsic size of the image.</phrase></textobject>
+    </mediaobject>
+</figure>
+]]>
+                        </programlisting></para>
+                        <figure xml:id="fig_svg">
+                            <title>An example of an external SVG graphic</title>
+                            <mediaobject>
+                                <imageobject>
+                                    <imagedata fileref="image_properties.svg" format="SVG" width="60%"/>
+                                </imageobject>
+                                 <textobject><phrase>A graphic illustrating the width and depth, align and valign attribute, as well as the intrinsic size of the image.</phrase></textobject>
+                            </mediaobject>
+                        </figure>
+                        </section>
+                </section>
+            </section>
+            <section>
+                <title>Linking to internal and external resources</title>
+                <section>
+                    <title>Linking to external resources</title>
+                    <para>For linking to external resources one can use the <code>&lt;link/&gt;</code> element with the <code>xlink:href</code> attribute. In order to enable external links one has to add the xlink namespace (<code> xmlns:xlink="http://www.w3.org/1999/xlink"</code>) in the <code>&lt;article/&gt;</code> root element, as <link linkend="doc_structure">demonstrated above</link>. Following is an example of a link to an external resource.</para>
+                    <para><programlisting>
+                        <![CDATA[
+<para>Please visit the <link xlink:href="http://www.svgopen.org/">SVG Open website</link>.</para>
+]]>
+</programlisting></para>
+                </section>
+                <section xml:id="cross_references">
+                    <title>Linking to internal resources (cross references)</title>
+                    <para>For linking to internal resources one can use the <code>&lt;link/&gt;</code> element with the <code>linkend</code> attribute. Another element needs to have a unique xml:id where the attribute <code>linkend</code> can link to, as demonstrated below:</para>
+                    <para><programlisting>
+                        <![CDATA[
+<para xml:id="doc_structure">The document structure ...</para>
+
+<!-- some paragraphs in between -->
+
+<para>as demonstrated in the section <link linkend="doc_structure">"document structure"</link>.</para>
+]]>
+                    </programlisting></para>
+                </section>
+            </section>
+            <section>
+                <title>Publishing code listings</title>
+                <para>The element <code>&lt;programlisting/&gt;</code> together with a <code>&lt;![CDATA[ ... ]]&gt;</code> section allows the publishing of program or XML source-code, without having to replace special characters, such as "&lt;" and "&gt;":</para>
+                <para><programlisting>
+                    <![CDATA[
+<para><programlisting>
+<![CDATA[
+<rect x="1" y="1" width="1198" height="398"
+        fill="none" stroke="blue" stroke-width="2"/>
+  <circle cx="600" cy="200" r="100"
+        fill="red" stroke="blue" stroke-width="10" />
+]]]]><![CDATA[>
+</programlisting></para>
+]]>
+                </programlisting></para>
+                
+            </section>
+     <section xml:id="tables">
+        <title>Tables</title>
+        <para>Following is an example for a table and its rendering.</para>
+        <para><programlisting>
+            <![CDATA[
+<table xml:id="ex.calstable" frame='all'>
+<title>Sample CALS Table</title>
+<tgroup cols='5' align='left' colsep='1' rowsep='1'>
+<colspec colname='c1'/>
+<colspec colname='c2'/>
+<colspec colname='c3'/>
+<colspec colnum='5' colname='c5'/>
+<thead>
+<row>
+  <entry namest="c1" nameend="c2" align="center">Horizontal Span</entry>
+  <entry>a3</entry>
+  <entry>a4</entry>
+  <entry>a5</entry>
+</row>
+</thead>
+<tfoot>
+<row>
+  <entry>f1</entry>
+  <entry>f2</entry>
+  <entry>f3</entry>
+  <entry>f4</entry>
+  <entry>f5</entry>
+</row>
+</tfoot>
+<tbody>
+<row>
+  <entry>b1</entry>
+  <entry>b2</entry>
+  <entry>b3</entry>
+  <entry>b4</entry>
+  <entry morerows='1' valign='middle'><para>Vertical Span</para></entry>
+</row>
+<row>
+  <entry>c1</entry>
+  <entry namest="c2" nameend="c3" align='center' morerows='1' valign='bottom'>Span Both</entry>
+  <entry>c4</entry>
+</row>
+<row>
+  <entry>d1</entry>
+  <entry>d4</entry>
+  <entry>d5</entry>
+</row>
+</tbody>
+</tgroup>
+</table>            
+]]>           
+        </programlisting></para>
+        <table xml:id="ex.calstable" frame='all'>
+            <title>Sample CALS Table</title>
+            <tgroup cols='5' align='left' colsep='1' rowsep='1'>
+                <colspec colname='c1'/>
+                <colspec colname='c2'/>
+                <colspec colname='c3'/>
+                <colspec colnum='5' colname='c5'/>
+                <thead>
+                    <row>
+                        <entry namest="c1" nameend="c2" align="center">Horizontal Span</entry>
+                        <entry>a3</entry>
+                        <entry>a4</entry>
+                        <entry>a5</entry>
+                    </row>
+                </thead>
+                <tfoot>
+                    <row>
+                        <entry>f1</entry>
+                        <entry>f2</entry>
+                        <entry>f3</entry>
+                        <entry>f4</entry>
+                        <entry>f5</entry>
+                    </row>
+                </tfoot>
+                <tbody>
+                    <row>
+                        <entry>b1</entry>
+                        <entry>b2</entry>
+                        <entry>b3</entry>
+                        <entry>b4</entry>
+                        <entry morerows='1' valign='middle'><para>Vertical Span</para></entry>
+                    </row>
+                    <row>
+                        <entry>c1</entry>
+                        <entry namest="c2" nameend="c3" align='center' morerows='1' valign='bottom'>Span Both</entry>
+                        <entry>c4</entry>
+                    </row>
+                    <row>
+                        <entry>d1</entry>
+                        <entry>d4</entry>
+                        <entry>d5</entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </section>
+    </section>
+    <section xml:id="bibliography">
+        <title>Bibliography</title>
+        <para>Following is the code of a <code>&lt;bibliography/&gt;</code> element, the <code>&lt;bibliodiv/&gt;</code> element for adding structure in the bibliography, and individual <code>&lt;biblioentry/&gt;</code> elements:</para>
+        <para><programlisting>
+            <![CDATA[
+<bibliography xmlns='http://docbook.org/ns/docbook'>
+<title>A Test Bibliography</title>
+
+<bibliodiv><title>Books</title>
+
+<biblioentry>
+  <abbrev>AhoSethiUllman96</abbrev>
+  <authorgroup>
+    <author><personname>
+      <firstname>Alfred V.</firstname><surname>Aho</surname>
+    </personname></author>
+    <author><personname>
+      <firstname>Ravi</firstname><surname>Sethi</surname>
+    </personname></author>
+    <author><personname>
+      <firstname>Jeffrey D.</firstname><surname>Ullman</surname>
+    </personname></author>
+  </authorgroup>
+  <copyright><year>1996</year>
+             <holder>Bell Telephone Laboratories, Inc.</holder></copyright>
+  <editor><personname>
+    <firstname>James T.</firstname><surname>DeWolf</surname>
+</personname></editor>
+  <biblioid class="isbn">0-201-10088-6</biblioid>
+  <publisher>
+    <publishername>Addison-Wesley Publishing Company</publishername>
+  </publisher>
+  <title>Compilers, Principles, Techniques, and Tools</title>
+</biblioentry>
+
+<biblioentry xreflabel="Kites75">
+  <authorgroup>
+    <author><personname>
+      <firstname>Andrea</firstname><surname>Bahadur</surname>
+    </personname></author>
+    <author><personname>
+      <firstname>Mark</firstname><surname>Shwarek</surname>
+    </personname></author>
+  </authorgroup>
+  <copyright><year>1974</year><year>1975</year>
+     <holder>Product Development International Holding N. V.</holder>
+     </copyright>
+  <biblioid class="isbn">0-88459-021-6</biblioid>
+  <publisher>
+    <publishername>Plenary Publications International, Inc.</publishername>
+  </publisher>
+  <title>Kites</title>
+  <subtitle>Ancient Craft to Modern Sport</subtitle>
+  <pagenums>988-999</pagenums>
+</biblioentry>
+
+</bibliodiv>
+<bibliodiv><title>Periodicals</title>
+
+<biblioentry>
+  <abbrev>Walsh97</abbrev>
+  <biblioset relation='journal'>
+    <title>XML: Principles, Tools, and Techniques</title>
+    <publisher>
+      <publishername>O'Reilly &amp; Associates, Inc.</publishername>
+    </publisher>
+    <biblioid class='issn'>1085-2301</biblioid>
+    <editor><personname>
+      <firstname>Dan</firstname><surname>Connolly</surname>
+    </personname></editor>
+  </biblioset>
+  <biblioset relation='article'>
+    <title>A Guide to XML</title>
+    <author><personname>
+      <surname>Walsh</surname><firstname>Norman</firstname>
+    </personname></author>
+    <copyright><year>1997</year><holder>ArborText, Inc.</holder></copyright>
+    <pagenums>97-108</pagenums>
+  </biblioset>
+</biblioentry>
+
+</bibliodiv>
+
+</bibliography>
+]]>
+        </programlisting></para>
+        <para>The rendering of the bibliography can be seen at the end of page.</para>
+        <para>A reference to an entry in the bibliography can be made as follows:</para>
+        <para><programlisting>
+            <![CDATA[
+        <para><xref linkend="AhoSethiUllman96"/> state that ...</para>
+]]>
+        </programlisting></para>
+        <para><xref linkend="AhoSethiUllman96"/> state that ...</para>
+     </section>
+    <section>
+        <title>Docbook Resources</title>
+        <para>Docbook resources can be found at the official <link xlink:href="http://www.docbook.org/">docbook homepage</link>. There is the <link xlink:href="http://www.docbook.org/specs/docbook-5.0-spec-cd-03.html">official DocBook 5 specification</link>, a <link xlink:href="http://www.docbook.org/tdg5/">free downloadable DocBook book</link>, a <link xlink:href="http://www.dpawson.co.uk/docbook/">DocBook FAQ</link> and a <link xlink:href="http://www.sagehill.net/docbookxsl/">DocBook XSLT book</link> available to help you get started. A listing of XML editors supporting docbook and specialized docbook editors is available from the <link xlink:href="http://wiki.docbook.org/topic/DocBookAuthoringTools">DocBook Wiki</link>.</para>
+    </section>
+    <bibliography xmlns='http://docbook.org/ns/docbook'>
+        <bibliodiv><title>Books</title>
+            
+            <biblioentry xml:id="AhoSethiUllman96">
+                <abbrev>AhoSethiUllman96</abbrev>
+                <authorgroup>
+                    <author><personname>
+                        <firstname>Alfred V.</firstname><surname>Aho</surname>
+                    </personname></author>
+                    <author><personname>
+                        <firstname>Ravi</firstname><surname>Sethi</surname>
+                    </personname></author>
+                    <author><personname>
+                        <firstname>Jeffrey D.</firstname><surname>Ullman</surname>
+                    </personname></author>
+                </authorgroup>
+                <copyright><year>1996</year>
+                    <holder>Bell Telephone Laboratories, Inc.</holder></copyright>
+                <editor><personname>
+                    <firstname>James T.</firstname><surname>DeWolf</surname>
+                </personname></editor>
+                <biblioid class="isbn">0-201-10088-6</biblioid>
+                <publisher>
+                    <publishername>Addison-Wesley Publishing Company</publishername>
+                </publisher>
+                <title>Compilers, Principles, Techniques, and Tools</title>
+            </biblioentry>
+            
+            <biblioentry xreflabel="Kites75">
+                <authorgroup>
+                    <author><personname>
+                        <firstname>Andrea</firstname><surname>Bahadur</surname>
+                    </personname></author>
+                    <author><personname>
+                        <firstname>Mark</firstname><surname>Shwarek</surname>
+                    </personname></author>
+                </authorgroup>
+                <copyright><year>1974</year><year>1975</year>
+                    <holder>Product Development International Holding N. V.</holder>
+                </copyright>
+                <biblioid class="isbn">0-88459-021-6</biblioid>
+                <publisher>
+                    <publishername>Plenary Publications International, Inc.</publishername>
+                </publisher>
+                <title>Kites</title>
+                <subtitle>Ancient Craft to Modern Sport</subtitle>
+                <pagenums>988-999</pagenums>
+            </biblioentry>
+            
+        </bibliodiv>
+        <bibliodiv><title>Periodicals</title>
+            
+            <biblioentry>
+                <abbrev>Walsh97</abbrev>
+                <biblioset relation='journal'>
+                    <title>XML: Principles, Tools, and Techniques</title>
+                    <publisher>
+                        <publishername>O'Reilly &amp; Associates, Inc.</publishername>
+                    </publisher>
+                    <biblioid class='issn'>1085-2301</biblioid>
+                    <editor><personname>
+                        <firstname>Dan</firstname><surname>Connolly</surname>
+                    </personname></editor>
+                </biblioset>
+                <biblioset relation='article'>
+                    <title>A Guide to XML</title>
+                    <author><personname>
+                        <surname>Walsh</surname><firstname>Norman</firstname>
+                    </personname></author>
+                    <copyright><year>1997</year><holder>ArborText, Inc.</holder></copyright>
+                    <pagenums>97-108</pagenums>
+                </biblioset>
+            </biblioentry>
+            
+        </bibliodiv>
+        
+    </bibliography>
+</article>

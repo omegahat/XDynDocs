@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+This is an example of an error in R code
+<r:code>
+summary(y)
+</r:code>
+The problem is that there is no variable named <r:var>y</r:var>.
+</para>
+
+<para>
+This is a run-time error and so we catch this.
+</para>
+
+</section>
+</article>

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<locatingRules xmlns="http://thaiopensource.com/ns/locating-rules/1.0">
+  <uri resource="dynDoc.xml" uri="../../../../../Books/RPackages/RXMLDoc/inst/schema/rhelp.rnc"/>
+  <uri resource="dynDoc.xml" uri="../../../../../Books/RPackages/RXMLDoc/inst/schema/rhelp.rnc"/>
+  <uri resource="dynDoc.xml" uri="../../../../../Books/RPackages/RXMLDoc/inst/schema/rhelp.rnc"/>
+</locatingRules>

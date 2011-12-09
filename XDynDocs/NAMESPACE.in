@@ -1,0 +1,61 @@
+importFrom(methods, show)
+
+import(XML)
+#importFrom(XML, saveXML, docName, catalogResolve)
+import(Sxslt)
+
+import(grDevices)
+import(codetools) # or should this be CodeDepends
+
+export(docName, saveXML)
+#exportMethods(docName, saveXML)
+
+exportClasses(DynamicTarget, UnknownTarget, HTMLTarget, 
+              InteractiveHTMLTarget, FOTarget, DocbookTarget, 
+              LaTeXTarget)
+# exportClasses(VirtualDirectory, Directory)
+exportClasses(DynamicDocContext)
+exportClasses(HTML, FO, Docbook)
+
+exportMethods("convert", "coerce")
+
+export(DynamicOptions)
+export(dynDoc)
+export(xslDynamicDoc)
+
+
+# Hidden for now
+#  exportClass(CodeBlock, RCodeBlock, RPlotCodeBlock)
+
+#export(viewIDoc, createIDocHandlers)
+
+export(createGraphicsDevice)
+
+export(dynamicData)
+
+
+
+#export(getXIncludes, getFunctionReferences, addFunctionID, addFunctionPackage)
+#export(findXSLImports)
+export(docbookVersion)
+
+export(getStyleSheetParams)
+
+export(matrix2FO, matrix2HTML, matrix2DocBook)
+
+export(newVerbatimNode)
+
+# ??? export(xmlMakePlot, xmlSourceVariable) # )
+
+
+# export(graphicsEval, evalNode)
+
+
+#export(removeVariables)
+export(evalShell)
+
+export(rdb2HTML, xml2HTML, rdb2PDF, xml2PDF)
+
+export(formatCode)
+#export(insertData)
+#export(xwithVisible)

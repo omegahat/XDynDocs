@@ -1,0 +1,13 @@
+<article xmlns:r="http://www.r-project.org">
+<para>
+
+This is an example of a plot from R 
+that is rendered via SVG.
+
+<r:plot r:inline="true" r:format="SVG" file="/tmp/bob.svg" r:width="4" r:height="4" width="400" height="400">
+hist(rnorm(100), prob = TRUE)
+curve(dnorm(x), -4, 4, add = TRUE)
+</r:plot>
+
+</para>
+</article>

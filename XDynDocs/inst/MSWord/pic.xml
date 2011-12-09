@@ -1,0 +1,65 @@
+<w:p w:rsidR="00C725DE" w:rsidRDefault="00725DBA" w:rsidP="00802046">
+  <w:pPr>
+    <w:pStyle w:val="Rplotoutput"/>
+  </w:pPr>
+  <w:r w:rsidRPr="00725DBA">
+    <w:drawing>
+      <wp:inline distT="0" distB="0" distL="0" distR="0">
+        <wp:extent cx="5254171" cy="5254171"/>
+        <wp:effectExtent l="0" t="0" r="0" b="0"/>
+        <wp:docPr id="1" name="Picture 1"/>
+        <wp:cNvGraphicFramePr>
+          <a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>
+        </wp:cNvGraphicFramePr>
+        <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+          <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
+            <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+              <pic:nvPicPr>
+                <pic:cNvPr id="0" name="Picture 1"/>
+                <pic:cNvPicPr>
+                  <a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>
+                </pic:cNvPicPr>
+              </pic:nvPicPr>
+              <ve:AlternateContent>
+                <ve:Choice xmlns:ma="http://schemas.microsoft.com/office/mac/drawingml/2008/main" Requires="ma">
+                  <pic:blipFill>
+                    <a:blip r:embed="rId6"/>
+                    <a:srcRect/>
+                    <a:stretch>
+                      <a:fillRect/>
+                    </a:stretch>
+                  </pic:blipFill>
+                </ve:Choice>
+                <ve:Fallback>
+                  <pic:blipFill>
+                    <a:blip r:embed="rId7"/>
+                    <a:srcRect/>
+                    <a:stretch>
+                      <a:fillRect/>
+                    </a:stretch>
+                  </pic:blipFill>
+                </ve:Fallback>
+              </ve:AlternateContent>
+              <pic:spPr bwMode="auto">
+                <a:xfrm>
+                  <a:off x="0" y="0"/>
+                  <a:ext cx="5254171" cy="5254171"/>
+                </a:xfrm>
+                <a:prstGeom prst="rect">
+                  <a:avLst/>
+                </a:prstGeom>
+                <a:noFill/>
+                <a:ln w="9525">
+                  <a:noFill/>
+                  <a:miter lim="800000"/>
+                  <a:headEnd/>
+                  <a:tailEnd/>
+                </a:ln>
+              </pic:spPr>
+            </pic:pic>
+          </a:graphicData>
+        </a:graphic>
+      </wp:inline>
+    </w:drawing>
+  </w:r>
+</w:p> 

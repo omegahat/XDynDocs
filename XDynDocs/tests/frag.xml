@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<article xmlns:r="http://www.r-project.org">
+<title>Test of r:frag and r:code</title>
+<para>
+A simple test of the dynamic document mechanism using
+"literate programming"-style fragments/chunks.
+</para>
+<para>
+
+<r:frag id="frag1">
+cat("In frag1\n")
+</r:frag>
+
+<r:code id="top">
+<r:code ref="frag1"/>
+<r:code ref="frag2"/>
+</r:code>
+
+<r:code id="frag2" eval="false">
+cat("In frag2\n")
+</r:code>
+
+</para>
+</article>

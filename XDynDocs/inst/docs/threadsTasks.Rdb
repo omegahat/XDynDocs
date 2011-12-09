@@ -1,0 +1,266 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude"
+ 	 xmlns:xml="http://www.w3.org/XML/1998/namespace">
+
+<articleinfo>
+
+<title>Dealing with alternative implementations and approaches</title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<para>
+Some of this may change slightly as we get more use-cases.
+Mostly, it will be extended to allow for different scenarios
+that different people want to express.
+</para>
+
+<section>
+<title>Threads, Tasks and Alternatives</title>
+
+<para>
+
+Here we talk about different types of code segments that arise when
+writing a dynamic (and potentially interactive) document.  There are
+several slightly different aspects to consider.  The first is that we
+might have different implementations of the same basic functionality.
+For example, we might have a naive implementation of an algorithm that
+we develop first and then a second approach that is more efficient.
+We may want to present both to the reader, but have the more efficient
+version be used.  We can prohibit the evaluation of the first
+implementation using <xml:expr>&lt;r:code
+eval="false"&gt;...</xml:expr>, but this is not ideal. We want to
+allow the code to be available for evaluation, but to explicitly
+identify the two code segments (or sequence of segments) as being
+<emphasis>alternatives</emphasis> to each other, giving the same
+outputs.  We use the <xml:tag>altImplementations</xml:tag> element for this
+and identify each with its own <xml:tag>altImplementation</xml:tag> element.
+So we might have something like the following:
+
+<programlisting lang="xml">
+<xi:include href="mixtureAlternatives.xml" parse="text"/>
+</programlisting>
+
+</para>
+
+<para>
+Note that we can have arbitrary markup and content within each
+<xml:tag>alternativeImplementation</xml:tag> element and also preceeding,
+between and following each <xml:tag>alternativeImplementation</xml:tag> element.
+The <xml:tag>compare</xml:tag> element allows us to provide some
+discussion about the alternatives which we can supress (i.e. discard
+or omit) in certain views of the document.
+
+</para>
+<para>
+Indeed, we can discard different alternatives by specifying which ones 
+to use in the actual "running" of the code within the document.
+We can give each <xml:tag>alternativeImplementation</xml:tag> a tag
+and specify which to use. By default, we use the last 
+<xml:tag>alternativeImplementation</xml:tag> within each <xml:tag>alternativeImplementations</xml:tag>.
+</para>
+
+<section>
+<title>Alternative Statistical Approaches</title>
+
+<para>
+In addition to having different implementations of the same
+programmatic functionality (e.g. implementing a particular algorithmic
+description or using grid or grz or ggplot2 to create the "same"
+plot), we also have different approaches  to analyzing data.
+For example, to "fit" a classifier we might use k-nearest neighbors
+or a classification tree or an SVM. Ideally, what we end up with
+in each approach is one or more R objects that can be used in subsequent 
+computations, regardless of which approach was used,
+e.g. via <r:func>predict</r:func> and <r:func>update</r:func>.
+</para>
+
+<para>
+To identify different approaches we use
+<xml:tag>altApproach</xml:tag>.
+We group these within an
+<xml:tag>altApproaches</xml:tag> element.
+</para>
+
+</section>
+
+
+<section>
+<title>Threads</title>
+
+<para>
+Once a document contains alternatives of any type, we have an issue of
+identifying which pieces of code across different tasks correspond to
+different alternatives and which sequence of code we want to run.  We
+use a <xml:attr>thread</xml:attr> attribute on an
+<xml:tag>altApproach</xml:tag> (or potentially on a
+<xml:tag>altImplementation</xml:tag> or <xml:tag>r:code</xml:tag>,
+<xml:tag>r:plot</xml:tag>, etc.  elments) to connect the different
+pieces together.  This identifier can be thought of as a piece of
+string that defines a path through the document and when we pull it,
+only the relevant pieces come from the document.  We can have
+different threads and refer to the by separate names. When we run the
+code or simply project the document to a particular view, these
+threads are treated separately, some being discarded or within some
+viewers, selectable by the reader to explore a different path through
+the document.
+
+
+</para>
+</section>
+
+</section>
+
+
+<section>
+<title>Tasks</title>
+
+<para>
+Often, a data analysis will have a series of tasks, e.g. access files
+from a repository and perform transformations and filtering; read the
+data into R; exploratory data analysis, modeling; presenting results.
+Within some of these steps we might create a collection of derived
+variables as a task; the EDA can be divided up into sub-tasks looking
+at different aspects of the data.  Modeling might involve exploring
+different families of models and approaches and evaluating these on
+test data.
+</para>
+<para>
+Explicitly identifying the tasks (and sub-tasks within these, etc.)
+in a case study/data analysis into tasks is very useful.  It allows
+the reader to see the connections between the tasks and focus on each
+task separately.  It also identifies different parts of the overall
+analysis that can be used as incremental exercises across different
+assignments, or different starting points that an instructor can use
+by providing the inputs created from earlier tasks.
+</para>
+
+
+<para>
+An additional benefit of identifying tasks is
+that we can identify their inputs and outputs.
+We can use this to do minimal evaluation to get
+to a particular point in the overall computations.
+We can use these inputs and outputs also to make
+the document interactive. Specifically, we can
+provide GUI controls within the rendering of the document
+to allow the reader to specify these values.
+With some (programmatic) type inference or specification by the author,
+we can know the types and possible values for the inputs and provide
+more tailored GUI controls, e.g. a slider between  0 and 1 rather.
+The <r:pkg>CodeDepends</r:pkg> package can examine
+(blocks of) code and potentially identify separate tasks,
+their connections and  also list the inputs and outputs of separate tasks.
+
+
+</para>
+
+
+<para>
+The following are displays of the tasks in two case studies: SPAM and 
+wireless geolocation.
+
+<figure>
+<caption><para>Tasks for the SPAM Case Study</para></caption>
+<graphic fileref="SpamTasks.svg" width="6in"/>
+</figure>
+
+<figure>
+<caption><para>Tasks for the wireless geo-location case study for the Mannheim experiment</para></caption>
+<graphic fileref="GeolocationTasks.svg" width="6in"/>
+</figure>
+
+Markup to describe some of these tasks for the SPAM example
+is in <ulink url="spamTasks.xml"/>
+</para>
+
+
+
+<para>
+Use the <xml:tag>task</xml:tag> element to identify a task.  These can
+be nested.  Add a <xml:attr>title</xml:attr> attribute to provide a
+short description. We expect to be able to use these within
+programmatically generated figures that display the flow of tasks.
+</para>
+
+<para>
+Tasks will often be sequential and be correspondingly
+introduced within the document, e.g.,
+
+<programlisting><![CDATA[
+<task title="Create Derived Variables"><xml:ns></xml:ns>
+
+</task>
+
+<task title="Build Classifier">
+ ...
+</task>
+]]></programlisting>
+
+Within a task however, we may have several non-sequential or parallel tasks.
+We can identify these with
+
+<programlisting><![CDATA[
+<task title="Create Derived Variables">
+<parallelTasks>
+
+<task title="Is In-Reply To">
+
+</task>
+
+<task title="Is Digitally Signed">
+
+</task>
+
+ ...
+
+</parallelTasks>
+</task>
+
+<task title="Build Classifier">
+ ...
+</task>
+
+]]></programlisting>
+
+
+</para>
+
+
+<para>
+Within a task we can have various <xml:tag>altImplementation</xml:tag>
+and <xml:tag>altApproach</xml:tag> elements.
+For example, we might have a "Build Classifier" task
+for classifying SPAM messages.
+Within this, we might use a classification tree, naive Bayes or k-nearest neighbors.
+
+
+</para>
+
+
+</section>
+
+<section>
+<title>Working with Code in a Document</title>
+
+<para>
+There are many good things about having code within the actual
+document. But there can be lots of cutting-and-pasting of the code
+into R.  Emacs, ESS and our extensions to nxml-mode can facilitate
+this.  See <ulink url="RdocbookEmacs.pdf"/>.  There are also
+facilities within R for evaluating code in such documents.  These are
+<r:func>xmlSource</r:func>, <r:func>xmlSourceFunctions</r:func>,
+<r:func>xmlSourceSection</r:func> and
+<r:func>xmlSourceThread</r:func>
+<footnote><para>These are in very recent versions of the XML package,
+i.e. &gt;= 2.7-0.</para></footnote>
+
+</para>
+</section>
+
+</article>

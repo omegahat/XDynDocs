@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>R &amp; Docbook</title>
+<link rel="stylesheet" href="http://www.omegahat.org/OmegaTech.css"/>
+</head>
+
+<body>
+<h1>R &amp; Docbook</h1>
+
+This is a page where we collect some of the materials
+related to how we use Docbook with the R programming
+language and environment.
+This includes:
+<ul>
+  <li> Documentation of R functions,
+classes, methods, data sets, C routines and data types
+and so on.
+  <li> dynamic, reproducible structured documents via XDynDocs,
+  <li> literate programming
+  <li> XDocTools for helping to validate the contents of text documents
+</ul>
+
+
+<h2>Software</h2>
+<dl>
+
+  <dt>
+  <li> <a href="Rdocbook.el">Rdocbook.el</a>
+  <dd> Emacs Lisp code to provide convenient facilities for authoring
+       R-Docbook documents. These facilities include inserting
+       R-specific nodes, compound Docbook templates/nodes for, e.g., a
+       section.
+       They also allow the author to evaluate R code within an R
+       session   directly from the R-Docbook document and include the
+       output into the r:code node.
+      <p>
+      <a href="RdocbookEmacs.html">Documentation for the emacs bindings and functions</a>.
+
+
+  <dt>
+  <li> <a href="DefaultXML.xml">XML template for an R-Docbook document.</a>
+  <dd>
+  
+  <dt>
+  <li> <a href="pdf2index">pdf2index</a>
+  <dd> pdf2index is a Perl script that comes with the Docbook-XSL
+      distribution and is used to build indices in a particular
+      manner.
+      We have extended the script to handle documents with multiple
+      indices (e.g. with different <b>type</b>s).
+      We also added some error checking to indicate if pstotext is not found.
+
+     
+</dl>
+
+
+
+
+<hr>
+<address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@wald.ucdavis.edu>&lt;duncan@wald.ucdavis.edu&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Wed Sep  9 12:37:01 PDT 2009
+<!-- hhmts end -->
+</body> </html>

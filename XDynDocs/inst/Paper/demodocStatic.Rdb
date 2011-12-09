@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:db="http://docbook.org/ns/docbook">
+
+<section>
+<title>Uniform Random Numbers</title>
+
+<para>
+There are two sorts of uniform distributions that
+we might sample from.  Selecting a single value
+from set of possible values, with equal probability 
+for each possible value is performed using the 
+<r:func>sample</r:func> function, as shown below.
+</para>
+
+<r:code><![CDATA[
+> (n <- sample(1:5, 1))
+]]>
+<r:output>
+[1] 3
+</r:output>
+</r:code>
+
+<para>
+The <r:func>runif</r:func> function  may be used to generate
+random numbers from a continuous uniform distribution.
+For example, the following code generates three random numbers 
+between zero and one.
+</para>
+
+<r:code><![CDATA[
+> runif(n)
+]]>
+<r:output>
+[1] 0.2554896 0.5595997 0.1491488
+</r:output>
+</r:code>
+
+</section>
+
+</article>

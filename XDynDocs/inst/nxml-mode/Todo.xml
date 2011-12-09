@@ -1,0 +1,15 @@
+<topics>
+<topic>
+
+
+<items>
+<item>
+Have aspell skip over R nodes.
+<br/>
+See ispell-html-skip-alists and 
+ispell-skip-region-alist
+</item>
+</items>
+
+</topic>
+</topics>

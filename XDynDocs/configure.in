@@ -1,0 +1,148 @@
+AC_INIT(R/config.R.in)
+
+echo "Directory: $0,  `pwd`"
+cd `dirname $0`
+echo "Current directory: `pwd`"
+
+AC_ARG_WITH(fop, [ --with-fop=fop command or directory], FOP=$withval, [if test -n "${FOP}" ; then echo "Using environment variable: $FOP"; FOP=$FOP; fi])
+AC_ARG_WITH(batik, [ --with-batik=batik command or directory], BATIK=$withval, [if test -n "${BATIK}" ; then echo "Using environment variable for batik: $BATIK"; BATIK=$BATIK; fi])
+
+
+if test -z  "$DEFAULT_XML_CATALOG_FILES"  ; then
+ DEFAULT_XML_CATALOG_FILES=${XML_CATALOG_FILES}
+fi
+
+if test -z "$DEFAULT_XML_CATALOG_FILES" ; then
+  DEFAULT_XML_CATALOG_FILES="${R_PACKAGE_DIR}/XML/catalog.xml"
+fi
+
+
+AC_SUBST(DEFAULT_XML_CATALOG_FILES)
+
+
+if test -z "$FOP" ; then
+  AC_PATH_PROGS(FOP, fop)
+fi
+
+if test -z "$FOP" ; then
+ echo "Searching for FOP in home directory"
+
+ for i in fop-0.93 fop-0.94 fop-0.95 ; do
+    if test -d "$HOME/$i" && test -x "$HOME/$i/fop" ; then
+       FOP="$HOME/$i"
+       echo "Found fop in $FOP"
+       break;
+    fi
+ done
+
+fi
+
+if test -z "$FOP" ; then
+  FOP="NA"
+  FOP_CMD=""
+else
+
+ FOP=`echo "$FOP" | sed -e "s|~/|$HOME/|"`
+#   FOP=`(cd $FOP; pwd)`
+ if test -d "$FOP" ; then
+   if test -x "$FOP/fop" ; then
+      FOP="\"$FOP/fop\""
+   else
+      echo "Cannot find the fop executable in $FOP"
+   fi
+ else
+      FOP="\"$FOP\""
+ fi
+ FOP_CMD="$FOP"
+fi
+# hyphenation jar file ?
+
+echo "Final value of FOP = $FOP"
+
+AC_SUBST(FOP)
+AC_SUBST(FOP_CMD)
+
+
+if test -z "${BATIK}" ; then
+  for f in "$HOME/batik" "$HOME/batik-1.7" ; do
+    if test -d "$f" ; then
+      BATIK="$HOME/batik-1.7"
+      break
+    fi
+  done
+fi
+
+
+if test -n "$BATIK" ; then
+
+ if test -d "$BATIK" ; then
+    f="$BATIK/batik.jar"
+    if test -r "$f" ; then
+      BATIK_DIR="$BATIK"
+      BATIK_CLASSES="$f"
+    fi
+ fi
+
+fi
+
+AC_SUBST(BATIK_CLASSES)
+AC_SUBST(BATIK_DIR)
+
+
+
+# Version of docbook.
+# Rewrite catalog.
+
+chmod -w inst/Make/Makefile
+if test -e inst/Make/Makefile ; then
+  chmod +w inst/Make/Makefile
+fi
+
+
+#####################
+
+AC_SUBST(R_PACKAGE_DIR)
+echo "${R_PACKAGE_DIR}"
+R_PACKAGE_DIR=`echo ${R_PACKAGE_DIR} | sed -e 's|/$||' | sed -e 's|//|/|'`
+
+echo "package directory: $R_PACKAGE_DIR"
+
+NXML_MODE_DIR="XXX"  # "/Users/duncan/Emacs/Contrib/nxml-mode-20041004"
+ELISP_DIRS=`emacs -script nxml.el | sed -e 's/[[)("]]//g'`
+#echo "ELISP_DIRS: ${ELISP_DIRS}"
+
+for dir in ${ELISP_DIRS} ; do
+  echo "Looking in $dir"
+  tmp=`find $dir -name docbook.rnc`
+  if test -n "$tmp" ; then
+   NXML_MODE_DIR="$dir"
+  fi
+done
+AC_SUBST(NXML_MODE_DIR)
+echo "NXML_MODE_DIR = $NXML_MODE_DIR"
+
+
+###########################
+# sed -e "|/Users/duncan|$R_PACKAGE_DIR|g"  inst/nxml-mode/schemas.xml > /tmp/schemas.xml
+
+${XSLTPROC} -o inst/nxml-mode/schemas.xml --stringparam newDir "${R_PACKAGE_DIR}" schemas.xsl inst/nxml-mode/schemas.xml
+
+AC_OUTPUT(R/config.R NAMESPACE inst/Make/Makefile inst/XML/catalog.xml inst/shellScripts/csh inst/shellScripts/bash
+           inst/nxml-mode/Rdocbook5.rnc)
+
+
+DIR=`pwd`
+if test -e inst/XSL/OmegahatXSL/Todo.xsl; then
+  chmod +w inst/XSL/OmegahatXSL/Todo.xsl
+fi
+
+# this is for use in this directory by developers.
+(XDYNDOCS="file://`pwd`/inst" ; export XDYNDOCS ; cd inst/XSL/OmegahatXSL ; $R_HOME/bin/R --silent --vanilla < updateTodoLocations.R)
+
+
+echo "Creating the XSL options for use in R"
+# We could also resolve these at run time.
+(export XML_CATALOG_FILES=inst/XML/catalog.xml ; $R_HOME/bin/R --silent --vanilla -e 'source("R/getMakeOpts.R"); makeOptions()')
+
+chmod -w inst/Make/Makefile
+chmod -w inst/XSL/OmegahatXSL/Todo.xsl

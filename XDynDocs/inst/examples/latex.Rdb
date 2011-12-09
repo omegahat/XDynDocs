@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title><latex/> and Docbook and conversion</title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title>Purpose</title>
+
+<para>
+This is an example of using Docbook to create a document
+and using <ulink url="http://dblatex.sourceforge.net/"/>
+or <ulink url="http://dblatex.sourceforge.net/"/> to convert it to <latex/>.
+We allow the author to have raw <latex/> content in the 
+Docbook document and have this passed straight through to the
+<latex/> document.
+For example,
+<latex>
+$$
+  E[X] = \int_\infty^\infty x f(x) dx
+$$
+</latex>
+
+</para>
+
+
+<para>
+We can have tables in docbook
+<table>
+<tgroup cols="2">
+<tbody>
+<row>
+<entry>A</entry>
+<entry>B</entry>
+</row>
+<row>
+<entry>D</entry>
+<entry>E</entry>
+</row>
+<row>
+<entry>F</entry>
+<entry>G</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+
+</para>
+
+
+<para>
+R code is fine
+
+<r:code>
+with(mtcars, plot(mpg ~ wt, pch = factor(cyl), col = factor(gear), 
+                   xlab = "Weight", ylab = "Miles per gallon"))
+</r:code>
+
+</para>
+
+
+<ignore>
+<para>
+This should not appear.
+</para>
+</ignore>
+
+
+
+<para>
+What about a plot.
+ <figure id="bob">
+  <graphic fileref="triangularDensity.pdf"/>
+ </figure>
+</para>
+
+
+<para>
+And a PNG plot
+ <figure id="png">
+  <graphic fileref="triangularDensity.png"/>
+ </figure>
+</para>
+
+
+
+</section>
+</article>

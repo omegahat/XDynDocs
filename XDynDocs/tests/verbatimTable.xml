@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+
+<article>
+
+<para>
+This is a simple example of putting two verbatim/programlisting
+blocks into  a table in FO and HTML.
+</para>
+
+<table>
+<tgroup cols="2">
+<thead>
+<row><entry>R</entry><entry>Python</entry></row>
+</thead>
+<tbody>
+<row valign="top">
+<entry>
+<programlisting lang="r">
+Sum = 
+function(x)
+{
+  ans = 0
+  for(e in x)
+    ans = ans + e
+  ans
+}
+</programlisting>
+</entry>
+<entry>
+<programlisting lang="python">
+def Sum(x):
+    ans = 0.0
+    for i in x:
+        ans = ans + i
+    return ans
+</programlisting>
+</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+</article>

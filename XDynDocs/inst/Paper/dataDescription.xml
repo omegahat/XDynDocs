@@ -1,0 +1,23 @@
+<dataDescription>
+<title></title>
+<description>
+</description>
+<author></author>					       <!-- or authorinfo  a la docbook -->
+<source></source>					       <!--institution, etc. -->
+<version></version>
+<date></date>
+<schema>
+</schema>
+<numObservations></numObservations>
+<variables count="">
+<variable name="" type="">
+<description>
+</description>
+<unit></unit>						       <!-- or as attribute of variable -->
+<note>
+</note>
+</variable>
+<variable name="">
+</variable>
+</variables>
+</dataDescription>

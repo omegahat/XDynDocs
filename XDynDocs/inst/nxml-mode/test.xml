@@ -1,0 +1,123 @@
+<article xmlns:r="http://www.r-project.org">
+
+<title></title>
+<authorinfo>
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname></author>
+</authorinfo>
+
+<section>
+<title></title>
+
+<para>
+<r:code>
+x = rnorm(1000)
+plot(density(x))
+</r:code>
+</para>
+
+<para>
+<r:code><![CDATA[
+x = rexp(1000, 3)
+plot(density(x), main = "Density of Exponential(3) with 1000 observations")
+]]></r:code>
+</para>
+
+
+<para>
+<r:code>
+x = rnorm(1000)
+mean(x)
+Sys.time()
+</r:code>
+</para>
+11288
+
+
+<para>
+
+<r:code>
+plot(1:10,
+      rnorm(10))
+abline(v = 5, 
+        col = "lightgray", lty = 3)
+</r:code>
+</para>
+
+
+<para>
+<r:code>
+Sys.sleep(3)
+1:10
+Sys.sleep(3)
+</r:code>
+</para>
+
+
+<para>
+<r:code>
+1:12
+<r:output><![CDATA[>  [1]  1  2  3  4  5  6  7  8  9 10 11 12]]></r:output>
+</r:code>
+</para>
+
+<para>
+<r:code>
+1:10
+letters
+<r:output><![CDATA[>  [1]  1  2  3  4  5  6  7  8  9 10 
+[1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"]]></r:output></r:code>
+</para>
+
+<r:function><![CDATA[
+foo = 
+function(x, n = length(x))
+{
+  x + rnorm(n)
+}
+]]></r:function>
+
+<r:code><![CDATA[
+x = rnorm(10)
+y = rnorm(length(x))
+x > 1 & y < 0
+]]></r:code>
+
+<r:code>
+<![CDATA[
+x = 1:10
+y = rnorm(length(x))
+]]>
+</r:code>
+
+<r:code>
+x = 1:10
+y = rnorm(length(x))
+</r:code>
+
+<r:code></r:code>
+<r:code>
+
+</r:code>
+<r:code><![CDATA[
+
+]]></r:code>
+
+<r:code><![CDATA[
+x = 1
+y = 2
+]]></r:code>
+
+
+<r:code><![CDATA[
+x = runif(100)
+y = 10 + 3 * x + rexp(length(x))
+summary(x)
+summary(y)
+]]><r:output><![CDATA[> >     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+0.006357 0.279900 0.549600 0.528900 0.801600 0.987200    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  10.60   11.74   12.55   12.82   13.38   19.97 ]]></r:output></r:code>
+
+</section>
+
+
+</article>

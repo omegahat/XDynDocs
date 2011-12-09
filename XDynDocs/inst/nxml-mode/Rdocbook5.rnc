@@ -1,0 +1,92 @@
+# See http://www.docbook.org/docs/howto/#customizations
+# for information about extending docbook.
+
+namespace db = "http://docbook.org/ns/docbook"
+namespace r = "http://www.r-project.org"
+
+include "/Users/duncan/Emacs/Contrib/nxml-mode-20041004//schema/docbook.rnc" inherit = db
+
+# redefinitions of named patterns
+
+r.output =
+  element r:output { text }
+
+r.logical.enumeration =  "true" |  "false" 
+
+r.code.eval = 
+  attribute r:eval { r.logical.enumeration } ?
+
+
+r.id = 
+  attribute id { empty | xsd:ID }?
+
+r.funcdef = 
+   r.id, r.code.eval, text
+
+r.block.content = 
+   r.funcdef, r.output ?
+
+r.code = 
+  element r:code {  r.block.content }
+
+r.test =
+  element r:test {   r.block.content}
+
+r.plot =
+  element r:plot {   r.block.content }
+
+ # Note that this is not r.block.content as we want to eliminate the possibility of r:output.
+r.function =
+  element r:function { r.funcdef }
+
+db.programlisting |= r.code | r.test| r.plot | r.function
+
+
+ # Eventhough this uses r.block.content, it is an inlined element.
+ # Any r:output will be flattened into a string without the new lines.
+r.expr = 
+  element r:expr { r.block.content } 
+
+r.name.attr = 
+     attribute name { text }?
+
+r.pkg.attr = 
+      attribute pkg  { text }?           
+
+r.symbol = 
+      r.name.attr, r.pkg.attr, text 
+  
+
+r.func =
+  element r:func {  r.symbol  }
+
+r.scope.enumeration = 
+   "exported" | "private"
+
+r.var =
+  element r:var {  r.symbol, attribute scope { r.scope.enumeration }?  }
+
+r.pkg =
+  element pkg {  r.name.attr, text  }
+
+r.keyword.enumeration =
+   "for" | "in" | "while" | "function" | "repeat" 
+
+r.keyword = 
+  element r:keyword { r.keyword.enumeration }
+
+r.func.attr =
+                  attribute func { text } ?
+
+r.param =
+  element r:param {   r.name.attr,   r.pkg.attr, r.func.attr,   text  }
+
+
+# To know that we should update db.all.inlines, we look for the definition of 
+# element para which is on line 1454 of docbook.rnc and we see what we want.
+
+
+db.all.inlines |=  r.var | r.func | r.pkg | r.keyword  | r.param
+
+
+

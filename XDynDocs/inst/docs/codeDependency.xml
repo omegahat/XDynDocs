@@ -1,0 +1,172 @@
+<article xmlns:xi="http://www.w3.org/2003/XInclude"
+         xmlns:r="http://www.r-project.org"
+	 xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<section>
+<title>Dependencies</title>
+
+<para>
+In the interactive documents we describe, we have a collection of code
+chunks that are the underlying computations.  Some of these will have
+associated interactive controls, or widgets, such as sliders,
+spinboxes, choice menus, etc.  For example, consider the very simple
+simulation that we do in ../examples/sim.R.
+<r:code>
+<xi:include href="../examples/sim.R" parse="text" />
+</r:code>
+There is essentially one input variable, n, which controls the entire
+simulation.  Both x and e are determined by n and, in turn, y is
+determined by x and e.  Then fit is determined by y and x.  The plot
+is slightly strange in that it results in the side effect of producing
+the display but does not explicitly create a result that is assigned.
+</para>
+<para>
+To make this interactive, we might chose to provide a spinbox (or a
+slider) for the user to adjust the value of <r:var>n</r:var>.  The
+callback for that value then must propogate the new value to each of
+the different depenendant expressions and up date these.  When we
+establish the callback code, we can identify these subsequent
+expressions.  The function <r:func>getPropogateChanges</r:func>
+identifies the expressions/fragments that are affected by a change,
+either directly or indirectly (depending the value of
+<r:var>recursive</r:var>).
+</para>
+<para>
+We can perform the propogation stepwise with our callbacks where we need only
+look for the expressions that directly depend on our
+changed variable. Then we can re-evaluate those
+and have their callbacks propogate their changes.
+</para>
+
+<para>
+Our plot would have a live graphics device within the
+HTML/XML document.
+</para>
+</section>
+
+<section>
+<title>Alternatives and Branches</title>
+</section>
+
+<section>
+<title>The Code</title>
+<para>
+We have added some tools to perform the dependency analysis and
+computations.  The high-level functions include
+<r:func>getVariableDepends</r:func>,
+<r:func>getExpressionThread</r:func>,
+<r:func>getVariableInputs</r:func>,
+<r:func>getSectionDepends</r:func>.  The key one for the GUIevents is
+<r:func>getPropogateChanges</r:func>.  This takes a given variable and
+finds the expressions that would need to be evaluated if that variable
+gets a new value.  In our dual.R example, if we change
+<r:var>n</r:var>, we need to recalculate both <r:var>x</r:var> and
+<r:var>e</r:var>.  These in turn would lead to updating
+<r:var>y</r:var>, which induces the update for <r:var>fit</r:var> and
+so the call to <r:func>plot</r:func> would need to be re-evaluated
+also.
+We can see the expressions that need to be updated directly with
+<r:code>
+ e = parse("../inst/examples/dual.R")
+ getPropogateChanges("n", e)
+<r:output>
+expression(x = rnorm(n), e = rnorm(n))
+</r:output>
+</r:code>
+To get the entire collection of all affected expressions,
+we use
+<r:code>
+ e = parse("../inst/examples/dual.R")
+ getPropogateChanges("n", e, recursive = TRUE)
+<r:output>
+expression(x = rnorm(n), e = rnorm(n), y = 3 + 10*x + e, fit = lm(y ~ x), 
+    plot(fit))
+</r:output>
+</r:code>
+</para>
+<para>
+We can use this when we create a callback for a widget associated
+with a particular variable.
+We can introduce the spinbox into our document for <r:var>n</r:var>
+<programlisting><![CDATA[
+<i:spinbox var="n" min="2" max="10000"/>
+]]></programlisting>
+When the <r:pkg>IDynDocs</r:pkg> code sees this,
+it can then generate a callback such as
+<r:code>
+addCallback(spinbox, "valueChanged", 
+             function(spinbox, value) {
+                assign("n", value) # or spinbox$getValue()
+		x = rnorm(n)
+		e = rnorm(n) 
+		y = 3 + 10*x + e
+		fit = lm(y ~ x), 
+		plot(fit)
+             })
+</r:code>
+Let's suppose further that we introduced a
+variable for the SD of the error and use
+this in the call to create <r:var>e</r:var>.
+See ../examples/sim1.R.
+And we might have a slider for specifying the value
+of <r:var>e.sd</r:var>.
+We would put this in the document as
+<programlisting><![CDATA[
+<i:slider var="e.sd" min=".0001" max="1000"/>
+]]></programlisting>
+For this, our callback would look like
+<r:code>
+addCallback(slider, "valueChanged", 
+             function(slider, value) {
+                assign("e.sd", value)
+		e = rnorm(n) 
+		y = 3 + 10*x + e
+		fit = lm(y ~ x), 
+		plot(fit)
+             })
+</r:code>
+Because  we evaluate the expressions in a separate
+environment rather than  the centralized
+session workspace, we would actually use
+<r:func>eval</r:func> to evaluate the expressions
+and the callbacks could be as simple as 
+specifying which expressions need to be evaluated
+and provide a list of the one or more variables
+with their new values.
+This might be something like
+<r:code>
+addCallback(slider, "valueChanged", 
+             function(slider, value) {
+                docEval(c(4, 5, 6, 7), "e.sd" = value)
+             })
+</r:code>
+The <r:func>docEval</r:func> function 
+would be created when the document page is displayed
+and it would have access to the code
+from all the different XML elements  of the document.
+And it uses the first argument to get the relevant subset
+of expressions and then  loops over these:
+<r:code>
+docEval = 
+function(indices, ...)
+{
+  vars = list(...)
+  mapply(assign, names(vars), vars, MoreArgs = list(docEnv))
+  sapply(expressions[indices], eval, envir = docEnv)
+}
+</r:code>
+</para>
+
+<para>
+The data underlying these computations is generated by the function
+is <r:func>getInputs</r:func>.
+This traverses the expressions and sub-expressions and finds
+the input variables,  libraries, files and also the output variables (in spite of the name).
+</para>
+<para>
+Others include
+<r:func>xmlSourceVariable</r:func>
+<r:func>makePlot</r:func>
+</para>
+</section>
+</article>

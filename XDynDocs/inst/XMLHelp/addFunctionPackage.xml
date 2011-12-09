@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<rh:help xmlns:rh="http://www.r-project.org/help" xmlns:r="http://www.r-project.org" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <rh:topic> </rh:topic>
+  <rh:topic>addFunctionPackage</rh:topic>
+  <rh:title>Add the pkg attribute to each r:func element in the XML document</rh:title>
+  <rh:description>
+    <para>This function is used to provide complete meta-information for
+    references to R functions that the author has supplied in brief form.
+    The function finds all XML elements named r:func which have no pkg attribute.
+    For each such node, it then determines the package in which the corresponding 
+    function resides and adds the packages name as the pkg attribute.
+     </para>
+  </rh:description>
+  <rh:arguments>
+   <rh:arg id="doc"><para>the XML document whose contents are to be updated.</para></rh:arg>
+   <rh:arg id="nodes"><para>
+</para></rh:arg>
+   <rh:arg id="save"><para>
+</para></rh:arg>
+   </rh:arguments>
+  <rh:value>
+    <para>
+     </para>
+  </rh:value>
+  <rh:details>
+    <para>
+     </para>
+  </rh:details>
+  <rh:seealso>
+   </rh:seealso>
+  <xi:include href="generalInfo.xml" xpointer="xmlns(rh=http://www.r-project.org/help) xpointer(//author|//authorgroup)"/>
+  <rh:references>
+   </rh:references>
+  <author>
+    <firstname> </firstname>
+    <surname> </surname>
+    <email> </email>
+  </author>
+  <rh:examples>
+    <r:init/>
+    <rh:example id="">
+      <rh:title> </rh:title>
+      <rh:description>
+        <para>
+	</para>
+      </rh:description>
+      <r:code>
+	</r:code>
+    </rh:example>
+  </rh:examples>
+  <rh:keywords>
+    <rh:keyword> </rh:keyword>
+  </rh:keywords>
+  <rh:versionIntroduced version=""/>
+</rh:help>

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname></firstname><surname></surname>
+  <affiliation><orgname></orgname>
+               <orgdiv></orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+
+Note that the invocation from XSL of 
+<xsl:code>
+   r:call('foo', ...)
+</xsl:code>
+and
+<xsl:code>
+  r:foo(...)
+</xsl:code>
+can be quite different.
+The former will resolve the object in the R search path;
+the latter will find the registered function. We may,
+and often do, modify the function before it is registered,
+e.g. make it an XSLTContextFunction or change its environment.
+In the case of <xsl:expr>r:call('foo', ...)</xsl:expr>, we get the unmodified
+version in the R search path and so it may have the wrong
+environment or other attributes..
+</para>
+
+</section>
+</article>

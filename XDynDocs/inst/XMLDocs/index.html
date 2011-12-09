@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<link rel="stylesheet" type="text/css" href="../OmegaTech.css"></link>
+<title>XML Documents</title>
+</head>
+
+<body>
+<h1>Writing Documents in XML</h1>
+
+This is a collection of materials related to creating documents using
+XML.  We write our documents such as articles, tutorials, assignments
+and books in Docbook, an XML vocabulary for technical documents.
+We convert these to HTML, PDF and LaTeX.
+<p>
+There are many benefits to using Docbook/XML in preference to other
+markups (e.g. LaTeX). These include
+<ul>
+  <li> separating content and meaning from appearance,
+  <li> targetting HTML and Web browsers which are increasingly richer
+      than PDF,
+  <li> synchronizing content across documents and formats and being
+      able to reuse content,
+  <li> being able to combine segments of different documents easily
+      into another document,
+  <li> being able to programmatically verify and modify structured
+      documents,
+  <li> using XSL templates to customize how the document is rendered
+  <li> using XML tools  which we increasly use in other settings,
+      e.g. Web services, scraping Web pages, reading structured data.
+</ul>
+
+<p>
+We are not trying to convinvce people to abandon LaTeX for a new
+toolchain.  We are merely attempting to make people aware of a
+rich alternative. This is especially applicable for people just
+embarking on a career and finding a good working setup and  environment.
+
+
+<h2>Documentation</h2>
+<dl>
+
+  <dt>
+  <li> <a href="authoringDocs.html">An illustration</a> of things we
+  can do with XML and generating content programmatically via XSL,
+   display mathematical content via MathJAX, and some reasons why XML
+  is a good format for authoring documents.
+  <dd>
+
+  <dt>
+  <li> <a href="OmegahatXSL.tar.bz2">Omegahat XSL files</a> for static
+  (not dynamic or interactive) documents.
+  <dd>
+  
+  <dt>
+  <li> <a href="Makefile">Makefile</a> for performing transformations.
+  <dd> Handles HTML, FO, LaTeX.
+       This should be used as part of the XDynDocs package or with the
+  <a href="OmegahatXSL.tar.bz2">Omegahat XSL files</a>, at least.
+      <br/>
+      You should use the .tar.bz2 file and run the configure script
+      to customize to your own machine.
+  
+  <dt>
+  <li> <a href="Rdocbook.el">Emacs bindings</a> for making authoring
+      R-related Docbook documents easier.
+  <dd>
+
+  <dt>
+  <li> <a href="RdocbookEmacs.html">documentation for the Emacs bindings</a>
+  <dd>
+
+
+  <dt>
+  <li> <a href="customizingXML.html">Introduction to customizing XSL rules and rendering</a>.
+  <dd>
+      
+</dl>
+
+<h2>Simple two-stage dynamic documents</h2>
+
+We can easily make XML documents dynamic in
+the sense of evaluating code contained in the document
+and inserting the results into the projected view of
+the document. This is like Sweave, but with a very
+extensible document structure and processing engine.
+(In addition to dynamic content, we can make these documents richly
+interactive.)
+<p>
+There are two approaches to dynamic documents with XML and XSL.
+<ul>
+  <li> One is to process the document in one step that
+converts the XML to the target format (e.g. HTML or FO or LaTeX), and
+      evaluates the R code  (or other languages) via XSL rules and
+      R functions as extension XSL functions
+
+  <li> The second is to have two stages: process the XML document in R
+      and evaluate the R code and insert the results, write the
+      results  to  new document and then process that with the regular
+      XSL conversion tools. 
+</ul>
+
+<p>
+
+<dl>
+  <dt>
+  <li> A brief <a href="twoStageDynDocs.html">description</a> of the 2
+  stage process
+  <dd>
+
+  <dt>
+  <li> An example
+  <dd>
+      <ul>
+	<li> <a href="basic.Rdyn">input</a>,
+	<li> <a href="basic.xml">converted by R, with results</a>
+	<li> <a href="basic.html">final HTML document</a>
+      </ul>
+
+  <dt>
+  <li> <a href="evalNode.R">Simple R code</a> to implement the first stage
+  <dd> This can then be used as
+<pre class="rcode">
+source("http://www.omegahat.org/XMLDocs/evalNode.R")
+dynDoc("http://www.omegahat.org/XMLDocs/basic.Rdyn", "basic.xml")
+</pre>      
+Then you can use
+<pre class="shellCode">
+make -f &lt;wherever&gt;/Makefile basic.html      
+</pre>
+assuming you have the XSL files installed and the Makefile accessible.      
+</dl>
+
+
+<hr>
+<address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@wald.ucdavis.edu>&lt;duncan@wald.ucdavis.edu&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Tue Aug  9 18:03:15 PDT 2011
+<!-- hhmts end -->
+</body> </html>

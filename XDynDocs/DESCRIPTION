@@ -1,0 +1,57 @@
+Package: XDynDocs
+Version: 0.3-1
+Title: Dynamic Documents with XML and XSL
+Description:
+  XDynDocs is a package for working with structured documents with R.
+  It uses a combination of R and Docbook to allow authors to 
+  create and then process documents to render them in HTML, PDF,
+  FO and LaTeX. The documents can be transformed "statically"
+  i.e. just rendering the current contents as the author wrote them,
+  or dynamically in which case R code within the document 
+  is evaluated and the results inserted into the output document.
+  The infrastructure allows static processing to be done both in R
+  or externally using make files.
+  The processing is highly extensible as it uses XML, XSL and 
+  facilities for combining R and XSL.  It is relatively straightforward
+  to change how XML elements are processed within R and/or rendered.
+  One can also control the rendering via an extensive collection
+  of parameters that govern the XSL transformations and also the evaluation
+  of R code.
+  The documents we promote and can operate on are significantly  richer
+  than simple linear documents (e.g. as with Sweave, odfWeave, etc.)
+  They allow inclusion of many additional document elements such as 
+  branches or alternative approaches, elements that are intended for different 
+  readers.
+  The documents can contain meta-information to make them interactive.
+  The structured documents allow for additional manipulation to verify
+  or augment the contents, e.g. find all references to R functions or classes or packages,
+  correct misspellings of their names, add package names, etc.
+  We can also generate the necessary help files for adding links to these references
+  so that readers can read help interactively.
+Maintainer: Duncan Temple Lang <duncan@wald.ucdavis.edu>
+Author: Deborah Nolan, Duncan Temple Lang
+Depends: methods, Sxslt
+Imports: methods, XML, grDevices, codetools
+Suggests: digest, xtable
+Enhances: RSvgDevice
+LazyLoad: yes
+License: GPL2
+Collate: config.R classes.S  docbook.R  dynamic.R dynOptions.R convert.R html.R
+         R2DocBook.R R2FO.R R2HTML.R onAttach.R xsl.R
+	 docstring.R
+	 reorder.R
+         svg.R
+         highlight.R
+         fixCatalog.R
+         nonDynamic.R
+         XSLOpts.R
+         getMakeOpts.R 
+         formatCode.R
+         insertData.R
+         fop.R utils.R
+         targetNames.R
+         getThread.R
+         tasks.R
+         fixSVGDim.R
+foo: sectionDepends.R codeDepends.R docTools.R xslTools.R
+

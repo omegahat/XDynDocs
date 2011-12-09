@@ -1,0 +1,12 @@
+<article xmlns:r='http://www.r-project.org'>
+<section>
+<title>An SVG plot</title>
+<para>
+A plot
+<r:plot>
+plot(rnorm(100))
+</r:plot>
+
+</para>
+</section>
+</article>

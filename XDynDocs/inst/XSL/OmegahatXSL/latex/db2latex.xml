@@ -1,0 +1,64 @@
+<article>
+
+<para>
+Empty \docbooktolatexcite{} calls: \docbooktolatexcite{, }{}
+See line 391.
+This comes from 
+<![CDATA[
+<citation><biblioref linkend="bib:R"/></citation>
+]]>
+</para>
+
+<para>
+The running header is overlapping with the text.
+<br/>
+That's because I was using \usepackage{fullpage}!
+</para>
+
+<para>
+Deal with svg figures, i.e. allow alternate content/formats or
+converting the name of the file to a .pdf
+<br/>
+The replacement to .pdf is done.
+</para>
+
+<para>
+hyperref conflicts.
+Vague recollection it goes away if we use  an xsl:include, but can't do that
+as we rename a named template and so get a duplicate error.
+</para>
+
+<para>
+Use a lang attribute on the top-level element of your document,
+e.g.
+<![CDATA[
+<article lang="en">
+ ...
+</article>
+]]>
+</para>
+
+<para>
+We need to arrange for a call to a general template just before
+the \begin{document} is emitted.
+We have to either take over the article template (in book-article.mod.xsl)
+or edit the original db2latex file and insert a new line just before the 
+<![CDATA[
+  <xsl:text>}&#10;</xsl:text>
+  <!-- Display  begindocument command -->
+  <xsl:call-template name="before.document.begins"/>
+  <xsl:call-template name="map.begin"/>
+  <xsl:value-of select="$latex.maketitle"/>
+]]>
+</para>
+
+<para>
+The language is still a problem as we are getting 
+references to Tableau.
+<br/>
+Of course, this is because I didn't put the 
+lang="en" on the new document I was working with!
+</para>
+
+
+</article>

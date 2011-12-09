@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+We illustrate how to construct threads within a document
+and how to use the groups mechanism for optional
+tasks.
+</para>
+
+<task label="initialization">
+
+<r:code id="a">
+n = 100
+x = runif(n)
+y = 10 + 3 * x + rnorm(n, sd = abs(x))
+</r:code>
+</task>
+
+
+<task label="remove outliers" groups="removeOutliers">
+
+<r:code id="b"><![CDATA[
+omit = abs(x) > 3
+x = x[!omit]
+y = y[!omit]
+n = length(x)
+]]></r:code>
+</task>
+
+
+<task thread="OLS">
+
+<r:code id="c">
+fit = lm(y ~ x)
+</r:code>
+
+
+</task>
+
+<task thread="WLS">
+
+<r:code id="d">
+fit = lm(y ~ x, weights = abs(x))
+</r:code>
+
+</task>
+
+<task>
+
+<r:code id="e">
+summary(fit)
+</r:code>
+
+</task>
+
+<task label="remove outliers" groups="removeOutliers">
+
+<r:code id="f">
+plot(predict(fit, x[omit]), y[omit], main = "Prediction of outliers")
+</r:code>
+
+</task>
+
+</section>
+
+<section>
+<title></title>
+
+<para>
+
+<programlisting><![CDATA[
+library(CodeDepends)
+tt = readScript("threadGroup.Rdb")
+]]></programlisting>
+
+</para>
+</section>
+
+</article>

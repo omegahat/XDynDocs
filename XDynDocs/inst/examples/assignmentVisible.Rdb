@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title></title>
+
+<author><firstname>Duncan</firstname><surname>Temple Lang</surname>
+  <affiliation><orgname>University of California at Davis</orgname>
+               <orgdiv>Department of Statistics</orgdiv>
+  </affiliation>
+</author>
+</articleinfo>
+
+<section>
+<title></title>
+
+<para>
+This is a test of the invisible printing tht
+R does to suppress  printing the result of an
+assignment or a return value wrapped
+in a call to <r:func>invisible</r:func>
+
+
+<r:code>
+x = 1
+</r:code>
+
+
+<r:code>
+x
+</r:code>
+
+
+
+<r:function><![CDATA[
+foo =
+function(x)
+  invisible(x + 10)
+]]></r:function>
+
+
+<r:code>
+foo(10)
+</r:code>
+
+
+
+</para>
+
+</section>
+</article>

@@ -1,0 +1,25 @@
+Makefile for Windows
+
+R function to find table of templates in an XSL file
+  Already in XDocTools - xslTools.R
+
+Function to find which are missing in, e.g. HTML but defined for FO.
+
+R function to find which parameters are defined, which are not.
+    Already in XDocTools - xslTools.R
+  Which are not?
+
+Document XSL parameters
+
+[Done] Empty XSL template
+    See inst/XSL/emptyTemplate.xsl
+
+[Fix]  Make the names the sae for each target, e.g. html/article.xsl and fo/article.xsl, etc.
+   so need only change directory name in the template to include the default XSL.
+
+Table of URIs for namespaces.
+  merge with Rdocbook.el
+
+   See getNSDefs() in xslTools.R
+
+Move to Docbook 5.

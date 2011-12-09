@@ -1,0 +1,491 @@
+<?xml version="1.0"?>
+<article xmlns:r="http://www.r-project.org"
+         xmlns:xi="http://www.w3.org/2003/XInclude">
+
+<articleinfo>
+
+<title>Template for showing how to use the <quote>R code</quote> tags
+and attributes</title>
+
+</articleinfo>
+
+<section>
+<title>The r:init tag</title>
+
+<para>
+R code that is essentially initialization code for the document or a
+section.  This often identifies the important inputs that the reader
+might want to modify and have propogate to the subsequent code
+elements for evaluation.
+</para>
+
+<r:init id="initCode"><![CDATA[
+x = 1:3
+z = rnorm(3)
+]]></r:init>
+
+<para>
+The init code block above, is not displayed in the final document.
+The code sets up the variable <r:var>x</r:var> and <r:var>z</r:var>.
+We show <r:var>x</r:var> in the r:code block below. 
+
+<r:code><![CDATA[
+x
+]]></r:code>
+</para>
+</section>
+
+<section>
+<title>The r:code tag</title>
+
+
+<para>
+The r:code tag is the most common tag.
+
+<r:code><![CDATA[
+N = 2
+x = runif(N, 0, 20)
+x
+]]></r:code>
+</para>
+
+<para>
+Next the same code is shown, but not run because we set the eval
+attribute to false on the tag.
+ 
+<r:code eval="false"><![CDATA[
+N = 2
+x = runif(N, 0, 20)
+x
+]]></r:code>
+
+There is also no output to be displayed, of course.  We check that the
+code was not run, by examining the value of <r:var>x</r:var>.
+
+<r:code>
+x
+</r:code>
+
+It has not changed.
+</para>
+
+<para>
+It is also possible to run code, but not show it. 
+To do this, set the showCode attribute to false.
+
+<r:code showCode="false"><![CDATA[
+y = letters[1:3]
+]]></r:code>
+
+The code in the block above (not shown) sets <r:var>y</r:var> to the
+first 3 values in <r:var>letters</r:var>. We confirm by displaying it.
+
+<r:code><![CDATA[
+y
+]]>
+</r:code>
+
+Note that although code is not shown when we use showCode="false", the
+output is displayed. In the following r:code, we make a call to
+<r:func>summary</r:func> on <r:var>x</r:var>.
+
+<r:code showCode="false">
+summary(x)
+</r:code>
+
+The code is not shown because we set showCode to false.
+</para>
+
+
+<para>
+To hide the code and the output, surround r:code by an invisible tag. 
+
+<invisible>
+<r:code><![CDATA[
+x = 1:20
+x
+]]></r:code>
+</invisible>
+
+The code in the invisible block above, set <r:var>x</r:var> to be
+1:20.
+
+<r:code>
+x
+</r:code>
+
+</para>
+
+</section>
+
+<section>
+<title>The r:output tag</title>
+
+<para>
+Typically, we include the r:output tag as a child of r:code.
+This tag is used to hold output from a previous running of 
+the code.  This output is displayed when we do not want to
+rerun the code, i.e. it may be using cached results.
+ 
+<r:code eval="false"><![CDATA[
+x = runif(N, 0, 20)
+x
+]]>
+<r:output>
+[1] 7.125657 8.944187
+</r:output>
+</r:code>
+
+<query>
+I MUST BE DOING THIS WRONG... SHOULD THE OUTPUT NOT BE SHOWN WHEN eval
+= false on the code block?
+<ans>
+Fix the XSL!
+<br/>
+When eval is false, we are just saying don't run the code.
+If you don't want the output shown, don't put it in. Or put it in
+an invisible. But it is your choice as the code is not being run.
+</ans>
+</query>
+
+Note that the value shown for <r:var>x</r:var> of 7.125657, 8.944187
+does not match the value shown above. This is because it is from an
+earlier capture of the code. When the code is run then the output will
+be placed in the r:output tag.  (In this case we have placed an
+eval=false tag on our code block to avoid confusion).
+</para>
+
+<para>
+The output, need not be a child of <xml:tag>r:code</xml:tag> as shown below.
+
+<r:output>
+[1] 7.125657 8.944187
+</r:output>
+</para>
+
+<para>
+<query status="done">
+QUESTION - We introduced the numLinesOutput attribute on
+r:output. Does it work yet?
+<a>
+I don't think this makes much sense for r:output.
+You are putting the content there. You can set the number
+of lines. What does come into effect is the <xml:attr>numLines</xml:attr>
+attribute (not <xml:attr>numLinesOutput</xml:attr>) which is on
+an r:code node.
+See the example just below this <xml:tag>query</xml:tag>.
+</a>
+</query>
+
+<r:code numLines="6">
+mtcars
+</r:code>
+
+<r:output numLinesOutput="6">
+  [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+ [13] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+ [25] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+ [37] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+ [49] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+ [61] FALSE FALSE  TRUE FALSE FALSE FALSE  TRUE  TRUE FALSE  TRUE FALSE  TRUE
+ [73] FALSE  TRUE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE
+ [85]  TRUE FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  TRUE
+ [97]  TRUE FALSE FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE  TRUE  TRUE  TRUE
+[109] FALSE FALSE FALSE FALSE  TRUE
+</r:output>
+</para>
+</section>
+
+
+<section>
+<title>The r:expr tag</title>
+
+<para>
+The r:expr tag is used to in-line in text the output from an R
+expression.  For example, we can examine the first element of
+<r:var>y</r:var>: <r:expr>y[1]</r:expr>.  We can set the number of
+digits to display with the digits attribute. Here we set it to 3, and
+look at z[1] is <r:expr digits="3">z[1]</r:expr>. (Recall
+<r:var>z</r:var> was created in the r:init.
+</para>
+
+<para>
+We just added the possibility of displaying vectors in-line.
+Here is all of z, <r:expr digits="3">z</r:expr>.
+</para>
+
+</section>
+
+<section>
+<title>The r:commands tag</title>
+
+<para>
+If we want to show the intermediate results from a block of code.
+Then we need to use r:commands, rather than r:code. For example to
+display a <r:func>summary</r:func> of <r:var>z</r:var> and the
+<r:func>range</r:func> of <r:var>x</r:var>, we use the following
+r:commands
+
+<r:commands><![CDATA[
+summary(z)
+range(x)
+]]></r:commands>
+
+</para>
+
+</section>
+
+<section>
+<title>
+The r:function tag
+</title>
+
+<para>
+The r:function tag is used for a code block that defines a function.
+Typically, only one function per code block.  It is recommended that
+the id attribute is used to make it easy to evaluate the code to
+define a function by specifiying just the id of this node.
+
+<query>
+QUESTION: Is the id supposed to match the name of the function?
+Not necessarily, but it is convenient in order to remember it.
+We use 
+
+<r:code eval="false">
+xmlSource(doc, ids = "funName")
+xmlSource(doc, ids = c("funName1", "otherFunName"))
+</r:code>
+and these refer to the ids. It is convenient if they are the function
+names as it makes the connection clear.
+
+</query>
+
+<r:function id="newSum">
+newSum = function(x) 
+{
+  abs(sum(x))
+}
+</r:function>
+
+Here we use the new function:
+<r:commands>
+x = rnorm(10, -1)
+sum(x)
+newSum(x)
+</r:commands>
+
+</para>
+
+</section>
+
+
+
+<section>
+<title>The <xml:tag>r:dynOptions</xml:tag> tag
+</title>
+
+<para>
+The <xml:tag>r:dynOptions</xml:tag> can be used to specify values for options.  The
+attribute name is the name of the option and the attribute value will
+be the assigned value of the option.
+
+<query>QUESTION: The following code crashes R:
+<a>
+This is  related to getting an error in the R code
+and XSL not checking the error status at some points.
+<br/>
+You have the concept of <xml:tag>r:dynOptions</xml:tag> wrong.
+</a>
+</query>
+</para>
+
+<para>
+The concept of options is to control the behavior of the dynamic document processing,
+not the evaluation of the code within the document.
+In other words, it controls the engine in <r:pkg>XDynDocs</r:pkg>, not the
+code in the <xml:tag>r:code</xml:tag> and <xml:tag>r:plot</xml:tag> nodes in the
+XML document.
+</para>
+<para>
+We can nest <xml:tag>r:code</xml:tag>, etc. nodes within  an <xml:tag>r:option</xml:tag> tag, i.e. so that these  options take effect for a duration
+and r:code, r:plot, etc. within the <xml:tag>r:dynOptions</xml:tag> node are evaluated with the context of these options in effect.
+</para>
+<para>
+We can have nested <xml:tag>r:dynOptions</xml:tag>, i.e. <xml:tag>r:options</xml:tag> within <xml:tag>r:options</xml:tag>
+so that some options apply to the whole group, but some are overridden and apply to a subset of nodes/content.
+</para>
+<para>
+If we wanted what you are doing here, you would use 
+  <r:code eval="false">
+   options(MYOPT = FALSE)
+  </r:code>
+ which is much better as there is no ambiguity  between strings and intended R values.
+</para>
+<para>
+But we don't want to call the function to get the dynamic document processing options in our code within the document.
+These are things that the document processor is using, not the code in the 
+document itself. We can call these <xml:tag>dynOptions</xml:tag> or <xml:tag>docOptions</xml:tag> if we want,
+to help distinguish the intentions.
+</para>
+<r:dynOptions MYOPT = "FALSE" width="20">
+<r:code>
+matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16), 8, 2, dimnames = list(NULL, c("X", "Y")))
+</r:code>
+<!--
+<r:commands>
+getOption("MYOPT")
+
+getDynOptions("MYOPT")
+getDynOptions("width")
+</r:commands>
+-->
+<programlisting><![CDATA[
+]]></programlisting>
+</r:dynOptions>
+</section>
+
+<section>
+<title>The r:plot</title>
+
+<para>
+The r:plot tag is not covered in this document. It is addressed in its
+own document.
+</para>
+</section>
+
+<section>
+<title>Markup for R language concepts/terms/entities</title>
+
+
+
+
+<para>
+When writing text, to identify names of functions, variables,
+parameters, packages and options, use the following tags: r:func
+(notice it is not the same as r:function), r:var, r:arg, r:pkg, and
+r:opt, respectively. These have been used throughout this document.
+Also, use the empty tags <xml:tag>r:true</xml:tag>, <xml:tag>r:false</xml:tag>, and 
+<xml:tag>r:na</xml:tag>, to represent <r:true/>,
+<r:false/>, and <r:na/> values, respectively.
+</para>
+
+
+
+<para>
+<query>QUESTION what about the values of parameters, variables, options?
+<br/>
+Not sure what you mean here?
+This the output of a literal. Your choice.
+e.g. "The value of <r:var>x</r:var> is 27" and we are talking here about the "27".
+</query>
+</para>
+
+</section>
+
+<section>
+<title>
+More QUESTIONS
+</title>
+
+<para>
+Is r:value used programmatically, i.e. and not by an author?
+<a>
+Now that I think back, I believe the idea is that r:value is the rendering
+of an R object that we can manually insert and display ourselves.
+We can have R insert it for us, but it is our choice as the author
+at authoring time, not run-time for processing the document.
+<xml:tag>r:data</xml:tag> is for representing data that is to be
+read into R at dynamic processing time.
+</a>
+</para>
+
+<para>
+I don't know how to use the id of an r:function to "can easily
+evaluate the code to define a function by specifiying just the id of
+this node".
+<a>
+xmlSource(doc, ids = "id_of_r:function_node"), e.g.
+<r:function id="foo">
+foo =
+function(x, y)
+ x + y
+</r:function>
+<r:code eval="false">
+library(XML)
+xmlSource("inst/examples/RCodeTagExs.Rdb", ids = "foo")
+foo(1, 2) # 3
+</r:code>
+
+<r:function id="bar"><![CDATA[
+bar = 
+function()
+  rnorm(10)
+]]></r:function>
+
+Alternatively, you can use <r:func>xmlSourceFunctions</r:func>
+to get all of them, or just a few by <r:arg>ids</r:arg>:
+
+<r:code eval="false">
+xmlSourceFunctions("inst/examples/RCodeTagExs.Rdb", ids = "foo")
+</r:code>
+</a>
+</para>
+
+
+<ignore>
+Don't ignore this. I just have the ignore tag so that it doesn't
+get processed by dynDoc.
+<para>
+I don't know how to pull together the r:frags into a function.
+<r:function id="fun">
+fun = 
+function(x, y = 2, z = 3)
+{
+  <r:code ref="checkInputs"/>
+  <r:code ref="doComputation"/>
+  <r:code ref="createOutput"/>
+}
+</r:function>
+</para>
+<para>
+The first part is 
+
+<r:code id="checkInputs"><![CDATA[
+ if(!(x < 0 || y < .5))
+    stop("invalid input")
+]]></r:code>
+</para>
+
+<para>
+Now we do the heart of the computation.
+This creates a derived local variable and then
+simulates some values. We do the latter within a separate fragment.
+<r:code id="doComputation">
+  tmp = z * log(x)^y  
+  <r:code ref="sim"/>
+</r:code>
+(Note that we cannot use a CDATA for this r:code as we refer to another 
+<xml:tag>r:code</xml:tag> element. So we would have to use entities for
+any special characters such as &amp; and &lt; and &gt;.
+</para>
+
+<para>
+Now we just put a class on the result
+<r:code id="createOutput"><![CDATA[
+  structure(ans, class = "FooBar")
+]]></r:code>
+
+</para>
+
+<para>
+We now come to the simulation part.
+<r:code id="sim"><![CDATA[
+  ans = rnorm(floor(tmp))
+]]></r:code>
+Note that we have to agree on the local variables across the fragments,
+e.g. <r:var>ans</r:var>.
+</para>
+</ignore>
+</section>
+
+</article>

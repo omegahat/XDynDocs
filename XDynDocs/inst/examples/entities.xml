@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE article  [
+  <!ENTITY DTL  "Duncan Temple Lang">
+  <!ENTITY docbook SYSTEM "docbook-entity.xml">
+]>
+<article>
+<para>
+&DTL; uses &docbook;
+</para>
+</article>

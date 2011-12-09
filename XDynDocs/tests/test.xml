@@ -1,0 +1,51 @@
+<section  xmlns:r="http://www.r-project.org">
+<title>Traffic flow on highways in California</title>
+ <para>
+Load the data
+<r:init>
+load("traffic.rda")
+</r:init>
+Then do a simple summary.
+<r:code>
+ summary(traffic$Occ1)
+</r:code>
+We use <r:func>read.csv</r:func> since the default values of the
+arguments match the data format - commma separated values with column
+names in the first line.
+</para>
+<para> Examine the relationships.
+The IQR in lane 2 is <r:expr>IQR(traffic$Flow2)</r:expr> in comparison to
+<r:expr>IQR(traffic$Flow3)</r:expr> for lane 3.
+ </para>
+ 
+ <para>
+Consider the flows in the three lanes using time series plots. Which
+lane typically serves the most traffic? 
+  
+<!--      <r:plot>
+plot(traffic$Flow1, type = "l")
+lines(traffic$Flow2, col = "blue")
+lines(traffic$Flow3, col = "red")
+      </r:plot>
+-->
+<r:code>
+  mean(traffic$Flow2)
+</r:code>
+Lane 1 has the highest peaks however it also has the lowest troughs. 
+</para>
+<para> 
+Consider the relationship between flow and occupancy. Plot flow
+against occupancy for lane 1. In one sentence, describe the shape of
+the points.
+<r:code> 
+length(traffic)
+</r:code>
+</para>
+<para>
+Consider using the R functions <r:func>plot</r:func>,
+<r:func>boxplot</r:func>, <r:func>density</r:func>,
+<r:func>hist</r:func>. Also consider using some of the arguments to
+the plotting functions to improve the appearance of your plot, such as
+<r:arg>ylim</r:arg> and <r:arg>xlab</r:arg>.
+</para>
+</section>

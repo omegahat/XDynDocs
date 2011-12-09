@@ -1,0 +1,1128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Markup for Scientific Documents</title><link rel="stylesheet" type="text/css" href="/Users/duncan/Classes/StatComputing/XDynDocs/inst/CSS/OmegaTech.css"></link><meta name="generator" content="DocBook XSL Stylesheets V1.76.1"></meta><script xmlns="" type="text/javascript" src="http://www.omegahat.org/DynDocs/JavaScript/toggleHidden.js"></script>
+</head><body class="yui-skin-sam">
+<script xmlns="" type="text/javascript"><!--
+var toggleCodeIds = [
+ 
+   "id1169450830296", 
+   "id1169450831668", 
+   "id1169450831671", 
+   "id1169450831691", 
+   "id1169450831704", 
+   "id1169450831723"
+];
+--></script><p xmlns=""></p>
+<div class="article" title="Markup for Scientific Documents"><div class="titlepage"><div><div><h2 class="title"><a id="id1169450778207"></a>Markup for Scientific Documents</h2></div><div><div class="author"><h3 class="author"><span class="firstname">Paul</span> <span class="surname">Murrell</span></h3><div class="affiliation"><span class="orgname">University of Auckland<br></br></span> <span class="orgdiv">Department of Statistics<br></br></span></div></div></div><div><div class="author"><h3 class="author"><span class="firstname">Deborah</span> <span class="surname">Nolan</span></h3><div class="affiliation"><span class="orgname">University of California at Berkeley<br></br></span> <span class="orgdiv">Department of Statistics<br></br></span></div></div></div><div><div class="author"><h3 class="author"><span class="firstname">Duncan</span> <span class="surname">Temple Lang</span></h3><div class="affiliation"><span class="orgname">University of California at Davis<br></br></span> <span class="orgdiv">Department of Statistics<br></br></span></div></div></div></div><hr></hr></div><div class="section" title="Introduction"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id1169450830049"></a>Introduction</h2></div></div></div><p>
+The author of a document or report often has only
+one target in mind:  formatted output on a page 
+or a computer screen.  
+</p><p>
+When the only tools available for creating documents
+were a quill and ink, or even a typewriter, this 
+was an understandably limited ambition.  
+However, now that we can create documents
+using computers and modern software tools, a focus only
+on the rendered appearance of a document represents a lost opportunity.
+</p><p>
+This article describes a set of XML-based technologies and an approach
+to creating documents that goes beyond the concern with
+how the document appears on the page or screen.  
+The aim is to encourage authors of documents to consider a much
+wider range of possible uses for their documents.
+</p><p class="remark"><em><span class="comment">
+<p>
+Mention some of the (intellectual) predecessors to this document?
+e.g. Gentleman and Temple Lang
+</p>
+</span></em></p><div class="section" title="Beyond formatted output"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450830081"></a>Beyond formatted output</h3></div></div></div><p>
+Consider the snippet of a report shown in <a class="xref" href="#reportsection" title="Figure 1. An example of a section of a report">Figure 1, &#8220;An example of a section of a report&#8221;</a>.
+The content of this report 
+is just text, but the text is formatted in a variety of
+ways.  For example, the first line, which is a section heading,
+ has a larger and bolder font.
+</p><div class="figure"><a id="reportsection"></a><p class="title"><strong>Figure 1. An example of a section of a report</strong></p><div class="figure-contents"><div><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="50%"><tr><td><img src="demodoc.png" width="100%" alt="An example of a section of a report"></img></td></tr></table></div></div></div><br class="figure-break"></br><p>
+One way to produce this appearance
+for the section heading is to 
+select a larger font and a bold face for the text.
+However, this focuses only on the appearance of the text,
+rather than what the text represents.  
+</p><p>
+Why is the text
+large and bold?  Because it is a section heading.  The important
+information is that the text is a section heading and the
+appearance of the text flows from that.
+Furthermore, the knowledge that the text is a section heading
+can be used in other ways.
+For example, this information makes
+it possible to automatically construct a table of contents for the report.
+</p><p>
+If the correct way to create the first line of the report in
+ <a class="xref" href="#reportsection" title="Figure 1. An example of a section of a report">Figure 1, &#8220;An example of a section of a report&#8221;</a> is to indicate that this
+text is a section heading, how can this information be specified?
+The answer will depend on the software that is being used to 
+create the document.  Users of <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i> will be familiar with 
+commands such as
+<strong class="userinput"><code>\section{Uniform Random Numbers}</code></strong>
+for this purpose.  In Microsoft Word, <em class="glossterm">styles</em>
+are the appropriate tool.
+</p><p>
+The general term that we will use for this idea is 
+<em class="glossterm">markup</em>.  We use markup to indicate different sorts
+of content within a document.  
+</p><p>
+As demonstrated above, 
+the concept of markup can be implemented in various ways and in 
+different software technologies.  In this article, we propose
+the use of XML as the underlying
+markup technology.  The XML technology itself and the reasons for using
+it are the subject of the remainder of this article.  For the
+particular example of a section heading, 
+one possible XML markup is shown below.
+</p><pre class="programlisting">
+&lt;section&gt;
+  &lt;title&gt;Uniform Random Numbers&lt;/title&gt;
+&lt;/section&gt;
+</pre><p>
+The code above shows the basic structure of XML markup:
+start and end tags of the form <code xmlns="" class="xmlTag">&lt;tag&gt;</code>
+and <code xmlns="" class="xmlTag">&lt;/tag&gt;</code> are placed around the text to be marked up.
+In XML terminology, the text is the <em class="glossterm">content</em> of
+the <code xmlns="" class="xmlTag">&lt;title&gt;</code> element.  That element is further marked up
+to indicate that it is the title of a section;  the
+<code xmlns="" class="xmlTag">&lt;title&gt;</code> element is the content
+of a <code xmlns="" class="xmlTag">&lt;section&gt;</code> element.
+</p></div><div class="section" title="Beyond structural markup"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450830180"></a>Beyond structural markup</h3></div></div></div><p>
+The first line of the second paragraph in
+<a class="xref" href="#reportsection" title="Figure 1. An example of a section of a report">Figure 1, &#8220;An example of a section of a report&#8221;</a> contains another
+example of special formatting.  The word <span class="quote">&#8220;<span class="quote">runif</span>&#8221;</span> (and its
+associated parentheses) is set in a monospaced font.
+</p><p>
+Again, this formatting could be achieved by simply selecting a monospaced
+font for that text, but the more important information is the reason
+for using this font to display that text.  In this case, the font
+is chosen because the text is a piece of computer code.  More 
+specifically, it is the name of a function for the R language.
+A possible markup to use for this text is shown below.
+</p><pre class="programlisting">
+The &lt;r:func name="runif" /&gt; function may be used to generate ...
+</pre><p class="remark"><em><span class="comment">
+<p>
+I have kept the attribute example (so that I can talk about XML
+attributes), but ADDED the content style as well, plus a general
+comment about style (not sure if the data/metadata angle works for you ...?)
+</p>
+</span></em></p><p>
+The code above demonstrates that XML markup may also consist of 
+<em class="glossterm">attributes</em> of the form 
+<strong class="userinput"><code>name="value"</code></strong>, within the start tag of an 
+XML element.  In this case, we have a <code xmlns="" class="xmlTag">&lt;r:func&gt;</code>
+element with an attribute called <strong class="userinput"><code>name</code></strong>
+and the value of that attribute is the text <strong class="userinput"><code>"runif"</code></strong>.
+</p><p>
+An alternative XML markup would be to have the name of the function
+as the content of the element, as shown below.  This is the style
+that we will typically use, with the <span class="quote">&#8220;<span class="quote">data</span>&#8221;</span> as the content
+of an element and attributes used for <span class="quote">&#8220;<span class="quote">metadata</span>&#8221;</span>.
+</p><pre class="programlisting">
+The &lt;r:func&gt;runif&lt;/r:func&gt; function may be used to generate ...
+</pre><p>
+As in the previous section, the important thing is to markup the 
+text to indicate what sort of content it represents and the 
+appearance of the text will just flow from that.
+One subtle enhancement in this case is that the text 
+only needs to provide the name of the R function; the parentheses
+can be added as part of the formatting for display.
+</p><p>
+Once this markup is in place, it can be used for other
+purposes as well, for example to create a list of R functions
+that are mentioned in the report.  More sophisticated uses
+include checking that the R function actually exists (has it been
+spelled correctly?) and perhaps adding a hyperlink to the online 
+help page for the function.
+</p><p>
+The significance of this example is that it is not just familiar
+things like section headings that benefit from markup.
+And it is not just familiar things like 
+tables of contents that can be usefully generated from the markup.
+All different types of content within a document deserve markup 
+and there is no end to the possible benefits that accrue from the
+use of markup.
+</p><p class="remark"><em><span class="comment">
+<p>
+I have spread the ideas of eval="false" attribute and invisible tags
+out across a couple of sections.
+</p>
+<p>
+What about using the attribute, eval="false" on the r:code tag? We
+could also show the invisible tag. 
+</p><pre class="programlisting">
+&lt;invisible&gt;
+&lt;r:code&gt;
+runif()
+&lt;/r:code&gt;
+&lt;/invisible&gt;
+</pre><p>
+Then these could lead to a discussion of how code can be shown but now
+evaluated, evaluated but not shown, or evaluated and shown. The hidden
+code could be used to, e.g., set the seed so the document always
+produced the same output from <i xmlns="" class="rfunc">runif()
+</i>.  The eval=false
+could be used to show that pseudo-code or the beginnings of code could
+be shown without it having to be syntactically correct, e.g.
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="id1169450830296"><div><pre class="" title="R code">
+myFunc = function(x, y){
+  ...
+}
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+Then we could make the point that these are r:code nodes, and the
+attributes contain additional information about how to process them.
+We used to have a showcode attribute not sure what happened there... 
+</p>
+</span></em></p><p>
+This case also provides an example of some of the benefits of 
+using XML as the markup technology.  In Microsoft Word, it would be
+possible to define a new style to apply to text that represents
+the name of an R function, but it would be difficult to take advantage
+of that style to produce things like lists of R functions or 
+links to R help pages (though we will return to this issue later on).
+Similarly, it is possible with <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i> to define a new command
+to format the text for an R function ...
+</p><pre class="programlisting">
+\newcommand{\rfunc}[1]{{\ttfamily #1()}}
+</pre><p>
+... but the <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i> syntax is not designed for general processing, such
+as finding all instances of a particular command.
+</p><p>
+XML, by contrast, <span class="emphasis"><em>is</em></span>
+ designed for general processing and is supported
+by a powerful suite of tools, such as XPath and XSL, which make
+it possible to introduce new markup and process that markup in 
+unlimited ways.  For example, the XPath code to select all 
+<code xmlns="" class="xmlTag">&lt;r:func&gt;</code> elements within a document is simply 
+<strong class="userinput"><code>//r:func</code></strong>.  The XSL code that formats
+<code xmlns="" class="xmlTag">&lt;r:func&gt;</code> elements (as HTML) is shown below.  
+This code says that wherever there is an <code xmlns="" class="xmlTag">&lt;r:func&gt;</code>
+element with a <strong class="userinput"><code>name</code></strong> attribute, replace
+it with a <code xmlns="" class="xmlTag">&lt;span&gt;</code> element 
+(with an attribute that selects a monospaced font)
+and make the content of the <code xmlns="" class="xmlTag">&lt;span&gt;</code> element
+the value of the original <strong class="userinput"><code>name</code></strong> attribute,
+followed by parentheses.
+</p><pre class="programlisting">
+&lt;xsl:template match="r:func[@name]"&gt;
+    &lt;span style="font-family: mono"&gt;
+        &lt;xsl:value-of select="@name"/&gt;()
+    &lt;/span&gt;
+&lt;/xsl:template&gt;
+</pre><p>
+The XSL syntax will be explored a little more later on.
+For now, the important point is that this
+language is extremely flexible and
+is designed to allow much more to be done when processing
+the XML elements for display and for other purposes. 
+</p></div><div class="section" title="Beyond static documents"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450830373"></a>Beyond static documents</h3></div></div></div><p>
+The last two lines shown in <a class="xref" href="#reportsection" title="Figure 1. An example of a section of a report">Figure 1, &#8220;An example of a section of a report&#8221;</a> 
+show some more examples of computer code:  part user input and part
+computer output.  
+Once again, we should focus on what these lines represent,
+rather than on the fact that they are set in a monospaced font.
+One possible XML markup for these pieces of code is shown below.
+This markup identifies the first line as a chunk of R code
+and the second line as the output from running the R code.
+</p><pre class="programlisting">
+&lt;r:code&gt;
+runif(n)
+&lt;r:output&gt;
+[1] 0.2554896 0.5595997 0.1491488
+&lt;/r:output&gt;
+&lt;/r:code&gt;
+</pre><p>
+As we have seen before, having used markup to describe the nature of
+certain content within a document, in addition to customizing the
+formatted appearance of the content, it becomes possible to perform
+actions on that content.
+In this case, there is an especially useful action that we can take with
+<code xmlns="" class="xmlTag">&lt;r:code&gt;</code> elements;
+we can extract the code within the element and <span class="emphasis"><em>execute</em></span>
+ it within an R session.
+</p><p>
+This is a useful thing to do if only to check that the code will run
+(that it is valid R code), but much more useful is the ability to capture the 
+results from running the code and then use that to update the content 
+of the <code xmlns="" class="xmlTag">&lt;r:output&gt;</code> element.
+</p><p class="remark"><em><span class="comment">
+<p>
+I think that discussion of an id attribute 
+would be a distraction at this point in the introduction.
+I have added a note to possibly include this in the section on
+DynDocs as an example of the sort of thing that is easy to set
+up with the XML tool chain and not so easy with LaTeX/Sweave.
+</p>
+</span></em></p><p>
+This is much better than running the code by hand and cutting-and-pasting
+the output from R into the document for two reasons:
+it is easy to automate the running of all of the code in a document and the
+automatic insertion of the output from the code and,
+if we change the code, it is easy to automatically update all of the
+output in the document.
+</p><p>
+Once we have the notion that our document can contain chunks of 
+computer code that can be evaluated, all sorts of other possibilities
+arise.  For example, if we wanted to ensure that the document generates
+the same set of <span class="quote">&#8220;<span class="quote">random</span>&#8221;</span> values every time, we could include
+a call to the <i xmlns="" class="rfunc">set.seed()
+</i> function at the start of the
+document.  However, we might not want this function call to appear
+in the formatted version.  That could be achieved by marking up this
+particular piece of R code to indicate that it should not be visible.
+An example of such markup is shown below.
+</p><pre class="programlisting">
+&lt;invisible&gt;
+&lt;r:code&gt;
+set.seed(1234)
+&lt;/r:code&gt;
+&lt;/invisible&gt;
+</pre><p>
+This chunk of code can now be evaluated, but not displayed.
+More generally, this shows that
+all possible combinations of evaluated or not, visible or not,
+and output visible or not can easily be specified through markup.
+</p></div><div class="section" title="Beyond literate documents"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450830456"></a>Beyond literate documents</h3></div></div></div><p>
+Some readers will recognize the description from the previous section
+as an implementation of literate documents.
+A number of software tools provide this sort of facility, including
+Sweave for integrating R code (predominantly in <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i> documents), 
+StatWeave, which generalizes the idea to multiple statistical languages
+(R, SAS, Stata, etc), and Org-babel, which generalizes the idea to multiple
+programming languages (R, Perl, C, etc).  (refs refs refs!
+the 
+<a class="ulink" href="http://cran.stat.auckland.ac.nz/web/views/ReproducibleResearch.html" target="_top">
+Reproducible Research</a> CRAN Task View has some useful links)
+</p><p>
+All of these facilities can also be implemented using an XML-based system.
+For example, the following shows how a section of shell code might be
+marked up.
+</p><pre class="programlisting">
+&lt;sh:code&gt;
+ls *.xml
+&lt;/sh:code&gt;
+</pre><p>
+This is a <code xmlns="" class="xmlTag">&lt;code&gt;</code> element like we have used before, but
+it is distinguished from a chunk of R code by the use of an XML
+<em class="glossterm">namespace</em>.  The <strong class="userinput"><code>sh:</code></strong> prefix,
+instead of the <strong class="userinput"><code>r:</code></strong> prefix, means that we can
+treat this code chunk differently from a chunk of R code.  For example,
+we can evaluate it in a shell rather than using R.
+It is also possible to generate any type of formatted output,
+such as HTML, <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i>, or PDF, from
+an XML document because of the powerful tools, such as XSL, 
+that are available for transforming XML.
+</p><p>
+The motivation for proposing an alternative, XML-based, system is twofold.
+First of all, the markup used to identify 
+blocks of computer code is the same markup that is used to identify any other
+significant component of the document.  In other words, blocks of
+computer code are not treated as a special case.  This means that it is 
+possible to use the same tools to process blocks of code as are used
+to process any other component of the document.  The second point is
+that the tools for processing XML markup are standardized and very powerful.
+This not only means that there are ready-made processing tools for
+working with chunks of code, but it also means that it
+is relatively easy for anyone, not just the document author, to develop 
+new processing tools.  We will provide some demonstrations of this later on.
+</p><p class="remark"><em><span class="comment">
+<p>
+Somewhere around here, I think it would be good to mention that the
+document can be represented as a hierarchical document, which is what
+makes it possible to produce generic tools that can be used by many
+different applications with different grammars/vocabularies.
+</p>
+</span></em></p><p class="remark"><em><span class="comment">
+<p>
+This feels like an implementation detail that could go later (e.g.,
+in the DynDocs section where we get into more detail about how 
+XML/DocBook/XSL work).  I have added a small mention of the fact that
+XML can be transformed (exported) to many different display formats.
+Is that enough for now?
+</p>
+</span></em></p></div><div class="section" title="Beyond the needs of the author"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450830533"></a>Beyond the needs of the author</h3></div></div></div><p>
+The technology of literate documents provides a convenience for
+authors, but it also facilitates the more lofty goal of 
+reproducible research.  Combining code, and possibly even data,
+with the text of a report, makes it possible for others to 
+verify and reproduce the results and claims made in the text of the document.
+</p><p>
+In this way, the author of a literate document provides others with 
+not just something that can be read, but something that can be used.
+</p><p>
+However, the uses of a literate document are still constrained and
+are largely predetermined by the document author.  Rather than
+use a document creation system that is aimed at a particular sort
+of document reuse, why not create documents in a way that 
+facilitates more general reuse?
+</p><p>
+The technology described in this article creates documents that 
+are extremely easy to process, plus the technology
+ includes tools that can process
+documents in very powerful ways.  
+We have already mentioned XPath and XSL.  Other 
+examples are XLink, which 
+means that, rather than making a 
+reference to an entire document, it is possible to refer to 
+a particular location within a document, and XInclude which means 
+that, rather than including
+an entire document, it is possible to include just a particular 
+subset of a document.
+</p><p>
+By using a system that allows very general markup of the content
+within a document <span class="emphasis"><em>and</em></span> a system that creates documents
+that can be processed in many possible ways, the author of a document
+can create something that suits her own purposes and at the same time does not
+exclude reuse by others.
+The result is to allow future uses of a document
+that the original author of the document had not herself anticipated.
+</p></div></div><div class="section" title="Markup"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id1169450830575"></a>Markup</h2></div></div></div><p>
+The purpose of this section is to describe in more detail what we mean
+by <em class="glossterm">markup</em>, to demonstrate that most people
+use markup already, and to explain why everyone should do more
+markup.
+</p><p>
+Consider again the document in <a class="xref" href="#reportsection" title="Figure 1. An example of a section of a report">Figure 1, &#8220;An example of a section of a report&#8221;</a>.
+One way to create this document would be to use the <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i> 
+typesetting system.  The following code shows what part 
+of such a document might look like.
+</p><pre class="programlisting">
+\section*{Uniform Random Numbers}
+
+There are two sorts of uniform distributions that
+we might sample from.  Selecting a single value
+from set of possible values, with equal probability 
+for each possible value is performed using the 
+\texttt{sample()} function, as shown below.
+</pre><p>
+The first line of this code is markup.  The text <strong class="userinput"><code>Uniform Random
+Numbers</code></strong> has been marked to indicate that it is a section
+heading.  The last line of this code contains something that looks 
+similar:  <strong class="userinput"><code>\texttt{sample()}</code></strong>.  However, this
+<i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i> command is only describing how the text should be formatted
+for display.  This is not markup because it does not describe the nature
+of the text.  <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i> code to markup this text might look like 
+the following.
+</p><pre class="programlisting">
+\newcommand{\rfunc}[1]{\texttt{#1()}}
+
+\section*{Uniform Random Numbers}
+
+...
+\rfunc{sample} function, as shown below.
+</pre><p>
+Having markup like this means that we can specify how to format
+the names of R functions, as before, but  we can also identify 
+R functions separately from other text that we might format 
+in a monospaced font.  This would allow us, for example, to
+automatically generate a list of R functions from a document.
+Another benefit is that we can easily change the formatting of
+all R functions in the document because the definition of this
+formatting is given in only one place.
+</p><p>
+Another way to create the document in <a class="xref" href="#reportsection" title="Figure 1. An example of a section of a report">Figure 1, &#8220;An example of a section of a report&#8221;</a>
+is to use Microsoft Word (see <a class="xref" href="#reportWord" title="Figure 2. A report in Microsoft Word.">Figure 2, &#8220;A report in Microsoft Word.&#8221;</a>).
+</p><div class="figure"><a id="reportWord"></a><p class="title"><strong>Figure 2. A report in Microsoft Word.</strong></p><div class="figure-contents"><div class="screenshot"><div><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="50%"><tr><td><img src="demodocWord.png" width="100%" alt="A report in ."></img></td></tr></table></div></div></div></div><br class="figure-break"></br><p>
+As with <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i>, the heading in this document is formatted differently
+because it has been marked up properly.  In this context, that means
+that the heading uses a <span class="quote">&#8220;<span class="quote">heading</span>&#8221;</span> <em class="glossterm">style</em>
+ (see <a class="xref" href="#reportWordSection" title="Figure 3. Applying a heading style in Microsoft Word.">Figure 3, &#8220;Applying a heading style in Microsoft Word.&#8221;</a>).
+</p><div class="figure"><a id="reportWordSection"></a><p class="title"><strong>Figure 3. Applying a heading style in Microsoft Word.</strong></p><div class="figure-contents"><div class="screenshot"><div><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="50%"><tr><td><img src="demodocWordSection.png" width="100%" alt="Applying a heading style in ."></img></td></tr></table></div></div></div></div><br class="figure-break"></br><p>
+The R function <strong class="userinput"><code>sample()</code></strong> is formatted using a
+monospace font.  This can be achieved simply by selecting an 
+appropriate font for that text (see <a class="xref" href="#reportWordMonospace" title="Figure 4. Applying a monospace font in Microsoft Word.">Figure 4, &#8220;Applying a monospace font in Microsoft Word.&#8221;</a>),
+but a better way is to define a style, say <span class="quote">&#8220;<span class="quote">rfunc</span>&#8221;</span>, and
+apply that style to the text (see <a class="xref" href="#reportWordRfuncStyle" title="Figure 5. Defining an &#8220;rfunc&#8221; style in Microsoft Word.">Figure 5, &#8220;Defining an <span class="quote">&#8220;<span class="quote">rfunc</span>&#8221;</span> style in Microsoft Word.&#8221;</a>
+for the style definition and <a class="xref" href="#reportWordRfunc" title="Figure 6. Applying the &#8220;rfunc&#8221; style in Microsoft Word.">Figure 6, &#8220;Applying the <span class="quote">&#8220;<span class="quote">rfunc</span>&#8221;</span> style in Microsoft Word.&#8221;</a> for
+the application of that style).
+</p><div class="figure"><a id="reportWordMonospace"></a><p class="title"><strong>Figure 4. Applying a monospace font in Microsoft Word.</strong></p><div class="figure-contents"><div class="screenshot"><div><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="50%"><tr><td><img src="demodocWordMonospace.png" width="100%" alt="Applying a monospace font in ."></img></td></tr></table></div></div></div></div><br class="figure-break"></br><div class="figure"><a id="reportWordRfuncStyle"></a><p class="title"><strong>Figure 5. Defining an <span class="quote">&#8220;<span class="quote">rfunc</span>&#8221;</span> style in Microsoft Word.</strong></p><div class="figure-contents"><div class="screenshot"><div><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="33%"><tr><td><img src="demodocWordRfuncStyle.png" width="100%" alt="Defining an rfunc style in ."></img></td></tr></table></div></div></div></div><br class="figure-break"></br><div class="figure"><a id="reportWordRfunc"></a><p class="title"><strong>Figure 6. Applying the <span class="quote">&#8220;<span class="quote">rfunc</span>&#8221;</span> style in Microsoft Word.</strong></p><div class="figure-contents"><div class="screenshot"><div><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="50%"><tr><td><img src="demodocWordRfunc.png" width="100%" alt="Applying the rfunc style in ."></img></td></tr></table></div></div></div></div><br class="figure-break"></br><p>
+With the <span class="quote">&#8220;<span class="quote">rfunc</span>&#8221;</span> style in place, it is possible distinguish
+R functions from other text that may be displayed in a monospace font,
+it is easy to change the way that R functions are displayed because
+the definition is now in one place, and,
+as we will see later, all other benefits of markup, such as
+making a list of all R functions in a document, also become possible.
+</p><p>
+It is also worth reiterating that by applying markup like this,
+whether in <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i> or Microsoft Word, we make it easier for others
+to process our document in ways that we might not have anticipated.
+</p><p>
+In summary, 
+with both <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i> and Microsoft Word, the standard workflow already involves
+markup of document content and, with a minor adjustment in work
+habits, markup can become fully incorporated into the normal 
+routine for creating documents.
+</p><p class="remark"><em><span class="comment">
+<p>
+Maybe need to incorporate a bit more diversity in the list of 
+benefits, as in the list below.
+</p>
+
+<p>
+The latex guys do use markup. But most of it is being used for
+rendering or for strucutre (e.g. ref, author).  Most of the mark up is
+not used for describing content. There is a word in a paragraph and it
+is a term in a vocabulary that has a specific meaning.  For example, a
+R package in JSS it's \pkg{}. Now we know this word isn't a typo. It's
+been given scope. We know how to interpret that word as the name of an
+R package.  Other examples: an R function, R plot, shell code, file
+name.  You can put attributes on the file name that says it doesn't
+exist. There's real benefit in this.
+</p>
+</span></em></p><div class="section" title="XML"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450830849"></a>XML</h3></div></div></div><p>
+The examples above demonstrate that the <span class="emphasis"><em>concept</em></span>
+ of markup is not
+tied to a particular technology.  The important idea is that
+the document content is somehow labelled to indicate the distinctive 
+nature of the content.  The following code demonstrates yet another
+way to create the report in <a class="xref" href="#reportsection" title="Figure 1. An example of a section of a report">Figure 1, &#8220;An example of a section of a report&#8221;</a>,
+this time using XML.
+</p><pre class="programlisting">
+
+&lt;section&gt;
+&lt;title&gt;Uniform Random Numbers&lt;/title&gt;
+
+&lt;para&gt;
+There are two sorts of uniform distributions that
+we might sample from.  Selecting a single value
+from set of possible values, with equal probability 
+for each possible value is performed using the 
+&lt;r:func&gt;sample&lt;/r:func&gt; function, as shown below.
+&lt;/para&gt;
+
+&lt;/section&gt;
+
+
+
+</pre><p>
+There is quite a lot of markup in this example.  The entire content
+is enclosed within <code xmlns="" class="xmlTag">&lt;section&gt;</code> tags, the section title
+is marked as such, the paragraph of text is within explicit
+<code xmlns="" class="xmlTag">&lt;para&gt;</code> tags, and the R function name has 
+appropriate markup. 
+</p><p>
+One thing to notice is that the XML markup
+creates a hierarchy of content.  For example, 
+the <code xmlns="" class="xmlTag">&lt;title&gt;</code> and
+the <code xmlns="" class="xmlTag">&lt;para&gt;</code> elements are nested within the
+<code xmlns="" class="xmlTag">&lt;section&gt;</code> element.
+This hierarchical structure can be very useful for manipulating
+the contents of a document.  For example, it is very easy to
+extract an entire section from a document because the limits
+of the section are clearly defined by the XML tags,
+plus there are existing tools that make it easy to specify 
+such subsets.
+For example, the XPath expression for selecting this first
+section of the document would be simply <strong class="userinput"><code>//section[1]</code></strong>.
+</p><p>
+Another important point about this example is that it is not arbitrary XML
+code.  While in general it is possible to make use of any tag name within
+an XML document, it is usual to make use of an existing XML vocabulary
+for which processing tools have already been developed.  In this case,
+most of the elements that we are using come from DocBook, 
+which is an XML dialect that is designed for creating documents.
+</p><p>
+The reason for using DocBook as a basis for our XML document is
+that we can then take advantage of the tools that already exist for
+processing DocBook documents.  For example, we can use existing tools
+to format our document as HTML or PDF output.
+</p><p>
+On the other hand, we can still introduce markup of our own, for example, the 
+<code xmlns="" class="xmlTag">&lt;r:func&gt;</code> tags, because it is straightforward to 
+extend the DocBook processing tools to accommodate our new markup
+(we will discuss this more later).
+</p><p>
+In summary, using XML to create our document means that we can
+get all of the benefits of markup, we can replicate the features of 
+systems that are currently widely in use, and we open up
+opportunities for new features both now and in the future,
+both for ourselves and for others.
+</p></div></div><div class="section" title="Dynamic Documents"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id1169450830938"></a>Dynamic Documents</h2></div></div></div><p class="remark"><em><span class="comment">
+<p>
+Use XDynDocs (or simplified version) so can use relatively 
+straightforward R function calls to do the processing(?)
+</p>
+</span></em></p><p>
+Here's an example that people have seen before for why mark up is pretty good.
+</p><p>
+Start with Word. If you create a new style, and put the style on
+content that indicates it is, say, R code, R plot, R expression. The
+mark up enables us to find that mark up and do something with the
+content. In this case it is R code. We know where this is in the
+document. We can execute the code and insert the result back in the
+document.  This is a dynamic document. It is similar to Sweave.
+</p><p>
+We can extend the LaTex mark up, we could use SWeave/NoWeb syntax,
+\begin{Scode} and \end{Scode}, or we could use an exisiting standard
+that is widely used and has many XML.  Note, we are not abandoning
+LaTex, we are putting an interface to it and using it's typesetting
+facilities.
+</p><p>
+Example of easy extensibility of XML tool chain: (?)
+What about including the notion of an id attribute on the code so that
+you can selectively run portions of the code?
+</p><p>
+XML format, well-formed.  Introduce DocBook.  Look article goes to
+article, section to section, para blank line to p, etc.
+</p><p>
+Now repeat the Word example in XML/Rdb.  Source this file in from the
+Web.  Run this function dynDoc(RDynFile) this produces docbook.  Look
+inside the function to how we cans XPath to extract the nodes,
+evaluate them, and put back in the document.  Show that we can now
+render it in HTML, PDF, FO, and LaTeX.
+</p></div><div class="section" title="New Tricks with Structured Documents"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id1169450830988"></a>New Tricks with Structured Documents</h2></div></div></div><p>
+Checking links and anchors.  Finding typos for R function names.
+Adding glossary terms and tooltips for them.  Programmatically move
+sections around using their unique ids (programmatic outline mode -
+extends to paragraphs).  Finding all the images in an HTML document so
+that you can publish as a single entity when put on the Web.
+</p></div><div class="section" title="Extensibility"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id1169450831000"></a>Extensibility</h2></div></div></div><p>
+Adding new mark up terms. Show how to do this with XSL.
+Simple example of how to render. 
+</p><p>
+Example includes major new terms, like solutions to exercises. One
+group of readers sees the solutions and others do not. Repurpose the
+docment for different readers. Likewise the code in an HTML document
+could be in a separate tab, the + will expand the document to display
+the code, and the PDF version shows all of the code.
+</p></div><div class="section" title="Pros and Cons of mark up and XML specifically"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id1169450831017"></a>Pros and Cons of mark up and XML specifically</h2></div></div></div><p>
+Bulleted list that we Pull from Duncan's site.
+</p></div><div class="section" title="Future"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id1169450831027"></a>Future</h2></div></div></div><p>
+IDynDocs and HTML5 for richer rendering, e.g. interactive and dynamic
+documents.  We will put in extra stuff to help do this.
+</p><p>
+If the mark up isn't there we can't do anything in the future. In the
+future, there will be many other options. Will be writing for purposes
+that you haven't thought of.
+</p></div><div class="section" title="Practicalities: Creating an XML-based Document"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id1169450831042"></a>Practicalities:  Creating an XML-based Document</h2></div></div></div><p class="remark"><em><span class="comment">
+<p>
+This section could be an appendix to avoid breaking the flow of the
+main argument within the article?  Just refer to it from various
+places in the main article (?)
+</p>
+</span></em></p><p>
+This section shows the basic principles behind the transformations
+that can be carried out when starting from an XML document.
+The examples shown in earlier sections of this article
+used front ends that hide some of this detail away.
+</p><div class="section" title="DocBook"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450831063"></a>DocBook</h3></div></div></div><p>
+The simplest step is to create a document that only contains
+DocBook elements.  For example, the following code shows
+the file <code class="filename">demodocDocBook.xml</code>, which contains
+DocBook code that could be used to produce 
+<a class="xref" href="#reportsection" title="Figure 1. An example of a section of a report">Figure 1, &#8220;An example of a section of a report&#8221;</a>.  
+</p><pre class="programlisting">
+&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"&gt;
+&lt;article&gt;
+
+&lt;section&gt;
+&lt;title&gt;Uniform Random Numbers&lt;/title&gt;
+
+&lt;para&gt;
+There are two sorts of uniform distributions that
+we might sample from.  Selecting a single value
+from set of possible values, with equal probability 
+for each possible value is performed using the 
+&lt;userinput&gt;sample&lt;/userinput&gt; function, as shown below.
+&lt;/para&gt;
+
+&lt;programlisting&gt;&lt;![CDATA[
+&gt; (n &lt;- sample(1:5, 1))
+
+[1] 3
+]]&gt;&lt;/programlisting&gt;
+
+&lt;para&gt;
+The &lt;userinput&gt;runif()&lt;/userinput&gt; function  may be used to generate
+random numbers from a continuous uniform distribution.
+For example, the following code generates three random numbers 
+between zero and one.
+&lt;/para&gt;
+
+&lt;programlisting&gt;&lt;![CDATA[
+&gt; runif(n)
+
+[1] 0.2554896 0.5595997 0.1491488
+]]&gt;&lt;/programlisting&gt;
+
+&lt;/section&gt;
+
+&lt;/article&gt;
+</pre><p>
+The first line of this code
+is an XML declaration;  it identifies the file as an XML document.
+The second and third lines refine the declaration to say that this
+is not only an XML file, but more specifically it is a DocBook
+document.  In other words, it is an XML document that only 
+contains XML elements from the DocBook vocabulary. 
+For example, R functions are marked up using <code xmlns="" class="xmlTag">&lt;userinput&gt;</code>
+tags and R code chunks are placed within 
+<code xmlns="" class="xmlTag">&lt;programlisting&gt;</code> tags.  This document
+is aimed primarily at display.
+</p><p>
+We can produce an HTML version of that file with something like the
+following code.  The idea is that we are transforming the DocBook 
+code into HTML code.  The file <code class="filename">docbook.xsl</code>
+contains XSL code that describes how to convert each DocBook element
+into HTML and the <span class="command"><strong>xsltproc</strong></span> command performs the 
+conversion.
+</p><pre xmlns="" xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.C.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com" xmlns:sh="http://www.shell.org" class="shell">
+xsltproc -o demodocDocBook.html \
+         http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl \
+         demodocDocBook.xml
+</pre>
+<p>
+The resulting web page is shown in <a class="xref" href="#reportDocBook" title="Figure 7. A DocBook document transformed to HTML">Figure 7, &#8220;A DocBook document transformed to HTML&#8221;</a>.
+</p><div class="figure"><a id="reportDocBook"></a><p class="title"><strong>Figure 7. A DocBook document transformed to HTML</strong></p><div class="figure-contents"><div class="screenshot"><div><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="50%"><tr><td><img src="demodocDocBookHTML.png" width="100%" alt="A DocBook document transformed to HTML"></img></td></tr></table></div></div></div></div><br class="figure-break"></br></div><div class="section" title="Catalog files"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450831147"></a>Catalog files</h3></div></div></div><p>
+One important detail about the call to <span class="command"><strong>xsltproc</strong></span> 
+in the previous section is that the XSL file that describes the
+transformations from DocBook to HTML is a URL.
+There is a real file at that URL, but it is not actually necessary to
+access that file from the internet.  
+</p><p>
+Not accessing the internet is
+important because such access is slow (compared to accessing a file
+on a local disk) and because we do not want to require access to the
+internet just to be able to process our document.
+On the other hand, specifing a URL is a good thing because 
+we do not want our code to depend upon paths to 
+local files, otherwise we cannot easily share code with anyone else.
+</p><p>
+The solution is to make use of a <em class="glossterm">catalog file</em>.
+This is a file that contains mappings from URLs to local files.
+XML tools like <span class="command"><strong>xsltproc</strong></span> make use of catalog files
+to determine whether they need to access the internet for a file
+or whether they can just make use of a local copy.
+</p><p>
+An example of a catalog file, called <code class="filename">simplecatalog.xml</code>
+ is shown below.
+This will map any URL that starts with 
+<code class="systemitem">http://docbook.sourceforge.net/release/xsl/current</code>
+to a path to the local directory
+<code class="systemitem">/usr/share/sgml/docbook/xsl-stylesheets-1.69.1-5.1</code>.
+Note that the catalog file is itself an XML document.
+</p><pre class="programlisting">
+<span style="color: red">&lt;xi:include&gt;&lt;/xi:include&gt;</span>
+</pre><p class="remark"><em><span class="comment">
+<p>
+The R packages that were used in examples earlier in this article
+provide catalog files that contain useful mappings, though they
+may need to be edited to conform to the local file paths
+on a particular system.  It may also be necessary to tell the XML
+tools where the catalog files are by setting the
+<code class="varname">XML_CATALOG_FILES</code> environment variable.
+</p>
+</span></em></p></div><div class="section" title="R DocBook"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450831230"></a>R DocBook</h3></div></div></div><p>
+The documents that we want to write contain more than just DocBook
+elements.  We want to be able to include elements of software code
+in various languages.  For example, the following code shows
+the file <code class="filename">demodocStatic.Rdb</code>, which 
+is one way 
+we could markup the document to produce <a class="xref" href="#reportsection" title="Figure 1. An example of a section of a report">Figure 1, &#8220;An example of a section of a report&#8221;</a>
+so that R functions and R code samples are properly identified.
+</p><pre class="programlisting">
+&lt;?xml version="1.0"?&gt;
+&lt;article xmlns:r="http://www.r-project.org"
+         xmlns:db="http://docbook.org/ns/docbook"&gt;
+
+&lt;section&gt;
+&lt;title&gt;Uniform Random Numbers&lt;/title&gt;
+
+&lt;para&gt;
+There are two sorts of uniform distributions that
+we might sample from.  Selecting a single value
+from set of possible values, with equal probability 
+for each possible value is performed using the 
+&lt;r:func&gt;sample&lt;/r:func&gt; function, as shown below.
+&lt;/para&gt;
+
+&lt;r:code&gt;&lt;![CDATA[
+&gt; (n &lt;- sample(1:5, 1))
+]]&gt;
+&lt;r:output&gt;
+[1] 3
+&lt;/r:output&gt;
+&lt;/r:code&gt;
+
+&lt;para&gt;
+The &lt;r:func&gt;runif&lt;/r:func&gt; function  may be used to generate
+random numbers from a continuous uniform distribution.
+For example, the following code generates three random numbers 
+between zero and one.
+&lt;/para&gt;
+
+&lt;r:code&gt;&lt;![CDATA[
+&gt; runif(n)
+]]&gt;
+&lt;r:output&gt;
+[1] 0.2554896 0.5595997 0.1491488
+&lt;/r:output&gt;
+&lt;/r:code&gt;
+
+&lt;/section&gt;
+
+&lt;/article&gt;
+</pre><p>
+Again, the first line of this file is an XML declaration.  We do not
+have a <strong class="userinput"><code>DOCTYPE</code></strong> declaration though because this
+document is not pure DocBook.  Instead, in the top-level
+<code xmlns="" class="xmlTag">&lt;article&gt;</code> element, we specify several XML
+namespaces so that we can distinguish between elements that are 
+DocBook and elements that are from some other XML vocabulary.
+The important other namespace in this example is one that includes 
+elements to mark up R functions and R code chunks.
+</p><p>
+The other differences are that, in this code, 
+ the R functions are contained within
+<code xmlns="" class="xmlTag">&lt;r:func&gt;</code> tags and the R code chunks are
+<code xmlns="" class="xmlTag">&lt;r:code&gt;</code> elements.
+</p><p>
+These differences mean that we cannot just use the existing DocBook
+XSL code to transform the document, for example, to HTML.
+Instead, we must extend the DocBook XSL by adding new 
+transformation rules for the new, R-specific XML elements.
+This involves writing an XSL document.
+</p></div><div class="section" title="XSL"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450831293"></a>XSL</h3></div></div></div><p>
+The code below shows the file <code class="filename">demodocStatic.xsl</code>.
+This is an example of the XSL code required to extend the existing
+DocBook transformations so that R-specific XML elements 
+can also be processed.
+</p><pre class="programlisting">
+&lt;?xml version='1.0'?&gt;
+&lt;xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+                xmlns:r="http://www.r-project.org"
+                exclude-result-prefixes="r"
+                version='1.0'&gt;
+
+&lt;xsl:import 
+    href="http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl"/&gt;
+
+&lt;xsl:template match="r:func"&gt;
+ &lt;strong&gt;&lt;xsl:value-of select="."/&gt;()&lt;/strong&gt;
+&lt;/xsl:template&gt;
+
+&lt;xsl:template match="r:code"&gt;
+ &lt;pre&gt;
+ &lt;xsl:apply-templates/&gt;
+ &lt;/pre&gt;
+&lt;/xsl:template&gt;
+
+&lt;xsl:template match="r:output"&gt;
+ &lt;xsl:value-of select="."/&gt;
+&lt;/xsl:template&gt;
+
+&lt;/xsl:stylesheet&gt;
+
+</pre><p>
+An XSL document is, once again, itself an XML document, so we have
+the XML declaration on the first line.  The top-level element
+is an <code xmlns="" class="xmlTag">&lt;xsl:stylesheet&gt;</code> and, as with the main document,
+several namespaces are declared so that we can mix 
+elements from different XML dialects within this XSL document.
+</p><p>
+The next element is an <code xmlns="" class="xmlTag">&lt;xsl:import&gt;</code>.  This
+is how we include all of the existing XSL transformations for
+DocBook elements.  All we need to add are transformations for
+the new elements that are not DocBook elements.  That is the
+purpose of the remaining <code xmlns="" class="xmlTag">&lt;xsl:template&gt;</code> elements.
+</p><p>
+The first <code xmlns="" class="xmlTag">&lt;xsl:template&gt;</code> works on <code xmlns="" class="xmlTag">&lt;r:func&gt;</code>
+elements.  It simply takes the content of the <code xmlns="" class="xmlTag">&lt;r:func&gt;</code>
+element and surrounds it with HTML  <code xmlns="" class="xmlTag">&lt;strong&gt;</code> tags
+(and adds parentheses after the function name).
+</p><p>
+The last <code xmlns="" class="xmlTag">&lt;xsl:template&gt;</code>, for <code xmlns="" class="xmlTag">&lt;r:output&gt;</code>
+elements, is even simpler because it simply echoes the original 
+content of the <code xmlns="" class="xmlTag">&lt;r:output&gt;</code> elements.  
+However, the template for <code xmlns="" class="xmlTag">&lt;r:code&gt;</code> is a little
+more complex.  It produces <code xmlns="" class="xmlTag">&lt;pre&gt;</code> tags, and then
+uses <code xmlns="" class="xmlTag">&lt;xsl:apply-templates&gt;</code> to enforce appropriate
+transformations on all content within the <code xmlns="" class="xmlTag">&lt;r:code&gt;</code>
+element.
+</p><p>
+This XSL code can be applied to the <code class="filename">demodocStatic.Rdb</code>
+file with the following command.  
+</p><pre xmlns="" xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.C.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com" xmlns:sh="http://www.shell.org" class="shell">
+xsltproc -o demodocStatic.html demodocStatic.xsl demodocStatic.Rdb
+</pre>
+<p>
+The resulting web page is shown
+in <a class="xref" href="#reportRdbStatic" title="Figure 8. An R DocBook document transformed to HTML">Figure 8, &#8220;An R DocBook document transformed to HTML&#8221;</a>.  This formatted result
+is very similar to <a class="xref" href="#reportDocBook" title="Figure 7. A DocBook document transformed to HTML">Figure 7, &#8220;A DocBook document transformed to HTML&#8221;</a>;  the difference
+is that the underlying XML document has better markup.
+</p><div class="figure"><a id="reportRdbStatic"></a><p class="title"><strong>Figure 8. An R DocBook document transformed to HTML</strong></p><div class="figure-contents"><div class="screenshot"><div><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="50%"><tr><td><img src="demodocRdbStaticHTML.png" width="100%" alt="An R DocBook document transformed to HTML"></img></td></tr></table></div></div></div></div><br class="figure-break"></br><p>
+This simple demonstration is a simplification in several ways.
+The XSL code could be made more sophisticated to make use of 
+other standard templates that already exist for formatting text
+(rather than the crude approach of using explicit 
+<code xmlns="" class="xmlTag">&lt;strong&gt;</code> tags), plus this transformation only
+solves the problem of transforming to HTML.  Further code would
+need to be written to allow <i xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:py="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:c="http://www.C.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:sql="http://www.sql.org" xmlns="">LaTeX</i> or PDF output to be produced.
+Nevertheless, the purpose of these simple examples is to make
+explicit some of the concepts and tools involved in the
+transformations that are performed by the higher-level tools
+that were used in the examples
+earlier in the article.
+</p></div><div class="section" title="Processing XML"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450831443"></a>Processing XML</h3></div></div></div><p>
+One of the main points of this article is that we can do a lot
+more than just format a document for display if we have used
+proper markup in the document.  One simple example of other
+ways to process an XML document is extracting 
+meaningful subsets.  For example, we could extract just the 
+R code chunks from a document.
+</p><p> 
+The code below shows the file <code class="filename">demodocExtract.xsl</code>,
+which contains XSL transformations that could be applied 
+to extract just the code chunks from the file 
+<code class="filename">demodocStatic.Rdb</code>.  One new element in this code
+is the <code xmlns="" class="xmlTag">&lt;xsl:for-each&gt;</code> element.  This is used
+to make sure that we process <span class="emphasis"><em>all</em></span> of the 
+<code xmlns="" class="xmlTag">&lt;r:code&gt;</code> elements in the file that we are
+processing, rather than just the first one.
+</p><pre class="programlisting">
+&lt;?xml version='1.0'?&gt;
+&lt;xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+                xmlns:r="http://www.r-project.org"
+                version='1.0'&gt;
+
+&lt;xsl:output method="text"/&gt;
+
+&lt;xsl:template match="article"&gt;
+  &lt;xsl:for-each select="//r:code"&gt;
+    &lt;xsl:value-of select="." /&gt;
+  &lt;/xsl:for-each&gt;
+&lt;/xsl:template&gt;
+
+&lt;/xsl:stylesheet&gt;
+
+</pre><p>
+This XSL code can be used to transform <code class="filename">demodocStatic.Rdb</code>,
+to extract just the code chunks,
+with the following command.  
+</p><pre xmlns="" xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.C.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com" xmlns:sh="http://www.shell.org" class="shell">
+xsltproc -o demodocExtract.txt demodocExtract.xsl demodocStatic.Rdb
+</pre>
+<p>
+The resulting output, the file <code class="filename">demodocExtract.txt</code>
+ is shown below.  The original complete XML
+document has been reduced to just the text content from a 
+well-defined subset of the document.
+</p><pre class="programlisting">
+<span style="color: red">&lt;xi:include&gt;&lt;/xi:include&gt;</span>
+</pre></div><div class="section" title="XPath"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450831514"></a>XPath</h3></div></div></div><p>
+An important feature of the XSL code in the previous section
+is the value of the <code xmlns="" class="xmlAttribute">select</code> attribute in
+the <code xmlns="" class="xmlTag">&lt;xsl:for-each&gt;</code> element.  This value, 
+<strong class="userinput"><code>//r:code</code></strong>, is an example of an XPath expression.
+It is used to select <code xmlns="" class="xmlTag">&lt;r:code&gt;</code> elements
+no matter where they are in the document (by putting the 
+<strong class="userinput"><code>//</code></strong> in front).
+</p><p>
+The XPath language is important when processing XML documents because
+it provides a powerful and accurate way
+ to specify any subset of the document that we want to 
+work with.  An alternative way to specify the <code xmlns="" class="xmlTag">&lt;r:code&gt;</code>
+elements within <code class="filename">demodocStatic.Rdb</code> would be to 
+use <strong class="userinput"><code>/article/section/r:code</code></strong>.  This explicitly
+selects only <code xmlns="" class="xmlTag">&lt;r:code&gt;</code> elements that are direct
+children of <code xmlns="" class="xmlTag">&lt;section&gt;</code> elements, which are in turn
+direct descendants of the <code xmlns="" class="xmlTag">&lt;article&gt;</code> element
+(so, for example, <code xmlns="" class="xmlTag">&lt;r:code&gt;</code> elements within 
+subsections would not be selected).
+</p><p>
+It is also possible to put predicates within an XPath so that only specific
+elements are selected.  For example, 
+<strong class="userinput"><code>/article/section/r:code[2]</code></strong> would only
+select the second <code xmlns="" class="xmlTag">&lt;r:code&gt;</code> element within each section.
+The XPath expression 
+<strong class="userinput"><code>/article/section[title/text() = 'Uniform Random Numbers']/r:code</code></strong>
+would only select <code xmlns="" class="xmlTag">&lt;r:code&gt;</code> elements from a section
+with the title <span class="quote">&#8220;<span class="quote">Uniform Random Numbers</span>&#8221;</span>.
+</p></div><div class="section" title="R Dynamic Documents"><div class="titlepage"><div><div><h3 class="title"><a id="id1169450831594"></a>R Dynamic Documents</h3></div></div></div><p>
+This section looks at the specific case of processing a document
+so that R code chunks are evaluated and the results are inserted
+back into the document.  As an example, we will look at yet another
+variation on a possible markup for a document that could be used to
+produce <a class="xref" href="#reportsection" title="Figure 1. An example of a section of a report">Figure 1, &#8220;An example of a section of a report&#8221;</a>.  The code below
+shows the file <code class="filename">demodoc.Rdb</code>.
+The difference between this file and <code class="filename">demodocStatic.Rdb</code>
+is that
+the <code xmlns="" class="xmlTag">&lt;r:code&gt;</code> elements in this document contain 
+only R expressions;  there are no <code xmlns="" class="xmlTag">&lt;r:output&gt;</code> elements.
+</p><pre class="programlisting">
+&lt;?xml version="1.0"?&gt;
+&lt;article xmlns:r="http://www.r-project.org"
+         xmlns:db="http://docbook.org/ns/docbook"&gt;
+
+&lt;section&gt;
+&lt;title&gt;Uniform Random Numbers&lt;/title&gt;
+
+&lt;para&gt;
+There are two sorts of uniform distributions that
+we might sample from.  Selecting a single value
+from set of possible values, with equal probability 
+for each possible value is performed using the 
+&lt;r:func&gt;sample&lt;/r:func&gt; function, as shown below.
+&lt;/para&gt;
+
+&lt;r:code&gt;&lt;![CDATA[
+(n &lt;- sample(1:5, 1))
+]]&gt;&lt;/r:code&gt;
+
+&lt;para&gt;
+The &lt;r:func&gt;runif&lt;/r:func&gt; function  may be used to generate
+random numbers from a continuous uniform distribution.
+For example, the following code generates three random numbers 
+between zero and one.
+&lt;/para&gt;
+
+&lt;r:code&gt;&lt;![CDATA[
+runif(n)
+]]&gt;&lt;/r:code&gt;
+
+&lt;/section&gt;
+
+&lt;/article&gt;
+</pre><p>
+We have already seen one way that we could extract the 
+<code xmlns="" class="xmlTag">&lt;r:code&gt;</code>
+chunks from a document using XSL code and 
+<span class="command"><strong>xsltproc</strong></span>.
+In this section, because we are going to evaluate the 
+<code xmlns="" class="xmlTag">&lt;r:code&gt;</code>
+chunks, we will use an alternative approach and extract the
+subset of the XML document using R.  Any <span class="quote">&#8220;<span class="quote">glue</span>&#8221;</span> or 
+scripting language could be used to do this, but R is
+particularly convenient when evaluating R code chunks.
+</p><p>
+R has a package called 
+<i xmlns=""><a href="http://cran.r-project.org/web/packages/XML/index.html">XML</a></i> which makes it possible to manipulate 
+XML documents from within R.  For example, the following R code
+reads the file <code class="filename">demodoc.Rdb</code> and extracts 
+just the text content of the <code xmlns="" class="xmlTag">&lt;r:code&gt;</code> chunks.
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="id1169450831668"><div><pre class="" title="R code">
+library(XML)
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<div xmlns="" class="codeToggle"><div class="unhidden" id="id1169450831671"><div><pre class="" title="R code">
+demodoc &lt;- xmlParse("demodoc.Rdb")
+rcode &lt;- getNodeSet(demodoc, "//r:code/text()")
+rcode
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+The function <i xmlns="" class="rfunc">getNodeSet()
+</i> uses 
+an XPath expression to select the relevant subset from the
+XML document.  In this case, we have selected the text content
+of all 
+<code xmlns="" class="xmlTag">&lt;r:code&gt;</code>
+elements (i.e., the R expressions within the 
+<code xmlns="" class="xmlTag">&lt;r:code&gt;</code>
+markup).
+It is a simple matter to evaluate those R expressions, as shown below.
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="id1169450831691"><div><pre class="" title="R code">
+evalCode &lt;- function(codeNode) { 
+                eval(parse(text=xmlValue(codeNode)),
+                     envir=.GlobalEnv)
+            }
+rcodeResults &lt;- lapply(rcode, evalCode)
+rcodeResults
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+It is also quite straightforward to 
+generate new XML nodes that contain those results
+and insert them back into the XML document as new children
+of the original 
+<code xmlns="" class="xmlTag">&lt;r:code&gt;</code>
+elements.
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="id1169450831704"><div><pre class="" title="R code">
+for (i in seq_along(rcode)) {
+    resultsText &lt;- paste("\n",
+                         capture.output(rcodeResults[[i]]),
+                         "\n", sep="", collapse="")
+    tnode &lt;- newXMLTextNode(resultsText)
+    node &lt;- newXMLNode("r:output", tnode,
+                       namespace=c(r="http://www.r-project.org"))
+    addChildren(xmlParent(rcode[[i]]), node)
+}
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+The following call to <i xmlns="" class="rfunc">saveXML()
+</i> writes the
+modified XML document to a new file called 
+<code class="filename">demodocDynamic.xml</code>.
+</p><div xmlns="" class="codeToggle"><div class="unhidden" id="id1169450831723"><div><pre class="" title="R code">
+saveXML(demodoc, "demodocDynamic.xml")
+</pre></div></div></div>
+<div xmlns="" class="clearFloat"></div>
+<p>
+We now have a modified version of the original XML document with 
+<code xmlns="" class="xmlTag">&lt;r:output&gt;</code> elements inserted within the original
+<code xmlns="" class="xmlTag">&lt;r:code&gt;</code>
+elements to show the results from evaluating the R expressions 
+within the original 
+<code xmlns="" class="xmlTag">&lt;r:code&gt;</code>
+elements.  This new file is shown below.
+</p><pre class="programlisting">
+&lt;?xml version="1.0"?&gt;
+&lt;article xmlns:r="http://www.r-project.org" xmlns:db="http://docbook.org/ns/docbook"&gt;
+  &lt;section&gt;
+    &lt;title&gt;Uniform Random Numbers&lt;/title&gt;
+    &lt;para&gt;
+There are two sorts of uniform distributions that
+we might sample from.  Selecting a single value
+from set of possible values, with equal probability 
+for each possible value is performed using the 
+&lt;r:func&gt;sample&lt;/r:func&gt; function, as shown below.
+&lt;/para&gt;
+    &lt;r:code&gt;&lt;![CDATA[
+(n &lt;- sample(1:5, 1))
+]]&gt;&lt;r:output xmlns:r="http://www.r-project.org"&gt;
+[1] 2
+&lt;/r:output&gt;&lt;/r:code&gt;
+    &lt;para&gt;
+The &lt;r:func&gt;runif&lt;/r:func&gt; function  may be used to generate
+random numbers from a continuous uniform distribution.
+For example, the following code generates three random numbers 
+between zero and one.
+&lt;/para&gt;
+    &lt;r:code&gt;&lt;![CDATA[
+runif(n)
+]]&gt;&lt;r:output xmlns:r="http://www.r-project.org"&gt;
+[1] 0.2616608 0.4959463
+&lt;/r:output&gt;&lt;/r:code&gt;
+  &lt;/section&gt;
+&lt;/article&gt;
+
+</pre><p>
+We can process this new document using the same XSL code as before
+to produce an HTML version for display.
+</p><pre xmlns="" xmlns:r="http://www.r-project.org" xmlns:s="http://cm.bell-labs.com/stat/S4" xmlns:c="http://www.C.org" xmlns:python="http://www.python.org" xmlns:perl="http://www.perl.org" xmlns:vb="http://www.visualbasic.com" xmlns:omegahat="http://www.omegahat.org" xmlns:bioc="http://www.bioconductor.org" xmlns:java="http://www.java.com" xmlns:statdocs="http://www.statdocs.org" xmlns:gtk="http://www.gtk.org" xmlns:com="http://www.microsoft.com" xmlns:sh="http://www.shell.org" class="shell">
+xsltproc -o demodocDynamic.html demodocStatic.xsl demodocDynamic.xml
+</pre>
+<p>
+The result of this processing is shown in 
+<a class="xref" href="#reportRdbDynamic" title="Figure 9. A Dynamic R DocBook document transformed to HTML">Figure 9, &#8220;A Dynamic R DocBook document transformed to HTML&#8221;</a>.
+</p><div class="figure"><a id="reportRdbDynamic"></a><p class="title"><strong>Figure 9. A Dynamic R DocBook document transformed to HTML</strong></p><div class="figure-contents"><div class="screenshot"><div><table border="0" summary="manufactured viewport for HTML img" cellspacing="0" cellpadding="0" width="50%"><tr><td><img src="demodocRdbDynamicHTML.png" width="100%" alt="A Dynamic R DocBook document transformed to HTML"></img></td></tr></table></div></div></div></div><br class="figure-break"></br><p>
+Again, this is a simplification of the general situation.
+For example, it does not consider cases where either the R code 
+or the R output should be hidden.  It also assumes that only the last 
+expression within a code chunk has any visible output.
+Clearly, the general mechanism that was demonstrated in earlier 
+sections of this article is doing much more work than has been shown here.
+However, this section has hopefully demonstrated the fundamental 
+ideas and technology that forms the basis of those higher-level tools.
+</p></div></div></div></body></html>

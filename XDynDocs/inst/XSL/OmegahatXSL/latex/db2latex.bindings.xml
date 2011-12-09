@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<latexbindings>
+    <latexmapping role="begin">
+	<mapping key="abstract" text="">
+	    <line>\Abstract{&#10;</line>
+	</mapping>
+    </latexmapping>
+
+    <latexmapping role="end">
+
+	<mapping key="abstract" text="">
+	    <line>}&#10;</line>
+	    <line>&#10;</line>
+	</mapping>	
+    </latexmapping>
+</latexbindings>
+
