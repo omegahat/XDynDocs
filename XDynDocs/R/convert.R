@@ -34,7 +34,7 @@ setMethod("convert",
                                         'linefeed-treatment' = "preserve",
                                         'white-space-treatment' ="preserve", 
                                        'white-space-collapse' = "false"),
-                              manageMemory = FALSE)
+                              addFinalizer = FALSE)
              #class(ans) = c("FO", class(ans))
              #ans
              new("FO", ans)
@@ -44,8 +44,8 @@ setMethod("convert",
           c("ANY", target = "HTMLTarget"),
 #setAs("ANY", "HTML",
       function(from, opts = NULL, target, context = NULL) {
-#        ans = newXMLNode("PRE", newXMLCDataNode(dumpRObject(from, "html")), attrs = c("class" = "routput"), manageMemory = FALSE)
-        ans = newXMLNode("PRE", dumpRObject(from, "html"), attrs = c("class" = "routput"), manageMemory = FALSE)              
+#        ans = newXMLNode("PRE", newXMLCDataNode(dumpRObject(from, "html")), attrs = c("class" = "routput"), addFinalizer = FALSE)
+        ans = newXMLNode("PRE", dumpRObject(from, "html"), attrs = c("class" = "routput"), addFinalizer = FALSE)              
         #class(ans) = c("HTML", class(ans))
         new("HTML", ans)
       })

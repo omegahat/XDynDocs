@@ -8,7 +8,7 @@ matrix2HTML =
 function(obj, digits = 3, border = FALSE, frame = FALSE, ..., doc = NULL,
           css = CSS, div = TRUE, manageMemory = TRUE)
 {
-  tbl = newXMLNode("table", doc = doc, attrs = c(class = as.character(css["table"])), manageMemory = manageMemory)
+  tbl = newXMLNode("table", doc = doc, attrs = c(class = as.character(css["table"])), addFinalizer = manageMemory)
 
   if( (is.logical(border) && border) || is(border, "numeric") || is(border, "character") )
     xmlAttrs(tbl)["border"] = if(is(border, "character")) border else as.integer(border)
@@ -19,22 +19,22 @@ function(obj, digits = 3, border = FALSE, frame = FALSE, ..., doc = NULL,
   rnames = rownames(obj)
   
   make.row = function(row, rowName = "", class = css["tr"]) {
-               tr = newXMLNode("tr", parent = tbl, attrs = c(class = as.character(class)), manageMemory = manageMemory)
+               tr = newXMLNode("tr", parent = tbl, attrs = c(class = as.character(class)), addFinalizer = manageMemory)
                if(length(rnames))
-                  newXMLNode("th", rowName, attrs = c(class = "thRowName"), parent = tr, manageMemory = manageMemory)
+                  newXMLNode("th", rowName, attrs = c(class = "thRowName"), parent = tr, addFinalizer = manageMemory)
                  
                sapply(row, function(x)
                                newXMLNode("td", format(x, digits = digits),
                                            attrs = c(align = ifelse(is(x, "numeric"), "right", "left"),
                                                      class = as.character(css["td"])),
-                                           parent = tr, manageMemory = manageMemory))
+                                           parent = tr, addFinalizer = manageMemory))
              }
   
   if(length(dimnames(obj)[[2]])) {
     make.row(colnames(obj), class = "trColNames")
-    tr = newXMLNode("tr", newXMLNode("th", newXMLNode("hr", attrs = c(class = as.character(css["topRule"])), manageMemory = manageMemory),
-                      attrs = c("colspan" = ncol(obj) + as.integer(length(rnames) > 0)), manageMemory = manageMemory),
-                      parent = tbl, manageMemory = manageMemory)
+    tr = newXMLNode("tr", newXMLNode("th", newXMLNode("hr", attrs = c(class = as.character(css["topRule"])), addFinalizer = manageMemory),
+                      attrs = c("colspan" = ncol(obj) + as.integer(length(rnames) > 0)), addFinalizer = manageMemory),
+                      parent = tbl, addFinalizer = manageMemory)
   }
 
   
@@ -44,7 +44,7 @@ function(obj, digits = 3, border = FALSE, frame = FALSE, ..., doc = NULL,
            })
 
   if(div)
-     newXMLNode("div", tbl, attrs = c(class = "routput"), manageMemory = manageMemory)
+     newXMLNode("div", tbl, attrs = c(class = "routput"), addFinalizer = manageMemory)
   else
      tbl
 }  
@@ -52,7 +52,7 @@ function(obj, digits = 3, border = FALSE, frame = FALSE, ..., doc = NULL,
 
 setMethod("convert", c("data.frame", target = "HTMLTarget"),
            function(from, opts = NULL, target, context = NULL)
-             matrix2HTML(from, manageMemory = TRUE))
+             matrix2HTML(from, addFinalizer = TRUE))
 
 setMethod("convert", c("matrix", target = "HTMLTarget"),
            function(from, opts = NULL, target, context = NULL)

@@ -173,7 +173,7 @@ config:
 
 
 define html-from-rdb 
-   $(XSLTPROC) -xinclude $(TO_DOCBOOK_XSL) $< | $(XSLTPROC) -o $@ $(XSLT_FLAGS) $(XSLT_OPTS) $(DB_OPTS) $(R_DB_OPTS) $(XSLT_ARGS) $(HTML_XSL_ARGS) $(XSTYLE) -
+   $(XSLTPROC) $(XSLT_OPTS) -xinclude $(TO_DOCBOOK_XSL) $< | $(XSLTPROC) -o $@ $(XSLT_FLAGS) $(XSLT_OPTS) $(DB_OPTS) $(R_DB_OPTS) $(XSLT_ARGS) $(HTML_XSL_ARGS) $(XSTYLE) -
 endef
 
 R_DB_OPTS=-stringparam yahoo.tab.utils.js "$(YAHOO_UI_DIR)/yahooTabUtils.js"
@@ -189,14 +189,14 @@ R_DB_OPTS=-stringparam yahoo.tab.utils.js "$(YAHOO_UI_DIR)/yahooTabUtils.js"
 
 %.tex: %.xml 
 ifneq ($(USE_DOCBOOK_SHORTHAND),0)
-	$(XSLTPROC) -xinclude $(TO_DOCBOOK_XSL) $< | $(XSLTPROC) -o $@ $(XSLT_OPTS) $(DBLATEX_PARAMS) $(XSLT_ARGS)  $(XSLT_XTRA_ARGS) $(LATEX_STYLE) -
+	$(XSLTPROC) $(XSLT_OPTS) -xinclude $(TO_DOCBOOK_XSL) $< | $(XSLTPROC) -o $@ $(XSLT_OPTS) $(DBLATEX_PARAMS) $(XSLT_ARGS)  $(XSLT_XTRA_ARGS) $(LATEX_STYLE) -
 else
 	$(XSLTPROC) -o $@ $(XSLT_OPTS) $(DBLATEX_PARAMS) $(XSLT_ARGS) $(TEX_XSL_ARGS)  $(XSLT_XTRA_ARGS) $(LATEX_STYLE) $<
 endif
 
 %.tex: %.Rdb 
 ifdef USE_DOCBOOK_SHORTHAND 
-	$(XSLTPROC) -xinclude $(TO_DOCBOOK_XSL) $< | $(XSLTPROC) -o $@ $(XSLT_OPTS) $(DBLATEX_PARAMS) $(XSLT_ARGS) $(TEX_XSL_ARGS)  $(XSLT_XTRA_ARGS) $(LATEX_STYLE) -
+	$(XSLTPROC) $(XSLT_OPTS) -xinclude $(TO_DOCBOOK_XSL) $< | $(XSLTPROC) -o $@ $(XSLT_OPTS) $(DBLATEX_PARAMS) $(XSLT_ARGS) $(TEX_XSL_ARGS)  $(XSLT_XTRA_ARGS) $(LATEX_STYLE) -
 else
 	$(XSLTPROC) -o $@ $(XSLT_OPTS) $(DBLATEX_PARAMS) $(XSLT_ARGS) $(TEX_XSL_ARGS)  $(XSLT_XTRA_ARGS) $(LATEX_STYLE) $<
 endif
@@ -207,7 +207,7 @@ endif
 ifdef USE_DOCBOOK_SHORTHAND
 
 %.fo: %.Rdb $(RESOLVED_FO_XSTYLE) $(DYN_DOCS)/Make/Makefile 
-	$(XSLTPROC) --xinclude $(TO_DOCBOOK_XSL) $< | $(XSLTPROC) $(XSLT_OPTS) $(DB_OPTS) $(FO_XSL_OPTS) $(FO_XTRA_OPTS) $(XSLT_XTRA_ARGS) $(XSLT_ARGS) -o $@ "$(FO_XSTYLE)" -
+	$(XSLTPROC) $(XSLT_OPTS) --xinclude $(TO_DOCBOOK_XSL) $< | $(XSLTPROC) $(XSLT_OPTS) $(DB_OPTS) $(FO_XSL_OPTS) $(FO_XTRA_OPTS) $(XSLT_XTRA_ARGS) $(XSLT_ARGS) -o $@ "$(FO_XSTYLE)" -
 
 %.html: %.Rdb 
 	$(html-from-rdb)
