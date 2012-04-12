@@ -61,7 +61,9 @@
 
 <xsl:template name="user.header.content">
 
+<xsl:if test="$add-toggle-code-controls">
  <xsl:call-template name="generateToggleAllCodeJS"/>
+</xsl:if>
 
 <xsl:if test="//altApproaches">
   <!-- Put a Choose approach  and a comma-separated list of the thread/approach labels. 
@@ -87,6 +89,7 @@
 
 <!-- material that goes into the HEAD of the HTML document to load up yahoo UI tab view. -->
 <xsl:template name="user.head.content">
+<xsl:message>add.yahoo.ui.code = <xsl:value-of select="$add.yahoo.ui.code"/></xsl:message>
 <xsl:if test="$add.yahoo.ui.code or count(//altApproaches) > 0">    <!--XXX determine what is a test or whether we need -->
   <xsl:text>&#010;</xsl:text>
   <link rel="stylesheet" type="text/css"><xsl:attribute name="href"><xsl:value-of select="$yahooCode"/>/tabview/assets/skins/sam/tabview.css</xsl:attribute></link>
@@ -106,7 +109,7 @@
 </xsl:if>
 
                                    <!-- The code to toggle an HTML's visible or not.  -->
-<xsl:if test='not(toggle.hidden.js = "") and count(//r:plot|//r:code|//r:init|//r:frag|//r:load|//r:test|//r:commands)>0'>
+<xsl:if test='$add-toggle-code-controls and not(toggle.hidden.js = "") and count(//r:plot|//r:code|//r:init|//r:frag|//r:load|//r:test|//r:commands)>0'>
   <script type="text/javascript"><xsl:attribute name="src"><xsl:value-of select="$toggle.hidden.js"/></xsl:attribute></script>
   <xsl:text>&#010;</xsl:text>
 </xsl:if>

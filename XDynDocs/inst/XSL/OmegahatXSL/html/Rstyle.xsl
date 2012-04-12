@@ -121,6 +121,11 @@
 </xsl:template>
 
 
+<xsl:template match="r:numeric|r:vector|r:list">
+  <b class="rkeyword"><xsl:value-of select="local-name()"/></b>
+</xsl:template>
+
+
 <xsl:template match="r:func[@name]|s:func[@name]|s:method[@name]">
   <i>
   <xsl:element name="a">

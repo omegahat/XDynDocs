@@ -77,7 +77,9 @@ else
 endif
 endif
 
-TO_DOCBOOK_XSL=http://www.omegahat.org/XSL/docbook/expandDB.xsl
+ifndef TO_DOCBOOK_XSL
+  TO_DOCBOOK_XSL=http://www.omegahat.org/XSL/docbook/expandDB.xsl
+endif
 
 ifndef FO_XSTYLE
  FO_XSTYLE=$(OMEGA_XSL_DIR)/fo/Rstyle.xsl

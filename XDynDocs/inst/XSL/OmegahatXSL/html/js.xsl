@@ -5,7 +5,8 @@
 	xmlns:xp="http://www.w3.org/TR/xpath"
         xmlns:ecma="http://www.ecma-international.org/publications/standards/Ecma-262.htm"
         xmlns:js="http://www.ecma-international.org/publications/standards/Ecma-262.htm"
-        exclude-result-prefixes="js ecma xp xml xsl"
+        xmlns:json="http://www.json.org"
+        exclude-result-prefixes="js ecma xp xml xsl json"
         version="1.0">
 
 <xsl:template match="js">
@@ -47,6 +48,17 @@
 
 <xsl:template match="js:keyword">
  <code class="jsKeyword"><xsl:apply-templates/></code>
+</xsl:template>
+
+
+<xsl:template match="json:true">
+ <code class="jsonKeyword">true</code>
+</xsl:template>
+<xsl:template match="json:false">
+ <code class="jsonKeyword">false</code>
+</xsl:template>
+<xsl:template match="json:null">
+ <code class="jsonKeyword">null</code>
 </xsl:template>
 
 </xsl:stylesheet>

@@ -8,6 +8,23 @@
 <xsl:template match="json"><proglang>JSON</proglang></xsl:template>
 <xsl:template match="r|R"><proglang>R</proglang></xsl:template>
 
+<xsl:template match="JSON|json"><acronym def="JavaScript Object Notation">JSON</acronym></xsl:template>
+<xsl:template match="xpath"><acronym def="XPath">XPath</acronym></xsl:template>
+<xsl:template match="xsl"><acronym def="eXtensible Stylesheet Language">XSL</acronym></xsl:template>
+<xsl:template match="c"><acronym def="C programming language">C</acronym></xsl:template>
+<xsl:template match="sql"><acronym def="Structured Query Language">SQL</acronym></xsl:template>
+<xsl:template match="oracle"><acronym def="Oracle Database System">SQL</acronym></xsl:template>
+<xsl:template match="mysql"><acronym def="MySQL Database System">MySQL</acronym></xsl:template>
+<xsl:template match="postgres"><acronym def="Postgres Database System">Postgres</acronym></xsl:template>
+<xsl:template match="ecmascript"><acronym def="ECMAScript">ECMAScript</acronym></xsl:template>
+<xsl:template match="flash"><acronym def="Flash">Flash</acronym></xsl:template>
+<xsl:template match="actionscript"><acronym def="ActionScript">ActionScript</acronym></xsl:template>
+<xsl:template match="rss"><acronym def="Real Simple Syndication">RSS</acronym></xsl:template>
+<xsl:template match="atom"><acronym def="">Atom</acronym></xsl:template>
+<xsl:template match="kml"><acronym def="Keyhole Markup Language">KML</acronym></xsl:template>
+<xsl:template match="http"><acronym def="HyperText Transfer Protocol">HTTP</acronym></xsl:template>
+<xsl:template match="java"><acronym def="Java">Java</acronym></xsl:template>
+
 
 <xsl:include href="shorthand.xsl"/>
 <xsl:include href="glossaryTable.xsl"/>

@@ -4,6 +4,7 @@
         xmlns:xml="http://www.w3.org/XML/1998/namespace"
 	xmlns:xp="http://www.w3.org/TR/xpath"
         xmlns:fo="http://www.w3.org/1999/XSL/Format"
+	xmlns:json="http://www.json.org"
         xmlns:ecma="http://www.ecma-international.org/publications/standards/Ecma-262.htm"
         xmlns:js="http://www.ecma-international.org/publications/standards/Ecma-262.htm"
         version="1.0">
@@ -30,11 +31,25 @@
   </xsl:call-template>
 </xsl:template>
 
-<xsl:template match="js:null">
+<xsl:template match="js:null|json:null">
   <fo:inline >
     <xsl:attribute name="color"><xsl:value-of select="$js.expr.color"/></xsl:attribute>null
   </fo:inline>
 </xsl:template>
+
+
+
+<xsl:template match="json:false">
+  <fo:inline >
+    <xsl:attribute name="color"><xsl:value-of select="$js.expr.color"/></xsl:attribute>false
+  </fo:inline>
+</xsl:template>
+<xsl:template match="json:true">
+  <fo:inline >
+    <xsl:attribute name="color"><xsl:value-of select="$js.expr.color"/></xsl:attribute>true
+  </fo:inline>
+</xsl:template>
+
 
 
 
@@ -68,6 +83,8 @@
     <xsl:with-param name="color"><xsl:value-of select="$js.var.color"/></xsl:with-param>
   </xsl:call-template>
 </xsl:template>
+
+
 
 <xsl:param name="js.field.color">black</xsl:param>
 <xsl:template match="js:field">

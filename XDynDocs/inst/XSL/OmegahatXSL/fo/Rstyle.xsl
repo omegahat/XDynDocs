@@ -213,6 +213,13 @@ R
  </fo:inline>
 </xsl:template>
 
+<xsl:template match="r:attr">
+ <fo:inline background-color="brown" font-style="italic">
+  <xsl:apply-templates />
+ </fo:inline>
+</xsl:template>
+
+
 <xsl:template name="expression">
  <xsl:param name="color">#e6e6fa</xsl:param>
  <fo:inline color="{string($color)}" xsl:use-attribute-sets="monospace.verbatim.properties">
@@ -236,6 +243,16 @@ R
     <xsl:apply-templates />
  </fo:inline>
 </xsl:template>
+
+
+<xsl:template match="r:numeric|r:vector|r:list">
+  <fo:inline color="#ff0000" 
+             font-weight="bold"
+             xsl:use-attribute-sets="monospace.verbatim.properties">
+    <xsl:value-of select="local-name()"/>
+ </fo:inline>
+</xsl:template>
+
 
 
 <xsl:template match="fo:literal">
